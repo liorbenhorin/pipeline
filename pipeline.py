@@ -2,7 +2,7 @@
 
 PIPELINE 
 
-BETA 1.0.0
+1.0.0-beta
 
 Project manager for Maya
 
@@ -138,8 +138,8 @@ create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipe
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
 
 
-version = "BETA - 1.0.0"
-tracking = True
+version = '1.0.0-beta'
+
 
 def set_icons():
     global localIconPath 
@@ -1564,7 +1564,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         >>> This enables the users+premissions mode of the script
         '''
-        self.users_mode(mode = False)
+        self.users_mode()
         '''
         >>> startup:
             finds the settings file or create one
@@ -1607,9 +1607,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
               
         end_time = timer()    
         log.info( "loaded in: %s"%(round((end_time - start_time),2)) )                 
-        if tracking:
-            track.event(name = "PipelineUI_init", users_mode = self._users_mode, maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
-
+        track.event(name = "PipelineUI_init", users_mode = self._users_mode, maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
+        
     def set_icons(self):
         
         for button in [
@@ -1655,8 +1654,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
 
 
-    def users_mode(self, mode = True):
-        if not mode:
+    def users_mode(self):
+        
+        if not track._users:
             self._users_mode = False
             self.ui.users_pushButton.setHidden(True)            
         else:
