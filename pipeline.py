@@ -64,7 +64,8 @@ import time
 from timeit import default_timer as timer
 import collections
 import logging
-
+import webbrowser
+        
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
 hdlr = logging.FileHandler(log_file, mode = 'w')
@@ -1456,6 +1457,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         #connect ui
         self.ui.actionAbout.triggered.connect(self.about)
+        self.ui.actionDocumentation.triggered.connect(self.documentation)
+        
         self.ui.actionFiles_repath.triggered.connect(self.repath)
         
         self.ui.users_pushButton.clicked.connect(self.login_window)
@@ -1556,8 +1559,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.init_sequencesTable()
         self.init_shotsTable()
         self.init_publishedAssetsTable()
-        self.init_shots_versionsTable()        
-        self.users_mode()
+        self.init_shots_versionsTable()
+        
+        '''
+        >>> This enables the users+premissions mode of the script
+        '''
+        self.users_mode(mode = False)
         '''
         >>> startup:
             finds the settings file or create one
@@ -1648,9 +1655,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
 
 
-    def users_mode(self):
-        self._users_mode = False
-        self.ui.users_pushButton.setHidden(True)            
+    def users_mode(self, mode = True):
+        if not mode:
+            self._users_mode = False
+            self.ui.users_pushButton.setHidden(True)            
+        else:
+            self._users_mode = True
         
 
     def init_settings(self):
@@ -3759,7 +3769,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def about(self):
         dlg.massage(None,"About",
                     "<p align='Center'><b>Pipeline</b><br>Projects manager for Maya<br><br>%s<br><br><a href='liorbenhorin@gmail.com'><font color='white'>liorbenhorin@gmail.com</font></a><br><br>All rights reserved to Lior Ben Horin 2016</p>"%(version))
-
+    
+    def documentation(self):
+        webbrowser.open('http://liorbenhorin.github.io/Pipeline_help/')
 
     def repath(self):        
         if self.settings.current_project_path:
