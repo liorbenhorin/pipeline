@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Fixed Top Navbar Example for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="navbar-fixed-top.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#Version_20">Version</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="../navbar/">Default</a></li>
+            <li><a href="../navbar-static-top/">Static top</a></li>
+            <li class="active"><a href="./">Fixed top <span class="sr-only">(current)</span></a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <p><img src="images/logo.png" alt="logo" style="width:128px; height:128px"></p>
+        <h1>Pipeline</h1>
+        <p>Projects manager for Maya</p>
+        <p>
+          <a class="btn btn-lg btn-success" href="../../components/#navbar" role="button">Download v1.0.0</a>
+        </p>
+      </div>
+
+    </div> <!-- /container -->
+
+    <div class="container">
+
+      <h1><a id="Dillinger_0"></a>Dillinger</h1>
+      <p>Dillinger is a cloud-enabled, mobile-ready, offline-storage, AngularJS powered HTML5 Markdown editor.</p>
+      <ul>
+      <li>Type some Markdown on the left</li>
+      <li>See HTML in the right</li>
+      <li>Magic</li>
+      </ul>
+      <p>Markdown is a lightweight markup language based on the formatting conventions that people naturally use in email.  As <a href="http://daringfireball.net">John Gruber</a> writes on the <a href="http://daringfireball.net/projects/markdown/">Markdown site</a></p>
+      <blockquote>
+      <p>The overriding design goal for Markdown’s
+      formatting syntax is to make it as readable
+      as possible. The idea is that a
+      Markdown-formatted document should be
+      publishable as-is, as plain text, without
+      looking like it’s been marked up with tags
+      or formatting instructions.</p>
+      </blockquote>
+      <a id="Version_20"></a>
+      <p>This text you see here is <em>actually</em> written in Markdown! To get a feel for Markdown’s syntax, type some text into the left window and watch the results in the right.</p>
+
+      <h3><a id="Version_21"></a>Version</h3>
+      <p>3.2.7</p>
+      <h3><a id="Tech_23"></a>Tech</h3>
+      <p>Dillinger uses a number of open source projects to work properly:</p>
+      <ul>
+      <li><a href="http://angularjs.org">AngularJS</a> - HTML enhanced for web apps!</li>
+      <li><a href="http://ace.ajax.org">Ace Editor</a> - awesome web-based text editor</li>
+      <li><a href="https://github.com/chjj/marked">Marked</a> - a super fast port of Markdown to JavaScript</li>
+      <li><a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a> - great UI boilerplate for modern web apps</li>
+      <li><a href="http://nodejs.org">node.js</a> - evented I/O for the backend</li>
+      <li><a href="http://expressjs.com">Express</a> - fast node.js network app framework <a href="http://twitter.com/tjholowaychuk">@tjholowaychuk</a></li>
+      <li><a href="http://gulpjs.com">Gulp</a> - the streaming build system</li>
+      <li><a href="https://github.com/madrobby/keymaster">keymaster.js</a> - awesome keyboard handler lib by <a href="http://twitter.com/thomasfuchs">@thomasfuchs</a></li>
+      <li><a href="http://jquery.com">jQuery</a> - duh</li>
+      </ul>
+      <p>And of course Dillinger itself is open source with a <a href="https://github.com/joemccann/dillinger">public repository</a>
+      on GitHub.</p>
+      <h3><a id="Installation_40"></a>Installation</h3>
+      <p>You need Gulp installed globally:</p>
+      <pre><code class="language-sh">$ npm i -g gulp
+      </code></pre>
+      <pre><code class="language-sh">$ git <span class="hljs-built_in">clone</span> [git-repo-url] dillinger
+      $ <span class="hljs-built_in">cd</span> dillinger
+      $ npm i <span class="hljs-operator">-d</span>
+      $ gulp build --prod
+      $ NODE_ENV=production node app
+      </code></pre>
+      <h3><a id="Plugins_56"></a>Plugins</h3>
+      <p>Dillinger is currently extended with the following plugins</p>
+      <ul>
+      <li>Dropbox</li>
+      <li>Github</li>
+      <li>Google Drive</li>
+      <li>OneDrive</li>
+      </ul>
+      <p>Readmes, how to use them in your own application can be found here:</p>
+      <ul>
+      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/dropbox/README.md">plugins/dropbox/README.md</a></li>
+      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/github/README.md">plugins/github/README.md</a></li>
+      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/googledrive/README.md">plugins/googledrive/README.md</a></li>
+      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/onedrive/README.md">plugins/onedrive/README.md</a></li>
+      </ul>
+      <h3><a id="Development_72"></a>Development</h3>
+      <p>Want to contribute? Great!</p>
+      <p>Dillinger uses Gulp + Webpack for fast developing.
+      Make a change in your file and instantanously see your updates!</p>
+      <p>Open your favorite Terminal and run these commands.</p>
+      <p>First Tab:</p>
+      <pre><code class="language-sh">$ node app
+      </code></pre>
+      <p>Second Tab:</p>
+      <pre><code class="language-sh">$ gulp watch
+      </code></pre>
+      <p>(optional) Third:</p>
+      <pre><code class="language-sh">$ karma start
+      </code></pre>
+      <h3><a id="Docker_96"></a>Docker</h3>
+      <p>Dillinger is very easy to install and deploy in a Docker container.</p>
+      <p>By default, the Docker will expose port 80, so change this within the Dockerfile if necessary. When ready, simply use the Dockerfile to build the image.</p>
+      <pre><code class="language-sh"><span class="hljs-built_in">cd</span> dillinger
+      docker build -t &lt;youruser&gt;/dillinger:latest .
+      </code></pre>
+      <p>This will create the dillinger image and pull in the necessary dependencies. Once done, run the Docker and map the port to whatever you wish on your host. In this example, we simply map port 80 of the host to port 80 of the Docker (or whatever port was exposed in the Dockerfile):</p>
+      <pre><code class="language-sh">docker run <span class="hljs-operator">-d</span> -p <span class="hljs-number">80</span>:<span class="hljs-number">80</span> --restart=<span class="hljs-string">"always"</span> &lt;youruser&gt;/dillinger:latest
+      </code></pre>
+      <p>Verify the deployment by navigating to your server address in your preferred browser.</p>
+      <h3><a id="NSolid_and_NGINX_113"></a>N|Solid and NGINX</h3>
+      <p>More details coming soon.</p>
+      <h4><a id="dockercomposeyml_117"></a>docker-compose.yml</h4>
+      <p>Change the path for the nginx conf mounting path to your full path, not mine!</p>
+      <h3><a id="Todos_121"></a>Todos</h3>
+      <ul>
+      <li>Write Tests</li>
+      <li>Rethink Github Save</li>
+      <li>Add Code Comments</li>
+      <li>Add Night Mode</li>
+      </ul>
+      <h2><a id="License_128"></a>License</h2>
+      <p>MIT</p>
+      <p><strong>Free Software, Hell Yeah!</strong></p>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
