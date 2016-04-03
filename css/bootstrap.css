@@ -1124,6 +1124,7 @@ img {
   display: block;
   max-width: 100%;
   height: auto;
+  margin: 0 auto;
 }
 .img-rounded {
   border-radius: 6px;
@@ -6758,4 +6759,7 @@ button.close {
     display: none !important;
   }
 }
+
+
+
 /*# sourceMappingURL=bootstrap.css.map */

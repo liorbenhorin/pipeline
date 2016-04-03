@@ -20,6 +20,9 @@
     <!-- Custom styles for this template -->
     <link href="navbar-fixed-top.css" rel="stylesheet">
 
+    <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+
+
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
     <script src="js/ie-emulation-modes-warning.js"></script>
@@ -34,7 +37,7 @@
   <body>
 
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -56,15 +59,16 @@
       </div>
     </nav>
 
+
     <div class="container">
 
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <p><img src="images/logo.png" alt="logo" style="width:128px; height:128px"></p>
+        <img class="img-responsive" src="images/pipeline_combine.png" alt="logo" ></p>
         <h1>Pipeline</h1>
         <p>Pipeline is a projects manager for Maya</p>
         <p><a id="features"></a></p>
-        <p><a class="btn btn-lg btn-success" href="https://github.com/liorbenhorin/pipeline/zipball/master" role="button">Download Pipeline</a></p>
+        <p><a class="btn btn-lg btn-success" href="https://github.com/liorbenhorin/pipeline/zipball/master" role="button">Download Pipeline <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></a></p>
 
       </div>
 
@@ -75,10 +79,11 @@
       <br>
       <h1><mark>Features</mark></h1>
       <br>
-      <blockquote><p>Pipeline is a Maya projects manager tool inspeired by openpipeline.<br>
+      <div class='well'>
+        Pipeline is a Maya projects manager tool inspeired by openpipeline.<br>
         It was crafted with all my experience in animaiton productions as TD for the past few years.<br>
         After getting used to Pipeline, you will find it much easier to manage your own projects and animation teams.
-      </blockquote></p>
+      </div></p>
       <ul>
       <li>Manage all your projects and Maya files from within Maya</li>
       <li>Takes care of versions and naming conventions so nothing gets lost</li>
@@ -93,80 +98,53 @@
       <br>
       <a id="version"></a>
       <h3><mark>Beta Version</mark></h3>
+      <br><br>
+      <p><span class="alert alert-success" role="alert">Pipeline beta is free for non-commercial use!</span></p>
       <br>
-      <p>Pipeline beta is <u>free for Non-Commercial</u> use!</p>
       <ul>
       <li>Things can go wrong</li>
       <li>Always backup you work</li>
       <li>You allow the program to collect usage statistics</li>
       </ul>
-      <p>And of course Dillinger itself is open source with a <a href="https://github.com/joemccann/dillinger">public repository</a>
-      on GitHub.</p>
-      <h3><a id="Installation_40"></a>Installation</h3>
-      <p>You need Gulp installed globally:</p>
-      <pre><code class="language-sh">$ npm i -g gulp
-      </code></pre>
-      <pre><code class="language-sh">$ git <span class="hljs-built_in">clone</span> [git-repo-url] dillinger
-      $ <span class="hljs-built_in">cd</span> dillinger
-      $ npm i <span class="hljs-operator">-d</span>
-      $ gulp build --prod
-      $ NODE_ENV=production node app
-      </code></pre>
-      <h3><a id="Plugins_56"></a>Plugins</h3>
-      <p>Dillinger is currently extended with the following plugins</p>
-      <ul>
-      <li>Dropbox</li>
-      <li>Github</li>
-      <li>Google Drive</li>
-      <li>OneDrive</li>
-      </ul>
-      <p>Readmes, how to use them in your own application can be found here:</p>
-      <ul>
-      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/dropbox/README.md">plugins/dropbox/README.md</a></li>
-      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/github/README.md">plugins/github/README.md</a></li>
-      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/googledrive/README.md">plugins/googledrive/README.md</a></li>
-      <li><a href="https://github.com/joemccann/dillinger/tree/master/plugins/onedrive/README.md">plugins/onedrive/README.md</a></li>
-      </ul>
-      <h3><a id="Development_72"></a>Development</h3>
-      <p>Want to contribute? Great!</p>
-      <p>Dillinger uses Gulp + Webpack for fast developing.
-      Make a change in your file and instantanously see your updates!</p>
-      <p>Open your favorite Terminal and run these commands.</p>
-      <p>First Tab:</p>
-      <pre><code class="language-sh">$ node app
-      </code></pre>
-      <p>Second Tab:</p>
-      <pre><code class="language-sh">$ gulp watch
-      </code></pre>
-      <p>(optional) Third:</p>
-      <pre><code class="language-sh">$ karma start
-      </code></pre>
-      <h3><a id="Docker_96"></a>Docker</h3>
-      <p>Dillinger is very easy to install and deploy in a Docker container.</p>
-      <p>By default, the Docker will expose port 80, so change this within the Dockerfile if necessary. When ready, simply use the Dockerfile to build the image.</p>
-      <pre><code class="language-sh"><span class="hljs-built_in">cd</span> dillinger
-      docker build -t &lt;youruser&gt;/dillinger:latest .
-      </code></pre>
-      <p>This will create the dillinger image and pull in the necessary dependencies. Once done, run the Docker and map the port to whatever you wish on your host. In this example, we simply map port 80 of the host to port 80 of the Docker (or whatever port was exposed in the Dockerfile):</p>
-      <pre><code class="language-sh">docker run <span class="hljs-operator">-d</span> -p <span class="hljs-number">80</span>:<span class="hljs-number">80</span> --restart=<span class="hljs-string">"always"</span> &lt;youruser&gt;/dillinger:latest
-      </code></pre>
-      <p>Verify the deployment by navigating to your server address in your preferred browser.</p>
-      <h3><a id="NSolid_and_NGINX_113"></a>N|Solid and NGINX</h3>
-      <p>More details coming soon.</p>
-      <h4><a id="dockercomposeyml_117"></a>docker-compose.yml</h4>
-      <p>Change the path for the nginx conf mounting path to your full path, not mine!</p>
-      <h3><a id="Todos_121"></a>Todos</h3>
-      <ul>
-      <li>Write Tests</li>
-      <li>Rethink Github Save</li>
-      <li>Add Code Comments</li>
-      <li>Add Night Mode</li>
-      </ul>
-      <h2><a id="License_128"></a>License</h2>
-      <p>MIT</p>
-      <p><strong>Free Software, Hell Yeah!</strong></p>
-
+      <br>
+      <h3><a id="nstallation"></a><mark>Installation</mark></h3>
+      <br>
+      <p><a herf="#">Pipeline 1.0.0 Beta Maya 2015, 2016 (Win/OSX)</a></p>
+      <p>Place the pipeline folder <em>( Make sure it is named 'Pipeline')</em> in your maya scripts folder.<br>
+         Run lines in a python tab in the script editor:</p>
+      <br>
+      <pre><code>from pipeline import pipeline
+pipeline.show()</code></pre>
+      <br><br>
     </div>
+
+    <!-- Begin MailChimp Signup Form -->
+    <div class="container">
+    <p>Intersted in updates?</p>
+    <form action="//nnl.us13.list-manage.com/subscribe/post?u=879fb8f252168589edce47432&amp;id=a626001b48" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="input-group input-group-lg">
+            <input type="email" value="" name="EMAIL" class="form-control email" id="mce-EMAIL" placeholder="email address" required>
+            <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+            <div style="position: absolute; left: -5000px;"><input type="text" name="b_879fb8f252168589edce47432_a626001b48" tabindex="-1" value=""></div>
+            <span class="input-group-btn">
+                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button btn btn-default">
+            </span>
+        </div>
+    </form>
+    <br><br>
+  </div>
+    <!--End mc_embed_signup-->
+
+
+
+    <footer class="footer">
+      <div class="container">
+        <br>
+        <p class="text-muted">All rights reserved to Lior Ben Horin 2016</p>
+      </div>
+    </footer>
+
+
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
