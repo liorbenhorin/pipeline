@@ -1289,7 +1289,7 @@ h6,
   font-size: 12px;
 }
 p {
-  margin: 0 0 10px;
+  margin: 0 0 20px;
 }
 .lead {
   margin-bottom: 20px;
@@ -1586,6 +1586,8 @@ pre code {
 .container {
   padding-right: 15px;
   padding-left: 15px;
+  padding-top: 15px;
+
   margin-right: auto;
   margin-left: auto;
 }
@@ -3119,8 +3121,8 @@ fieldset[disabled] .btn-default.focus {
 }
 .btn-primary {
   color: #fff;
-  background-color: #337ab7;
-  border-color: #2e6da4;
+  background-color: #6633CC;/*#337ab7;*/
+  border-color: #6633CC;/*#2e6da4;*/
 }
 .btn-primary:focus,
 .btn-primary.focus {

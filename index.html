@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="images/favicon.png">
 
     <title>Pipeline for Maya</title>
 
@@ -35,7 +35,6 @@
   </head>
 
   <body>
-
     <!-- Fixed navbar -->
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -61,29 +60,23 @@
 
 
     <div class="container">
-
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
         <img class="img-responsive" src="images/pipeline_combine.png" alt="logo" ></p>
         <h1>Pipeline</h1>
         <p>Pipeline is a projects manager for Maya</p>
-        <p><a id="features"></a></p>
-        <p><a class="btn btn-lg btn-success" href="https://github.com/liorbenhorin/pipeline/zipball/master" role="button">Download Pipeline <span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></a></p>
-
+        <p><a class="btn btn-lg btn-primary" href="https://github.com/liorbenhorin/pipeline/zipball/master" role="button">Download Pipeline 1.0.0</a></p>
       </div>
-
     </div> <!-- /container -->
 
     <div class="container">
-      <br>
-      <br>
-      <h1><mark>Features</mark></h1>
-      <br>
-      <div class='well'>
-        Pipeline is a Maya projects manager tool inspeired by openpipeline.<br>
-        It was crafted with all my experience in animaiton productions as TD for the past few years.<br>
-        After getting used to Pipeline, you will find it much easier to manage your own projects and animation teams.
-      </div></p>
+      <!-- Main component for a projects indoramtion -->
+      <h3><p><a id="features"></a><mark>Features</mark></p></h3>
+      <p class='lead'>
+        Pipeline is a simple and straight forward tool for managing maya projects,<br>
+        from student shorts to meduim teams working on commercial projects.
+      </p>
+
       <ul>
       <li>Manage all your projects and Maya files from within Maya</li>
       <li>Takes care of versions and naming conventions so nothing gets lost</li>
@@ -92,35 +85,35 @@
       <li>Animation mode with published assets bank</li>
       <li>Collaborate on projects on the cloud, shared drives and multiple platforms</li>
       <li>Designed especially for creating short films and commercials by small teams</li>
+      <li>Embeded nativly into Maya's interface</li>
       <li>Projects have users with permissions, so they are protected from technophobe-animators (not included in the beta)</li>
       </ul>
-      <br>
-      <br>
-      <a id="version"></a>
-      <h3><mark>Beta Version</mark></h3>
-      <br><br>
-      <p><span class="alert alert-success" role="alert">Pipeline beta is free for non-commercial use!</span></p>
-      <br>
+
+      <p><a id="version"></a><h3><mark>Beta Version</mark></h3></p>
+      <p class="lead">Pipeline beta is free for non-commercial use!</p>
       <ul>
       <li>Things can go wrong</li>
       <li>Always backup you work</li>
       <li>You allow the program to collect usage statistics</li>
       </ul>
-      <br>
-      <h3><a id="nstallation"></a><mark>Installation</mark></h3>
-      <br>
+
+      <h3><a id="installation"></a><p><mark>Installation</mark></p></h3></p>
       <p><a herf="#">Pipeline 1.0.0 Beta Maya 2015, 2016 (Win/OSX)</a></p>
-      <p>Place the pipeline folder <em>( Make sure it is named 'Pipeline')</em> in your maya scripts folder.<br>
-         Run lines in a python tab in the script editor:</p>
-      <br>
-      <pre><code>from pipeline import pipeline
-pipeline.show()</code></pre>
-      <br><br>
-    </div>
+      <p>Place the pipeline folder <em>( Make sure it is named 'pipeline')</em> in your maya scripts folder.<br>
+         Run the following lines in a python tab in the script editor:</p>
+      <p>
+      <pre>from pipeline import pipeline
+pipeline.show()</pre>
+      </p>
+
+      <p></p>
+      <h3><p><mark>Documentation</mark></p></h3></p>
+      <p><a herf="http://liorbenhorin.github.io/Pipeline_help/">Visit pipeline online documentation</a></p>
+    </div><!-- /container -->
 
     <!-- Begin MailChimp Signup Form -->
     <div class="container">
-    <p>Intersted in updates?</p>
+    <p class="lead">Sign up to recive new version updates:</p>
     <form action="//nnl.us13.list-manage.com/subscribe/post?u=879fb8f252168589edce47432&amp;id=a626001b48" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
         <div class="input-group input-group-lg">
             <input type="email" value="" name="EMAIL" class="form-control email" id="mce-EMAIL" placeholder="email address" required>
@@ -131,18 +124,15 @@ pipeline.show()</code></pre>
             </span>
         </div>
     </form>
-    <br><br>
-  </div>
+    </div>
     <!--End mc_embed_signup-->
 
-
-
     <footer class="footer">
+      <!-- Begin footer -->
       <div class="container">
-        <br>
-        <p class="text-muted">All rights reserved to Lior Ben Horin 2016</p>
+        <p class="text-muted text-center">All rights reserved to Lior Ben Horin 2016</p>
       </div>
-    </footer>
+    </footer><!-- /footer -->
 
 
 
