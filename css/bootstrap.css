@@ -3132,7 +3132,7 @@ fieldset[disabled] .btn-default.focus {
 }
 .btn-primary:hover {
   color: #fff;
-  background-color: #286090;
+  background-color: #855cd6;/*#286090;*/
   border-color: #204d74;
 }
 .btn-primary:active,
@@ -4968,15 +4968,21 @@ a.badge:focus {
   color: inherit;
   background-color: #eee;
   text-align: center;
+  background: url("../images/pipeline_combine_white.png") center center ;
+  background-size: cover;
+
 }
+
+
 .jumbotron h1,
 .jumbotron .h1 {
-  color: inherit;
+  color: white;
 }
 .jumbotron p {
   margin-bottom: 15px;
   font-size: 21px;
   font-weight: 200;
+  color: white;
 }
 .jumbotron > hr {
   border-top-color: #d5d5d5;
