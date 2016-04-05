@@ -4968,7 +4968,12 @@ a.badge:focus {
   color: inherit;
   background-color: #eee;
   text-align: center;
+  background: url("../images/pipeline_combine_white.png") center center ;
+  background-size: cover;
+
 }
+
+
 .jumbotron h1,
 .jumbotron .h1 {
   color: inherit;
