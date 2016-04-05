@@ -22,15 +22,3 @@ body {
   height: 60px;
   background-color: #f5f5f5;
 }
-
-
-jumbotron {
-  padding-top: 30px;
-  padding-bottom: 30px;
-  margin-bottom: 30px;
-  color: inherit;
-  background-color: #eee;
-  background: url("../images/pipeline_combine_white.png") center center ;
-  background-size: cover;
-
-}
