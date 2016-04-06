@@ -23,6 +23,7 @@ body {
   background-color: #f5f5f5;
 }
 
+
 .pipeline-div-edit {
       text-align: left;
 }
@@ -31,6 +32,4 @@ body {
     top: -15px;
 }
 
-.carousel-control.left, .carousel-control.right {
-    background-image: none
-}
+
