@@ -1289,7 +1289,7 @@ h6,
   font-size: 12px;
 }
 p {
-  margin: 0 0 20px;
+  margin: 0 0 10px;
 }
 .lead {
   margin-bottom: 20px;
@@ -1412,7 +1412,7 @@ a.bg-danger:focus {
 .page-header {
   padding-bottom: 9px;
   margin: 40px 0 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #ccc;
 }
 ul,
 ol {
