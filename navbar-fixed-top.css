@@ -30,3 +30,7 @@ body {
 .navbar-fixed-top {
     top: -15px;
 }
+
+.carousel-control.left, .carousel-control.right {
+    background-image: none
+}
