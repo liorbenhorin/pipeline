@@ -66,48 +66,47 @@
         <div class="container">
           <img class="img-responsive" src="images/pipeline_logo.png" alt="logo" width="128px" height="128px"></p>
           <h1>Pipeline</h1>
-          <p>Pipeline is a simple projects manager for Maya</p>
+          <p>A simple projects manager for Maya</p>
           <p><a class="btn btn-lg btn-primary" href="https://github.com/liorbenhorin/pipeline/zipball/master" role="button">Download Pipeline 1.0.0<br><small>Free for non-commercial use</small></a></p>
         </div>
     </div> <!-- /container -->
 
-    <div class="container">
+    <div class="container pipeline-div-edit" >
       <!-- Main component for a projects indoramtion -->
-      <h3><p><a id="features"></a><mark>Features</mark></p></h3>
+      <h2 class="page-header"><p><a id="features"></a>Features</p></h2>
       <p class='lead'>
         Pipeline is a simple and straight forward tool for managing maya projects,<br>
         from student shorts to meduim teams working on commercial projects.
       </p>
 
-      <dl>
-        <dt>Simplex</dt>
-          <ul>
-            <li>Pipeline takes care of versions, nameing convention and folder structure, and nothing gets lost</li>
-            <li>Asset bank for quick referecing into animation scenes</li>
-            <li>Published assets with versions for easy recoveries</li>
-          </ul>
-        <dt>Straight forward</dt>
-          <ul>
-            <li>Embeded nativly into Maya's interface</li>
-            <li>Manage all you projects without leaving Maya</li>
-          </ul>
-        </dt>
-        <dt>Collaborative</dt>
-          <ul>
-            <li>Work on projects via file sharing services like Dropbox</li>
-            <li>Users with premissions keep assets safe from less-technical animators</li>
-            <li>OSX / Windows support</li>
-          </ul>
-      </dl>
-      <p><a id="version"></a><h4><mark>Beta Version</mark></h4></p>
+      <div class="row">
+        <div class="col-sm-4">
+          <h3>Simple</h3>
+          <p>Pipeline takes care of versions, nameing convention and folder structure, and nothing gets lost</p>
+          <p>Asset bank for quick referecing into animation scenes</p>
+          <p>Published assets with versions for easy recoveries</p>
+        </div>
+        <div class="col-sm-4">
+          <h3>Straight forward</h3>
+          <p>Embeded nativly into Maya's interface</p>
+          <p>Manage all you projects without leaving Maya</p>
+        </div>
+        <div class="col-sm-4">
+          <h3>Collaborative</h3>
+          <p>Work on projects via file sharing services like Dropbox</p>
+          <p>Users with premissions keep assets safe from less-technical animators</p>
+          <p>OSX / Windows support</p>
+        </div>
+      </div>
+
+
+      <a id="version"></a>
+      <h2 class="page-header">Beta Version</h2>
       <p class="lead">Pipeline beta is now free for non-commercial use!</p>
-      <p>
-        <ul>
-        <li>Things can go wrong so backup your work</li>
-        <li>You allow the pipeline to collect usage data</li>
-        </ul>
-      </p>
-      <h4><a id="installation"></a><p><mark>Installation</mark></p></h4></p>
+      <p>Things can go wrong so backup your work</p>
+      <p>You allow the pipeline to collect usage data</p>
+
+      <h2 class="page-header"><a id="installation"></a>Installation</h2>
       <p><a herf="#">Pipeline 1.0.0 Beta Maya 2015, 2016 (Win/OSX)</a></p>
       <p>Place the pipeline folder <em>( Make sure it is named 'pipeline')</em> in your maya scripts folder.<br>
          Run the following lines in a python tab in the script editor:</p>
@@ -117,7 +116,7 @@ pipeline.show()</pre>
       </p>
 
       <p></p>
-      <h4><p><mark>Documentation</mark></p></h4></p>
+      <h4><p>Documentation</p></h4></p>
       <p><a herf="http://liorbenhorin.github.io/Pipeline_help/">Visit pipeline online documentation</a></p>
 
 
@@ -143,7 +142,7 @@ pipeline.show()</pre>
     <!--End mc_embed_signup-->
 
     <div id="feedback" class="container">
-    <h4><p><mark>Feedback and requests</mark></p></h4></p>
+    <h4><p>Feedback and requests</p></h4></p>
     </div>
     <div class = "container" id="disqus_thread"></div><!--/ disqus -->
     <script>
