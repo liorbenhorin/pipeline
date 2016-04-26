@@ -178,6 +178,7 @@ def set_icons():
     global help_icon
     global anim_icon
     global asset_mode_icon
+    global reload_icon
     
     global large_image_icon
     global large_image_icon_dark
@@ -217,6 +218,7 @@ def set_icons():
     help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
     anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
     asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
+    reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
     
     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
     large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark")) 
@@ -2476,22 +2478,36 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 explore_action.triggered.connect(self.version_explore)  
 
 
+                openButtonItem = QtGui.QPushButton()
+                openButtonItem.clicked.connect(self.version_open)
+                openButtonItem.setIcon(QtGui.QIcon(open_icon))
+                openButtonItem.setIconSize(QtCore.QSize(20,20))              
+                self.ui.component_versions_tableWidget.setCellWidget(index,4,openButtonItem)  
+
                 if not active:
                     
                     actions_menu.addAction(reference_action)
                     actions_menu.addAction(import_action)
                     actions_menu.addAction(delete_action)
                     
-                    openButtonItem = QtGui.QPushButton()
-                    openButtonItem.clicked.connect(self.version_open)
-                    openButtonItem.setIcon(QtGui.QIcon(open_icon))
-                    openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                    self.ui.component_versions_tableWidget.setCellWidget(index,4,openButtonItem)
+                   
+                    
+
                 else:
-                    active = QtGui.QTableWidgetItem("Active")
-                    active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    self.ui.component_versions_tableWidget.setItem(index,4,active) 
-                    active.setBackground(active_color) 
+
+                    #openButtonItem = QtGui.QPushButton()
+                    #openButtonItem.clicked.connect(self.version_open)
+                    openButtonItem.setIcon(QtGui.QIcon(reload_icon))
+                    #openButtonItem.setIconSize(QtCore.QSize(20,20))              
+                    #self.ui.component_versions_tableWidget.setCellWidget(index,4,openButtonItem)    
+ 
+                #openButtonItem.setIconSize(QtCore.QSize(20,20))              
+                #self.ui.component_versions_tableWidget.setCellWidget(index,4,openButtonItem)
+                    
+                    #active = QtGui.QTableWidgetItem("Active")
+                    #active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    #self.ui.component_versions_tableWidget.setItem(index,4,active) 
+                    #active.setBackground(active_color) 
                                         
                 
               
@@ -2874,7 +2890,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.settings.component_selection = self.component_name
             self.settings.sequence_selection = None
             self.settings.shot_selection = None  
-            
+           
     def update_shot_selection(self):
             
             self.settings.catagory_selection = None
