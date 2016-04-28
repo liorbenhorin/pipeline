@@ -70,8 +70,8 @@ def track_event(id = None, event = None, data = None):
             data['regionName'] = g['regionName']
             data['query'] = g['query'] 
             
-        #mp = mixpanel.Mixpanel("044cfc882c3fef3212a90aa9bab46ef8")
-        #mp.track(id, event, data)                  
+        mp = mixpanel.Mixpanel("044cfc882c3fef3212a90aa9bab46ef8")
+        mp.track(id, event, data)                  
         #logging.info(event)
         #logging.info(data)
         
