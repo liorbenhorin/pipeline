@@ -222,3 +222,47 @@ def set_fps(fps = None):
     if fps == 30:
         fps_string = "ntsc"                
     cmds.currentUnit(t=fps_string)
+
+
+def clean_up_file():
+    
+    # import references
+
+    refs = cmds.ls(type='reference')
+    for i in refs:
+        rFile = cmds.referenceQuery(i, f=True)
+        cmds.file(rFile, importReference=True, mnr=True)    
+        
+    defaults = ['UI', 'shared']
+
+    # Used as a sort key, this will sort namespaces by how many children they have.
+    def num_children(ns):
+        return ns.count(':')
+
+    namespaces = [ns for ns in cmds.namespaceInfo(lon=True, r=True) if ns not in defaults]
+    # We want to reverse the list, so that namespaces with more children are at the front of the list.
+    namespaces.sort(key=num_children, reverse=True)
+
+    for ns in namespaces:
+
+        if namespaces.index(ns)+1 < len(namespaces):
+            parent_ns = namespaces[namespaces.index(ns)+1]   
+            cmds.namespace(mv=[ns,parent_ns], f=True) 
+            cmds.namespace(rm=ns) 
+        else:
+            cmds.namespace(mv=[ns,":"], f=True)  
+            cmds.namespace(rm=ns) 
+	
+    # remove ngSkinTools custom nodes
+    from ngSkinTools.layerUtils import LayerUtils 
+    LayerUtils.deleteCustomNodes()
+    
+    # remove RRM proxies
+    if cmds.objExists("RRM_MAIN"):
+        cmds.select("RRM_MAIN",hi=True)
+        proxies = cmds.ls(sl=True)
+        cmds.lockNode(proxies,lock=False)
+        cmds.delete(proxies)
+        
+        if cmds.objExists("RRM_ProxiesLayer"):
+            cmds.delete("RRM_ProxiesLayer")

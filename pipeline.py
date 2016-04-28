@@ -675,6 +675,9 @@ class pipeline_component(pipeline_data):
                         # this will be the first master
                         version_number = set_padding(1,self.project.project_padding)                
                     
+                    maya.clean_up_file()
+                    
+                    
                     file_name = "%s_%s_%s_%s.%s"%(self.asset_name,self.component_name,"MASTER",version_number,"ma")                                                       
                     if not from_file:                    
                         scene_path = maya.save_scene_as(path = self.masters_path, file_name = file_name )                         
