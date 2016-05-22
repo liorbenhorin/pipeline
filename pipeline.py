@@ -4162,7 +4162,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.setWindowTitle("Create Project")        
         self.projects_window = projects_window
         
-        self.setMaximumHeight(100)
+        self.setMaximumHeight(500)
         
         self.project_file_name = 'project.pipe'
         self.project_name = "My_Project"
