@@ -4406,9 +4406,9 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             fps = 30
             
             
-        self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users)
-        
-        self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)
+        self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users)        
+        self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)        
+        self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]            
         self.projects_window.set_project(project_key = self.project_file.project_key)
         self.close()
 
