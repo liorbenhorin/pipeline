@@ -1584,7 +1584,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self.ui.users_pushButton.setText("Not logged In") 
             self.unload_project()
-            maya.viewMassage("Pipeline: No user is logged in")
+            maya.viewMassage("No user is logged in")
   
         
         if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'       
@@ -1730,18 +1730,27 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                         if self.project.project_users[username][0] == password:
                             self.settings.role = self.project.project_users[username][1]
                             self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))                                                          
+                            
+                            
                             return True
                 
 
                     if not self.settings.role:
-                        #dlg.massage("critical", "Login Failed", "Sorry, looks like you are not registerd to edit this project" )
+                                            
                         login = dlg.Login()
                         result = login.exec_()
-                        input = login.result()
+                        q_user, q_password  = login.result()
                         if result == QtGui.QDialog.Accepted:
-                            print input
-                        
-                        #self.login_window()
+                            if q_user in self.project.project_users:
+                                if self.project.project_users[q_user][0] == q_password:
+                                    self.settings.user = [q_user, q_password]
+                                    self.settings.role = self.project.project_users[q_user][1]
+                                    self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))                                                          
+                                    return True 
+                                
+                                                                 
+                            
+                        maya.viewMassage("Login faild")      
                         self.project = None
                         self.settings.current_project = None
                         
@@ -3749,6 +3758,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
     def login_window(self):
 
+        login = dlg.Login()
+        result = login.exec_()
+        user, password  = login.result()
+        if result == QtGui.QDialog.Accepted:
+            if user != "":
+                self.settings.user = [user, password]
+                self.ui.users_pushButton.setText(user)
+                self.unload_project()  
+                return True
+                            
+        self.settings.user = [None, None]
+        self.ui.users_pushButton.setText("Not logged In") 
+        self.unload_project()  
+        return False
+            
+        '''
         global loginWindow
         try:
             loginWindow.close()
@@ -3756,7 +3781,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             pass
         loginWindow=pipeLine_login_UI(parent=self, pipeline_window=self)
         loginWindow.show()
-
+        '''
     def set_control_types(self):
         localIconPath = os.path.join(os.path.dirname(__file__), 'icons/controls')
         if not os.path.exists(localIconPath):
@@ -4441,6 +4466,8 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         if self.ui.users_checkBox.isChecked() == True:
             self.set_users_dict()
             self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]  
+            
+            #self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name)) 
         else:
             self.users = None
 
