@@ -58,8 +58,6 @@ logging.basicConfig(level=logging.INFO)
 import pipeline.modules.mixpanel as mixpanel
 reload(mixpanel)
 
-_users = True
-        
 
 def track_event(id = None, event = None, data = None):
     if id and event and data:

@@ -1565,11 +1565,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.init_shotsTable()
         self.init_publishedAssetsTable()
         self.init_shots_versionsTable()
-        
-        '''
-        >>> This enables the users+premissions mode of the script
-        '''
-        self.users_mode()
+
         '''
         >>> startup:
             finds the settings file or create one
@@ -1613,7 +1609,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
               
         end_time = timer()    
         log.info( "loaded in: %s"%(round((end_time - start_time),2)) )                 
-        track.event(name = "PipelineUI_init", users_mode = self._users_mode, maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
+        track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         
     def set_icons(self):
         
@@ -1660,13 +1656,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
 
 
-    def users_mode(self):
-        
-        if not track._users:
-            self._users_mode = False
-            self.ui.users_pushButton.setHidden(True)            
-        else:
-            self._users_mode = True
         
 
     def init_settings(self):
@@ -1680,9 +1669,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             return
 
         self.settings = pipeline_settings().create(path = file)
-        if not self._users_mode:
-            self.settings.role = "admin"
-            self.settings.user = ["None",""]
+
 
     def verify_projects(self):
         self.project = None
@@ -1719,56 +1706,54 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.settings.current_project:            
             self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.pipe"), settings = self.settings)
             
-            if self._users_mode:
-                                       
-                self.settings.role = None
-                username = self.settings.user[0]
-                password = self.settings.user[1]
-                
-                if self.project.project_users != None:
-                    if username in self.project.project_users:
-                        if self.project.project_users[username][0] == password:
-                            self.settings.role = self.project.project_users[username][1]
-                            self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))                                                          
-                            
-                            
-                            return True
-                
 
-                    if not self.settings.role:
-                                            
-                        login = dlg.Login()
-                        result = login.exec_()
-                        q_user, q_password  = login.result()
-                        if result == QtGui.QDialog.Accepted:
-                            if q_user in self.project.project_users:
-                                if self.project.project_users[q_user][0] == q_password:
-                                    self.settings.user = [q_user, q_password]
-                                    self.settings.role = self.project.project_users[q_user][1]
-                                    self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))                                                          
-                                    return True 
-                                
-                                                                 
-                            
-                        log.info("Login faild")      
-                        self.project = None
-                        self.settings.current_project = None
-                        
-                        if projectsWindow:
-                            try:
-                                projectsWindow.updateProjectsTable()
-                            except:
-                                pass
-                        
-                        return False
-           
+                                       
+            self.settings.role = None
+            username = self.settings.user[0]
+            password = self.settings.user[1]
             
-                else:
+            if self.project.project_users != None:
+                if username in self.project.project_users:
+                    if self.project.project_users[username][0] == password:
+                        self.settings.role = self.project.project_users[username][1]
+                        self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))                                                          
+                        
+                        
+                        return True
+            
+
+                if not self.settings.role:
+                                        
+                    login = dlg.Login()
+                    result = login.exec_()
+                    q_user, q_password  = login.result()
+                    if result == QtGui.QDialog.Accepted:
+                        if q_user in self.project.project_users:
+                            if self.project.project_users[q_user][0] == q_password:
+                                self.settings.user = [q_user, q_password]
+                                self.settings.role = self.project.project_users[q_user][1]
+                                self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))                                                          
+                                return True 
+                            
+                                                             
+                        
+                    log.info("Login faild")      
+                    self.project = None
+                    self.settings.current_project = None
                     
-                    return True
+                    if projectsWindow:
+                        try:
+                            projectsWindow.updateProjectsTable()
+                        except:
+                            pass
+                    
+                    return False
+       
+        
             else:
-                self.settings.role = "admin"
-                self.settings.user = ["None",""]
+                
+                return True
+
                 
         else:
             self.settings.role = None
@@ -1819,19 +1804,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.enable(self.ui.shots_assets_tabWidget)               
 
              
-            if self._users_mode:
-                self.enable(self.ui.save_master_pushButton, level = 1)        
-                self.enable(self.ui.save_version_pushButton, level = 1)
-                self.enable(self.ui.import_version_pushButton, level = 1)
-                self.enable(self.ui.save_shot_version_pushButton, level = 2)
-                self.enable(self.ui.import_shot_version_pushButton, level = 2)
-                
-                if self.settings.role > 1:
-                    if self.ui.scenes_main_widget.isHidden():
-                        self.asset_scenes_switch()            
-                    self.ui.asset_scenes_switch_pushButton.setHidden(True)
-                else:
-                    self.ui.asset_scenes_switch_pushButton.setHidden(False)
+
+            self.enable(self.ui.save_master_pushButton, level = 1)        
+            self.enable(self.ui.save_version_pushButton, level = 1)
+            self.enable(self.ui.import_version_pushButton, level = 1)
+            self.enable(self.ui.save_shot_version_pushButton, level = 2)
+            self.enable(self.ui.import_shot_version_pushButton, level = 2)
+            
+            if self.settings.role > 1:
+                if self.ui.scenes_main_widget.isHidden():
+                    self.asset_scenes_switch()            
+                self.ui.asset_scenes_switch_pushButton.setHidden(True)
+            else:
+                self.ui.asset_scenes_switch_pushButton.setHidden(False)
                     
                     
                     
@@ -3723,13 +3708,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def enable(self, Qwidget, level = None):
-        if self._users_mode:
-            if level:
-                if self.settings.role <= level:
-                    Qwidget.setEnabled(True)
-                    return
-                Qwidget.setEnabled(False)
+
+        if level:
+            if self.settings.role <= level:
+                Qwidget.setEnabled(True)
                 return
+            Qwidget.setEnabled(False)
+            return
         Qwidget.setEnabled(True)
 
     def disable(self, Qwidget):
@@ -4240,10 +4225,9 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.boldFont.setBold(True)  
         self.set_icons()
         
-        if self.projects_window.pipeline_window._users_mode:
-            self.updateUsersTable()
-        else:
-            self.ui.users_widget.setHidden(True)
+
+        self.updateUsersTable()
+
             
 
 
