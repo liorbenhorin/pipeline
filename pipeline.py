@@ -1565,11 +1565,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.init_shotsTable()
         self.init_publishedAssetsTable()
         self.init_shots_versionsTable()
-        
-        '''
-        >>> This enables the users+premissions mode of the script
-        '''
-        self.users_mode()
+
         '''
         >>> startup:
             finds the settings file or create one
@@ -1584,7 +1580,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self.ui.users_pushButton.setText("Not logged In") 
             self.unload_project()
-        
+            #maya.viewMassage("No user is logged in")
+  
         
         if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'       
             self.set_project() # if the user logged in matchs with the settings active project, create a project object
@@ -1612,7 +1609,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
               
         end_time = timer()    
         log.info( "loaded in: %s"%(round((end_time - start_time),2)) )                 
-        track.event(name = "PipelineUI_init", users_mode = self._users_mode, maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
+        track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         
     def set_icons(self):
         
@@ -1659,13 +1656,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
 
 
-    def users_mode(self):
-        
-        if not track._users:
-            self._users_mode = False
-            self.ui.users_pushButton.setHidden(True)            
-        else:
-            self._users_mode = True
         
 
     def init_settings(self):
@@ -1679,9 +1669,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             return
 
         self.settings = pipeline_settings().create(path = file)
-        if not self._users_mode:
-            self.settings.role = "admin"
-            self.settings.user = ["None",""]
+
 
     def verify_projects(self):
         self.project = None
@@ -1718,21 +1706,38 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.settings.current_project:            
             self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.pipe"), settings = self.settings)
             
-            if self._users_mode:
+
                                        
-                self.settings.role = None
-                username = self.settings.user[0]
-                password = self.settings.user[1]
-                
+            self.settings.role = None
+            username = self.settings.user[0]
+            password = self.settings.user[1]
+            
+            if self.project.project_users != None:
                 if username in self.project.project_users:
                     if self.project.project_users[username][0] == password:
                         self.settings.role = self.project.project_users[username][1]
                         self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))                                                          
+                        
+                        
                         return True
-                
+            
 
                 if not self.settings.role:
-                    dlg.massage("critical", "Login Failed", "Sorry, looks like you are not registerd to edit this project" )
+                                        
+                    login = dlg.Login()
+                    result = login.exec_()
+                    q_user, q_password  = login.result()
+                    if result == QtGui.QDialog.Accepted:
+                        if q_user in self.project.project_users:
+                            if self.project.project_users[q_user][0] == q_password:
+                                self.settings.user = [q_user, q_password]
+                                self.settings.role = self.project.project_users[q_user][1]
+                                self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))                                                          
+                                return True 
+                            
+                                                             
+                        
+                    log.info("Login faild")      
                     self.project = None
                     self.settings.current_project = None
                     
@@ -1743,10 +1748,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                             pass
                     
                     return False
-           
+       
+        
             else:
-                self.settings.role = "admin"
-                self.settings.user = ["None",""]
+                
+                return True
+
                 
         else:
             self.settings.role = None
@@ -1797,19 +1804,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.enable(self.ui.shots_assets_tabWidget)               
 
              
-            if self._users_mode:
-                self.enable(self.ui.save_master_pushButton, level = 1)        
-                self.enable(self.ui.save_version_pushButton, level = 1)
-                self.enable(self.ui.import_version_pushButton, level = 1)
-                self.enable(self.ui.save_shot_version_pushButton, level = 2)
-                self.enable(self.ui.import_shot_version_pushButton, level = 2)
-                
-                if self.settings.role > 1:
-                    if self.ui.scenes_main_widget.isHidden():
-                        self.asset_scenes_switch()            
-                    self.ui.asset_scenes_switch_pushButton.setHidden(True)
-                else:
-                    self.ui.asset_scenes_switch_pushButton.setHidden(False)
+
+            self.enable(self.ui.save_master_pushButton, level = 1)        
+            self.enable(self.ui.save_version_pushButton, level = 1)
+            self.enable(self.ui.import_version_pushButton, level = 1)
+            self.enable(self.ui.save_shot_version_pushButton, level = 2)
+            self.enable(self.ui.import_shot_version_pushButton, level = 2)
+            
+            if self.settings.role > 1:
+                if self.ui.scenes_main_widget.isHidden():
+                    self.asset_scenes_switch()            
+                self.ui.asset_scenes_switch_pushButton.setHidden(True)
+            else:
+                self.ui.asset_scenes_switch_pushButton.setHidden(False)
                     
                     
                     
@@ -1909,16 +1916,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if self.settings.current_project != project_key:
                 
                 self.settings.current_project = project_key
-                self.set_project()
-                self.init_current_project()
+                if self.set_project():
+                    self.init_current_project()
                 
-                return True
+                    return True
         else:
             
             self.settings.current_project = None
             self.set_project()
             self.init_current_project()            
-            return True
+            #return True
         
         return False
 
@@ -3701,13 +3708,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def enable(self, Qwidget, level = None):
-        if self._users_mode:
-            if level:
-                if self.settings.role <= level:
-                    Qwidget.setEnabled(True)
-                    return
-                Qwidget.setEnabled(False)
+
+        if level:
+            if self.settings.role <= level:
+                Qwidget.setEnabled(True)
                 return
+            Qwidget.setEnabled(False)
+            return
         Qwidget.setEnabled(True)
 
     def disable(self, Qwidget):
@@ -3736,6 +3743,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
     def login_window(self):
 
+        login = dlg.Login()
+        result = login.exec_()
+        user, password  = login.result()
+        if result == QtGui.QDialog.Accepted:
+            if user != "":
+                self.settings.user = [user, password]
+                self.ui.users_pushButton.setText(user)
+                self.unload_project()  
+                return True
+                            
+        self.settings.user = [None, None]
+        self.ui.users_pushButton.setText("Not logged In") 
+        self.unload_project()  
+        return False
+            
+        '''
         global loginWindow
         try:
             loginWindow.close()
@@ -3743,7 +3766,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             pass
         loginWindow=pipeLine_login_UI(parent=self, pipeline_window=self)
         loginWindow.show()
-
+        '''
     def set_control_types(self):
         localIconPath = os.path.join(os.path.dirname(__file__), 'icons/controls')
         if not os.path.exists(localIconPath):
@@ -4043,7 +4066,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                 log.info ( "project changed to: %s"%project_Name)                
             
             else:
-                log.info ( "This is already the active project") 
+                log.info ( "Cannot set project") 
                 
        
     def updateProjectsTable(self):
@@ -4162,7 +4185,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.setWindowTitle("Create Project")        
         self.projects_window = projects_window
         
-        self.setMaximumHeight(100)
+        self.setMaximumHeight(500)
         
         self.project_file_name = 'project.pipe'
         self.project_name = "My_Project"
@@ -4202,10 +4225,9 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.boldFont.setBold(True)  
         self.set_icons()
         
-        if self.projects_window.pipeline_window._users_mode:
-            self.updateUsersTable()
-        else:
-            self.ui.users_widget.setHidden(True)
+
+        self.updateUsersTable()
+
             
 
 
@@ -4227,7 +4249,13 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
     def init_edit_project(self):
         self.ui.project_name_lineEdit.setText(self.project_file.project_name)
-        self.users = self.project_file.project_users        
+        if self.project_file.project_users != None:        
+            self.users = self.project_file.project_users  
+            self.ui.users_checkBox.setChecked(True)
+        else:
+            self.users = {}
+            self.users["Admin"] = ["1234", self.roles[0]]  
+                       
         self.ui.padding_spinBox.setValue(self.project_file.project_padding)
         
         type = "Maya Ascii (*.ma)"
@@ -4385,7 +4413,12 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             
 
     def create_project(self):
-        self.set_users_dict()
+        if self.ui.users_checkBox.isChecked() == True:
+            self.set_users_dict()
+            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]] 
+            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin")) 
+        else:
+            self.users = None
    
         project_path = str(self.ui.project_path_lineEdit.text())        
         project_name = str(self.ui.project_name_lineEdit.text())
@@ -4406,15 +4439,24 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             fps = 30
             
             
-        self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users)
+        self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users)        
+        self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)        
         
-        self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)
+            
         self.projects_window.set_project(project_key = self.project_file.project_key)
         self.close()
 
 
     def edit_project(self):
-        self.set_users_dict()
+        if self.ui.users_checkBox.isChecked() == True:
+            self.set_users_dict()
+            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]  
+            
+            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin")) 
+        else:
+            self.users = None
+
+        
         
         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
             file_type = "ma"

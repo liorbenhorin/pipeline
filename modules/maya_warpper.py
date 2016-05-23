@@ -266,3 +266,7 @@ def clean_up_file():
         
         if cmds.objExists("RRM_ProxiesLayer"):
             cmds.delete("RRM_ProxiesLayer")
+            
+def viewMassage(text = None):
+            cmds.inViewMessage( amg="Pipeline: " + text, pos='topCenter', fade=True, fst = 3000 )
+        

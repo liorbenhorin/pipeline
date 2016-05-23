@@ -56,9 +56,11 @@ def set_icons():
     global warning_icon
     global simple_warning_icon
     global massage_icon
+    global users_icon
     warning_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"critical")) 
     simple_warning_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"warning"))
     massage_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"massage"))
+    users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
     
 def warning(icon, title, message ):
     
@@ -111,7 +113,8 @@ set_icons()
 class Create_from_selection(QtGui.QDialog):
     def __init__(self, parent = None, title = None):
         super(Create_from_selection, self).__init__(parent)
-
+        
+        
         
         self.setMaximumWidth(200) 
         self.setMinimumWidth(200)        
@@ -148,4 +151,57 @@ class Create_from_selection(QtGui.QDialog):
         
         
     
+class Login(QtGui.QDialog):
+    def __init__(self, parent=None):
+        super(Login, self).__init__(parent)
+
+        self.setMaximumWidth(200) 
+        self.setMinimumWidth(200)        
+        self.setMaximumHeight(50) 
         
+        self.label = QtGui.QLabel()
+        self.label.setPixmap(users_icon)
+        
+        self.label_user = QtGui.QLabel("Username:")
+        self.label_password = QtGui.QLabel("Password:")
+        
+        self.textName = QtGui.QLineEdit(self)
+        self.textName.setMinimumSize(QtCore.QSize(0, 30))
+        self.textPass = QtGui.QLineEdit(self)
+        self.textPass.setMinimumSize(QtCore.QSize(0, 30))
+
+        self.textPass.setInputMethodHints(QtCore.Qt.ImhHiddenText|QtCore.Qt.ImhNoAutoUppercase|QtCore.Qt.ImhNoPredictiveText)
+        self.textPass.setEchoMode(QtGui.QLineEdit.Password)
+    
+        layout = QtGui.QVBoxLayout(self)
+        layout.addWidget(self.label)
+        layout.addWidget(self.HLine())
+        layout.addWidget(self.label_user)
+        layout.addWidget(self.textName)
+        layout.addWidget(self.label_password)
+        layout.addWidget(self.textPass)
+        
+        log = QtGui.QPushButton("Login")
+        log.setDefault(True)
+        
+        canc = QtGui.QPushButton("Cancel")
+        
+       
+        buttons = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
+        buttons.addButton(log, QtGui.QDialogButtonBox.AcceptRole)
+        buttons.addButton(canc, QtGui.QDialogButtonBox.RejectRole)
+
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+        
+
+    def result(self):
+        return self.textName.text(), self.textPass.text()
+
+
+    def HLine(self):
+        toto = QtGui.QFrame()
+        toto.setFrameShape(QtGui.QFrame.HLine)
+        toto.setFrameShadow(QtGui.QFrame.Sunken)
+        return toto    
