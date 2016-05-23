@@ -63,17 +63,19 @@ _users = True
 
 def track_event(id = None, event = None, data = None):
     if id and event and data:
+        
+        if socket.gethostname() != 'liors-MacBook-Pro.local':
 
-        g = geo()
-        if geo:
-            data['country'] = g['country']
-            data['regionName'] = g['regionName']
-            data['query'] = g['query'] 
-            
-        #mp = mixpanel.Mixpanel("044cfc882c3fef3212a90aa9bab46ef8")
-        #mp.track(id, event, data)                  
-        #logging.info(event)
-        #logging.info(data)
+            g = geo()
+            if geo:
+                data['country'] = g['country']
+                data['regionName'] = g['regionName']
+                data['query'] = g['query'] 
+                
+            mp = mixpanel.Mixpanel("044cfc882c3fef3212a90aa9bab46ef8")
+            mp.track(id, event, data)                  
+            #logging.info(event)
+            #logging.info(data)
         
         return
 

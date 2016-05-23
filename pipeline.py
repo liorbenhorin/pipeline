@@ -1584,7 +1584,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self.ui.users_pushButton.setText("Not logged In") 
             self.unload_project()
-            maya.viewMassage("No user is logged in")
+            #maya.viewMassage("No user is logged in")
   
         
         if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'       
@@ -1750,7 +1750,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                 
                                                                  
                             
-                        maya.viewMassage("Login faild")      
+                        log.info("Login faild")      
                         self.project = None
                         self.settings.current_project = None
                         
