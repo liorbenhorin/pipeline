@@ -4431,7 +4431,8 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
     def create_project(self):
         if self.ui.users_checkBox.isChecked() == True:
             self.set_users_dict()
-            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]  
+            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]] 
+            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin")) 
         else:
             self.users = None
    
@@ -4467,7 +4468,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             self.set_users_dict()
             self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]  
             
-            #self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name)) 
+            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin")) 
         else:
             self.users = None
 
