@@ -1725,33 +1725,38 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 username = self.settings.user[0]
                 password = self.settings.user[1]
                 
-                if username in self.project.project_users:
-                    if self.project.project_users[username][0] == password:
-                        self.settings.role = self.project.project_users[username][1]
-                        self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))                                                          
-                        return True
+                if self.project.project_users != None:
+                    if username in self.project.project_users:
+                        if self.project.project_users[username][0] == password:
+                            self.settings.role = self.project.project_users[username][1]
+                            self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))                                                          
+                            return True
                 
 
-                if not self.settings.role:
-                    #dlg.massage("critical", "Login Failed", "Sorry, looks like you are not registerd to edit this project" )
-                    login = dlg.Login()
-                    result = login.exec_()
-                    input = login.result()
-                    if result == QtGui.QDialog.Accepted:
-                        print input
-                    
-                    #self.login_window()
-                    self.project = None
-                    self.settings.current_project = None
-                    
-                    if projectsWindow:
-                        try:
-                            projectsWindow.updateProjectsTable()
-                        except:
-                            pass
-                    
-                    return False
+                    if not self.settings.role:
+                        #dlg.massage("critical", "Login Failed", "Sorry, looks like you are not registerd to edit this project" )
+                        login = dlg.Login()
+                        result = login.exec_()
+                        input = login.result()
+                        if result == QtGui.QDialog.Accepted:
+                            print input
+                        
+                        #self.login_window()
+                        self.project = None
+                        self.settings.current_project = None
+                        
+                        if projectsWindow:
+                            try:
+                                projectsWindow.updateProjectsTable()
+                            except:
+                                pass
+                        
+                        return False
            
+            
+                else:
+                    
+                    return True
             else:
                 self.settings.role = "admin"
                 self.settings.user = ["None",""]
@@ -4235,7 +4240,13 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
     def init_edit_project(self):
         self.ui.project_name_lineEdit.setText(self.project_file.project_name)
-        self.users = self.project_file.project_users        
+        if self.project_file.project_users != None:        
+            self.users = self.project_file.project_users  
+            self.ui.users_checkBox.setChecked(True)
+        else:
+            self.users = {}
+            self.users["Admin"] = ["1234", self.roles[0]]  
+                       
         self.ui.padding_spinBox.setValue(self.project_file.project_padding)
         
         type = "Maya Ascii (*.ma)"
@@ -4393,7 +4404,11 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             
 
     def create_project(self):
-        self.set_users_dict()
+        if self.ui.users_checkBox.isChecked() == True:
+            self.set_users_dict()
+            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]  
+        else:
+            self.users = None
    
         project_path = str(self.ui.project_path_lineEdit.text())        
         project_name = str(self.ui.project_name_lineEdit.text())
@@ -4416,13 +4431,20 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             
         self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users)        
         self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)        
-        self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]            
+        
+            
         self.projects_window.set_project(project_key = self.project_file.project_key)
         self.close()
 
 
     def edit_project(self):
-        self.set_users_dict()
+        if self.ui.users_checkBox.isChecked() == True:
+            self.set_users_dict()
+            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]  
+        else:
+            self.users = None
+
+        
         
         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
             file_type = "ma"

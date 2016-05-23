@@ -278,7 +278,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_3">
+           <widget class="QCheckBox" name="users_checkBox">
             <property name="text">
              <string>Users</string>
             </property>
@@ -286,6 +286,9 @@
           </item>
           <item>
            <widget class="QTableWidget" name="users_tableWidget">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -327,5 +330,22 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>users_checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>users_tableWidget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>54</x>
+     <y>376</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>68</x>
+     <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
