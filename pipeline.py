@@ -1584,7 +1584,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self.ui.users_pushButton.setText("Not logged In") 
             self.unload_project()
-        
+            maya.viewMassage("Pipeline: No user is logged in")
+  
         
         if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'       
             self.set_project() # if the user logged in matchs with the settings active project, create a project object
@@ -1732,7 +1733,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 
 
                 if not self.settings.role:
-                    dlg.massage("critical", "Login Failed", "Sorry, looks like you are not registerd to edit this project" )
+                    #dlg.massage("critical", "Login Failed", "Sorry, looks like you are not registerd to edit this project" )
+                    self.login_window()
                     self.project = None
                     self.settings.current_project = None
                     
@@ -1909,16 +1911,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if self.settings.current_project != project_key:
                 
                 self.settings.current_project = project_key
-                self.set_project()
-                self.init_current_project()
+                if self.set_project():
+                    self.init_current_project()
                 
-                return True
+                    return True
         else:
             
             self.settings.current_project = None
             self.set_project()
             self.init_current_project()            
-            return True
+            #return True
         
         return False
 
@@ -4043,7 +4045,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                 log.info ( "project changed to: %s"%project_Name)                
             
             else:
-                log.info ( "This is already the active project") 
+                log.info ( "Cannot set project") 
                 
        
     def updateProjectsTable(self):
