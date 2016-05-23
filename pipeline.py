@@ -1737,7 +1737,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     login = dlg.Login()
                     result = login.exec_()
                     input = login.result()
-                    print input
+                    if result == QtGui.QDialog.Accepted:
+                        print input
                     
                     #self.login_window()
                     self.project = None

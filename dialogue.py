@@ -56,9 +56,11 @@ def set_icons():
     global warning_icon
     global simple_warning_icon
     global massage_icon
+    global users_icon
     warning_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"critical")) 
     simple_warning_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"warning"))
     massage_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"massage"))
+    users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
     
 def warning(icon, title, message ):
     
@@ -152,14 +154,24 @@ class Create_from_selection(QtGui.QDialog):
 class Login(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Login, self).__init__(parent)
+
+        self.setMaximumWidth(200) 
+        self.setMinimumWidth(200)        
+        self.setMaximumHeight(50) 
         
-        self.label = QtGui.QLabel("Login")
+        self.label = QtGui.QLabel()
+        self.label.setPixmap(users_icon)
         
         self.label_user = QtGui.QLabel("Username:")
         self.label_password = QtGui.QLabel("Password:")
         
         self.textName = QtGui.QLineEdit(self)
+        self.textName.setMinimumSize(QtCore.QSize(0, 30))
         self.textPass = QtGui.QLineEdit(self)
+        self.textPass.setMinimumSize(QtCore.QSize(0, 30))
+
+        self.textPass.setInputMethodHints(QtCore.Qt.ImhHiddenText|QtCore.Qt.ImhNoAutoUppercase|QtCore.Qt.ImhNoPredictiveText)
+        self.textPass.setEchoMode(QtGui.QLineEdit.Password)
     
         layout = QtGui.QVBoxLayout(self)
         layout.addWidget(self.label)
@@ -169,9 +181,16 @@ class Login(QtGui.QDialog):
         layout.addWidget(self.label_password)
         layout.addWidget(self.textPass)
         
-        buttons = QtGui.QDialogButtonBox(
-            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
-            QtCore.Qt.Horizontal, self)
+        log = QtGui.QPushButton("Login")
+        log.setDefault(True)
+        
+        canc = QtGui.QPushButton("Cancel")
+        
+       
+        buttons = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
+        buttons.addButton(log, QtGui.QDialogButtonBox.AcceptRole)
+        buttons.addButton(canc, QtGui.QDialogButtonBox.RejectRole)
+
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
