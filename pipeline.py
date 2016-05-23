@@ -1734,7 +1734,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
                 if not self.settings.role:
                     #dlg.massage("critical", "Login Failed", "Sorry, looks like you are not registerd to edit this project" )
-                    self.login_window()
+                    login = dlg.Login()
+                    result = login.exec_()
+                    input = login.result()
+                    print input
+                    
+                    #self.login_window()
                     self.project = None
                     self.settings.current_project = None
                     
