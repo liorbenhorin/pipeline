@@ -3121,8 +3121,8 @@ fieldset[disabled] .btn-default.focus {
 }
 .btn-primary {
   color: #fff;
-  background-color: #6633CC;/*#337ab7;*/
-  border-color: #6633CC;/*#2e6da4;*/
+  background-color: #6317F8;/*#337ab7;*/
+  border-color: #6317F8;/*#2e6da4;*/
 }
 .btn-primary:focus,
 .btn-primary.focus {
@@ -4966,9 +4966,9 @@ a.badge:focus {
   padding-bottom: 30px;
   margin-bottom: 30px;
   color: inherit;
-  background-color: #eee;
+  background-color: #1A1A1A;
   text-align: center;
-  background: url("../images/pipeline_combine_white.png") center center ;
+  /*background: url("../images/pipeline_combine_white.png") center center ;*/
   background-size: cover;
 
 }
