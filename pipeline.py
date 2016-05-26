@@ -336,6 +336,8 @@ class pipeline_component(pipeline_data):
         if not create_from:
             maya.new_scene()
             maya.set_fps(self.project.project_fps)
+            maya.rewind()
+            
         elif create_from == "current_scene":
             pass    
             
@@ -742,6 +744,8 @@ class pipeline_shot(pipeline_component):
         if not create_from:
             maya.new_scene()
             maya.set_fps(self.project.project_fps)
+            maya.rewind()
+            
         elif create_from == "current_scene":
             pass 
         
@@ -1579,7 +1583,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.ui.users_pushButton.setText(self.settings.user[0])
         else:
             self.ui.users_pushButton.setText("Not logged In") 
-            self.unload_project()
+            #self.unload_project()
             #maya.viewMassage("No user is logged in")
   
         
@@ -1751,7 +1755,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
        
         
             else:
-                
                 return True
 
                 
@@ -3594,7 +3597,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         if dlg.warning("critical", "Delete", "Are you sure you want to make this version the master?" ):
             if maya.current_open_file() == self.component.master:
-                maya.new_scene()                
+                maya.new_scene() 
+                maya.set_fps(self.project.project_fps)
+                maya.rewind()   
+                            
             self.component.make_master(version)            
             maya.open_scene(self.component.master)
             self.update_masters()

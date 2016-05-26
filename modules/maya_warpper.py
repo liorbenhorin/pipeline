@@ -62,7 +62,11 @@ reload(files)
 def new_scene():
     checkState()
     return cmds.file(new=True, f=True)
-    
+
+def rewind():
+    cmds.currentTime(1)    
+    cmds.playbackOptions(minTime=1)
+
         
 def save_scene_as(path = None, file_name = None):
     if os.path.exists(path):
