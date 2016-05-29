@@ -1814,7 +1814,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.enable(self.ui.save_shot_version_pushButton, level = 2)
             self.enable(self.ui.import_shot_version_pushButton, level = 2)
             
-            if self.settings.role > 1:
+            if self.settings.role > 1 and self.settings.role < 3:
                 if self.ui.scenes_main_widget.isHidden():
                     self.asset_scenes_switch()            
                 self.ui.asset_scenes_switch_pushButton.setHidden(True)
@@ -2478,9 +2478,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 actions_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
                 
                 reference_action = QtGui.QAction("Reference",actionButtonItem)
-                reference_action.triggered.connect(self.version_reference)                
+                reference_action.triggered.connect(self.version_reference)    
+                self.enable(reference_action, level = 2)
+                            
                 import_action = QtGui.QAction("Import",actionButtonItem)  
                 import_action.triggered.connect(self.version_add_import)                                               
+                self.enable(import_action, level = 2)
                                                               
                 delete_action = QtGui.QAction("Delete",actionButtonItem)
                 delete_action.triggered.connect(self.version_delete)                 
