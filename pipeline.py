@@ -438,6 +438,16 @@ class pipeline_component(pipeline_data):
             return self.component_file["component_name"]
         else:
             return None  
+            
+    @component_name_.setter
+    def component_name_(self,name):
+        if self.data_file:
+            data = {}
+            data["component_name"] = name
+            self.data_file.edit(data)
+            self.component_file = self.data_file.read()
+        else:
+            return None              
 
     @property
     def catagory_name(self):
@@ -738,6 +748,10 @@ class pipeline_component(pipeline_data):
         print versions
         print masters
         print master
+        
+        
+        #last action
+        #self.component_name_ = new_name
 
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
