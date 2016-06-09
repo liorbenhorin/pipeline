@@ -3772,7 +3772,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         component_name, ok = QtGui.QInputDialog.getText(self, 'Rename component', 'Enter component name:')
         
         if ok:
-            if dlg.warning("critical", "Rename", "If this component is referenced in other scenes, you will need to menually relink them. Proceed?" ):
+            if dlg.warning("critical", "Rename", "If this component is referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
                 maya.new_scene()
                                 
                 if self.component.rename(component_name):
