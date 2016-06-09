@@ -723,7 +723,21 @@ class pipeline_component(pipeline_data):
             return True
         
         return False
+
+    def rename(self, new_name):
+        versions = []
+        for version in self.versions:
+            versions.append(self.file_path("versions",version))
             
+
+        masters = []
+        for version in self.masters:
+            masters.append(self.file_path("masters",version))
+            
+        master = self.master
+        print versions
+        print masters
+        print master
 
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
@@ -3733,6 +3747,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if dlg.warning("critical", "Rename", "If this component is referenced in other scenes, you will need to menually relink them. Proceed?" ):
                 
                 print "old name: ", self.component.component_name, " new name: ", component_name
+                self.component.rename(component_name)
             #result = self._create_component(component_name = component_name, create_from = None)
             
             #if result:
