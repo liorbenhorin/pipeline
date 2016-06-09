@@ -54,6 +54,17 @@ import sys
 import subprocess
 
 
+def dir_rename(dir_fullpath, new_name):
+    
+    new_dir = os.path.join(os.path.dirname(dir_fullpath),new_name)
+    #create_directory(new_dir)
+    try:
+        shutil.move(dir_fullpath, new_dir)
+        return new_dir
+    except:
+        return False
+        
+            
 def file_rename(fullpath, new_name):
     '''
     input: string, fullpath of the file to rename
@@ -70,7 +81,7 @@ def file_rename(fullpath, new_name):
     
     try:
         os.rename(fullpath, new_fullpath)
-        return True
+        return new_fullpath
     except:
         return False
     

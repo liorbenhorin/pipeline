@@ -439,8 +439,8 @@ class pipeline_component(pipeline_data):
         else:
             return None  
             
-    @component_name_.setter
-    def component_name_(self,name):
+    @component_name.setter
+    def component_name(self,name):
         if self.data_file:
             data = {}
             data["component_name"] = name
@@ -735,24 +735,38 @@ class pipeline_component(pipeline_data):
         return False
 
     def rename(self, new_name):
-        versions = []
+         
+        
+        versions = {}
         for version in self.versions:
-            versions.append(self.file_path("versions",version))
-            
+            version_number = set_padding(version,self.project.project_padding) 
+            versions[version] = [self.file_path("versions",version_number), "%s_%s_%s"%(self.asset_name,new_name,version_number)] 
+            files.file_rename(versions[version][0],versions[version][1])
 
-        masters = []
-        for version in self.masters:
-            masters.append(self.file_path("masters",version))
-            
-        master = self.master
-        print versions
-        print masters
-        print master
+        if self.master:
+            masters = {}
+            for version in self.masters:
+                version_number = set_padding(version,self.project.project_padding) 
+                masters[version] = [self.file_path("masters",version_number), "%s_%s_%s_%s"%(self.asset_name,new_name,"MASTER",version_number)] 
+                files.file_rename(masters[version][0],masters[version][1])
+
+                
+            master = [self.master, "%s_%s_%s"%(self.asset_name,new_name,"MASTER")]
+            files.file_rename(master[0],master[1])
+
+        self.component_name = new_name
+        path = files.file_rename(self.data_file_path,new_name)        
+        
+        component_path = files.dir_rename(os.path.dirname(self.data_file_path),new_name)  
+     
+        self.set_data_file(os.path.join(component_path,"%s.%s"%(new_name,"pipe")))
+        self.component_file = self.data_file.read()
+        
+        return True
         
         
-        #last action
-        #self.component_name_ = new_name
-
+        
+        
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
         pipeline_component.__init__(self, **kwargs)
@@ -1534,7 +1548,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.component_menu.addAction(new_folder_icon,'New from file',self.create_component_from_file)
         self.component_menu.addSeparator()   
         self.rename_component_action = QtGui.QAction("Rename",self)
-        self.rename_component_action.triggered.connect(self.rename_component)
+        self.rename_component_action.triggered.connect(self.component_rename)
         self.component_menu.addAction(self.rename_component_action)
         self.component_menu.addSeparator()  
         self.delete_component_action = QtGui.QAction("Delete",self)
@@ -3753,20 +3767,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         files.explore(file) 
 
 
-    def rename_component(self):
+    def component_rename(self):
         
         component_name, ok = QtGui.QInputDialog.getText(self, 'Rename component', 'Enter component name:')
         
         if ok:
             if dlg.warning("critical", "Rename", "If this component is referenced in other scenes, you will need to menually relink them. Proceed?" ):
-                
-                print "old name: ", self.component.component_name, " new name: ", component_name
-                self.component.rename(component_name)
-            #result = self._create_component(component_name = component_name, create_from = None)
-            
-            #if result:
-                
-                #self.component = result
+                maya.new_scene()
+                                
+                if self.component.rename(component_name):
+                    self.update_component()
+                    self.settings.component_selection = component_name
+                    self.table_selection_by_string(self.ui.components_tableWidget,self.settings.component_selection)
+                    
+
 
     def enable(self, Qwidget, level = None):
 
