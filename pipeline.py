@@ -1505,6 +1505,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.component_menu.addAction(new_folder_icon,'New from current selection',self.create_component_from_current_selection)
         self.component_menu.addAction(new_folder_icon,'New from file',self.create_component_from_file)
         self.component_menu.addSeparator()   
+        self.rename_component_action = QtGui.QAction("Rename",self)
+        self.rename_component_action.triggered.connect(self.rename_component)
+        self.component_menu.addAction(self.rename_component_action)
+        self.component_menu.addSeparator()  
         self.delete_component_action = QtGui.QAction("Delete",self)
         self.delete_component_action.triggered.connect(self.delete_component)
         self.delete_component_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
@@ -1554,6 +1558,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.disable(self.delete_component_action)
         self.disable(self.delete_sequence_action)
         self.disable(self.delete_shot_action)
+        self.disable(self.rename_component_action)
 
         
         #hide the shots panel so the assets panel will show up on init
@@ -3144,10 +3149,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.asset_name and self.catagory_name:
 
                  
-            self.enable(self.delete_asset_action, level = 1)           
+            self.enable(self.delete_asset_action, level = 1)   
+                      
             self.enable(self.ui.component_pushButton)            
         else:
             self.disable(self.delete_asset_action)
+            
             self.disable(self.ui.component_pushButton)
    
         self.update_component()
@@ -3168,6 +3175,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
             self.component = pipeline_component(path = component_file_path, project = self.project, settings = self.settings)            
             self.enable(self.delete_component_action, level = 1)
+            self.enable(self.rename_component_action, level = 1)
             self.enable(self.ui.component_frame)            
             self.set_component_thumbnail(self.component.thumbnail)  
             self.set_grab_thumbnail_button(large_image_icon_click)     
@@ -3175,6 +3183,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self.component = None
             
+            self.disable(self.rename_component_action)
             self.disable(self.delete_component_action)
             self.disable(self.ui.component_frame)
             self.set_component_thumbnail(large_image_icon_dark)
@@ -3714,6 +3723,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         file = self.shot.file_path("versions",version)
         files.explore(file) 
+
+
+    def rename_component(self):
+        pass
 
 
     def enable(self, Qwidget, level = None):
