@@ -753,6 +753,10 @@ class pipeline_component(pipeline_data):
                 
             master = [self.master, "%s_%s_%s"%(self.asset_name,new_name,"MASTER")]
             files.file_rename(master[0],master[1])
+         
+        thumb_path = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))   
+        if os.path.isfile(thumb_path):
+            files.file_rename(thumb_path,new_name) 
 
         self.component_name = new_name
         path = files.file_rename(self.data_file_path,new_name)        
