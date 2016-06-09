@@ -3726,8 +3726,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def rename_component(self):
-        pass
-
+        
+        component_name, ok = QtGui.QInputDialog.getText(self, 'Rename component', 'Enter component name:')
+        
+        if ok:
+            if dlg.warning("critical", "Rename", "If this component is referenced in other scenes, you will need to menually relink them. Proceed?" ):
+                
+                print "old name: ", self.component.component_name, " new name: ", component_name
+            #result = self._create_component(component_name = component_name, create_from = None)
+            
+            #if result:
+                
+                #self.component = result
 
     def enable(self, Qwidget, level = None):
 
