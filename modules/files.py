@@ -54,6 +54,38 @@ import sys
 import subprocess
 
 
+def dir_rename(dir_fullpath, new_name):
+    
+    new_dir = os.path.join(os.path.dirname(dir_fullpath),new_name)
+    #create_directory(new_dir)
+    try:
+        shutil.move(dir_fullpath, new_dir)
+        return new_dir
+    except:
+        return False
+        
+            
+def file_rename(fullpath, new_name):
+    '''
+    input: string, fullpath of the file to rename
+           string, new_name without the extension
+    output True if the rename is successful        
+    '''
+    dir = os.path.dirname(fullpath)
+    
+    name = file_name(fullpath)
+    file_extension = extension(name)
+    new_name_with_extension = new_name + file_extension
+    
+    new_fullpath = os.path.join(dir,new_name_with_extension)
+    
+    try:
+        os.rename(fullpath, new_fullpath)
+        return new_fullpath
+    except:
+        return False
+    
+
 def file_copy(source, dest):
     if os.path.exists(source):
         return shutil.copy2(source, dest)
