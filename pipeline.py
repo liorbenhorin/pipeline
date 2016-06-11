@@ -456,12 +456,24 @@ class pipeline_component(pipeline_data):
         else:
             return None  
 
+    @catagory_name.setter
+    def catagory_name(self,name):
+        if self.data_file:
+            data = {}
+            data["catagory_name"] = name
+            self.data_file.edit(data)
+            self.component_file = self.data_file.read()
+        else:
+            return None 
+
     @property
     def asset_name(self):
         if self.component_file:
             return self.component_file["asset_name"]
         else:
             return None  
+
+
 
     @asset_name.setter
     def asset_name(self,name):
@@ -1245,15 +1257,24 @@ class pipeline_project(pipeline_data):
         
         return False  
 
-
-    def rename_asset(self, project_path = None, catagory_name = None, asset_name = None, new_name=True):
+    def rename_catagory(self, project_path = None, catagory_name = None, new_name=True):
         
         for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
-            if asset_name == new_name:
-                dlg.massage("critical", "Sorry", "This Asset exsists" )
-                return False
         
-        components = []
+            for component in self.components(project_path, catagory_name, asset):
+                
+                path = os.path.join(project_path,self.assets_dir,catagory_name,asset, component, ("%s.%s"%(component,"pipe")))
+                if os.path.isfile(path):
+                    component_object = pipeline_component(path = path, project = self, settings = self.settings) 
+                    component_object.catagory_name = new_name
+        
+        path = os.path.join(project_path,self.assets_dir,catagory_name)       
+        path = files.file_rename(path,new_name) 
+        
+        return True  
+
+    def rename_asset(self, project_path = None, catagory_name = None, asset_name = None, new_name=True):
+                
         for component in self.components(project_path, catagory_name, asset_name):
             path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component, ("%s.%s"%(component,"pipe")))
             if os.path.isfile(path):
@@ -3851,6 +3872,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if category_name == self.catagory_name:
                 dlg.massage("critical", "Sorry", "This category exsists" )
                 return False
+                                
+            if dlg.warning("critical", "Rename", "If this category contains components that are referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
+                self.toggle_scene_open_script()
+                maya.new_scene()
+                self.toggle_scene_open_script()
+
+                if self.project.rename_catagory(project_path = self.settings.current_project_path, catagory_name = self.catagory_name,new_name = category_name ):
+                    
+                    self.update_category()
+                    self.settings.catagory_selection = category_name
+                    self.set_component_selection()                  
     
     def asset_rename(self):
 
