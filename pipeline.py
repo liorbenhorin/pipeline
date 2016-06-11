@@ -745,6 +745,11 @@ class pipeline_component(pipeline_data):
 
     def rename(self, new_name):
          
+        #asset_path = os.path.dirname(files.dir_rename(os.path.dirname(self.data_file_path),new_name))
+        #componentes = files.list_dir_folders(asset_path)
+        #if new_name in componentes:
+        #    dlg.massage("critical", "Sorry", "This Component exsists" )
+        #    return False
         
         versions = {}
         for version in self.versions:
@@ -1584,7 +1589,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         #create menus
         self.catagories_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
-        self.catagories_menu.addAction(new_folder_icon,'New',self.create_catagory, )
+        self.catagories_menu.addAction(new_folder_icon,'New',self.create_catagory)       
+        self.catagories_menu.addSeparator()   
+        self.rename_category_action = QtGui.QAction("Rename",self)
+        self.rename_category_action.triggered.connect(self.category_rename)
+        self.catagories_menu.addAction(self.rename_category_action)
+        self.catagories_menu.addSeparator()                  
         self.delete_catagory_action = QtGui.QAction("Delete",self)
         self.delete_catagory_action.triggered.connect(self.delete_catagory)
         self.delete_catagory_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
@@ -3829,11 +3839,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         file = self.shot.file_path("versions",version)
         files.explore(file) 
 
+    
+    def category_rename(self):
+        pass
+    
     def asset_rename(self):
 
         asset_name, ok = QtGui.QInputDialog.getText(self, 'Rename asset', 'Enter asset name:')
         
         if ok:
+            
+            if asset_name == self.self.asset_name:
+                dlg.massage("critical", "Sorry", "This asset exsists" )
+                return False
+            
             if dlg.warning("critical", "Rename", "If this asset contains components that are referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
                 self.toggle_scene_open_script()
                 maya.new_scene()
@@ -3850,6 +3869,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         component_name, ok = QtGui.QInputDialog.getText(self, 'Rename component', 'Enter component name:')
         
         if ok:
+            if component_name == self.component.component_name:
+                dlg.massage("critical", "Sorry", "This component exsists" )
+                return False    
+            
             if dlg.warning("critical", "Rename", "If this component is referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
                 self.toggle_scene_open_script()
                 maya.new_scene()
