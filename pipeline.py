@@ -1673,8 +1673,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.disable(self.delete_component_action)
         self.disable(self.delete_sequence_action)
         self.disable(self.delete_shot_action)
+        self.disable(self.rename_category_action)
+        self.disable(self.rename_asset_action)
         self.disable(self.rename_component_action)
-
         
         #hide the shots panel so the assets panel will show up on init
         self.ui.scenes_main_widget.setHidden(True)
@@ -3247,11 +3248,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
 
         if self.catagory_name:
-            self.enable(self.delete_catagory_action, level = 1)           
+            self.enable(self.delete_catagory_action, level = 1)   
+            self.enable(self.rename_category_action, level = 1)         
             self.enable(self.ui.asset_pushButton)
         else:
             
             self.disable(self.delete_catagory_action)
+            self.disable(self.rename_category_action) 
             self.disable(self.ui.asset_pushButton)
             
         self.update_asset()
@@ -3265,11 +3268,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
                  
             self.enable(self.delete_asset_action, level = 1)   
-                      
+            self.enable(self.rename_asset_action, level = 1)         
             self.enable(self.ui.component_pushButton)            
         else:
             self.disable(self.delete_asset_action)
-            
+            self.disable(self.rename_asset_action)
             self.disable(self.ui.component_pushButton)
    
         self.update_component()
@@ -3841,7 +3844,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     
     def category_rename(self):
-        pass
+        category_name, ok = QtGui.QInputDialog.getText(self, 'Rename category', 'Enter category name:')
+        
+        if ok:
+            
+            if category_name == self.catagory_name:
+                dlg.massage("critical", "Sorry", "This category exsists" )
+                return False
     
     def asset_rename(self):
 
@@ -3849,7 +3858,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         if ok:
             
-            if asset_name == self.self.asset_name:
+            if asset_name == self.asset_name:
                 dlg.massage("critical", "Sorry", "This asset exsists" )
                 return False
             
