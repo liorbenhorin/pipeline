@@ -3777,14 +3777,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         if ok:
             if dlg.warning("critical", "Rename", "If this component is referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
+                self.toggle_scene_open_script()
                 maya.new_scene()
+                self.toggle_scene_open_script()
+                
                                 
                 if self.component.rename(component_name):
                     self.update_component()
                     self.settings.component_selection = component_name
-                    self.table_selection_by_string(self.ui.components_tableWidget,self.settings.component_selection)
+                    self.set_component_selection()
                     
-
+                    #re open the component that was open...
+                    
 
     def enable(self, Qwidget, level = None):
 
