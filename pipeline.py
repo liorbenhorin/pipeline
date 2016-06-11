@@ -686,6 +686,7 @@ class pipeline_component(pipeline_data):
                     else:
                         return None
 
+
     @property
     def master(self):
         if self.project:
@@ -1331,17 +1332,17 @@ class pipeline_project(pipeline_data):
                             )
             
                         component_object = pipeline_component(path = component_file_path, project = self, settings = self.settings)
-                        
-                        master_padded_version = set_padding(0, self.project_padding)
-                        master_file = component_object.master
-                        if master_file:
-                            masters["%s_%s"%(asset,component)] = [master_file, 
-                                                 component_object.thumbnail, 
-                                                 component_object.author("masters",master_padded_version), 
-                                                 component_object.date_created("masters",master_padded_version),
-                                                 ]
+                        if component_object.component_public_state:
+                            master_padded_version = set_padding(0, self.project_padding)
+                            master_file = component_object.master
+                            if master_file:
+                                masters["%s_%s"%(asset,component)] = [master_file, 
+                                                     component_object.thumbnail, 
+                                                     component_object.author("masters",master_padded_version), 
+                                                     component_object.date_created("masters",master_padded_version),
+                                                     ]
                             
-                            del component_object
+                        del component_object
                            
             return masters        
         else:            
@@ -3787,11 +3788,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.ui.publicMaster_checkBox.isChecked() == True:
             
             self.component.component_public_state = True
-     
+            
         else:
             
             self.component.component_public_state = False   
-
+        
+        self.update_published_masters()
 
     def shot_note(self, event):
         print "clcike"            

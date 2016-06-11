@@ -364,7 +364,7 @@
                <item>
                 <widget class="QCheckBox" name="publicMaster_checkBox">
                  <property name="text">
-                  <string>Public master</string>
+                  <string>Visible in asstes bank</string>
                  </property>
                  <property name="checked">
                   <bool>false</bool>
