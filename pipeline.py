@@ -485,6 +485,29 @@ class pipeline_component(pipeline_data):
         else:
             return None  
 
+
+    @property
+    def component_public_state(self):
+        if self.component_file:
+            if "component_public_state" in self.component_file:
+                return self.component_file["component_public_state"]
+            else:
+                # for legacy components, if no public state key exists, then the component is public
+                return True
+        else:
+            return None  
+            
+    @component_public_state.setter
+    def component_public_state(self,state):
+        if self.data_file:
+            data = {}
+            data["component_public_state"] = state
+            self.data_file.edit(data)
+            self.component_file = self.data_file.read()
+        else:
+            return None 
+
+
     def path(self, type, version):
         if self.component_file:
             try:                
@@ -662,6 +685,7 @@ class pipeline_component(pipeline_data):
                         return sorted_masters
                     else:
                         return None
+
 
     @property
     def master(self):
@@ -1308,17 +1332,17 @@ class pipeline_project(pipeline_data):
                             )
             
                         component_object = pipeline_component(path = component_file_path, project = self, settings = self.settings)
-                        
-                        master_padded_version = set_padding(0, self.project_padding)
-                        master_file = component_object.master
-                        if master_file:
-                            masters["%s_%s"%(asset,component)] = [master_file, 
-                                                 component_object.thumbnail, 
-                                                 component_object.author("masters",master_padded_version), 
-                                                 component_object.date_created("masters",master_padded_version),
-                                                 ]
+                        if component_object.component_public_state:
+                            master_padded_version = set_padding(0, self.project_padding)
+                            master_file = component_object.master
+                            if master_file:
+                                masters["%s_%s"%(asset,component)] = [master_file, 
+                                                     component_object.thumbnail, 
+                                                     component_object.author("masters",master_padded_version), 
+                                                     component_object.date_created("masters",master_padded_version),
+                                                     ]
                             
-                            del component_object
+                        del component_object
                            
             return masters        
         else:            
@@ -1607,6 +1631,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.import_shot_version_pushButton.clicked.connect(self.shot_import)  
         self.ui.save_shot_version_pushButton.clicked.connect(self.shot_version_save)
         self.ui.asset_scenes_switch_pushButton.clicked.connect(self.asset_scenes_switch)
+        self.ui.publicMaster_checkBox.clicked.connect(self.public_master_toggle)
         
         #create menus
         self.catagories_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
@@ -2706,6 +2731,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         versions = None
         if self.component: 
             
+            self.ui.publicMaster_checkBox.setChecked(self.component.component_public_state)
+            
             if self.component.masters:
                 versions = self.component.masters
             if self.component.master:
@@ -3755,6 +3782,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.component.make_master(version)            
             maya.open_scene(self.component.master)
             self.update_masters()
+
+    def public_master_toggle(self):
+
+        if self.ui.publicMaster_checkBox.isChecked() == True:
+            
+            self.component.component_public_state = True
+            
+        else:
+            
+            self.component.component_public_state = False   
+        
+        self.update_published_masters()
 
     def shot_note(self, event):
         print "clcike"            
