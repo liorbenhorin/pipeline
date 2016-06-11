@@ -463,6 +463,15 @@ class pipeline_component(pipeline_data):
         else:
             return None  
 
+    @asset_name.setter
+    def asset_name(self,name):
+        if self.data_file:
+            data = {}
+            data["asset_name"] = name
+            self.data_file.edit(data)
+            self.component_file = self.data_file.read()
+        else:
+            return None  
 
     def path(self, type, version):
         if self.component_file:
@@ -768,7 +777,29 @@ class pipeline_component(pipeline_data):
         
         return True
         
+    def rename_asset(self, new_name):
+         
         
+        versions = {}
+        for version in self.versions:
+            version_number = set_padding(version,self.project.project_padding) 
+            versions[version] = [self.file_path("versions",version_number), "%s_%s_%s"%(new_name,self.component_name,version_number)] 
+            files.file_rename(versions[version][0],versions[version][1])
+
+        if self.master:
+            masters = {}
+            for version in self.masters:
+                version_number = set_padding(version,self.project.project_padding) 
+                masters[version] = [self.file_path("masters",version_number), "%s_%s_%s_%s"%(new_name,self.component_name,"MASTER",version_number)] 
+                files.file_rename(masters[version][0],masters[version][1])
+
+                
+            master = [self.master, "%s_%s_%s"%(new_name,self.component_name,"MASTER")]
+            files.file_rename(master[0],master[1])
+        
+        self.asset_name = new_name       
+        return True
+                
         
         
 class pipeline_shot(pipeline_component):
@@ -1209,6 +1240,29 @@ class pipeline_project(pipeline_data):
         
         return False  
 
+
+    def rename_asset(self, project_path = None, catagory_name = None, asset_name = None, new_name=True):
+        
+        for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
+            if asset_name == new_name:
+                dlg.massage("critical", "Sorry", "This Asset exsists" )
+                return False
+        
+        components = []
+        for component in self.components(project_path, catagory_name, asset_name):
+            path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component, ("%s.%s"%(component,"pipe")))
+            if os.path.isfile(path):
+                component_object = pipeline_component(path = path, project = self, settings = self.settings) 
+                component_object.rename_asset(new_name)
+
+        
+        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)       
+        path = files.file_rename(path,new_name)   
+        
+        return True
+    
+
+
     @property
     def masters(self):
         if self.project_file:
@@ -1539,6 +1593,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         self.assets_menu = QtGui.QMenu(parent = self.ui.asset_pushButton)
         self.assets_menu.addAction(new_folder_icon,'New',self.create_asset)
+        self.assets_menu.addSeparator()   
+        self.rename_asset_action = QtGui.QAction("Rename",self)
+        self.rename_asset_action.triggered.connect(self.asset_rename)
+        self.assets_menu.addAction(self.rename_asset_action)
+        self.assets_menu.addSeparator()  
         self.delete_asset_action = QtGui.QAction("Delete",self)
         self.delete_asset_action.triggered.connect(self.delete_asset)
         self.delete_asset_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
@@ -3770,7 +3829,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         file = self.shot.file_path("versions",version)
         files.explore(file) 
 
+    def asset_rename(self):
 
+        asset_name, ok = QtGui.QInputDialog.getText(self, 'Rename asset', 'Enter asset name:')
+        
+        if ok:
+            if dlg.warning("critical", "Rename", "If this asset contains components that are referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
+                self.toggle_scene_open_script()
+                maya.new_scene()
+                self.toggle_scene_open_script()
+
+                if self.project.rename_asset(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, new_name = asset_name ):
+                    
+                    self.update_asset()
+                    self.settings.asset_selection = asset_name
+                    self.set_component_selection()        
+        
     def component_rename(self):
         
         component_name, ok = QtGui.QInputDialog.getText(self, 'Rename component', 'Enter component name:')
