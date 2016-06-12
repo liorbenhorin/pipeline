@@ -3998,7 +3998,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     if len(glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))) == 1:
                         pipe_file = glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))[0]                        
                         comp_name = os.path.basename(pipe_file)[0]
-                        tumb_file = os.path.join(os.path.dirname(pipe_path),"tumbnails",("%s.%s"%(comp_name,"png")))
+                        tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))
                         
                         dep_paths.append(files.reletive_path(self.settings.current_project_path,pipe_file))
                         dep_paths.append(files.reletive_path(self.settings.current_project_path,tumb_file))
@@ -4006,7 +4006,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     if len(glob.glob(os.path.join(os.path.dirname(os.path.dirname(dep[0])),"*.pipe"))) == 1:
                         pipe_file = glob.glob(os.path.join(os.path.dirname(os.path.dirname(dep[0])),"*.pipe"))[0]
                         comp_name = os.path.basename(pipe_file)[0]
-                        tumb_file = os.path.join(os.path.dirname(pipe_path),"tumbnails",("%s.%s"%(comp_name,"png")))
+                        tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))
                         
                         dep_paths.append(files.reletive_path(self.settings.current_project_path,pipe_file))
                         dep_paths.append(files.reletive_path(self.settings.current_project_path,tumb_file))
