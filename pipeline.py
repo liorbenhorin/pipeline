@@ -3988,13 +3988,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             dependencies = maya.list_referenced_files()
             dep_paths = []
             for dep in dependencies:
+                # for texture files
                 if dep[1] == 'file':
-                    print "TEX: ", files.reletive_path(self.settings.current_project_path,dep[0])
+                    #print "TEX: ", files.reletive_path(self.settings.current_project_path,dep[0])
                     dep_paths.append(files.reletive_path(self.settings.current_project_path,dep[0]))
+                
+                # for refernce files
                 if dep[1] == 'reference':
-                    print "REF: ", files.reletive_path(self.settings.current_project_path,dep[0])
+                    #print "REF: ", files.reletive_path(self.settings.current_project_path,dep[0])
                     
-
+                    # if this is a master version or a verison or a master, this will detect it and grab the 
+                    # *.pipe file and the tumbnail
+                    # otherwise, it will only get the file and create a path for it
+                    
                     if len(glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))) == 1:
                         pipe_file = glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))[0]                        
                         comp_name = os.path.basename(pipe_file)[0]
@@ -4015,13 +4021,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     
                     
-                    
+            # where to collect the files        
             collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
             
             for rel_path in dep_paths:
                 path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'Collect'),self.settings.current_project_name,rel_path)            
                 files.assure_path_exists(path)
-                
+            
+            # need to create a project.pipe file for this, with only the releated assets, name it after the component + collect
+            # create no users
+            
+            # if the function is a success, open the project folder in the finder    
             
             
 
