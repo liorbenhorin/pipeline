@@ -3979,18 +3979,50 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             ref = input[1]
             texture = input[2]
             
+            
+            
+            #collect dependencies
+            
+            import glob
+            
             dependencies = maya.list_referenced_files()
+            dep_paths = []
             for dep in dependencies:
                 if dep[1] == 'file':
                     print "TEX: ", files.reletive_path(self.settings.current_project_path,dep[0])
+                    dep_paths.append(files.reletive_path(self.settings.current_project_path,dep[0]))
                 if dep[1] == 'reference':
                     print "REF: ", files.reletive_path(self.settings.current_project_path,dep[0])
                     
-            path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
-            print path
+
+                    if len(glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))) == 1:
+                        pipe_file = glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))[0]                        
+                        comp_name = os.path.basename(pipe_file)[0]
+                        tumb_file = os.path.join(os.path.dirname(pipe_path),"tumbnails",("%s.%s"%(comp_name,"png")))
+                        
+                        dep_paths.append(files.reletive_path(self.settings.current_project_path,pipe_file))
+                        dep_paths.append(files.reletive_path(self.settings.current_project_path,tumb_file))
+                        
+                    if len(glob.glob(os.path.join(os.path.dirname(os.path.dirname(dep[0])),"*.pipe"))) == 1:
+                        pipe_file = glob.glob(os.path.join(os.path.dirname(os.path.dirname(dep[0])),"*.pipe"))[0]
+                        comp_name = os.path.basename(pipe_file)[0]
+                        tumb_file = os.path.join(os.path.dirname(pipe_path),"tumbnails",("%s.%s"%(comp_name,"png")))
+                        
+                        dep_paths.append(files.reletive_path(self.settings.current_project_path,pipe_file))
+                        dep_paths.append(files.reletive_path(self.settings.current_project_path,tumb_file))
+                    
+                    dep_paths.append(files.reletive_path(self.settings.current_project_path,dep[0]))
+                    
+                    
+                    
+                    
+            collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
             
+            for rel_path in dep_paths:
+                path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'Collect'),self.settings.current_project_name,rel_path)            
+                files.assure_path_exists(path)
+                
             
-            files.assure_path_exists()
             
 
     def enable(self, Qwidget, level = None):
