@@ -164,6 +164,15 @@ def list_dir_folders(path):
     return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
 
+def assure_path_exists(path):
+        dir = os.path.dirname(path)
+        if not os.path.exists(dir):
+                os.makedirs(dir)
+
+
+def reletive_path(absolute_path, path):
+    return os.path.relpath(path, absolute_path)
+
 def create_directory(path):
                      
     if not os.path.exists(path):

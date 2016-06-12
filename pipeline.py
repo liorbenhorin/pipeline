@@ -3975,8 +3975,23 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         if result == QtGui.QDialog.Accepted:
             log.info(input)
-
-
+            tree = input[0]
+            ref = input[1]
+            texture = input[2]
+            
+            dependencies = maya.list_referenced_files()
+            for dep in dependencies:
+                if dep[1] == 'file':
+                    print "TEX: ", files.reletive_path(self.settings.current_project_path,dep[0])
+                if dep[1] == 'reference':
+                    print "REF: ", files.reletive_path(self.settings.current_project_path,dep[0])
+                    
+            path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+            print path
+            
+            
+            files.assure_path_exists()
+            
 
     def enable(self, Qwidget, level = None):
 

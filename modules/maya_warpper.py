@@ -131,16 +131,15 @@ def list_referenced_files():
         '''
         
         for i in range(0,items):
-            order[pairs[index+1]] = [os.path.join(link,pairs[index]),pairs[index+2]]
+            order[pairs[index+1]] = [os.path.join(link,pairs[index]),pairs[index+1],pairs[index+2]]
             index = index + 3  
                     
         for key in order:            
             # for each item in the dict, if the status is 0, repath it
-            if order[key][1] == "1": 
-                results.append(order[key][0])
+            if order[key][2] == "1": 
+                results.append([order[key][0],cmds.nodeType(order[key][1])])
                     
-                    
-        return results
+    return results 
             
      
 def relink_pathes(project_path = None):
@@ -171,8 +170,8 @@ def relink_pathes(project_path = None):
                 if repath(key,order[key][0],project_path):
                     results.append(key)
                     
-                    
-        return results
+                   
+    return results
 
     
     

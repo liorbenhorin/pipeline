@@ -193,7 +193,7 @@ class collect_component_options(QtGui.QDialog):
         if self.include_textures.isChecked():
             textures = True 
             
-        return references, textures  
+        return directory_tree, references, textures  
 
 
     def result(self):
