@@ -1619,6 +1619,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.actionDocumentation.triggered.connect(self.documentation)
         
         self.ui.actionFiles_repath.triggered.connect(self.repath)
+        self.ui.actionCollect_component.triggered.connect(self.collect_component)
         
         self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
@@ -3965,7 +3966,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.set_component_selection()
                     
                     #re open the component that was open...
-                    
+
+    def collect_component(self):
+
+        dialog = dlg.collect_component_options(self, title = "Collect component options")
+        result = dialog.exec_()
+        input = dialog.result()
+
+        if result == QtGui.QDialog.Accepted:
+            log.info(input)
+
+
 
     def enable(self, Qwidget, level = None):
 

@@ -149,7 +149,55 @@ class Create_from_selection(QtGui.QDialog):
     def result(self):
         return self.text_input.text(), self.radio_selection()
         
+class collect_component_options(QtGui.QDialog):
+    def __init__(self, parent = None, title = None):
+        super(collect_component_options, self).__init__(parent)
         
+    
+        self.setMaximumWidth(200) 
+        self.setMinimumWidth(200)        
+        self.setMaximumHeight(50) 
+
+        layout = QtGui.QVBoxLayout(self)
+        self.item_name = QtGui.QLabel(title)
+        #self.text_input = QtGui.QLineEdit()
+        self.directory_tree = QtGui.QCheckBox("Keep directory structure")
+        self.directory_tree.setChecked(True)
+        self.include_reference = QtGui.QCheckBox("Include referenced files")
+        self.include_reference.setChecked(True)
+        self.include_textures = QtGui.QCheckBox("Include textures")
+        self.include_textures.setChecked(True)
+        
+        layout.addWidget(self.item_name)
+        #layout.addWidget(self.text_input)
+        layout.addWidget(self.directory_tree)
+        layout.addWidget(self.include_reference)
+        layout.addWidget(self.include_textures)
+        
+        buttons = QtGui.QDialogButtonBox(
+            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
+            QtCore.Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+    
+    def options(self):
+        directory_tree = False
+        references = False
+        textures = False
+        
+        if self.directory_tree.isChecked():
+            directory_tree = True        
+        if self.include_reference.isChecked():
+            references = True
+        if self.include_textures.isChecked():
+            textures = True 
+            
+        return references, textures  
+
+
+    def result(self):
+        return self.options()        
     
 class Login(QtGui.QDialog):
     def __init__(self, parent=None):
