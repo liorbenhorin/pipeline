@@ -4021,12 +4021,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     
                     
+                    
             # where to collect the files        
             collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
             
+            
+            # create the tree sturcutre in a releative path
             for rel_path in dep_paths:
                 path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'Collect'),self.settings.current_project_name,rel_path)            
                 files.assure_path_exists(path)
+            
+            # ---> copy the actual files to the new relative directories...
             
             # need to create a project.pipe file for this, with only the releated assets, name it after the component + collect
             # create no users
