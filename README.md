@@ -3,7 +3,7 @@ Projects manager for Maya
 
 [http://pipeline.nnl.tv](http://pipeline.nnl.tv)
 
-#Features**
+#Features
 
 Pipeline is a simple and straight forward tool for managing maya projects,
 from student shorts to meduim teams working on commercial projects.
