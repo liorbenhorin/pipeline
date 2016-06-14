@@ -65,6 +65,7 @@ from timeit import default_timer as timer
 import collections
 import logging
 import webbrowser
+
         
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
@@ -3974,64 +3975,75 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         input = dialog.result()
 
         if result == QtGui.QDialog.Accepted:
+
+            # where to collect the files        
+            collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+            collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'),self.settings.current_project_name)
+                        
+            
             log.info(input)
             tree = input[0]
             ref = input[1]
             texture = input[2]
             
-            
-            
+                       
             #collect dependencies
             
-            import glob
+            # ALL OF THIS SHOULD BE RETRIVED BY THE COMPONENT AND NOT IN THIS UGLY WAY!!
+            
+            
+            file = maya.current_open_file()
+            path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
+            files.assure_path_exists(path)
+            files.file_copy(file,path)
+            
+            pipe_file = files.get_pipe_file_from_folder_or_parent_folder(file)
+            comp_name = os.path.basename(pipe_file)[0]
+            tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))  
+
+            pipe_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+            files.assure_path_exists(pipe_file_new_path)
+            files.file_copy(pipe_file,pipe_file_new_path)
+
+            tumb_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,tumb_file))
+            files.assure_path_exists(tumb_file_new_path)
+            files.file_copy(tumb_file,tumb_file_new_path)
             
             dependencies = maya.list_referenced_files()
-            dep_paths = []
+            #dep_paths = []
             for dep in dependencies:
                 # for texture files
                 if dep[1] == 'file':
-                    #print "TEX: ", files.reletive_path(self.settings.current_project_path,dep[0])
-                    dep_paths.append(files.reletive_path(self.settings.current_project_path,dep[0]))
-                
+                    filename = files.file_name(dep[0])
+                    path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+                    files.assure_path_exists(path)
+                    files.file_copy(dep[0],path)
+                    
+
                 # for refernce files
                 if dep[1] == 'reference':
-                    #print "REF: ", files.reletive_path(self.settings.current_project_path,dep[0])
+
                     
-                    # if this is a master version or a verison or a master, this will detect it and grab the 
-                    # *.pipe file and the tumbnail
-                    # otherwise, it will only get the file and create a path for it
-                    
-                    if len(glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))) == 1:
-                        pipe_file = glob.glob(os.path.join(os.path.dirname(dep[0]),"*.pipe"))[0]                        
-                        comp_name = os.path.basename(pipe_file)[0]
-                        tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))
-                        
-                        dep_paths.append(files.reletive_path(self.settings.current_project_path,pipe_file))
-                        dep_paths.append(files.reletive_path(self.settings.current_project_path,tumb_file))
-                        
-                    if len(glob.glob(os.path.join(os.path.dirname(os.path.dirname(dep[0])),"*.pipe"))) == 1:
-                        pipe_file = glob.glob(os.path.join(os.path.dirname(os.path.dirname(dep[0])),"*.pipe"))[0]
-                        comp_name = os.path.basename(pipe_file)[0]
-                        tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))
-                        
-                        dep_paths.append(files.reletive_path(self.settings.current_project_path,pipe_file))
-                        dep_paths.append(files.reletive_path(self.settings.current_project_path,tumb_file))
-                    
-                    dep_paths.append(files.reletive_path(self.settings.current_project_path,dep[0]))
+                    filename = files.file_name(dep[0])
+                    path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+                    files.assure_path_exists(path)
+                    files.file_copy(dep[0],path)
                     
                     
+                    pipe_file = files.get_pipe_file_from_folder_or_parent_folder(dep[0])
+                    comp_name = os.path.basename(pipe_file)[0]
+                    tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))                   
+                            
+
+                    pipe_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+                    files.assure_path_exists(pipe_file_new_path)
+                    files.file_copy(pipe_file,pipe_file_new_path)
+
+                    tumb_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,tumb_file))
+                    files.assure_path_exists(tumb_file_new_path)
+                    files.file_copy(tumb_file,tumb_file_new_path)
+
                     
-                    
-            # where to collect the files        
-            collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
-            
-            
-            # create the tree sturcutre in a releative path
-            for rel_path in dep_paths:
-                path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'Collect'),self.settings.current_project_name,rel_path)            
-                files.assure_path_exists(path)
-            
-            # ---> copy the actual files to the new relative directories...
             
             # need to create a project.pipe file for this, with only the releated assets, name it after the component + collect
             # create no users
