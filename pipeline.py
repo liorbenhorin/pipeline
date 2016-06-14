@@ -4019,7 +4019,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             # where to collect the files        
             collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
-            collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'),self.settings.current_project_name)
+            collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'))
                                    
             log.info(input)
             tree = input[0]
@@ -4043,6 +4043,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                
                 pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
                 files.assure_path_exists(pipe_file_copy)
+                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
                 files.file_copy(pipe_file,pipe_file_copy)
 
                 if component.thumbnail_path:
@@ -4053,7 +4055,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             
             dependencies = maya.list_referenced_files()
-            #dep_paths = []
+
             for dep in dependencies:
                 # for texture files
                 if dep[1] == 'file':
@@ -4074,13 +4076,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                             
                     component_dummy = pipeline_component()
-                    pipe_file = component_dummy.get_data_file(path = file)            
+                    pipe_file = component_dummy.get_data_file(path = dep[0])            
                   
                     if pipe_file:
                         component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
                         
                         pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
                         files.assure_path_exists(pipe_file_copy)
+                        files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+                        files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
                         files.file_copy(pipe_file,pipe_file_copy)
 
                         if component.thumbnail_path:
@@ -4088,8 +4092,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                             files.assure_path_exists(tumb_file_copy)
                             files.file_copy(component.thumbnail_path,tumb_file_copy)
                     
-                    
             
+            fps = self.project.project_fps
+            padding = self.project.project_padding
+            file_type = self.project.project_file_type
+                    
+            project_file = self.project_file = pipeline_project().create(collect_path, name = '%s_%s'%(self.component.component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)   
             # need to create a project.pipe file for this, with only the releated assets, name it after the component + collect
             # create no users
             

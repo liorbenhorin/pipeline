@@ -172,7 +172,9 @@ def assure_path_exists(path):
         if not os.path.exists(dir):
                 os.makedirs(dir)
 
-
+def assure_folder_exists(path):
+        if not os.path.exists(path):
+                os.makedirs(path)
 
 def reletive_path(absolute_path, path):
     return os.path.relpath(path, absolute_path)
