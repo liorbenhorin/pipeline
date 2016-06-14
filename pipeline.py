@@ -700,6 +700,7 @@ class pipeline_component(pipeline_data):
                         return master_file
         return None
         
+    '''
     @property
     def thumbnail(self):
         if self.project:
@@ -710,6 +711,26 @@ class pipeline_component(pipeline_data):
                         return QtGui.QPixmap(thumbnail_name)
         
         return large_image_icon
+    '''
+    @property
+    def thumbnail(self):
+        file = self.thumbnail_path
+        if file:
+            return QtGui.QPixmap(file)
+        
+        return large_image_icon
+
+    @property
+    def thumbnail_path(self):
+        if self.project:
+            if self.component_file:
+                if self.settings:
+                    thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))
+                    if os.path.isfile(thumbnail_name):
+                        return thumbnail_name
+        
+        return None
+
         
     def new_master(self, from_file = False):
         if self.project:
@@ -842,7 +863,27 @@ class pipeline_component(pipeline_data):
         self.asset_name = new_name       
         return True
                 
-        
+
+    def get_data_file(self,path = None):
+                
+        if path:
+            dir = os.path.dirname(path)
+            file = os.path.join(dir,"*.pipe")
+            
+            
+            if len(glob.glob(file)) == 1: #if its a master
+                return glob.glob(file)[0]                        
+
+            dir = os.path.dirname(dir)
+            file = os.path.join(dir,"*.pipe")
+                                       
+            if len(glob.glob(file)) == 1: #if its a version
+                return glob.glob(file)[0]  
+            
+            return None
+            
+        return None        
+    
         
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
@@ -3979,35 +4020,37 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             # where to collect the files        
             collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
             collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'),self.settings.current_project_name)
-                        
-            
+                                   
             log.info(input)
             tree = input[0]
             ref = input[1]
             texture = input[2]
             
+            
                        
             #collect dependencies
-            
-            # ALL OF THIS SHOULD BE RETRIVED BY THE COMPONENT AND NOT IN THIS UGLY WAY!!
-            
-            
+
             file = maya.current_open_file()
             path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
             files.assure_path_exists(path)
             files.file_copy(file,path)
             
-            pipe_file = files.get_pipe_file_from_folder_or_parent_folder(file)
-            comp_name = os.path.basename(pipe_file)[0]
-            tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))  
+            component_dummy = pipeline_component()
+            pipe_file = component_dummy.get_data_file(path = file)            
+          
+            if pipe_file:
+                component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+               
+                pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+                files.assure_path_exists(pipe_file_copy)
+                files.file_copy(pipe_file,pipe_file_copy)
 
-            pipe_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
-            files.assure_path_exists(pipe_file_new_path)
-            files.file_copy(pipe_file,pipe_file_new_path)
+                if component.thumbnail_path:
+                    tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+                    files.assure_path_exists(tumb_file_copy)
+                    files.file_copy(component.thumbnail_path,tumb_file_copy)
 
-            tumb_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,tumb_file))
-            files.assure_path_exists(tumb_file_new_path)
-            files.file_copy(tumb_file,tumb_file_new_path)
+
             
             dependencies = maya.list_referenced_files()
             #dep_paths = []
@@ -4029,20 +4072,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     files.assure_path_exists(path)
                     files.file_copy(dep[0],path)
                     
-                    
-                    pipe_file = files.get_pipe_file_from_folder_or_parent_folder(dep[0])
-                    comp_name = os.path.basename(pipe_file)[0]
-                    tumb_file = os.path.join(os.path.dirname(pipe_file),"tumbnails",("%s.%s"%(comp_name,"png")))                   
                             
+                    component_dummy = pipeline_component()
+                    pipe_file = component_dummy.get_data_file(path = file)            
+                  
+                    if pipe_file:
+                        component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+                        
+                        pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+                        files.assure_path_exists(pipe_file_copy)
+                        files.file_copy(pipe_file,pipe_file_copy)
 
-                    pipe_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
-                    files.assure_path_exists(pipe_file_new_path)
-                    files.file_copy(pipe_file,pipe_file_new_path)
-
-                    tumb_file_new_path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,tumb_file))
-                    files.assure_path_exists(tumb_file_new_path)
-                    files.file_copy(tumb_file,tumb_file_new_path)
-
+                        if component.thumbnail_path:
+                            tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+                            files.assure_path_exists(tumb_file_copy)
+                            files.file_copy(component.thumbnail_path,tumb_file_copy)
+                    
                     
             
             # need to create a project.pipe file for this, with only the releated assets, name it after the component + collect

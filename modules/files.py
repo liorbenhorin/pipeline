@@ -281,6 +281,8 @@ def get_pipe_file_from_folder_or_parent_folder(path):
     file = os.path.join(dir,"*.pipe")
                                
     if len(glob.glob(file)) == 1: #if its a version
-        return glob.glob(file)[0]     
+        return glob.glob(file)[0]  
+        
+    return None
         
         
