@@ -57,10 +57,15 @@ def set_icons():
     global simple_warning_icon
     global massage_icon
     global users_icon
+    global archive_icon
+    global new_icon
+    
     warning_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"critical")) 
     simple_warning_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"warning"))
     massage_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"massage"))
     users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
+    archive_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"archive"))
+    new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
     
 def warning(icon, title, message ):
     
@@ -120,6 +125,9 @@ class Create_from_selection(QtGui.QDialog):
         self.setMinimumWidth(200)        
         self.setMaximumHeight(50) 
 
+        self.label = QtGui.QLabel()
+        self.label.setPixmap(new_icon)
+
         layout = QtGui.QVBoxLayout(self)
         self.item_name = QtGui.QLabel(title)
         self.text_input = QtGui.QLineEdit()
@@ -128,10 +136,12 @@ class Create_from_selection(QtGui.QDialog):
         self.exclude_radio = QtGui.QRadioButton("Include only textures")
         
         
+
         layout.addWidget(self.item_name)
         layout.addWidget(self.text_input)
         layout.addWidget(self.include_radio)
         layout.addWidget(self.exclude_radio)
+
         
         buttons = QtGui.QDialogButtonBox(
             QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
@@ -158,19 +168,23 @@ class collect_component_options(QtGui.QDialog):
         self.setMinimumWidth(200)        
         self.setMaximumHeight(50) 
 
+        self.label = QtGui.QLabel()
+        self.label.setPixmap(archive_icon)
+
         layout = QtGui.QVBoxLayout(self)
         self.item_name = QtGui.QLabel(title)
-        #self.text_input = QtGui.QLineEdit()
-        self.directory_tree = QtGui.QCheckBox("Keep directory structure")
-        self.directory_tree.setChecked(True)
+
         self.include_reference = QtGui.QCheckBox("Include referenced files")
         self.include_reference.setChecked(True)
         self.include_textures = QtGui.QCheckBox("Include textures")
         self.include_textures.setChecked(True)
         
+        
+        layout.addWidget(self.label)
+        layout.addStretch()
         layout.addWidget(self.item_name)
-        #layout.addWidget(self.text_input)
-        layout.addWidget(self.directory_tree)
+
+        layout.addWidget(self.HLine())
         layout.addWidget(self.include_reference)
         layout.addWidget(self.include_textures)
         
@@ -182,22 +196,25 @@ class collect_component_options(QtGui.QDialog):
         layout.addWidget(buttons)
     
     def options(self):
-        directory_tree = False
         references = False
         textures = False
-        
-        if self.directory_tree.isChecked():
-            directory_tree = True        
+               
         if self.include_reference.isChecked():
             references = True
         if self.include_textures.isChecked():
             textures = True 
             
-        return directory_tree, references, textures  
+        return references, textures  
 
 
     def result(self):
         return self.options()        
+
+    def HLine(self):
+        toto = QtGui.QFrame()
+        toto.setFrameShape(QtGui.QFrame.HLine)
+        toto.setFrameShadow(QtGui.QFrame.Sunken)
+        return toto  
     
 class Login(QtGui.QDialog):
     def __init__(self, parent=None):

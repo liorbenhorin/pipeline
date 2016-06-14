@@ -4018,90 +4018,89 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if result == QtGui.QDialog.Accepted:
 
             # where to collect the files        
+            
             collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
-            collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'))
-                                   
-            log.info(input)
-            tree = input[0]
-            ref = input[1]
-            texture = input[2]
-            
-            
-                       
-            #collect dependencies
+            if collect_path:
+                
+                collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'))
+                                       
+                log.info(input)
+                ref = input[0]
+                texture = input[1]
+                
+                                     
+                #collect dependencies
 
-            file = maya.current_open_file()
-            path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
-            files.assure_path_exists(path)
-            files.file_copy(file,path)
-            
-            component_dummy = pipeline_component()
-            pipe_file = component_dummy.get_data_file(path = file)            
-          
-            if pipe_file:
-                component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
-               
-                pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
-                files.assure_path_exists(pipe_file_copy)
-                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
-                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
-                files.file_copy(pipe_file,pipe_file_copy)
+                file = maya.current_open_file()
+                path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
+                files.assure_path_exists(path)
+                files.file_copy(file,path)
+                
+                component_dummy = pipeline_component()
+                pipe_file = component_dummy.get_data_file(path = file)            
+              
+                if pipe_file:
+                    component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+                   
+                    pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+                    files.assure_path_exists(pipe_file_copy)
+                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
+                    files.file_copy(pipe_file,pipe_file_copy)
 
-                if component.thumbnail_path:
-                    tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
-                    files.assure_path_exists(tumb_file_copy)
-                    files.file_copy(component.thumbnail_path,tumb_file_copy)
+                    if component.thumbnail_path:
+                        tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+                        files.assure_path_exists(tumb_file_copy)
+                        files.file_copy(component.thumbnail_path,tumb_file_copy)
 
 
-            
-            dependencies = maya.list_referenced_files()
+                
+                dependencies = maya.list_referenced_files()
 
-            for dep in dependencies:
-                # for texture files
-                if dep[1] == 'file':
-                    filename = files.file_name(dep[0])
-                    path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
-                    files.assure_path_exists(path)
-                    files.file_copy(dep[0],path)
-                    
-
-                # for refernce files
-                if dep[1] == 'reference':
-
-                    
-                    filename = files.file_name(dep[0])
-                    path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
-                    files.assure_path_exists(path)
-                    files.file_copy(dep[0],path)
-                    
-                            
-                    component_dummy = pipeline_component()
-                    pipe_file = component_dummy.get_data_file(path = dep[0])            
-                  
-                    if pipe_file:
-                        component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+                for dep in dependencies:
+                    if texture: # for texture files
                         
-                        pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
-                        files.assure_path_exists(pipe_file_copy)
-                        files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
-                        files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
-                        files.file_copy(pipe_file,pipe_file_copy)
+                        if dep[1] == 'file':
+                            filename = files.file_name(dep[0])
+                            path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+                            files.assure_path_exists(path)
+                            files.file_copy(dep[0],path)
+                        
+                    if ref: # for refernce files
+                        
+                        if dep[1] == 'reference':
 
-                        if component.thumbnail_path:
-                            tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
-                            files.assure_path_exists(tumb_file_copy)
-                            files.file_copy(component.thumbnail_path,tumb_file_copy)
-                    
-            
-            fps = self.project.project_fps
-            padding = self.project.project_padding
-            file_type = self.project.project_file_type
-                    
-            project_file = self.project_file = pipeline_project().create(collect_path, name = '%s_%s'%(self.component.component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)   
-            # need to create a project.pipe file for this, with only the releated assets, name it after the component + collect
-            # create no users
-            
-            # if the function is a success, open the project folder in the finder    
+                            
+                            filename = files.file_name(dep[0])
+                            path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+                            files.assure_path_exists(path)
+                            files.file_copy(dep[0],path)
+                            
+                                    
+                            component_dummy = pipeline_component()
+                            pipe_file = component_dummy.get_data_file(path = dep[0])            
+                          
+                            if pipe_file:
+                                component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+                                
+                                pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+                                files.assure_path_exists(pipe_file_copy)
+                                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+                                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
+                                files.file_copy(pipe_file,pipe_file_copy)
+
+                                if component.thumbnail_path:
+                                    tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+                                    files.assure_path_exists(tumb_file_copy)
+                                    files.file_copy(component.thumbnail_path,tumb_file_copy)
+                        
+                
+                fps = self.project.project_fps
+                padding = self.project.project_padding
+                file_type = self.project.project_file_type                   
+                project_file = pipeline_project().create(collect_path, name = '%s_%s'%(self.component.component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)   
+                
+                dlg.massage("massage", "Success", "Project created successfully" )
             
             
 
