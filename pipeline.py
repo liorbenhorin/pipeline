@@ -65,6 +65,7 @@ from timeit import default_timer as timer
 import collections
 import logging
 import webbrowser
+
         
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
@@ -699,6 +700,7 @@ class pipeline_component(pipeline_data):
                         return master_file
         return None
         
+    '''
     @property
     def thumbnail(self):
         if self.project:
@@ -709,6 +711,26 @@ class pipeline_component(pipeline_data):
                         return QtGui.QPixmap(thumbnail_name)
         
         return large_image_icon
+    '''
+    @property
+    def thumbnail(self):
+        file = self.thumbnail_path
+        if file:
+            return QtGui.QPixmap(file)
+        
+        return large_image_icon
+
+    @property
+    def thumbnail_path(self):
+        if self.project:
+            if self.component_file:
+                if self.settings:
+                    thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))
+                    if os.path.isfile(thumbnail_name):
+                        return thumbnail_name
+        
+        return None
+
         
     def new_master(self, from_file = False):
         if self.project:
@@ -841,7 +863,27 @@ class pipeline_component(pipeline_data):
         self.asset_name = new_name       
         return True
                 
-        
+
+    def get_data_file(self,path = None):
+                
+        if path:
+            dir = os.path.dirname(path)
+            file = os.path.join(dir,"*.pipe")
+            
+            
+            if len(glob.glob(file)) == 1: #if its a master
+                return glob.glob(file)[0]                        
+
+            dir = os.path.dirname(dir)
+            file = os.path.join(dir,"*.pipe")
+                                       
+            if len(glob.glob(file)) == 1: #if its a version
+                return glob.glob(file)[0]  
+            
+            return None
+            
+        return None        
+    
         
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
@@ -1619,6 +1661,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.actionDocumentation.triggered.connect(self.documentation)
         
         self.ui.actionFiles_repath.triggered.connect(self.repath)
+        self.ui.actionCollect_component.triggered.connect(self.collect_component)
         
         self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
@@ -3965,7 +4008,101 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.set_component_selection()
                     
                     #re open the component that was open...
-                    
+
+    def collect_component(self):
+
+        dialog = dlg.collect_component_options(self, title = "Collect component options")
+        result = dialog.exec_()
+        input = dialog.result()
+
+        if result == QtGui.QDialog.Accepted:
+
+            # where to collect the files        
+            
+            collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+            if collect_path:
+                
+                collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'))
+                                       
+                log.info(input)
+                ref = input[0]
+                texture = input[1]
+                
+                                     
+                #collect dependencies
+
+                file = maya.current_open_file()
+                path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
+                files.assure_path_exists(path)
+                files.file_copy(file,path)
+                
+                component_dummy = pipeline_component()
+                pipe_file = component_dummy.get_data_file(path = file)            
+              
+                if pipe_file:
+                    component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+                   
+                    pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+                    files.assure_path_exists(pipe_file_copy)
+                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
+                    files.file_copy(pipe_file,pipe_file_copy)
+
+                    if component.thumbnail_path:
+                        tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+                        files.assure_path_exists(tumb_file_copy)
+                        files.file_copy(component.thumbnail_path,tumb_file_copy)
+
+
+                
+                dependencies = maya.list_referenced_files()
+
+                for dep in dependencies:
+                    if texture: # for texture files
+                        
+                        if dep[1] == 'file':
+                            filename = files.file_name(dep[0])
+                            path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+                            files.assure_path_exists(path)
+                            files.file_copy(dep[0],path)
+                        
+                    if ref: # for refernce files
+                        
+                        if dep[1] == 'reference':
+
+                            
+                            filename = files.file_name(dep[0])
+                            path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+                            files.assure_path_exists(path)
+                            files.file_copy(dep[0],path)
+                            
+                                    
+                            component_dummy = pipeline_component()
+                            pipe_file = component_dummy.get_data_file(path = dep[0])            
+                          
+                            if pipe_file:
+                                component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+                                
+                                pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+                                files.assure_path_exists(pipe_file_copy)
+                                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+                                files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
+                                files.file_copy(pipe_file,pipe_file_copy)
+
+                                if component.thumbnail_path:
+                                    tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+                                    files.assure_path_exists(tumb_file_copy)
+                                    files.file_copy(component.thumbnail_path,tumb_file_copy)
+                        
+                
+                fps = self.project.project_fps
+                padding = self.project.project_padding
+                file_type = self.project.project_file_type                   
+                project_file = pipeline_project().create(collect_path, name = '%s_%s'%(self.component.component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)   
+                
+                dlg.massage("massage", "Success", "Project created successfully" )
+            
+            
 
     def enable(self, Qwidget, level = None):
 

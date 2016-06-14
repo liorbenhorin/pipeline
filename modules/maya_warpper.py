@@ -111,7 +111,36 @@ def import_scene(path = None):
         namesspace = files.file_name_no_extension(files.file_name(path))
         return cmds.file(path, i = True, f = True, ns = namesspace, esn = False)    
         
+
+def list_referenced_files():
+    results = []
+    links = cmds.filePathEditor(query=True, listDirectories="")
+    for link in links:
+        pairs =  cmds.filePathEditor(query=True, listFiles=link, withAttribute=True, status=True)
+        '''
+        paris: list of strings ["file_name node status ...", "file_name node status ...",...]
+        we need to make this large list of ugly strings (good inforamtion seperated by white space) into a dictionry we can use
+        '''        
+        l = len(pairs)
+        items = l/3
+        order = {}
+        index = 0
         
+        '''
+        order: dict of {node: [file_name, status],...}
+        '''
+        
+        for i in range(0,items):
+            order[pairs[index+1]] = [os.path.join(link,pairs[index]),pairs[index+1],pairs[index+2]]
+            index = index + 3  
+                    
+        for key in order:            
+            # for each item in the dict, if the status is 0, repath it
+            if order[key][2] == "1": 
+                results.append([order[key][0],cmds.nodeType(order[key][1])])
+                    
+    return results 
+            
      
 def relink_pathes(project_path = None):
     results = []
@@ -141,8 +170,8 @@ def relink_pathes(project_path = None):
                 if repath(key,order[key][0],project_path):
                     results.append(key)
                     
-                    
-        return results
+                   
+    return results
 
     
     

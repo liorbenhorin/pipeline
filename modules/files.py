@@ -52,7 +52,7 @@ from send2trash import send2trash
 import operator
 import sys
 import subprocess
-
+import glob
 
 def dir_rename(dir_fullpath, new_name):
     
@@ -88,7 +88,10 @@ def file_rename(fullpath, new_name):
 
 def file_copy(source, dest):
     if os.path.exists(source):
-        return shutil.copy2(source, dest)
+        try:
+            return shutil.copy2(source, dest)
+        except:
+            return None
     else:
         return None
 
@@ -163,6 +166,18 @@ def list_directory(path,type):
 def list_dir_folders(path):
     return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
+
+def assure_path_exists(path):
+        dir = os.path.dirname(path)
+        if not os.path.exists(dir):
+                os.makedirs(dir)
+
+def assure_folder_exists(path):
+        if not os.path.exists(path):
+                os.makedirs(path)
+
+def reletive_path(absolute_path, path):
+    return os.path.relpath(path, absolute_path)
 
 def create_directory(path):
                      
@@ -255,4 +270,21 @@ def explore(path):
             os.startfile(path)
         
 
+def get_pipe_file_from_folder_or_parent_folder(path):
     
+    dir = os.path.dirname(path)
+    file = os.path.join(dir,"*.pipe")
+    
+    
+    if len(glob.glob(file)) == 1: #if its a master
+        return glob.glob(file)[0]                        
+
+    dir = os.path.dirname(dir)
+    file = os.path.join(dir,"*.pipe")
+                               
+    if len(glob.glob(file)) == 1: #if its a version
+        return glob.glob(file)[0]  
+        
+    return None
+        
+        

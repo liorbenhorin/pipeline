@@ -735,6 +735,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionFiles_repath"/>
+    <addaction name="actionCollect_component"/>
    </widget>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -765,6 +766,11 @@
   <action name="actionDocumentation">
    <property name="text">
     <string>Documentation</string>
+   </property>
+  </action>
+  <action name="actionCollect_component">
+   <property name="text">
+    <string>Collect component</string>
    </property>
   </action>
  </widget>
