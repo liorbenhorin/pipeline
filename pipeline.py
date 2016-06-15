@@ -436,7 +436,10 @@ class pipeline_component(pipeline_data):
     @property
     def component_name(self):
         if self.component_file:
-            return self.component_file["component_name"]
+            try:
+                return self.component_file["component_name"]
+            except:
+                return None
         else:
             return None  
             
@@ -883,7 +886,21 @@ class pipeline_component(pipeline_data):
             return None
             
         return None        
-    
+
+    @property
+    def type(self):
+        
+        if self.component_name:
+            return "component"
+        
+        
+        shot = pipeline_shot(path = self.data_file_path, project = self.project, settings = self.settings)
+        print shot
+        if shot:
+            if shot.shot_name:
+                return "shot"
+            
+        return None    
         
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
@@ -937,7 +954,10 @@ class pipeline_shot(pipeline_component):
     @property
     def shot_name(self):
         if self.component_file:
-            return self.component_file["shot_name"]
+            try:
+                return self.component_file["shot_name"]
+            except:
+                return None
         else:
             return None  
 
@@ -987,7 +1007,7 @@ class pipeline_shot(pipeline_component):
                 versions[version_number] = new_version
                 self.versions_ = versions  
 
-
+    '''
     @property
     def thumbnail(self):
         if self.project:
@@ -998,6 +1018,28 @@ class pipeline_shot(pipeline_component):
                         return QtGui.QPixmap(thumbnail_name)
 
         return wide_image_icon
+
+    '''
+    
+    @property
+    def thumbnail(self):
+        file = self.thumbnail_path
+        if file:
+            return QtGui.QPixmap(file)
+        
+        return wide_image_icon
+
+    @property
+    def thumbnail_path(self):
+        if self.project:
+            if self.component_file:
+                if self.settings:
+                    thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.shot_name,"png"))
+                    if os.path.isfile(thumbnail_name):
+                        return thumbnail_name
+        
+        return None
+
 
 class pipeline_project(pipeline_data):
     def __init__(self,**kwargs):
@@ -2091,6 +2133,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 if self.settings.shot_selection in self.project.shots(self.settings.sequence_selection):
                     
                     self.table_selection_by_string(self.ui.shots_tableWidget,self.settings.shot_selection)
+                    self.enable(self.ui.actionCollect_component, level = 4) 
 
                     if self.ui.scenes_main_widget.isHidden():
         
@@ -3887,6 +3930,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.settings.component_selection = None
         #self.settings.sequence_selection = self.sequence_name
         #self.settings.shot_selection = self.shot_name 
+        self.enable(self.ui.actionCollect_component, level = 4) 
 
 
     def shot_reference(self):
@@ -4028,28 +4072,32 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
             collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
             if collect_path:
-                
-                collect_path = os.path.join(collect_path,'%s_%s'%(self.component.component_name,'collect'))
-                                       
+                                                   
                 log.info(input)
                 ref = input[0]
                 texture = input[1]
-                
-                                     
-                #collect dependencies
-
+                      
                 file = maya.current_open_file()
-                
-                
-                path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
-                files.assure_path_exists(path)
-                files.file_copy(file,path)
-            
                 component_dummy = pipeline_component()
                 pipe_file = component_dummy.get_data_file(path = file)            
-              
+                component_name = None
+                
                 if pipe_file:
                     component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
+                    
+                    if component.type == "shot":
+                        component = pipeline_shot(path = pipe_file, project = self.project, settings = self.settings) 
+                        component_name = component.shot_name
+                        
+                    if component.type == "component":
+                        component_name = component.component_name
+                    
+                        
+                    collect_path = os.path.join(collect_path,'%s_%s'%(component_name,'collect'))
+                                           
+                    path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
+                    files.assure_path_exists(path)
+                    files.file_copy(file,path)
                    
                     pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
                     files.assure_path_exists(pipe_file_copy)
@@ -4062,7 +4110,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                         files.assure_path_exists(tumb_file_copy)
                         files.file_copy(component.thumbnail_path,tumb_file_copy)
 
-
+                else: #active file is not a component or a shot from pipeline
+                    dlg.massage("massage", "Failed", "Component collection failed" )
+                    return False
                 
                 dependencies = maya.list_referenced_files()
 
@@ -4127,9 +4177,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 fps = self.project.project_fps
                 padding = self.project.project_padding
                 file_type = self.project.project_file_type                   
-                project_file = pipeline_project().create(collect_path, name = '%s_%s'%(self.component.component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)   
+                project_file = pipeline_project().create(collect_path, name = '%s_%s'%(component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)   
                 
-                dlg.massage("massage", "Success", "Project created successfully" )
+                dlg.massage("massage", "Success", "Component collected successfully" )
             
             
 
