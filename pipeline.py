@@ -3387,7 +3387,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.enable(self.rename_component_action, level = 1)
             self.enable(self.ui.component_frame)            
             self.set_component_thumbnail(self.component.thumbnail)  
-            self.set_grab_thumbnail_button(large_image_icon_click)     
+            self.set_grab_thumbnail_button(large_image_icon_click) 
+            
+            self.enable(self.ui.actionCollect_component, level = 4)    
             
         else:
             self.component = None
@@ -3397,6 +3399,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.disable(self.ui.component_frame)
             self.set_component_thumbnail(large_image_icon_dark)
             self.set_grab_thumbnail_button(large_image_icon_click_dark) 
+            
+            self.disable(self.ui.actionCollect_component)
            
         
         self.update_masters()
@@ -4032,10 +4036,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 #collect dependencies
 
                 file = maya.current_open_file()
+                
+                
                 path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
                 files.assure_path_exists(path)
                 files.file_copy(file,path)
-                
+            
                 component_dummy = pipeline_component()
                 pipe_file = component_dummy.get_data_file(path = file)            
               
@@ -4061,13 +4067,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     if texture: # for texture files
                         
                         if dep[1] == 'file':
+                            #filename = files.file_name(dep[0])
                             
                             if files.is_subdir(self.settings.current_project_path, dep[0]): #if texture is in the projects folder
-                            
-                                filename = files.file_name(dep[0])
+                                                            
                                 path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
                                 files.assure_path_exists(path)
                                 files.file_copy(dep[0],path)
+                                
+                            else: #if texture if not in the project
+                    
+                                path = os.path.join(collect_path,"sourceimages",files.file_name(dep[0]))
+                                files.assure_path_exists(path)
+                                files.file_copy(dep[0],path)      
                         
                     if ref: # for refernce files
                         
@@ -4102,6 +4114,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                         files.assure_path_exists(tumb_file_copy)
                                         files.file_copy(component.thumbnail_path,tumb_file_copy)
                             
+                            else: #if texture if not in the project
+                    
+                                path = os.path.join(collect_path,"scenes","collect",files.file_name(dep[0]))
+                                files.assure_path_exists(path)
+                                files.file_copy(dep[0],path)  
                         
                 
                 fps = self.project.project_fps
