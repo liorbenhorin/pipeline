@@ -4235,8 +4235,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.setMaximumWidth(600)
 
     def about(self):
-        dlg.massage(None,"About",
-                    "<p align='Center'><b>Pipeline</b><br>Projects manager for Maya<br><br>%s<br><br><a href='liorbenhorin@gmail.com'><font color='white'>liorbenhorin@gmail.com</font></a><br><br>All rights reserved to Lior Ben Horin 2016</p>"%(version))
+        about = dlg.about()#(None,"About",
+        about.exec_()            #"<p align='Center'><b>Pipeline</b><br>Projects manager for Maya<br><br>%s<br><br><a href='liorbenhorin@gmail.com'><font color='white'>liorbenhorin@gmail.com</font></a><br><br>All rights reserved to Lior Ben Horin 2016</p>"%(version))
     
     def documentation(self):
         webbrowser.open('http://liorbenhorin.github.io/Pipeline_help/')
