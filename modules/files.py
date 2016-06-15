@@ -179,6 +179,9 @@ def assure_folder_exists(path):
 def reletive_path(absolute_path, path):
     return os.path.relpath(path, absolute_path)
 
+def is_subdir(dir,subdir):
+    return subdir.startswith(os.path.abspath(dir)+'/')
+
 def create_directory(path):
                      
     if not os.path.exists(path):
@@ -270,21 +273,3 @@ def explore(path):
             os.startfile(path)
         
 
-def get_pipe_file_from_folder_or_parent_folder(path):
-    
-    dir = os.path.dirname(path)
-    file = os.path.join(dir,"*.pipe")
-    
-    
-    if len(glob.glob(file)) == 1: #if its a master
-        return glob.glob(file)[0]                        
-
-    dir = os.path.dirname(dir)
-    file = os.path.join(dir,"*.pipe")
-                               
-    if len(glob.glob(file)) == 1: #if its a version
-        return glob.glob(file)[0]  
-        
-    return None
-        
-        
