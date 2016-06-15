@@ -1662,6 +1662,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         self.ui.actionFiles_repath.triggered.connect(self.repath)
         self.ui.actionCollect_component.triggered.connect(self.collect_component)
+        self.disable(self.ui.actionCollect_component)
+        
         
         self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
@@ -2080,6 +2082,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                                                                         asset_name = self.settings.asset_selection):
                             
                             self.table_selection_by_string(self.ui.components_tableWidget,self.settings.component_selection)
+                            self.enable(self.ui.actionCollect_component, level = 4) 
             
             elif asset == self.settings.sequence_selection and component == self.settings.shot_selection:
                 
@@ -3389,7 +3392,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.set_component_thumbnail(self.component.thumbnail)  
             self.set_grab_thumbnail_button(large_image_icon_click) 
             
-            self.enable(self.ui.actionCollect_component, level = 4)    
+            #self.enable(self.ui.actionCollect_component, level = 4)    
             
         else:
             self.component = None
@@ -3400,7 +3403,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.set_component_thumbnail(large_image_icon_dark)
             self.set_grab_thumbnail_button(large_image_icon_click_dark) 
             
-            self.disable(self.ui.actionCollect_component)
+            #self.disable(self.ui.actionCollect_component)
            
         
         self.update_masters()
@@ -3653,11 +3656,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         when opening a file, save the ui navigation selection to the settings file
         '''  
         self.update_component_selection()   
-        #self.settings.catagory_selection = self.catagory_name
-        #self.settings.asset_selection = self.asset_name
-        #self.settings.component_selection = self.component_name
-        #self.settings.sequence_selection = None
-        #self.settings.shot_selection = None      
+        
+        self.enable(self.ui.actionCollect_component, level = 4) 
+          
             
     def version_reference(self):
         widget = self.sender()
@@ -3740,7 +3741,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.update_masters()
             
             self.update_component_selection()
-
+            
+            self.enable(self.ui.actionCollect_component, level = 4) 
+            
             return 
 
 
@@ -4250,8 +4253,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
  
     def scen_opened(self):
         
+        
         self.init_current_project()
         self.init_assets_selection()
+        self.disable(self.ui.actionCollect_component)
         log.info( "Scene opend" )     
   
     def toggle_scene_open_script(self):
