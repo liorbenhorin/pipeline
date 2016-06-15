@@ -4173,9 +4173,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                         files.assure_path_exists(tumb_file_copy)
                                         files.file_copy(component.thumbnail_path,tumb_file_copy)
                             
-                            else: #if texture if not in the project
+                            else: #if ref if not in the project
                     
-                                path = os.path.join(collect_path,"scenes","collect",files.file_name(dep[0]))
+                                path = os.path.join(collect_path,"scenes","reference",files.file_name(dep[0]))
                                 files.assure_path_exists(path)
                                 files.file_copy(dep[0],path)  
                         
