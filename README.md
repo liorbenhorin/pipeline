@@ -1,4 +1,4 @@
-# pipeline
+# PIPELINE
 Projects manager for Maya
 
 [http://pipeline.nnl.tv](http://pipeline.nnl.tv)
