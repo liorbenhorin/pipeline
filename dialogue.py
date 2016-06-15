@@ -59,6 +59,7 @@ def set_icons():
     global users_icon
     global archive_icon
     global new_icon
+    global logo
     
     warning_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"critical")) 
     simple_warning_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"warning"))
@@ -66,6 +67,7 @@ def set_icons():
     users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
     archive_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"archive"))
     new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
+    logo = QtGui.QPixmap(os.path.join(localIconPath, "%s.png"%"pipeline_logo"))
     
 def warning(icon, title, message ):
     
@@ -113,6 +115,44 @@ def massage(icon, title, message ):
         
 set_icons()
 
+
+class about(QtGui.QDialog):
+    def __init__(self, parent = None, title = None):
+        super(about, self).__init__(parent)                    
+
+        self.setMaximumWidth(330) 
+        self.setMinimumWidth(330)        
+        self.setMaximumHeight(300) 
+
+        layout = QtGui.QVBoxLayout(self)
+
+        self.logo_label = QtGui.QLabel()
+        self.logo_label.setPixmap(logo.scaled(250,56))         
+        self.logo_label.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.version_label = QtGui.QLabel("<b>V 1.0</b>")
+        self.version_label.setAlignment(QtCore.Qt.AlignCenter)
+        
+        self.title_label = QtGui.QLabel("<b>A SIMPLE PROJECTS MANAGER FOR MAYA</b>")
+        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
+        
+        self.info_label = QtGui.QLabel("<a href='http://pipeline.nnl.tv'><font color='white'>http://pipeline.nnl.tv</font></a><br><br>All rights reserved to Lior Ben Horin 2016")
+        self.info_label.setAlignment(QtCore.Qt.AlignCenter)
+        
+
+        buttons = QtGui.QDialogButtonBox(
+            QtGui.QDialogButtonBox.Ok,
+            QtCore.Qt.Horizontal, self)
+        
+        buttons.setCenterButtons(True)
+        buttons.accepted.connect(self.accept)
+        
+        layout.addWidget(self.logo_label)
+        layout.addWidget(self.version_label)  
+        layout.addWidget(HLine())
+        layout.addWidget(self.title_label)
+        layout.addWidget(self.info_label)
+        layout.addWidget(buttons)
 
 
 class Create_from_selection(QtGui.QDialog):
@@ -168,8 +208,8 @@ class collect_component_options(QtGui.QDialog):
         self.setMinimumWidth(200)        
         self.setMaximumHeight(50) 
 
-        self.label = QtGui.QLabel()
-        self.label.setPixmap(archive_icon)
+        #self.label = QtGui.QLabel()
+        #self.label.setPixmap(archive_icon)
 
         layout = QtGui.QVBoxLayout(self)
         self.item_name = QtGui.QLabel(title)
@@ -180,11 +220,11 @@ class collect_component_options(QtGui.QDialog):
         self.include_textures.setChecked(True)
         
         
-        layout.addWidget(self.label)
-        layout.addStretch()
+        #layout.addWidget(self.label)
+        #layout.addStretch()
         layout.addWidget(self.item_name)
 
-        layout.addWidget(self.HLine())
+        layout.addWidget(HLine())
         layout.addWidget(self.include_reference)
         layout.addWidget(self.include_textures)
         
@@ -210,11 +250,7 @@ class collect_component_options(QtGui.QDialog):
     def result(self):
         return self.options()        
 
-    def HLine(self):
-        toto = QtGui.QFrame()
-        toto.setFrameShape(QtGui.QFrame.HLine)
-        toto.setFrameShadow(QtGui.QFrame.Sunken)
-        return toto  
+
     
 class Login(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -240,7 +276,8 @@ class Login(QtGui.QDialog):
     
         layout = QtGui.QVBoxLayout(self)
         layout.addWidget(self.label)
-        layout.addWidget(self.HLine())
+        layout.addWidget(self.label)
+        layout.addWidget(HLine())
         layout.addWidget(self.label_user)
         layout.addWidget(self.textName)
         layout.addWidget(self.label_password)
@@ -265,8 +302,8 @@ class Login(QtGui.QDialog):
         return self.textName.text(), self.textPass.text()
 
 
-    def HLine(self):
-        toto = QtGui.QFrame()
-        toto.setFrameShape(QtGui.QFrame.HLine)
-        toto.setFrameShadow(QtGui.QFrame.Sunken)
-        return toto    
+def HLine():
+    toto = QtGui.QFrame()
+    toto.setFrameShape(QtGui.QFrame.HLine)
+    toto.setFrameShadow(QtGui.QFrame.Sunken)
+    return toto    
