@@ -4085,6 +4085,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 if pipe_file:
                     component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
                     
+                    
+                    # detarmain wheter the scenes is a shot or a component
                     if component.type == "shot":
                         component = pipeline_shot(path = pipe_file, project = self.project, settings = self.settings) 
                         component_name = component.shot_name
@@ -4156,6 +4158,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                 if pipe_file:
                                     component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
                                     
+                                    # detarmain wheter the scenes is a shot or a component
+                                    if component.type == "shot":
+                                        component = pipeline_shot(path = pipe_file, project = self.project, settings = self.settings) 
+
                                     pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
                                     files.assure_path_exists(pipe_file_copy)
                                     files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
