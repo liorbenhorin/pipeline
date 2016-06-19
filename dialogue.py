@@ -302,6 +302,123 @@ class Login(QtGui.QDialog):
         return self.textName.text(), self.textPass.text()
 
 
+        
+class playblast_options(QtGui.QDialog):
+    def __init__(self, parent = None, title = None, hud = True, offscreen = True, formats = None, format = "movie", compressions = None, compression = "H.264", scale = 50):
+        super(playblast_options, self).__init__(parent)
+        
+    
+        self.setMaximumWidth(200) 
+        self.setMinimumWidth(200)        
+        self.setMaximumHeight(50) 
+
+
+        layout = QtGui.QVBoxLayout(self)
+        self.item_name = QtGui.QLabel(title)
+
+        self.include_hud = QtGui.QCheckBox("Record HUD")
+        self.include_hud.setChecked(hud)
+        
+        self.render_offscreen = QtGui.QCheckBox("Record Offscreen")
+        self.render_offscreen.setChecked(offscreen)
+
+        
+        self.scaleLayout = QtGui.QHBoxLayout(self)
+        
+        self.scale_label = QtGui.QLabel("Scale:")
+        
+        self.scaleSlider = QtGui.QSlider()
+        self.scaleSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.scaleSlider.setMinimum(10)
+        self.scaleSlider.setMaximum(100)
+        self.scaleSlider.setValue(scale)       
+        
+        self.scaleSpinbox = QtGui.QSpinBox()
+        self.scaleSpinbox.setMinimum(10)
+        self.scaleSpinbox.setMaximum(100)
+        self.scaleSpinbox.setValue(scale)
+        
+        self.scaleSlider.valueChanged.connect(self.sacle_spinbox_value)
+        self.scaleSpinbox.valueChanged.connect(self.sacle_slider_value)
+
+        
+        self.scaleLayout.addWidget(self.scaleSpinbox)
+        self.scaleLayout.addWidget(self.scaleSlider)
+        
+        self.format_label = QtGui.QLabel("Format:")    
+            
+        self.format_combo = QtGui.QComboBox()
+        self.format_combo.setEditable(False)
+        if formats:
+            self.format_combo.addItems(formats)
+        else:
+            self.format_combo.addItems([format])
+                  
+        i = self.format_combo.findText(format, QtCore.Qt.MatchFixedString)
+        if i >= 0:
+            self.format_combo.setCurrentIndex(i)
+
+        self.compression_label = QtGui.QLabel("Compression:")  
+
+        self.compression_combo = QtGui.QComboBox()
+        self.compression_combo.setEditable(False)
+        if formats:
+            self.compression_combo.addItems(compressions)
+        else:
+            self.compression_combo.addItems([compression])
+                  
+        i = self.compression_combo.findText(compression, QtCore.Qt.MatchFixedString)
+        if i >= 0:
+            self.compression_combo.setCurrentIndex(i)
+
+        
+        layout.addWidget(self.item_name)
+
+        layout.addWidget(HLine())
+        layout.addWidget(self.include_hud)
+        layout.addWidget(self.render_offscreen)
+        layout.addWidget(self.scale_label)
+        layout.addLayout(self.scaleLayout)
+        layout.addWidget(self.format_label)
+        layout.addWidget(self.format_combo)
+        layout.addWidget(self.compression_label)
+        layout.addWidget(self.compression_combo)
+                
+        buttons = QtGui.QDialogButtonBox(
+            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
+            QtCore.Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def sacle_spinbox_value(self,value):
+        self.scaleSpinbox.setValue(value)
+
+    def sacle_slider_value(self,value):
+        self.scaleSlider.setValue(value)
+    
+    def options(self):
+        options = {}
+        hud = False
+        offscreen = False
+        
+        if self.include_hud.isChecked():
+            hud = True
+        if self.render_offscreen.isChecked():
+            offscreen = False
+        
+        options["hud"] = hud
+        options["offscreen"] = offscreen
+        options["format"] = self.format_combo.currentText() 
+        options["compression"] = self.compression_combo.currentText()
+        options["scale"] = self.scaleSpinbox.value()
+            
+        return options
+        
+    def result(self):
+        return self.options()   
+
+
 def HLine():
     toto = QtGui.QFrame()
     toto.setFrameShape(QtGui.QFrame.HLine)

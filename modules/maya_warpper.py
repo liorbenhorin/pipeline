@@ -197,7 +197,7 @@ def repath(node, file, project_path):
     
 def snapshot(path = None, width = 96, height = 96):
     current_image_format = cmds.getAttr("defaultRenderGlobals.imageFormat")
-    cmds.setAttr("defaultRenderGlobals.imageFormat", 32)
+    cmds.setAttr("defaultRenderGlobals.imageFormat", 32) # *.png
     #path = "/Users/liorbenhorin/Library/Preferences/Autodesk/maya/2015-x64/scripts/pipeline/thumb.png"
     cmds.playblast(cf = path, fmt="image", frame = cmds.currentTime( query=True ), orn=False, wh = [width,height], p=100, v=False)
     cmds.setAttr("defaultRenderGlobals.imageFormat", current_image_format)
@@ -206,6 +206,61 @@ def snapshot(path = None, width = 96, height = 96):
         return path
     else:
         return False
+
+
+def playblast_snapshot(path = None,format = None, compression = None, hud = None, offscreen = None, range=None, scale = None):
+    current_image_format = cmds.getAttr("defaultRenderGlobals.imageFormat")
+    cmds.setAttr("defaultRenderGlobals.imageFormat", 32) # *.png
+
+    if range is None:
+        
+        range = playback_selection_range()
+        print range
+        if range is None:
+        
+            start = cmds.playbackOptions( q=True,min=True )
+            end  = cmds.playbackOptions( q=True,max=True )
+            range = [start, end]
+ 	
+    cmds.playblast(frame =int((range[0] + range[1])/2), cf = path, fmt="image",  orn=hud, os=offscreen, wh = scene_resolution(), p=scale, v=False) 
+    
+    cmds.setAttr("defaultRenderGlobals.imageFormat", current_image_format)
+
+
+def playblast(path = None,format = None, compression = None, hud = None, offscreen = None, range=None, scale = None):
+    if range is None:
+        
+        range = playback_selection_range()
+        print range
+        if range is None:
+        
+            start = cmds.playbackOptions( q=True,min=True )
+            end  = cmds.playbackOptions( q=True,max=True )
+            range = [start, end]
+ 	
+    cmds.playblast(startTime =range[0] ,endTime =range[1], f = path, fmt=format,  orn=hud, os=offscreen, wh = scene_resolution(), p=scale, qlt=90,c=compression, v=True) 
+
+
+def playback_selection_range():
+    aPlayBackSliderPython = mel.eval('$tmpVar=$gPlayBackSlider')
+    time_selection = cmds.timeControl( aPlayBackSliderPython, q=True,rng=True )[1:-1]
+    start = int(time_selection.split(":")[0])
+    end = int(time_selection.split(":")[1])
+    
+    if start+1 == end:
+        return None
+    else:
+        return [start, end]    
+
+def getPlayblastOptions():
+    options = {}
+    options["format"] = cmds.playblast(q=True,fmt=True)
+    options["compression"] = cmds.playblast(q=True,c=True)
+    return options
+    
+
+def scene_resolution():
+    return [cmds.getAttr("defaultResolution.width"),cmds.getAttr("defaultResolution.height")]
     
 
 def create_scriptjob(parent = None, event = None, script = None):

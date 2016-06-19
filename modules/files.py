@@ -53,6 +53,7 @@ import operator
 import sys
 import subprocess
 import glob
+import logging
 
 def dir_rename(dir_fullpath, new_name):
     
@@ -61,6 +62,14 @@ def dir_rename(dir_fullpath, new_name):
     try:
         shutil.move(dir_fullpath, new_dir)
         return new_dir
+    except:
+        return False
+
+def dir_move(dir_fullpath, new_dir_fullpath):
+    
+    try:
+        shutil.move(dir_fullpath, new_dir_fullpath)
+        return new_dir_fullpath
     except:
         return False
         
@@ -95,6 +104,18 @@ def file_copy(source, dest):
     else:
         return None
 
+
+def find_by_name(path, name):
+    files = []
+    for file in glob.glob(os.path.join(path, "%s.*"%(name))):
+        files.append(file)
+    
+    if len(files)>0:
+        return files
+    else:
+        return None
+        
+        
 def file_name(fullPath):
     return os.path.basename(fullPath)
 
@@ -154,14 +175,35 @@ def list_directory(path,type):
     
     @return: list of strings
     '''    
-            
-    fullNames = []
-    for file in os.listdir(path):        
-        if os.path.isfile(os.path.join(path, file)):
-            if extension(file)[1:] == type:
-                fullNames.append(os.path.join(path, file))
+    if os.path.exists(path):        
+        fullNames = []
+        for file in os.listdir(path):        
+            if os.path.isfile(os.path.join(path, file)):
+                if extension(file)[1:] == type:
+                    fullNames.append(os.path.join(path, file))
 
-    return fullNames
+        return fullNames
+    else:
+        return None
+
+
+def list_all_directory(path):
+    '''
+    This method return all files in a folder
+        
+    @param path: directory to map
+    @type path: string
+        
+    @return: list of strings
+    '''    
+    if os.path.exists(path):        
+        fullNames = []
+        for file in os.listdir(path):        
+            fullNames.append(os.path.join(path, file))
+
+        return fullNames
+    else:
+        return None
 
 def list_dir_folders(path):
     return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
@@ -192,26 +234,28 @@ def create_directory(path):
         return False
 
 def create_dummy(path, file_name):
+        assure_path_exists(os.path.join(path,file_name))
         file = open(os.path.join(path,file_name),'w')
         file.close()
 
 def delete(path):
-                     
-    if os.path.exists(path):
-        # shutil.rmtree(path) DELETE FOR GOOD
-        send2trash(path) # SEND TO BIN
-        return True
-    else:
-        warnings.warn("Unable to delete")    
-        return False
+    if path:                 
+        if os.path.exists(path):
+            # shutil.rmtree(path) DELETE FOR GOOD
+            send2trash(path) # SEND TO BIN
+            return True
+        else:
+            warnings.warn("Unable to delete")    
+            return False
 
 def delete_file(path):
-    if os.path.isfile(path):
-        os.remove(path)
-        return True
-    else:
-        warnings.warn("Unable to delete")    
-        return False    
+    if path:
+        if os.path.isfile(path):
+            os.remove(path)
+            return True
+        else:
+            warnings.warn("Unable to delete")    
+            return False    
 
 def file_size_mb(filePath):
     if filePath: 
@@ -243,7 +287,8 @@ def dict_versions(versions,padding):
             name = file_name_no_extension(file_name(version))
             versions_dict[int(name[-padding:len(name)])] = version
         except:
-            print "cant find version in ", version
+            pass
+            #logging.info( "cant find version in %s"%version)
     return versions_dict
         
 
@@ -272,4 +317,10 @@ def explore(path):
         elif platform == "win32":
             os.startfile(path)
         
-
+        
+def run(filename):
+    if sys.platform == "win32":
+        os.startfile(filename)
+    else:
+        opener ="open" if sys.platform == "darwin" else "xdg-open"
+        subprocess.call([opener, filename])            

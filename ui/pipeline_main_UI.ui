@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>449</width>
     <height>1500</height>
    </rect>
   </property>
@@ -661,11 +661,35 @@
             </widget>
            </item>
            <item>
-            <widget class="QTableWidget" name="shots_versions_tableWidget"/>
+            <widget class="QTabWidget" name="tabWidget">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="tab_5">
+              <attribute name="title">
+               <string>Versions</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_11">
+               <item>
+                <widget class="QTableWidget" name="shots_versions_tableWidget"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_6">
+              <attribute name="title">
+               <string>Playblasts</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_12">
+               <item>
+                <widget class="QTableWidget" name="shots_playblasts_tableWidget"/>
+               </item>
+              </layout>
+             </widget>
+            </widget>
            </item>
            <item>
             <widget class="QWidget" name="widget_6" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0">
+             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,0">
               <property name="spacing">
                <number>6</number>
               </property>
@@ -690,6 +714,22 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="playblast_shot_pushButton">
+                <property name="minimumSize">
+                 <size>
+                  <width>110</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="contextMenuPolicy">
+                 <enum>Qt::ActionsContextMenu</enum>
+                </property>
+                <property name="text">
+                 <string>Playblast</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -707,7 +747,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>449</width>
      <height>22</height>
     </rect>
    </property>
@@ -771,6 +811,11 @@
   <action name="actionCollect_component">
    <property name="text">
     <string>Collect component</string>
+   </property>
+  </action>
+  <action name="playblast_shot_options">
+   <property name="text">
+    <string>Playblast options</string>
    </property>
   </action>
  </widget>

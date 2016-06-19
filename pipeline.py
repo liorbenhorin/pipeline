@@ -180,6 +180,9 @@ def set_icons():
     global anim_icon
     global asset_mode_icon
     global reload_icon
+    global shutter_icon
+    global camrea_icon
+    global play_icon
     
     global large_image_icon
     global large_image_icon_dark
@@ -220,6 +223,9 @@ def set_icons():
     anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
     asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
     reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
+    shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
+    camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
+    play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
     
     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
     large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark")) 
@@ -395,6 +401,7 @@ class pipeline_component(pipeline_data):
                 return os.path.join(self.component_path, "masters") 
         else:
             return None  
+   
 
     @property
     def tumbnails_path(self):
@@ -975,6 +982,16 @@ class pipeline_shot(pipeline_component):
                 return os.path.join(self.settings.current_project_path, "scenes",self.sequence_name,self.shot_name)  
         else:
             return None  
+    '''
+    @property
+    def playblasts_path(self):
+        if self.component_file:
+            
+            if self.settings:                             
+                return os.path.join(self.component_path, "playblasts") 
+        else:
+            return None  
+    '''
 
     def file_path(self, type, version):
         if self.component_file:
@@ -985,6 +1002,7 @@ class pipeline_shot(pipeline_component):
                 return os.path.join(versions_path, version_file)  
         else:
             return None  
+
             
     def new_version(self): 
         if self.project:
@@ -1041,6 +1059,208 @@ class pipeline_shot(pipeline_component):
         return None
 
 
+
+    @property  
+    def playblasts_(self):
+        if self.component_file:
+            try:
+                return self.component_file["playblasts"]
+            except:
+                return {}
+    
+    @playblasts_.setter
+    def playblasts_(self,playblasts):
+       
+        if self.data_file:
+            data = {}
+            data["playblasts"] = playblasts
+            self.data_file.edit(data)
+            self.component_file = self.data_file.read()
+
+
+    
+    @property
+    def playblasts(self):
+        if self.project:
+            if self.component_file:
+                if self.settings:
+                   
+                    playblasts = files.list_all_directory(os.path.join(self.project.playblasts_path,self.sequence_name,self.shot_name))
+                    if playblasts:
+                        playblasts_dict = files.dict_versions(playblasts,self.project.project_padding)
+                        
+                        sorted_playblasts = files.sort_version(playblasts_dict)
+                        return sorted_playblasts
+                    else:
+                        return None
+
+    def new_playblast(self):
+        if self.project:
+            if self.component_file:
+                if self.settings:
+                                    
+                    new_playbalst = {}
+                    new_playbalst["date_created"] = "%s %s"%(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
+                    new_playbalst["author"] = self.settings.user[0]
+                    new_playbalst["note"] = "No notes"  
+                                                 
+                    if self.playblasts:
+                        # playblast versions existst                        
+                        playblasts = self.playblasts
+                        last = playblasts[len(playblasts)-1]
+                        version_number = set_padding(last+1,self.project.project_padding)                
+                   
+                    else:
+                        
+                        # this will be the first master
+                        version_number = set_padding(1,self.project.project_padding)                
+                                      
+                    file_name = "%s_%s_%s_%s.%s"%(self.sequence_name,self.shot_name,"PREVIEW",version_number,self.project.movie_file_type)
+                    
+                    #----> the self.project.movie_file_type dose not really matter, is is obsolete and only in use for the
+                    #----> assure_path_exists function to create the folder
+                                                                     
+                    playblast_path = os.path.join(self.project.playblasts_path,self.sequence_name,self.shot_name)
+
+                    files.assure_path_exists(os.path.join(playblast_path,file_name)) 
+                    file_name = "%s_%s_%s_%s"%(self.sequence_name,self.shot_name,"PREVIEW",version_number)    
+                    maya.playblast(path=os.path.join(playblast_path,file_name),
+                                   format=self.settings.playblast_format,
+                                   compression=self.settings.playblast_compression,
+                                   hud=self.settings.playblast_hud,
+                                   offscreen=self.settings.playblast_offscreen,
+                                   range=None,
+                                   scale = self.settings.playblast_scale)
+                    
+                    
+                    thumb_file_name = "%s_%s_%s_%s_%s"%(self.sequence_name,self.shot_name,"PREVIEW",version_number,"THUMB") 
+                    path = os.path.join(playblast_path,"%s.%s"%(thumb_file_name,"png"))   
+                    #maya.playblast_snapshot(path = path, width = 96, height = 54)
+
+
+                    maya.playblast_snapshot(path=path,
+                                   hud=self.settings.playblast_hud,
+                                   offscreen=self.settings.playblast_offscreen,
+                                   range=None,
+                                   scale = self.settings.playblast_scale)
+                                          
+                    playblasts = self.playblasts_ 
+                    playblasts[version_number] = new_playbalst                    
+                    self.playblasts_ = playblasts 
+
+
+    def playblast_path(self, version):
+        if self.component_file:
+            if self.project: 
+         
+                #file_name = "%s_%s_%s_%s.%s"%(self.sequence_name,self.shot_name,"PREVIEW",version,self.project.movie_file_type)
+                file_name = "%s_%s_%s_%s"%(self.sequence_name,self.shot_name,"PREVIEW",version)                                                       
+                playblast_path = os.path.join(self.project.playblasts_path,self.sequence_name,self.shot_name)             
+                files.find_by_name(playblast_path,file_name)
+                #return os.path.join(playblast_path, file_name)  
+                file = files.find_by_name(playblast_path,file_name)
+                if file:
+                    file = file[0]
+                    return file
+                else:
+                    return None
+        else:
+            return None                                     
+
+    def playblast_size(self, version):
+
+        if self.playblast_path(version):            
+            size_mb = files.file_size_mb(self.playblast_path(version))
+            if size_mb:
+                return ("{0:.1f}".format(size_mb))      
+        else:
+            return None    
+
+
+    def playblast_note(self, version, **kwargs):
+         
+        if self.component_file:
+            
+            note = None
+            for key in kwargs:
+                if key == "note":
+                    note = kwargs[key]
+            
+            if note:
+ 
+                data = self.data_file.read()
+                data["playblasts"][version]["note"] = note    
+                self.data_file.edit(data)
+                self.component_file = self.data_file.read()
+                return True
+                                                
+            else:
+                
+                try:
+                    
+                    version_data = self.component_file["playblasts"][version]
+                    return version_data["note"]
+                except:
+                    return None
+            
+        else:
+            return None  
+
+
+    def playblast_thumbnail(self, version):
+        file = self.playblast_thumbnail_path(version)
+        if file:
+            return QtGui.QPixmap(file)
+        else:
+            return wide_image_icon
+
+    def playblast_thumbnail_path(self, version):
+        if self.component_file:
+            if self.project: 
+         
+                #file_name = "%s_%s_%s_%s.%s"%(self.sequence_name,self.shot_name,"PREVIEW",version,self.project.movie_file_type)
+                file_name = "%s_%s_%s_%s_%s"%(self.sequence_name,self.shot_name,"PREVIEW",version,"THUMB")                                                       
+                playblast_path = os.path.join(self.project.playblasts_path,self.sequence_name,self.shot_name)             
+                files.find_by_name(playblast_path,file_name)
+                file = files.find_by_name(playblast_path,file_name)
+                if file:
+                    file = file[0]
+                #return os.path.join(playblast_path, file_name)  
+                    return file
+                else:
+                    return None
+        else:
+            return None  
+
+    def delete_playblast(self, version):
+        if self.component_file:
+            if self.settings:
+                versions = self.playblasts_
+                if not isinstance(version, list):
+
+                    files.delete(self.playblast_path(version))
+                    files.delete(self.playblast_thumbnail_path(version))
+                                                                              
+                    if version in versions:
+                        del versions[version]
+                          
+                    self.playblasts_ = versions
+
+                    
+                else:
+                    for v in version:
+                        files.delete(self.playblast_path(v))
+                        files.delete(self.playblast_thumbnail_path(v))
+                        
+                        if v in versions:
+                            del versions[v]
+                          
+                        self.playblasts_ = versions
+                                        
+                return True                                    
+        else:
+            return None   
+
 class pipeline_project(pipeline_data):
     def __init__(self,**kwargs):
         #super(pipeline_project, self,).__init__()
@@ -1066,7 +1286,8 @@ class pipeline_project(pipeline_data):
                padding = 3,
                file_type = "ma",
                fps = 25,
-               users = {"Admin":(1234,"admin")}):
+               users = {"Admin":(1234,"admin")},
+               playblast_outside = False):
         
         project_settings_file = os.path.join(project_path, self.project_file_name) 
         
@@ -1078,6 +1299,7 @@ class pipeline_project(pipeline_data):
         project_data["fps"] = fps
         project_data["defult_file_type"] = file_type
         project_data["users"] = users
+        project_data["playblast_outside"] = playblast_outside
                      
         folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
                    "sound", "clips", "renderData", "cache"]
@@ -1176,7 +1398,13 @@ class pipeline_project(pipeline_data):
             data["defult_file_type"] = type
             self.data_file.edit(data)
             self.project_file = self.data_file.read()
-
+    
+    @property
+    def movie_file_type(self):
+        if self.project_file:
+            return "mov"
+        else:
+            return None    
 
     @property
     def project_users(self):
@@ -1198,6 +1426,33 @@ class pipeline_project(pipeline_data):
             self.project_file = self.data_file.read()
 
 
+    @property
+    def playblast_outside(self):
+        if self.project_file:
+            if "playblast_outside" in self.project_file.keys():
+                return self.project_file["playblast_outside"]
+            else:
+                return False    
+        else:
+            return None  
+
+    @playblast_outside.setter
+    def playblast_outside(self,playblast_outside):
+        
+
+        old_path = self.playblasts_path
+                      
+        if self.data_file:
+            data = {}
+            data["playblast_outside"] = playblast_outside
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+            files.dir_move(old_path, self.playblasts_path)
+            
+        
+            
+
 
     @property
     def assets_dir(self):
@@ -1205,6 +1460,9 @@ class pipeline_project(pipeline_data):
             return self.project_file_key(key = "assets")
         else:
             return None  
+
+
+
 
 
     def catagories(self, project_path = None):
@@ -1242,6 +1500,19 @@ class pipeline_project(pipeline_data):
             path = os.path.join(self.settings.current_project_path,"scenes")
             if os.path.exists(path):
                 return path
+        return None
+
+    @property
+    def playblasts_path(self):
+        if self.settings:
+            if self.playblast_outside:            
+                path = os.path.join(os.path.dirname(self.settings.current_project_path),"%s_playblasts"%(self.project_name))
+           
+            else:
+                path = os.path.join(self.settings.current_project_path,"%s_playblasts"%(self.project_name))
+            
+            
+            return path
         return None
     
     @property
@@ -1673,6 +1944,77 @@ class pipeline_settings(pipeline_data):
         if self.settings_file:
             return self.settings_file["project_premissions"]
 
+    @property
+    def playblast_format(self):
+        data = self.selection
+        try:
+            return data["playblast_format"]
+        except:
+            return "movie"
+
+    @playblast_format.setter
+    def playblast_format(self,format):
+        data = self.selection
+        data["playblast_format"] = format
+        self.selection = data
+
+    @property
+    def playblast_compression(self):
+        data = self.selection
+        try:
+            return data["playblast_compression"]
+        except:
+            return "H.264"
+
+    @playblast_compression.setter
+    def playblast_compression(self,type):
+        data = self.selection
+        data["playblast_compression"] = type
+        self.selection = data
+
+
+    @property
+    def playblast_hud(self):
+        data = self.selection
+        try:
+            return data["playblast_hud"]
+        except:
+            return True
+
+    @playblast_hud.setter
+    def playblast_hud(self,type):
+        data = self.selection
+        data["playblast_hud"] = type
+        self.selection = data
+
+    @property
+    def playblast_offscreen(self):
+        data = self.selection
+        try:
+            return data["playblast_offscreen"]
+        except:
+            return False
+
+    @playblast_offscreen.setter
+    def playblast_offscreen(self,type):
+        data = self.selection
+        data["playblast_offscreen"] = type
+        self.selection = data
+
+
+    @property
+    def playblast_scale(self):
+        data = self.selection
+        try:
+            return data["playblast_scale"]
+        except:
+            return 50
+
+    @playblast_scale.setter
+    def playblast_scale(self,int):
+        data = self.selection
+        data["playblast_scale"] = int
+        self.selection = data
 
 class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -1717,8 +2059,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.import_version_pushButton.clicked.connect(self.version_import)                
         self.ui.import_shot_version_pushButton.clicked.connect(self.shot_import)  
         self.ui.save_shot_version_pushButton.clicked.connect(self.shot_version_save)
+        #self.ui.playblast_shot_pushButton.clicked.connect(self.shot_record_playblast)
         self.ui.asset_scenes_switch_pushButton.clicked.connect(self.asset_scenes_switch)
         self.ui.publicMaster_checkBox.clicked.connect(self.public_master_toggle)
+        
+        self.playblast_menu = QtGui.QMenu(parent = self.ui.playblast_shot_pushButton)
+        self.playblast_shot = QtGui.QAction("Record Playblast",self)
+        self.playblast_shot.triggered.connect(self.shot_record_playblast)
+        self.playblast_menu.addAction(self.playblast_shot)  
+        self.playblast_menu.addSeparator() 
+        self.playblast_shot_options = QtGui.QAction("Playblast options",self)
+        self.playblast_shot_options.triggered.connect(self.shot_record_playblast_options)
+        self.playblast_menu.addAction(self.playblast_shot_options)   
+        self.ui.playblast_shot_pushButton.setMenu(self.playblast_menu)     
+        #self.ui.playblast_shot_pushButton.addAction(self.ui.playblast_shot_options)
+        #self.ui.playblast_shot_options.triggered.connect(self.shot_record_playblast_options)
         
         #create menus
         self.catagories_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
@@ -1823,6 +2178,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.init_shotsTable()
         self.init_publishedAssetsTable()
         self.init_shots_versionsTable()
+        self.init_shots_playblastsTable()
 
         '''
         >>> startup:
@@ -1886,6 +2242,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                        self.ui.save_shot_version_pushButton,
                        self.ui.import_shot_version_pushButton,
                        self.ui.export_shot_pushButton,
+                       self.ui.playblast_shot_pushButton
                        ]:
             
             button.setIconSize(QtCore.QSize(20,20)) 
@@ -1904,6 +2261,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.save_shot_version_pushButton.setIcon(QtGui.QIcon(save_icon))
         self.ui.import_shot_version_pushButton.setIcon(QtGui.QIcon(import_icon))
         self.ui.export_shot_pushButton.setIcon(QtGui.QIcon(export_icon))
+        self.ui.playblast_shot_pushButton.setIcon(QtGui.QIcon(camrea_icon))
                 
         self.ui.comp_icon_label.setPixmap(new_icon.scaled(16,16))
         self.ui.comp_user_label.setPixmap(users_icon.scaled(16,16))
@@ -2053,6 +2411,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._shot_name = None
         self._shot = None
         self._shot_version = None
+        self._shot_playblast_version = None
  
         #if self.settings.current_project_name: 
         if self.project:             
@@ -2172,13 +2531,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                      
         if project_key:
 
-            if self.settings.current_project != project_key:
+            #if self.settings.current_project != project_key:
                 
-                self.settings.current_project = project_key
-                if self.set_project():
-                    self.init_current_project()
-                
-                    return True
+            self.settings.current_project = project_key
+            if self.set_project():
+                self.init_current_project()
+            
+                return True
         else:
             
             self.settings.current_project = None
@@ -2427,6 +2786,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_tableWidget.itemSelectionChanged.connect(self.shot_selection)
 
 
+        
     def init_publishedAssetsTable(self):     
         self.ui.published_assets_tableWidget.horizontalHeader().setVisible(False)
         self.ui.published_assets_tableWidget.verticalHeader().setVisible(False)
@@ -2479,6 +2839,38 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_versions_tableWidget.clearContents()
         self.ui.shots_versions_tableWidget.setRowCount(0)        
         self.ui.shots_versions_tableWidget.itemSelectionChanged.connect(self.shot_version_selection)
+
+
+    def init_shots_playblastsTable(self):
+        
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setVisible(False)
+        self.ui.shots_playblasts_tableWidget.verticalHeader().setVisible(False)
+        self.ui.shots_playblasts_tableWidget.setWordWrap(True)
+        self.ui.shots_playblasts_tableWidget.setColumnCount(7)
+        self.ui.shots_playblasts_tableWidget.setRowCount(1)
+        self.ui.shots_playblasts_tableWidget.setHorizontalHeaderLabels(["Version","Thumb","Creator","Date Saved","Size","Open","Action"])
+        self.ui.shots_playblasts_tableWidget.resizeRowsToContents()
+        self.ui.shots_playblasts_tableWidget.verticalHeader().setDefaultSectionSize(54);
+        self.ui.shots_playblasts_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)      
+        self.ui.shots_playblasts_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
+       
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(0,25)
+        
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(1,96)
+        
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(5,25)
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(6,25)
+
+        self.ui.shots_playblasts_tableWidget.clearContents()
+        self.ui.shots_playblasts_tableWidget.setRowCount(0)        
+        self.ui.shots_playblasts_tableWidget.itemSelectionChanged.connect(self.shot_playblast_selection)
 
     
     @property
@@ -2615,6 +3007,23 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     @shot_version.setter
     def shot_version(self,version):
         self._shot_version = version
+
+    @property
+    def shot_playblast_version(self):
+        if self._shot_playblast_version:
+            if len(self._shot_playblast_version)>1:
+                versions = []
+                for v in self._shot_playblast_version:
+                    versions.append(v.text())
+                return versions
+            else:
+                return self._shot_playblast_version[0].text()
+        else:
+            return None
+            
+    @shot_playblast_version.setter
+    def shot_playblast_version(self,version):
+        self._shot_playblast_version = version
 
                 
     def update_category(self):
@@ -3156,6 +3565,87 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.ui.shot_notes_label.setStyleSheet("")
 
 
+    def update_shot_playblasts(self):
+
+        
+        self.ui.shots_playblasts_tableWidget.clearContents()
+        self.ui.shots_playblasts_tableWidget.setRowCount(0) 
+               
+        versions = None
+        if self.shot: 
+            versions = self.shot.playblasts
+            if versions:
+                versions.reverse()
+                
+                
+                self.ui.shots_playblasts_tableWidget.setRowCount(len(versions))
+                
+                for index, version in enumerate(versions):
+                    padded_version = set_padding(version, self.project.project_padding)
+                        
+                    version_number = QtGui.QTableWidgetItem(padded_version)            
+                    version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    version_number.setTextAlignment(QtCore.Qt.AlignTop)
+                    self.ui.shots_playblasts_tableWidget.setItem(index,0,version_number)
+
+                    user = QtGui.QTableWidgetItem(self.shot.author("playblasts", padded_version))
+                    user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    self.ui.shots_playblasts_tableWidget.setItem(index,1,user) 
+                    
+                    thumb = QtGui.QLabel()
+                    w = self.ui.shots_playblasts_tableWidget.columnWidth(1)
+                    h = self.ui.shots_playblasts_tableWidget.rowHeight(index)
+                    
+                    thumb_pixmap = self.shot.playblast_thumbnail(padded_version)
+                    
+                    thumb.setPixmap(thumb_pixmap.scaled(w,h,QtCore.Qt.KeepAspectRatio))      
+                    thumb.setAlignment(QtCore.Qt.AlignCenter)
+                    self.ui.shots_playblasts_tableWidget.setCellWidget(index,1,thumb)    
+                    
+                    date_time = QtGui.QTableWidgetItem(self.shot.date_created("playblasts", padded_version))
+                    date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    date_time.setTextAlignment(QtCore.Qt.AlignTop)
+                    self.ui.shots_playblasts_tableWidget.setItem(index,3,date_time)            
+                    
+                                                             
+                    size = QtGui.QTableWidgetItem("%s %s"%(self.shot.playblast_size( padded_version), "MB"))
+                    size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    size.setTextAlignment(QtCore.Qt.AlignTop)
+                    self.ui.shots_playblasts_tableWidget.setItem(index,4,size)
+                    
+                    
+                    actionButtonItem = QtGui.QPushButton()
+                    actionButtonItem.setIcon(QtGui.QIcon(add_icon))
+                    actionButtonItem.setIconSize(QtCore.QSize(20,20)) 
+                    actions_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
+                                                                                 
+                    delete_action = QtGui.QAction("Delete",actionButtonItem)
+                    delete_action.triggered.connect(self.shot_playblast_delete)                 
+                    self.enable(delete_action, level = 2)
+
+                    explore_action = QtGui.QAction("Explore",actionButtonItem)
+                    explore_action.triggered.connect(self.shot_playblast_explore)  
+                    actions_menu.addAction(delete_action)
+                    actions_menu.addAction(explore_action)
+                    
+                    openButtonItem = QtGui.QPushButton()
+                    openButtonItem.clicked.connect(self.shot_playblast_open)
+                    openButtonItem.setIcon(QtGui.QIcon(play_icon))
+                    openButtonItem.setIconSize(QtCore.QSize(20,20))              
+                    self.ui.shots_playblasts_tableWidget.setCellWidget(index,5,openButtonItem)
+                 
+                    actionButtonItem.setMenu(actions_menu)                
+                    self.ui.shots_playblasts_tableWidget.setCellWidget(index,6,actionButtonItem)
+
+                            
+                
+            else:
+                self.ui.shot_name_label.setText("No Selection")
+                self.ui.shot_info_label.setText("No Selection")
+                self.ui.shot_notes_label.setText("No Selection")
+                self.ui.shot_notes_label.setStyleSheet("")
+                
+
 
     def update_component_selection(self):
             
@@ -3568,11 +4058,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.set_grab_shot_thumbnail_button(wide_image_icon_click_dark)
  
         self.update_shots()
+        self.update_shot_playblasts()
  
  
     def shot_version_selection(self):
         if self.shot:
-            
+            self.shot_playblast_version = None
             self.shot_version = self.table_row_selection(self.ui.shots_versions_tableWidget)
             
             if self.shot_version:
@@ -3591,6 +4082,37 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 else:
                                     
                     self.ui.shot_name_label.setText(self.shot.sequence_name + " > " + self.shot.shot_name)
+                    self.ui.shot_info_label.setText("Multiple selections")
+                    self.ui.shot_notes_label.setText("Multiple selections")              
+                    self.ui.shot_notes_label.setStyleSheet("")
+
+            else:
+                self.ui.shot_info_label.setText("No selection")
+                self.ui.shot_notes_label.setText("No selection")                 
+                self.ui.shot_notes_label.setStyleSheet("")
+
+
+    def shot_playblast_selection(self):
+        if self.shot:
+            self.shot_version = None
+            self.shot_playblast_version = self.table_row_selection(self.ui.shots_playblasts_tableWidget)
+            
+            if self.shot_playblast_version:
+                if not isinstance(self.shot_playblast_version,list):        
+                                
+                    self.ui.shot_name_label.setText(self.shot.sequence_name + " > " + self.shot.shot_name + " > Preview")                                
+                    author = self.shot.author("playblasts", self.shot_playblast_version) if self.shot.author("playblasts", self.shot_playblast_version) else "None"                               
+                    date = self.shot.date_created("playblasts", self.shot_playblast_version) if self.shot.date_created("playblasts", self.shot_playblast_version) else "None"                                                   
+                    self.ui.shot_info_label.setText("%s\n%s"%(author, date))
+                    
+                    note = self.shot.playblast_note(self.shot_playblast_version) if self.shot.playblast_note(self.shot_playblast_version) else "None"                                    
+                    self.ui.shot_notes_label.setText(note)               
+                    
+                    self.ui.shot_notes_label.setStyleSheet("color: #ccffff; text-decoration: underline;")
+
+                else:
+                                    
+                    self.ui.shot_name_label.setText(self.shot.sequence_name + " > " + self.shot.shot_name + " > Preview")
                     self.ui.shot_info_label.setText("Multiple selections")
                     self.ui.shot_notes_label.setText("Multiple selections")              
                     self.ui.shot_notes_label.setStyleSheet("")
@@ -3889,21 +4411,31 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.update_published_masters()
 
     def shot_note(self, event):
-        print "clcike"            
+           
         dlg = QtGui.QInputDialog(self)                 
         dlg.setInputMode( QtGui.QInputDialog.TextInput) 
         dlg.setLabelText("Edit Note:")                             
         dlg.resize(400,100)
             
         if self.shot_version and not isinstance(self.shot_version,list):
+            
             dlg.setTextValue(self.shot.note("versions",self.shot_version))                   
             ok = dlg.exec_()                                
             note = dlg.textValue()
             self.shot.note("versions",self.shot_version, note=note)                                 
             self.ui.shot_notes_label.setText(note) 
             
+        elif self.shot_playblast_version and not isinstance(self.shot_playblast_version,list):
+            
+            dlg.setTextValue(self.shot.playblast_note(self.shot_playblast_version))                   
+            ok = dlg.exec_()                                
+            note = dlg.textValue()
+            self.shot.playblast_note(self.shot_playblast_version, note=note)                                 
+            self.ui.shot_notes_label.setText(note) 
+            
         else:
             del dlg
+
 
     def shot_version_save(self):
         if self.set_shot_selection():
@@ -3957,6 +4489,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 result = self.shot.delete_version("versions", version)
                 if result:
                     self.update_shots()
+                    self.update_shot_playblasts()
             
         else:
             
@@ -3970,6 +4503,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 result = self.shot.delete_version("versions", versions)
                 if result:
                     self.update_shots()
+                    self.update_shot_playblasts()
 
     def shot_import(self):
         if self.settings:
@@ -3985,6 +4519,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     if maya.open_scene(path[0]):
                         self.shot.new_version()
                         self.update_shots()
+                        self.update_shot_playblasts()
                    
                     
     def shot_explore(self):
@@ -3996,7 +4531,107 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         file = self.shot.file_path("versions",version)
         files.explore(file) 
 
+    '''
+    def shot_playblast_note(self, event):
+           
+        dlg = QtGui.QInputDialog(self)                 
+        dlg.setInputMode( QtGui.QInputDialog.TextInput) 
+        dlg.setLabelText("Edit Note:")                             
+        dlg.resize(400,100)
+            
+        if self.shot_playblast_version and not isinstance(self.shot_playblast_version,list):
+            dlg.setTextValue(self.shot.playblast_note(self.shot_playblast_version))                   
+            ok = dlg.exec_()                                
+            note = dlg.textValue()
+            self.shot.playblast_note(self.shot_playblast_version, note=note)                                 
+            self.ui.shot_notes_label.setText(note) 
+            
+        else:
+            del dlg
+    '''
+
+    def shot_playblast_open(self):    
+        widget = self.sender()
+        index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
+        version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
+        
+        file = self.shot.playblast_path(version)
+        files.run(file)
+
+    def shot_playblast_delete(self):
+
+
+        if not isinstance(self.shot_playblast_version,list):
+            widget = self.sender()        
+            widget = widget.parent()
+            index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
+            version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
+            
+            if dlg.warning("critical", "Delete", "Are you sure you want to delete this preview?" ):
+                
+                result = self.shot.delete_playblast(version)
+                if result:
+                    self.update_shot_playblasts()
+            
+        else:
+            
+            if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
+                
+                # make sure not to delete the active file
+                versions = self.shot_playblast_version
+                
+                result = self.shot.delete_playblast(versions)
+                if result:
+                    self.update_shot_playblasts()
+
+
+    def shot_playblast_explore(self):
+        widget = self.sender()
+        widget = widget.parent()
+        index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
+        version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
+        
+        file = self.shot.playblast_path(version)
+        files.explore(file)         
+
+    def shot_record_playblast(self):
+        if self.set_shot_selection():
+            if self.shot:
+                self.shot.new_playblast() 
+                self.update_shot_playblasts()       
     
+    def shot_record_playblast_options(self):
+ 
+        playback_options = maya.getPlayblastOptions()
+        
+        dialog = dlg.playblast_options(self, title = "Playblast options:",
+                                       formats = playback_options["format"],
+                                       compressions = playback_options["compression"],
+                                       format = self.settings.playblast_format, 
+                                       compression = self.settings.playblast_compression,
+                                       hud = self.settings.playblast_hud,
+                                       offscreen = self.settings.playblast_offscreen,
+                                       scale = self.settings.playblast_scale)
+        result = dialog.exec_()
+        input = dialog.result()
+        
+        if result == QtGui.QDialog.Accepted:
+            self.settings.playblast_format = input["format"]
+            self.settings.playblast_compression = input["compression"]
+            self.settings.playblast_hud = input["hud"]
+            self.settings.playblast_offscreen = input["offscreen"]
+            self.settings.playblast_scale = input["scale"]
+        
+        '''
+        
+        
+        
+        if self.set_shot_selection():
+            if self.shot:
+                print "OPTIONS"
+                self.shot.new_playblast()
+           '''     
+                      
     def category_rename(self):
         category_name, ok = QtGui.QInputDialog.getText(self, 'Rename category', 'Enter category name:')
         
@@ -4436,7 +5071,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         
         projects = self.pipeline_window.settings.projects        
         path = os.path.join(projects[wanted_project_key][0],"project.pipe")        
-        self.create_edit_project(project_file = pipeline_project(path = path))       
+        self.create_edit_project(project_file = pipeline_project(path = path, settings = self.pipeline_window.settings))       
         
     def create_edit_project(self, **kwargs):
         project_file = None
@@ -4700,9 +5335,14 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             self.ui.padding_spinBox.setEnabled(False)
             self.ui.project_name_lineEdit.setEnabled(False)
             self.ui.project_path_lineEdit.setEnabled(False)
+
+            self.ui.playblast_sister_dir_checkBox.setChecked(self.project_file.playblast_outside)
             
+           
         self.ui.cancel_pushButton.clicked.connect(self.cancel)                
         
+
+        self.playblast_help_button()
         
         
         self.boldFont=QtGui.QFont()
@@ -4713,7 +5353,37 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.updateUsersTable()
 
             
+    def playblast_help_button(self):
+        
+        self.playblast_help_label = QtGui.QLabel()
+        sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizepolicy.setHeightForWidth(self.playblast_help_label.sizePolicy().hasHeightForWidth())
+        self.playblast_help_label.setSizePolicy(sizepolicy)
+        self.playblast_help_label.setMinimumSize(QtCore.QSize(30, 30)) 
+       
+        self.ui.horizontalLayout_3.addWidget(self.playblast_help_label)
+        self.ui.horizontalLayout_3.setContentsMargins(0,0,0,0)               
+                       
+        layout = QtGui.QHBoxLayout(self.playblast_help_label)
+        layout.setContentsMargins(0,0,0,0)
+        
+        
+        self.playblast_help = alpha_button(self,help_icon)  
+        self.playblast_help.set_pixmap(help_icon)      
+        sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizepolicy2.setHeightForWidth(self.playblast_help.sizePolicy().hasHeightForWidth())
+        self.playblast_help.setSizePolicy(sizepolicy2)
+        self.playblast_help.setMinimumSize(QtCore.QSize(30, 30))          
+        self.playblast_help.button.setAlignment(QtCore.Qt.AlignCenter)
+        layout.addWidget(self.playblast_help)        
+        self.connect(self.playblast_help, QtCore.SIGNAL('clicked()'), self.playblast_help_popup)
+        
+        self.spacer = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.ui.horizontalLayout_3.addItem(self.spacer)
+        
 
+    def playblast_help_popup(self):
+        dlg.massage("massage","Playblasts","Playblasts can consume a lot of disk space,\nWhen working on a project on a shared disk or cloud, This can slow the syncing proccess.\nHave more control by keeping them in a sister directory.")
 
     def set_icons(self):
         self.ui.create_edit_project_pushButton.setIcon(QtGui.QIcon(yes_icon))
@@ -4724,7 +5394,6 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
                
         self.ui.cancel_pushButton.setIcon(QtGui.QIcon(no_icon))
         self.ui.cancel_pushButton.setIconSize(QtCore.QSize(20,20))
-
 
     def init_new_project(self):
         self.ui.project_name_lineEdit.setText(self.project_name)
@@ -4921,9 +5590,12 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             fps = 24            
         if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
             fps = 30
+        
+        playblast_outside = False 
+        if self.ui.playblast_sister_dir_checkBox.isChecked():
+            playblast_outside = True    
             
-            
-        self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users)        
+        self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users, playblast_outside = playblast_outside)        
         self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)        
         
             
@@ -4958,6 +5630,13 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.project_file.project_file_type = file_type
         self.project_file.project_fps = fps
         
+        playblast_outside = False 
+        if self.ui.playblast_sister_dir_checkBox.isChecked():
+            playblast_outside = True 
+            
+        self.project_file.playblast_outside = playblast_outside
+        
+        self.projects_window.set_project(project_key = self.project_file.project_key)
         self.close()
              
     def cancel(self):

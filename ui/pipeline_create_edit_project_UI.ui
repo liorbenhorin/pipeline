@@ -135,6 +135,22 @@
         </widget>
        </item>
        <item>
+        <widget class="QWidget" name="widget_8" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="playblast_sister_dir_checkBox">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Keep playblasts in a sister directory</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QWidget" name="widget_5" native="true">
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
