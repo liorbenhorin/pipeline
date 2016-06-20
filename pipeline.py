@@ -968,12 +968,32 @@ class pipeline_shot(pipeline_component):
         else:
             return None  
 
+    @shot_name.setter
+    def shot_name(self, name):
+        if self.data_file:
+            data = {}
+            data["shot_name"] = name
+            self.data_file.edit(data)
+            self.component_file = self.data_file.read()
+        else:
+            return None   
+
     @property
     def sequence_name(self):
         if self.component_file:
             return self.component_file["sequence_name"]
         else:
             return None  
+
+    @sequence_name.setter
+    def sequence_name(self, name):
+        if self.data_file:
+            data = {}
+            data["sequence_name"] = name
+            self.data_file.edit(data)
+            self.component_file = self.data_file.read()
+        else:
+            return None   
 
     @property
     def component_path(self):
@@ -1261,6 +1281,83 @@ class pipeline_shot(pipeline_component):
         else:
             return None   
 
+    def rename(self, new_name):
+         
+        if self.playblasts:
+            playblasts = {}
+            playblasts_thumbs = {}
+            for version in self.playblasts:
+                
+                version_number = set_padding(version,self.project.project_padding) 
+                playblasts[version] = [self.playblast_path(version_number), "%s_%s_%s_%s"%(self.sequence_name,new_name,"PREVIEW",version_number) ]
+                playblasts_thumbs[version] = [self.playblast_thumbnail_path(version_number), "%s_%s_%s_%s_%s"%(self.sequence_name,new_name,"PREVIEW",version_number,"THUMB") ]
+                
+                files.file_rename(playblasts[version][0],playblasts[version][1])
+                files.file_rename(playblasts_thumbs[version][0],playblasts_thumbs[version][1])
+        
+            #rename playblasts dir
+            files.dir_rename(os.path.dirname(playblasts[version][0]),new_name) 
+            
+            
+        versions = {}
+
+        for version in self.versions:
+
+            
+            version_number = set_padding(version,self.project.project_padding) 
+            versions[version] = [self.file_path("versions",version_number), "%s_%s_%s"%(self.sequence_name,new_name,version_number)] 
+            files.file_rename(versions[version][0],versions[version][1])
+        
+
+        
+        thumb_path = os.path.join(self.tumbnails_path,"%s.%s"%(self.shot_name,"png"))   
+        if os.path.isfile(thumb_path):
+            files.file_rename(thumb_path,new_name) 
+        
+        
+        self.component_name = new_name
+        self.shot_name = new_name
+        path = files.file_rename(self.data_file_path,new_name)        
+
+        component_path = files.dir_rename(os.path.dirname(self.data_file_path),new_name)  
+     
+        self.set_data_file(os.path.join(component_path,"%s.%s"%(new_name,"pipe")))
+        self.component_file = self.data_file.read()
+        
+        return True
+
+    def rename_sequence(self, new_name):
+         
+
+        if self.playblasts:
+            playblasts = {}
+            playblasts_thumbs = {}
+            for version in self.playblasts:
+                
+                version_number = set_padding(version,self.project.project_padding) 
+                playblasts[version] = [self.playblast_path(version_number), "%s_%s_%s_%s"%(new_name,self.shot_name,"PREVIEW",version_number) ]
+                playblasts_thumbs[version] = [self.playblast_thumbnail_path(version_number), "%s_%s_%s_%s_%s"%(new_name,self.shot_name,"PREVIEW",version_number,"THUMB") ]
+                
+                files.file_rename(playblasts[version][0],playblasts[version][1])
+                files.file_rename(playblasts_thumbs[version][0],playblasts_thumbs[version][1])
+        
+            #rename playblasts dir
+            files.dir_rename(os.path.dirname(os.path.dirname(playblasts[version][0])),new_name) 
+            
+        versions = {}
+
+        for version in self.versions:
+
+            
+            version_number = set_padding(version,self.project.project_padding) 
+            versions[version] = [self.file_path("versions",version_number), "%s_%s_%s"%(new_name,self.shot_name,version_number)] 
+            files.file_rename(versions[version][0],versions[version][1])
+        
+        
+        self.sequence_name = new_name       
+        return True
+
+
 class pipeline_project(pipeline_data):
     def __init__(self,**kwargs):
         #super(pipeline_project, self,).__init__()
@@ -1509,7 +1606,7 @@ class pipeline_project(pipeline_data):
                 path = os.path.join(os.path.dirname(self.settings.current_project_path),"%s_playblasts"%(self.project_name))
            
             else:
-                path = os.path.join(self.settings.current_project_path,"%s_playblasts"%(self.project_name))
+                path = os.path.join(self.settings.current_project_path,"playblasts")
             
             
             return path
@@ -1557,7 +1654,12 @@ class pipeline_project(pipeline_data):
 
         path = os.path.join(self.scenes_path,sequence_name)       
         if files.delete(path):
-            return True
+            
+            path = os.path.join(self.playblasts_path,sequence_name)   
+            if files.delete(path):
+                
+                return True
+            
         
         return False  
 
@@ -1565,7 +1667,11 @@ class pipeline_project(pipeline_data):
 
         path = os.path.join(self.scenes_path,sequence_name, shot_name)       
         if files.delete(path):
-            return True
+            
+            path = os.path.join(self.playblasts_path,sequence_name, shot_name)   
+            if files.delete(path):
+                
+                return True
         
         return False  
 
@@ -1635,6 +1741,22 @@ class pipeline_project(pipeline_data):
             return True
         
         return False  
+
+
+    def rename_sequence(self, project_path = None,sequence_name = None, new_name=True):
+        
+
+        for shot in self.shots( sequence_name ):
+            
+            path = os.path.join(project_path,self.scenes_path,sequence_name,shot,  ("%s.%s"%(shot,"pipe")))
+            if os.path.isfile(path):
+                shot_object = pipeline_shot(path = path, project = self, settings = self.settings) 
+                shot_object.rename_sequence(new_name)
+        
+        path = os.path.join(project_path,self.scenes_path,sequence_name)       
+        path = files.file_rename(path,new_name) 
+        
+        return True  
 
     def rename_catagory(self, project_path = None, catagory_name = None, new_name=True):
         
@@ -2120,6 +2242,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         self.sequence_menu = QtGui.QMenu(parent = self.ui.sequence_pushButton)
         self.sequence_menu.addAction(new_folder_icon,'New',self.create_sequence )
+        
+        self.sequence_menu.addSeparator()   
+        self.rename_sequence_action = QtGui.QAction("Rename",self)
+        self.rename_sequence_action.triggered.connect(self.sequence_rename)
+        self.sequence_menu.addAction(self.rename_sequence_action)
+        self.sequence_menu.addSeparator()  
+        
+        
         self.delete_sequence_action = QtGui.QAction("Delete",self)
         self.delete_sequence_action.triggered.connect(self.delete_sequence)
         self.delete_sequence_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
@@ -2130,7 +2260,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.shot_menu.addAction(new_folder_icon,'New',self.create_shot)       
         self.shot_menu.addAction(new_folder_icon,'New from current scene',self.create_shot_from_current_scene)
         self.shot_menu.addAction(new_folder_icon,'New from file',self.create_shot_from_file)
-        self.shot_menu.addSeparator()           
+        self.shot_menu.addSeparator()  
+  
+        self.rename_shot_action = QtGui.QAction("Rename",self)
+        self.rename_shot_action.triggered.connect(self.shot_rename)
+        self.shot_menu.addAction(self.rename_shot_action)
+        self.shot_menu.addSeparator()  
+        
+                 
         self.delete_shot_action = QtGui.QAction("Delete",self)
         self.delete_shot_action.triggered.connect(self.delete_shot)
         self.delete_shot_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
@@ -3470,6 +3607,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                
         versions = None
         if self.shot: 
+
             versions = self.shot.versions
             versions.reverse()
             
@@ -4636,6 +4774,46 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 print "OPTIONS"
                 self.shot.new_playblast()
            '''     
+
+    def sequence_rename(self):
+        sequence_name, ok = QtGui.QInputDialog.getText(self, 'Rename sequence', 'Enter sequence name:')
+        
+        if ok:
+            
+            if sequence_name == self.sequence_name:
+                dlg.massage("critical", "Sorry", "This sequence exsists" )
+                return False
+                                
+            if dlg.warning("critical", "Rename", "If this sequence contains components that are referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
+                self.toggle_scene_open_script()
+                maya.new_scene()
+                self.toggle_scene_open_script()
+
+                if self.project.rename_sequence(project_path = self.settings.current_project_path, sequence_name = self.sequence_name,new_name = sequence_name ):
+                    
+                    self.update_sequence()
+                    self.settings.sequence_selection = sequence_name
+                    #self.set_sequence_selection() 
+        
+    def shot_rename(self):
+        shot_name, ok = QtGui.QInputDialog.getText(self, 'Rename shot', 'Enter shot name:')
+        
+        if ok:
+            if shot_name == self.shot.shot_name:
+                dlg.massage("critical", "Sorry", "This shot exsists" )
+                return False    
+            
+            if dlg.warning("critical", "Rename", "If this shot is referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
+                self.toggle_scene_open_script()
+                maya.new_scene()
+                self.toggle_scene_open_script()
+                
+                                
+                if self.shot.rename(shot_name):
+                    self.update_shot()
+                    self.settings.shot_selection = shot_name
+                    self.set_shot_selection()
+
                       
     def category_rename(self):
         category_name, ok = QtGui.QInputDialog.getText(self, 'Rename category', 'Enter category name:')
