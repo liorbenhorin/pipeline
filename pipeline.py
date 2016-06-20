@@ -3525,22 +3525,27 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 explore_action.triggered.connect(self.shot_explore)  
 
 
+                openButtonItem = QtGui.QPushButton()
+                openButtonItem.clicked.connect(self.shot_version_open)
+                openButtonItem.setIcon(QtGui.QIcon(open_icon))
+                openButtonItem.setIconSize(QtCore.QSize(20,20))              
+                self.ui.shots_versions_tableWidget.setCellWidget(index,4,openButtonItem)
+
                 if not active:
                     
                     actions_menu.addAction(reference_action)
                     actions_menu.addAction(import_action)
                     actions_menu.addAction(delete_action)
                     
-                    openButtonItem = QtGui.QPushButton()
-                    openButtonItem.clicked.connect(self.shot_version_open)
-                    openButtonItem.setIcon(QtGui.QIcon(open_icon))
-                    openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                    self.ui.shots_versions_tableWidget.setCellWidget(index,4,openButtonItem)
+
                 else:
-                    active = QtGui.QTableWidgetItem("Active")
-                    active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    self.ui.shots_versions_tableWidget.setItem(index,4,active) 
-                    active.setBackground(active_color) 
+                    
+                    openButtonItem.setIcon(QtGui.QIcon(reload_icon))
+                    
+                    #active = QtGui.QTableWidgetItem("Active")
+                    #active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    #self.ui.shots_versions_tableWidget.setItem(index,4,active) 
+                    #active.setBackground(active_color) 
                                         
                 
               
