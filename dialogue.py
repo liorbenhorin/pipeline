@@ -43,10 +43,17 @@ Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License:
 ---------------------------------------------------------------------------------------------  
 
 '''
+import base64
+import modules.data as data
+reload(data)
 
 
 from PySide import QtCore, QtGui
 import os
+
+def textToolTips():
+    strings = data.strings()       
+    return decode64(strings)
 
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
@@ -417,6 +424,13 @@ class playblast_options(QtGui.QDialog):
         
     def result(self):
         return self.options()   
+
+
+def encode64(string):
+    return base64.b64encode(string)
+
+def decode64(string):
+    return  base64.b64decode(string)
 
 
 def HLine():

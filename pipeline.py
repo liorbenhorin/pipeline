@@ -66,7 +66,7 @@ import collections
 import logging
 import webbrowser
 import glob
-import base64
+
 
         
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
@@ -251,11 +251,7 @@ def set_padding(int, padding):
 
 
 
-def encode64(string):
-    return base64.b64encode(string)
 
-def decode64(string):
-    return  base64.b64decode(string)
 
 
 class QLabelButton(QtGui.QLabel):
@@ -1679,6 +1675,8 @@ class pipeline_project(pipeline_data):
                 
                 return True
             
+            return True
+            
         
         return False  
 
@@ -1691,6 +1689,8 @@ class pipeline_project(pipeline_data):
             if files.delete(path):
                 
                 return True
+            
+            return True
         
         return False  
 
@@ -1763,8 +1763,7 @@ class pipeline_project(pipeline_data):
 
 
     def rename_sequence(self, project_path = None,sequence_name = None, new_name=True):
-        
-
+                
         for shot in self.shots( sequence_name ):
             
             path = os.path.join(project_path,self.scenes_path,sequence_name,shot,  ("%s.%s"%(shot,"pipe")))
@@ -2294,6 +2293,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shot_pushButton.setMenu(self.shot_menu)
         
         #customize widgets
+        self.set_project_tooltips()
         self.thumbnail_button()
         
         boldFont=QtGui.QFont()
@@ -2424,16 +2424,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.comp_note_label.setPixmap(edit_icon.scaled(16,16))        
         self.ui.shot_icon_label.setPixmap(new_icon.scaled(16,16))
         self.ui.shot_user_label.setPixmap(users_icon.scaled(16,16))
-        self.ui.shot_note_label.setPixmap(edit_icon.scaled(16,16))
+        self.ui.shot_note_label.setPixmap(edit_icon.scaled(16,16))      
         
-        #self.ui.project_label.setText(decode64('Tm9uIGNvbW1lcmNpYWwgdmVyc2lvbiBvZiBwaXBlbGluZQ=='))
-        self.ui.widget_5.setHidden(True)
+
 
         
 
     def init_settings(self):
   
-
+        
         self.settings_file_name = 'settings.pipe'                 
         file = os.path.join(os.path.dirname(__file__), self.settings_file_name)
         
@@ -5092,9 +5091,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if not os.path.exists(localIconPath):
             log.info("icons folder not found: %s"%localIconPath)
             return 
-                               
 
-
+    def set_project_tooltips(self):
+        textToolTips = dlg.textToolTips()
+        self.ui.projects_tooltip_label.setText(textToolTips)
+        self.ui.projects_tooltip_widget.setHidden(True)
             
     # If it's floating or docked, this will run and delete it self when it closes.
     # You can choose not to delete it here so that you can still re-open it through the right-click menu, but do disable any callbacks/timers that will eat memory
@@ -5379,9 +5380,14 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                     
                 pm.workspace.open(project_path)
                 pm.workspace.chdir(project_path)
-                melCmd = "setProject \""+ project_path +"\";"
-                mel.eval(melCmd)
-                                         
+
+                raw_project_path = project_path.replace("\\", "\\\\")
+                melCmd = "setProject \""+ raw_project_path +"\";"
+                try:
+                    mel.eval(melCmd)
+                except:
+                    pass
+                                             
                 self.pipeline_window.ui.projects_pushButton.setText(project_Name)                
                 self.updateProjectsTable()
                 

@@ -218,7 +218,8 @@ class pickleDict():
                 with open(path, "w") as file:
                     pass
                 
-
+def strings():
+    return 'Tm9uIGNvbW1lcmNpYWwgdmVyc2lvbiBvZiBwaXBlbGluZQ=='
 
 def edit_key(dict = None ,key = None ,value = None):
     

@@ -247,7 +247,8 @@ def delete(path):
             send2trash(path) # SEND TO BIN
             return True
         else:
-            warnings.warn("Unable to delete")    
+            pass
+            #warnings.warn("Unable to delete")    
             return False
 
 def delete_file(path):
@@ -256,7 +257,8 @@ def delete_file(path):
             os.remove(path)
             return True
         else:
-            warnings.warn("Unable to delete")    
+            pass
+            #warnings.warn("Unable to delete")    
             return False    
 
 def file_size_mb(filePath):
