@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>449</width>
+    <width>462</width>
     <height>1500</height>
    </rect>
   </property>
@@ -30,6 +30,50 @@
     <property name="spacing">
      <number>6</number>
     </property>
+    <item>
+     <widget class="QWidget" name="widget_5" native="true">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="styleSheet">
+          <string notr="true">background-color: #682ad0; color: white;
+font: 13pt &quot;.SF NS Text&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Non commercial license of pipeline</string>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="margin">
+          <number>7</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
     <item>
      <widget class="QWidget" name="control_widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -747,7 +791,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>449</width>
+     <width>462</width>
      <height>22</height>
     </rect>
    </property>

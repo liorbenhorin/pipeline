@@ -66,6 +66,8 @@ import collections
 import logging
 import webbrowser
 import glob
+import base64
+
         
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
@@ -246,6 +248,15 @@ def set_padding(int, padding):
 
 
 #print set_padding(11,1)
+
+
+
+def encode64(string):
+    return base64.b64encode(string)
+
+def decode64(string):
+    return  base64.b64decode(string)
+
 
 class QLabelButton(QtGui.QLabel):
     '''
@@ -2415,7 +2426,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shot_user_label.setPixmap(users_icon.scaled(16,16))
         self.ui.shot_note_label.setPixmap(edit_icon.scaled(16,16))
         
-
+        #self.ui.project_label.setText(decode64('Tm9uIGNvbW1lcmNpYWwgdmVyc2lvbiBvZiBwaXBlbGluZQ=='))
+        self.ui.widget_5.setHidden(True)
 
         
 

@@ -313,9 +313,9 @@ def set_fps(fps = None):
 
 
 def clean_up_file():
-    
+    pass
     # import references
-
+    """
     refs = cmds.ls(type='reference')
     for i in refs:
         rFile = cmds.referenceQuery(i, f=True)
@@ -353,7 +353,7 @@ def clean_up_file():
         cmds.delete(proxies)
         
         if cmds.objExists("RRM_ProxiesLayer"):
-            cmds.delete("RRM_ProxiesLayer")
+            cmds.delete("RRM_ProxiesLayer")"""
             
 def viewMassage(text = None):
             cmds.inViewMessage( amg="Pipeline: " + text, pos='topCenter', fade=True, fst = 3000 )
