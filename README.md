@@ -29,7 +29,23 @@ Manage all you projects without leaving Maya.
 
 #Version history
 
-**1.0.0 - BETA - Free for educational and non commercial use!**
+**TBA - 1.0.0 - First stable version**
+
+*New features*
+
+* Rename anything (catagories, assets, components, sequences and shots).
+* Toggle component masters from showing in the assets bank in the scenes mode (helps keep things clean).
+* Record playblasts from shots, and Pipeline orgenise them in versions, too.
+* Store playblasts inside the project folder or in a sister directory (useful when sharing projects to not slow down sync times)
+
+
+*Bugfixes*
+
+* Bug when project is not being right set after creation, on some cases.
+* Bug when you cannot load a project, and need to restart Pipeline.
+* Bug that was causing many function to fail when setting a version padding numbr other then 3.
+
+**8.6.16 - 1.0.0 - BETA - Free for educational and non commercial use!**
 
 Like any program, it can have some bugs and glitchs,
 so it's always a good idea to backup your work.
