@@ -269,8 +269,6 @@ def file_size_mb(filePath):
 def extract_version(file, padding):
     return file[-padding:]
 
-
-
 def dict_versions(versions,padding):
     '''
     This method return a dictionery of versions and their file path
@@ -289,7 +287,7 @@ def dict_versions(versions,padding):
     for version in versions:
         try:
             name = file_name_no_extension(file_name(version))
-            number = re.search(r'\d+', name).group(0)
+            number = re.findall(r'\d+',name)[-1]
             #int(name[-padding:len(name)])
             versions_dict[int(number.lstrip("0"))] = version
             
