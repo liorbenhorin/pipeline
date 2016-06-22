@@ -53,6 +53,9 @@ import urllib
 import urllib2
 import json
 import logging
+#import tornado
+
+
 logging.basicConfig(level=logging.INFO)
 
 import pipeline.modules.mixpanel as mixpanel
@@ -65,7 +68,7 @@ def track_event(id = None, event = None, data = None):
         if socket.gethostname() != 'liors-MacBook-Pro.local':
 
             g = geo()
-            if geo:
+            if g:
                 data['country'] = g['country']
                 data['regionName'] = g['regionName']
                 data['query'] = g['query'] 
@@ -82,6 +85,8 @@ def event(name = None, **kwargs):
     if name and kwargs:
         kwargs["operating-system"] = sys.platform
         kwargs["host-name"] = socket.gethostname()
+        
+        
         t = threading.Thread(target = track_event, kwargs = {'id': socket.gethostname(), 'event': name, 'data': kwargs})
         t.start()
         t.join()  
@@ -90,6 +95,7 @@ def event(name = None, **kwargs):
 def geo():
     try:
         geo = json.load(urllib2.urlopen('http://ip-api.com/json'))
+        
         return geo
     except:
         pass
