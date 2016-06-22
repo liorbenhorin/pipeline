@@ -244,8 +244,8 @@ def playblast(path = None,format = None, compression = None, hud = None, offscre
 def playback_selection_range():
     aPlayBackSliderPython = mel.eval('$tmpVar=$gPlayBackSlider')
     time_selection = cmds.timeControl( aPlayBackSliderPython, q=True,rng=True )[1:-1]
-    start = int(time_selection.split(":")[0])
-    end = int(time_selection.split(":")[1])
+    start = round(float(time_selection.split(":")[0]))
+    end = round(float(time_selection.split(":")[1]))
     
     if start+1 == end:
         return None
