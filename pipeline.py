@@ -245,6 +245,8 @@ def set_padding(int, padding):
     return str(int).zfill(padding)
 
 
+#print set_padding(11,1)
+
 class QLabelButton(QtGui.QLabel):
     '''
         custom QLbael the can send clicked signal
@@ -597,7 +599,7 @@ class pipeline_component(pipeline_data):
     def file_path(self, type, version):
         if self.component_file:
             if self.settings:
-                if type == "masters" and version == "000":
+                if type == "masters" and version == str(set_padding(0,self.project.project_padding)):
                     return self.master
                     
                 versions_path = os.path.join(self.settings.current_project_path, self.project.assets_dir,self.catagory_name,self.asset_name,self.component_name,type)
@@ -614,6 +616,7 @@ class pipeline_component(pipeline_data):
                 versions = files.list_directory(self.versions_path,self.project.project_file_type)
                 versions_dict = files.dict_versions(versions,self.project.project_padding)
                 sorted_versions = files.sort_version(versions_dict)
+                
                 
                 return sorted_versions
 
@@ -635,7 +638,12 @@ class pipeline_component(pipeline_data):
                 versions = self.versions
                 last = versions[len(versions)-1]
                 
+
+                
                 version_number = set_padding(last+1,self.project.project_padding)                
+
+                
+                
                 file_name = "%s_%s_%s.%s"%(self.asset_name,self.component_name,version_number,"ma")                   
                 scene_path = maya.save_scene_as(path = self.versions_path, file_name = file_name ) 
                                 
@@ -776,7 +784,7 @@ class pipeline_component(pipeline_data):
                         
                     new_master["path"] = scene_path    
                     masters = self.masters_ 
-                    masters["000"] = new_master 
+                    masters[str(set_padding(0,self.project.project_padding))] = new_master 
                     masters[version_number] = new_master
                     
                     self.masters_ = masters 
@@ -803,7 +811,7 @@ class pipeline_component(pipeline_data):
             new_master["note"] = self.note("masters",version) 
 
             masters = self.masters_ 
-            masters["000"] = new_master 
+            masters[str(set_padding(0,self.project.project_padding))] = new_master 
 
             self.masters_ = masters 
             

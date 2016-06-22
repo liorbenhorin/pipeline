@@ -54,7 +54,8 @@ import sys
 import subprocess
 import glob
 import logging
-
+import re
+    
 def dir_rename(dir_fullpath, new_name):
     
     new_dir = os.path.join(os.path.dirname(dir_fullpath),new_name)
@@ -182,6 +183,7 @@ def list_directory(path,type):
                 if extension(file)[1:] == type:
                     fullNames.append(os.path.join(path, file))
 
+            
         return fullNames
     else:
         return None
@@ -267,6 +269,8 @@ def file_size_mb(filePath):
 def extract_version(file, padding):
     return file[-padding:]
 
+
+
 def dict_versions(versions,padding):
     '''
     This method return a dictionery of versions and their file path
@@ -279,13 +283,16 @@ def dict_versions(versions,padding):
     
     @return: dict: {version: "path",...}
     '''
-  
+
     versions_dict = {}
     
     for version in versions:
         try:
             name = file_name_no_extension(file_name(version))
-            versions_dict[int(name[-padding:len(name)])] = version
+            number = re.search(r'\d+', name).group(0)
+            #int(name[-padding:len(name)])
+            versions_dict[int(number.lstrip("0"))] = version
+            
         except:
             pass
             #logging.info( "cant find version in %s"%version)
