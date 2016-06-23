@@ -185,6 +185,7 @@ def set_icons():
     global shutter_icon
     global camrea_icon
     global play_icon
+    global comment_icon
     
     global large_image_icon
     global large_image_icon_dark
@@ -228,6 +229,7 @@ def set_icons():
     shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
     camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
     play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
+    comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
     
     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
     large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark")) 
@@ -2860,9 +2862,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.component_versions_tableWidget.horizontalHeader().setVisible(False)
         self.ui.component_versions_tableWidget.verticalHeader().setVisible(False)
         self.ui.component_versions_tableWidget.setWordWrap(False)
-        self.ui.component_versions_tableWidget.setColumnCount(6)
+        self.ui.component_versions_tableWidget.setColumnCount(7)
         self.ui.component_versions_tableWidget.setRowCount(1)
-        self.ui.component_versions_tableWidget.setHorizontalHeaderLabels(["Version","Creator","Date Saved","Size","Open","Action"])
+        self.ui.component_versions_tableWidget.setHorizontalHeaderLabels(["Version","Note","Creator","Date Saved","Size","Open","Action"])
         self.ui.component_versions_tableWidget.resizeRowsToContents()
         self.ui.component_versions_tableWidget.verticalHeader().setDefaultSectionSize(30);
         self.ui.component_versions_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)       
@@ -2871,12 +2873,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
         self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(0,25)
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.ResizeToContents )
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.Fixed )
-        self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(4,60)
+        
+        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(1,25)
+        
+        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
         self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
-        self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(5,25)
+        self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(5,60)
+        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.component_versions_tableWidget.clearContents()
         self.ui.component_versions_tableWidget.setRowCount(0)        
@@ -2887,9 +2893,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.component_masters_tableWidget.horizontalHeader().setVisible(False)
         self.ui.component_masters_tableWidget.verticalHeader().setVisible(False)
         self.ui.component_masters_tableWidget.setWordWrap(False)
-        self.ui.component_masters_tableWidget.setColumnCount(6)
+        self.ui.component_masters_tableWidget.setColumnCount(7)
         self.ui.component_masters_tableWidget.setRowCount(1)
-        self.ui.component_masters_tableWidget.setHorizontalHeaderLabels(["Version","Creator","Date Saved","Size","Open","Action"])
+        self.ui.component_masters_tableWidget.setHorizontalHeaderLabels(["Version","Note","Creator","Date Saved","Size","Open","Action"])
         self.ui.component_masters_tableWidget.resizeRowsToContents()
         self.ui.component_masters_tableWidget.verticalHeader().setDefaultSectionSize(30);
         self.ui.component_masters_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)      
@@ -2898,12 +2904,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
         self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(0,25)
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.ResizeToContents )
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.Fixed )
-        self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(4,60)
+        
+        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(1,25)
+        
+        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
         self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
-        self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(5,25)
+        self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(5,60)
+        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.component_masters_tableWidget.clearContents()
         self.ui.component_masters_tableWidget.setRowCount(0)        
@@ -2974,9 +2984,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_versions_tableWidget.horizontalHeader().setVisible(False)
         self.ui.shots_versions_tableWidget.verticalHeader().setVisible(False)
         self.ui.shots_versions_tableWidget.setWordWrap(False)
-        self.ui.shots_versions_tableWidget.setColumnCount(6)
+        self.ui.shots_versions_tableWidget.setColumnCount(7)
         self.ui.shots_versions_tableWidget.setRowCount(1)
-        self.ui.shots_versions_tableWidget.setHorizontalHeaderLabels(["Version","Creator","Date Saved","Size","Open","Action"])
+        self.ui.shots_versions_tableWidget.setHorizontalHeaderLabels(["Version","Note","Creator","Date Saved","Size","Open","Action"])
         self.ui.shots_versions_tableWidget.resizeRowsToContents()
         self.ui.shots_versions_tableWidget.verticalHeader().setDefaultSectionSize(30);
         self.ui.shots_versions_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)      
@@ -2985,12 +2995,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
         self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(0,25)
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.ResizeToContents )
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.Fixed )
-        self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(4,60)
+        
+        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(1,25)
+        
+        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
         self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
-        self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(5,25)
+        self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(5,60)
+        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.shots_versions_tableWidget.clearContents()
         self.ui.shots_versions_tableWidget.setRowCount(0)        
@@ -3016,8 +3030,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(1,96)
+
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(2,25)
         
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        #self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
         self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(5,25)
@@ -3249,6 +3266,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def update_versions(self):
         
+        #remove users column if no users in project
+        if self.project.project_users == None:
+                self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(2,0)
+        else:
+            self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        
+        
         self.active_version = None
         
         active_color = QtGui.QColor()
@@ -3278,19 +3303,29 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 version_number = QtGui.QTableWidgetItem(padded_version)            
                 version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.component_versions_tableWidget.setItem(index,0,version_number)
+                
 
+                
                 user = QtGui.QTableWidgetItem(self.component.author("versions", padded_version))
                 user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                self.ui.component_versions_tableWidget.setItem(index,1,user) 
+                self.ui.component_versions_tableWidget.setItem(index,2,user)
+                
 
+
+                note_indicator = QtGui.QLabel()
+                if self.component.note("versions", padded_version) != "No notes":
+                    note_indicator.setContentsMargins(2,0,0,0)
+                    note_indicator.setPixmap(comment_icon)                
+                self.ui.component_versions_tableWidget.setCellWidget(index,1,note_indicator)
+                    
                 date_time = QtGui.QTableWidgetItem(self.component.date_created("versions", padded_version))
                 date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                self.ui.component_versions_tableWidget.setItem(index,2,date_time)            
+                self.ui.component_versions_tableWidget.setItem(index,3,date_time)            
                 
                                                          
                 size = QtGui.QTableWidgetItem("%s %s"%(self.component.size("versions", padded_version), "MB"))
                 size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                self.ui.component_versions_tableWidget.setItem(index,3,size)
+                self.ui.component_versions_tableWidget.setItem(index,4,size)
                 
                 
                 actionButtonItem = QtGui.QPushButton()
@@ -3319,7 +3354,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 openButtonItem.clicked.connect(self.version_open)
                 openButtonItem.setIcon(QtGui.QIcon(open_icon))
                 openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                self.ui.component_versions_tableWidget.setCellWidget(index,4,openButtonItem)  
+                self.ui.component_versions_tableWidget.setCellWidget(index,5,openButtonItem)  
 
                 if not active:
                     
@@ -3332,34 +3367,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
                 else:
 
-                    #openButtonItem = QtGui.QPushButton()
-                    #openButtonItem.clicked.connect(self.version_open)
                     openButtonItem.setIcon(QtGui.QIcon(reload_icon))
-                    #openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                    #self.ui.component_versions_tableWidget.setCellWidget(index,4,openButtonItem)    
- 
-                #openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                #self.ui.component_versions_tableWidget.setCellWidget(index,4,openButtonItem)
-                    
-                    #active = QtGui.QTableWidgetItem("Active")
-                    #active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    #self.ui.component_versions_tableWidget.setItem(index,4,active) 
-                    #active.setBackground(active_color) 
-                                        
-                
-              
+
                 
                 actions_menu.addAction(explore_action)                
                 actionButtonItem.setMenu(actions_menu)                
-                self.ui.component_versions_tableWidget.setCellWidget(index,5,actionButtonItem)
+                self.ui.component_versions_tableWidget.setCellWidget(index,6,actionButtonItem)
                 
                 if active:
                     self.ui.component_versions_tableWidget.selectRow(index)
                     for item in [version_number,
-                                 user,
+                                 user, 
                                  date_time,
                                  size]:
                         item.setBackground(active_color) 
+                    note_indicator.setStyleSheet("background-color: purple")
+
                                     
         else:
             self.ui.component_name_label.setText("No Selection")
@@ -3370,6 +3393,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def update_masters(self):
+
+
+        #remove users column if no users in project
+        if self.project.project_users == None:
+                self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(2,0)
+        else:
+            self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        
         
         self.active_version = None
         
@@ -3414,18 +3446,33 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.component_masters_tableWidget.setItem(index,0,version_number)
 
+
+                    user = QtGui.QTableWidgetItem(self.component.author("masters", padded_version))
+                    user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    self.ui.component_masters_tableWidget.setItem(index,2,user)
+                    
+
+
+                    note_indicator = QtGui.QLabel()
+                    if self.component.note("masters", padded_version) != "No notes":
+                        note_indicator.setContentsMargins(2,0,0,0)
+                        note_indicator.setPixmap(comment_icon)                
+                    self.ui.component_masters_tableWidget.setCellWidget(index,1,note_indicator)
+
+
+                    '''
                     user = QtGui.QTableWidgetItem(self.component.author("masters", padded_version))
                     user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.component_masters_tableWidget.setItem(index,1,user) 
-                    
+                    '''
                     date_time = QtGui.QTableWidgetItem(self.component.date_created("masters", padded_version))
                     date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    self.ui.component_masters_tableWidget.setItem(index,2,date_time)            
+                    self.ui.component_masters_tableWidget.setItem(index,3,date_time)            
                     
                                                              
                     size = QtGui.QTableWidgetItem("%s %s"%(self.component.size("masters", padded_version), "MB"))
                     size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    self.ui.component_masters_tableWidget.setItem(index,3,size)
+                    self.ui.component_masters_tableWidget.setItem(index,4,size)
 
 
                     actionButtonItem = QtGui.QPushButton()
@@ -3466,7 +3513,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                         openButtonItem.clicked.connect(self.master_open)
                         openButtonItem.setIcon(QtGui.QIcon(open_icon))
                         openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                        self.ui.component_masters_tableWidget.setCellWidget(index,4,openButtonItem)
+                        self.ui.component_masters_tableWidget.setCellWidget(index,5,openButtonItem)
                     
                     else:
                         active = QtGui.QTableWidgetItem("Active")
@@ -3477,7 +3524,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     actions_menu.addAction(explore_action)                
                     actionButtonItem.setMenu(actions_menu)                
-                    self.ui.component_masters_tableWidget.setCellWidget(index,5,actionButtonItem)
+                    self.ui.component_masters_tableWidget.setCellWidget(index,6,actionButtonItem)
                         
                     if active:
                         self.ui.component_masters_tableWidget.selectRow(index)
@@ -3485,7 +3532,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                      user,
                                      date_time,
                                      size]:
-                            item.setBackground(active_color)                         
+                            item.setBackground(active_color) 
+                        note_indicator.setStyleSheet("background-color: purple")                        
                     if version == 0:
                         
                         
@@ -3495,6 +3543,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                      date_time,
                                      size]:
                             item.setBackground(master_color) 
+                        note_indicator.setStyleSheet("background-color: green")
           
         else:
             
@@ -3615,6 +3664,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def update_shots(self):
+
+        #remove users column if no users in project
+        if self.project.project_users == None:
+                self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(2,0)
+        else:
+            self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+        
+        
         
         self.active_version = None
         
@@ -3647,18 +3705,25 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.shots_versions_tableWidget.setItem(index,0,version_number)
 
+
+                note_indicator = QtGui.QLabel()
+                if self.shot.note("versions", padded_version) != "No notes":
+                    note_indicator.setContentsMargins(2,0,0,0)
+                    note_indicator.setPixmap(comment_icon)                
+                self.ui.shots_versions_tableWidget.setCellWidget(index,1,note_indicator)
+
                 user = QtGui.QTableWidgetItem(self.shot.author("versions", padded_version))
                 user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                self.ui.shots_versions_tableWidget.setItem(index,1,user) 
+                self.ui.shots_versions_tableWidget.setItem(index,2,user) 
 
                 date_time = QtGui.QTableWidgetItem(self.shot.date_created("versions", padded_version))
                 date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                self.ui.shots_versions_tableWidget.setItem(index,2,date_time)            
+                self.ui.shots_versions_tableWidget.setItem(index,3,date_time)            
                 
                                                          
                 size = QtGui.QTableWidgetItem("%s %s"%(self.shot.size("versions", padded_version), "MB"))
                 size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                self.ui.shots_versions_tableWidget.setItem(index,3,size)
+                self.ui.shots_versions_tableWidget.setItem(index,4,size)
                 
                 
                 actionButtonItem = QtGui.QPushButton()
@@ -3686,7 +3751,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 openButtonItem.clicked.connect(self.shot_version_open)
                 openButtonItem.setIcon(QtGui.QIcon(open_icon))
                 openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                self.ui.shots_versions_tableWidget.setCellWidget(index,4,openButtonItem)
+                self.ui.shots_versions_tableWidget.setCellWidget(index,5,openButtonItem)
 
                 if not active:
                     
@@ -3709,7 +3774,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 
                 actions_menu.addAction(explore_action)                
                 actionButtonItem.setMenu(actions_menu)                
-                self.ui.shots_versions_tableWidget.setCellWidget(index,5,actionButtonItem)
+                self.ui.shots_versions_tableWidget.setCellWidget(index,6,actionButtonItem)
                 
                 if active:
                     self.ui.shots_versions_tableWidget.selectRow(index)
@@ -3718,7 +3783,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                  date_time,
                                  size]:
                         item.setBackground(active_color) 
-                        
+                    note_indicator.setStyleSheet("background-color: purple")    
             
         else:
             self.ui.shot_name_label.setText("No Selection")
@@ -3750,10 +3815,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     version_number.setTextAlignment(QtCore.Qt.AlignTop)
                     self.ui.shots_playblasts_tableWidget.setItem(index,0,version_number)
 
-                    user = QtGui.QTableWidgetItem(self.shot.author("playblasts", padded_version))
-                    user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    self.ui.shots_playblasts_tableWidget.setItem(index,1,user) 
-                    
+                    #user = QtGui.QTableWidgetItem(self.shot.author("playblasts", padded_version))
+                    #user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                    #self.ui.shots_playblasts_tableWidget.setItem(index,1,user) 
+               
+                    note_indicator = QtGui.QLabel()
+                    if self.shot.playblast_note(padded_version) != "No notes":
+                        note_indicator.setContentsMargins(2,0,0,0)
+                        note_indicator.setPixmap(comment_icon)                
+                    self.ui.shots_playblasts_tableWidget.setCellWidget(index,2,note_indicator)    
+                                
                     thumb = QtGui.QLabel()
                     w = self.ui.shots_playblasts_tableWidget.columnWidth(1)
                     h = self.ui.shots_playblasts_tableWidget.rowHeight(index)
@@ -3762,9 +3833,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     thumb.setPixmap(thumb_pixmap.scaled(w,h,QtCore.Qt.KeepAspectRatio))      
                     thumb.setAlignment(QtCore.Qt.AlignCenter)
+                    thumb.setStyleSheet("border: 3px solid grey")
                     self.ui.shots_playblasts_tableWidget.setCellWidget(index,1,thumb)    
                     
-                    date_time = QtGui.QTableWidgetItem(self.shot.date_created("playblasts", padded_version))
+                    text = self.shot.date_created("playblasts", padded_version)
+                    
+                    if self.project.project_users != None:
+                        author = self.shot.author("playblasts", padded_version)
+                        if author is not None:
+                            text =  author + " @ " + text
+                            
+                    
+                    date_time = QtGui.QTableWidgetItem(text)
                     date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     date_time.setTextAlignment(QtCore.Qt.AlignTop)
                     self.ui.shots_playblasts_tableWidget.setItem(index,3,date_time)            
@@ -4120,7 +4200,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.ui.component_info_label.setText("%s | %s"%(author, date))
                     
                     note = self.component.note("versions", self.catagory_version) if self.component.note("versions", self.catagory_version) else "None"                                    
-                    self.ui.component_note_label.setText(note)               
+                    self.ui.component_note_label.setText(dlg.crop_text(note,3," (...)"))               
                     
                     self.ui.component_note_label.setStyleSheet("color: #ccffff; text-decoration: underline;")
            
@@ -4157,7 +4237,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.ui.component_info_label.setText("%s | %s"%(author, date))
                     
                     note = self.component.note("masters", self.master_version) if self.component.note("masters", self.master_version) else "None"                                    
-                    self.ui.component_note_label.setText(note)                
+                    self.ui.component_note_label.setText(dlg.crop_text(note,3," (...)"))                
 
                     self.ui.component_note_label.setStyleSheet("color: #ccffff; text-decoration: underline;")
 
@@ -4237,7 +4317,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.ui.shot_info_label.setText("%s\n%s"%(author, date))
                     
                     note = self.shot.note("versions", self.shot_version) if self.shot.note("versions", self.shot_version) else "None"                                    
-                    self.ui.shot_notes_label.setText(note)               
+                    self.ui.shot_notes_label.setText(dlg.crop_text(note,3," (...)"))               
                     
                     self.ui.shot_notes_label.setStyleSheet("color: #ccffff; text-decoration: underline;")
 
@@ -4268,7 +4348,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.ui.shot_info_label.setText("%s\n%s"%(author, date))
                     
                     note = self.shot.playblast_note(self.shot_playblast_version) if self.shot.playblast_note(self.shot_playblast_version) else "None"                                    
-                    self.ui.shot_notes_label.setText(note)               
+                    self.ui.shot_notes_label.setText(dlg.crop_text(note,3," (...)"))               
                     
                     self.ui.shot_notes_label.setStyleSheet("color: #ccffff; text-decoration: underline;")
 
@@ -4316,29 +4396,26 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 qTabel.selectRow(i)
 
     def version_note(self, event):
-                    
-        dlg = QtGui.QInputDialog(self)                 
-        dlg.setInputMode( QtGui.QInputDialog.TextInput) 
-        dlg.setLabelText("Edit Note:")                             
-        dlg.resize(400,100)
         
         if self.master_version and not isinstance(self.master_version,list):
-            dlg.setTextValue(self.component.note("masters",self.master_version))   
-            ok = dlg.exec_()                                
-            note = dlg.textValue()
-            self.component.note("masters",self.master_version, note=note)
-            self.ui.component_note_label.setText(note)
-            
+        
+            note_inpute = dlg.Note(plainText = self.component.note("masters",self.master_version))
+            note = note_inpute.exec_()
+            text = note_inpute.result()
+            if note == QtGui.QDialog.Accepted:
+                self.component.note("masters",self.master_version, note=text)
+                self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
+                self.update_masters()
+        
         elif self.catagory_version and not isinstance(self.catagory_version,list):
-            dlg.setTextValue(self.component.note("versions",self.catagory_version))                   
-            ok = dlg.exec_()                                
-            note = dlg.textValue()
-            self.component.note("versions",self.catagory_version, note=note)                                 
-            self.ui.component_note_label.setText(note) 
-            
-        else:
-            del dlg
-
+            note_inpute = dlg.Note(plainText = self.component.note("versions",self.catagory_version))
+            note = note_inpute.exec_()
+            text = note_inpute.result()
+            if note == QtGui.QDialog.Accepted:
+                
+                self.component.note("versions",self.catagory_version, note=text)
+                self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
+                self.update_versions()                    
 
     def version_import(self):
         if self.settings:
@@ -4573,30 +4650,27 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.update_published_masters()
 
     def shot_note(self, event):
-           
-        dlg = QtGui.QInputDialog(self)                 
-        dlg.setInputMode( QtGui.QInputDialog.TextInput) 
-        dlg.setLabelText("Edit Note:")                             
-        dlg.resize(400,100)
-            
+
+
         if self.shot_version and not isinstance(self.shot_version,list):
-            
-            dlg.setTextValue(self.shot.note("versions",self.shot_version))                   
-            ok = dlg.exec_()                                
-            note = dlg.textValue()
-            self.shot.note("versions",self.shot_version, note=note)                                 
-            self.ui.shot_notes_label.setText(note) 
-            
+        
+            note_inpute = dlg.Note(plainText = self.shot.note("versions",self.shot_version))
+            note = note_inpute.exec_()
+            text = note_inpute.result()
+            if note == QtGui.QDialog.Accepted:
+                self.shot.note("versions",self.shot_version, note=text)
+                self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
+                self.update_shots()
+        
         elif self.shot_playblast_version and not isinstance(self.shot_playblast_version,list):
-            
-            dlg.setTextValue(self.shot.playblast_note(self.shot_playblast_version))                   
-            ok = dlg.exec_()                                
-            note = dlg.textValue()
-            self.shot.playblast_note(self.shot_playblast_version, note=note)                                 
-            self.ui.shot_notes_label.setText(note) 
-            
-        else:
-            del dlg
+            note_inpute = dlg.Note(plainText = self.shot.playblast_note(self.shot_playblast_version))
+            note = note_inpute.exec_()
+            text = note_inpute.result()
+            if note == QtGui.QDialog.Accepted:
+                self.shot.playblast_note(self.shot_playblast_version, note=text)
+                self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
+                self.update_shot_playblasts() 
+
 
 
     def shot_version_save(self):

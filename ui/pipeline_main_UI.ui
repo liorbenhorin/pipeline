@@ -625,6 +625,9 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                    <property name="text">
                     <string>Comment</string>
                    </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item row="2" column="0" colspan="3">

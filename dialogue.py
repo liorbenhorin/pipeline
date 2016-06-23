@@ -66,7 +66,9 @@ def set_icons():
     global users_icon
     global archive_icon
     global new_icon
+    global edit_icon
     global logo
+    global comment_icon
     
     warning_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"critical")) 
     simple_warning_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"warning"))
@@ -75,7 +77,9 @@ def set_icons():
     archive_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"archive"))
     new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
     logo = QtGui.QPixmap(os.path.join(localIconPath, "%s.png"%"pipeline_logo"))
-    
+    edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
+    comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
+        
 def warning(icon, title, message ):
     
     if icon == "critical":
@@ -309,6 +313,49 @@ class Login(QtGui.QDialog):
         return self.textName.text(), self.textPass.text()
 
 
+class Note(QtGui.QDialog):
+    def __init__(self, parent=None, plainText=None):
+        super(Note, self).__init__(parent)
+
+        self.setMaximumWidth(400) 
+        self.setMinimumWidth(400)        
+        self.setMaximumHeight(200) 
+        
+        self.label = QtGui.QLabel()
+        self.label.setPixmap(edit_icon)
+        
+        self.label_Note = QtGui.QLabel("Take note:")       
+        self.textNote = QtGui.QTextEdit(self)
+    
+        layout = QtGui.QVBoxLayout(self)
+        layout.addWidget(self.label)
+        layout.addWidget(self.label)
+        layout.addWidget(HLine())
+        layout.addWidget(self.label_Note)
+        layout.addWidget(self.textNote)
+
+        
+        ok = QtGui.QPushButton("OK")
+        ok.setDefault(True)
+        
+        canc = QtGui.QPushButton("Cancel")
+        
+       
+        buttons = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
+        buttons.addButton(ok, QtGui.QDialogButtonBox.AcceptRole)
+        buttons.addButton(canc, QtGui.QDialogButtonBox.RejectRole)
+
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+        
+        self.textNote.setPlainText(plainText)
+
+    def result(self):
+        if self.textNote.toPlainText() == "":
+            return "No notes"
+        return self.textNote.toPlainText()
+
         
 class playblast_options(QtGui.QDialog):
     def __init__(self, parent = None, title = None, hud = True, offscreen = True, formats = None, format = "movie", compressions = None, compression = "H.264", scale = 50):
@@ -438,3 +485,34 @@ def HLine():
     toto.setFrameShape(QtGui.QFrame.HLine)
     toto.setFrameShadow(QtGui.QFrame.Sunken)
     return toto    
+    
+def crop_text(text,lines,crop_sign):   
+    if len(text.split('\n')) > lines:
+        crop_text  = text.rsplit('\n',len(text.split('\n'))-lines)[0]
+        crop_text = crop_text + crop_sign
+        return crop_text    
+    else:
+        return text
+        
+        
+class author_note_widget(QtGui.QWidget):
+
+    def __init__(self, parent=None, author_name = None, note = False):
+        super(author_note_widget,self).__init__(parent)
+
+        # add your buttons
+        self.layout = QtGui.QHBoxLayout()
+
+        # adjust spacings to your needs
+        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setSpacing(0)
+
+        self.name = QtGui.QLabel(author_name)
+        self.layout.addWidget(self.name)
+        self.note_icon = QtGui.QLabel()
+        self.note_icon.setContentsMargins(10,5,2,2)
+        if note:            
+            self.note_icon.setPixmap(comment_icon)#.scaled(20,20))
+            self.layout.addWidget(self.note_icon)
+
+        self.setLayout(self.layout)        
