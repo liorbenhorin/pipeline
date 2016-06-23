@@ -3615,14 +3615,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def update_published_masters(self):
 
+        
 
-        if self.project.project_users == None:
-                self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
-                self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(3,0)
-        else:
-            self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.ResizeToContents )
-        
-        
 
         boldFont=QtGui.QFont()
         boldFont.setBold(True)
@@ -3631,6 +3625,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.published_assets_tableWidget.setRowCount(0) 
 
         if self.project: 
+
+            if self.project.project_users == None:
+                    self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
+                    self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(3,0)
+            else:
+                self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.ResizeToContents )
+            
+            
             
             masters = self.project.masters
             if masters:
