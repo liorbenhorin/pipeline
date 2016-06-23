@@ -3616,6 +3616,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def update_published_masters(self):
 
 
+        if self.project.project_users == None:
+                self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
+                self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(3,0)
+        else:
+            self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.ResizeToContents )
+        
+        
+
         boldFont=QtGui.QFont()
         boldFont.setBold(True)
         
@@ -3636,7 +3644,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.ui.published_assets_tableWidget.setItem(index,0,path) 
                    
                     master_thumb = QtGui.QLabel()
-                    master_thumb.setPixmap(masters[key][1].scaled(48,48))
+                    #master_thumb.setPixmap(masters[key][1].scaled(48,48))
+                    
+                    master_thumb.setPixmap(masters[key][1].scaled(48,48,QtCore.Qt.KeepAspectRatio))      
+                    master_thumb.setAlignment(QtCore.Qt.AlignCenter)
+                    
+                    #master_thumb.setStyleSheet("border: 3px solid grey")
                     self.ui.published_assets_tableWidget.setCellWidget(index,1,master_thumb)
                     
                     
