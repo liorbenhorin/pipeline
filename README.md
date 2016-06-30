@@ -38,7 +38,7 @@ Manage all you projects without leaving Maya.
 * Record playblasts from shots, and Pipeline orgenise them in versions, too.
 * Store playblasts inside the project folder or in a sister directory (useful when sharing projects to not slow down sync times)
 * Improved notes module
-
+* Pipeline now have a batter bug reports system to help in fixing more bugs.
 
 *Bugfixes*
 
@@ -46,6 +46,8 @@ Manage all you projects without leaving Maya.
 * Bug when you cannot load a project, and need to restart Pipeline.
 * Bug that was causing many function to fail when setting a version padding numbr other then 3.
 * Bug that was showing an empty column when no users set to project
+* Bug that was not setting the project correctly in some cases on a windows machines.
+* Random ui bugs
 
 **8.6.16 - 1.0.0 - BETA - Free for educational and non commercial use!**
 
