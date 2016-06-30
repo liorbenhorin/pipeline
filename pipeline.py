@@ -66,9 +66,10 @@ import collections
 import logging
 import webbrowser
 import glob
+import sys
+import inspect
 
-
-        
+'''        
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
 hdlr = logging.FileHandler(log_file, mode = 'w')
@@ -76,7 +77,7 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 log.handlers[:] = [hdlr]
 log.setLevel(logging.DEBUG)
-
+'''
 global start_time
 global end_time
 start_time = timer()
@@ -92,7 +93,127 @@ reload(track)
 import dialogue as dlg
 reload(dlg)
 
+log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
+log = logging.getLogger(__name__)
+hdlr = logging.StreamHandler(stream=sys.stdout)
+hdlr = logging.FileHandler(log_file, mode = 'w')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+log.handlers[:] = [hdlr]
+log.setLevel(logging.DEBUG)
+log.info(os.path.realpath(__file__))
 
+def general_log():
+    if 'UiWindow' in globals():
+        UiWindow.log()
+        UiWindow.log_settings()
+    else:
+        log.info("cannot log anything - ui is not loaded")
+             
+def standard_error_report_handler():
+    
+    py_file_dir = os.path.dirname(__file__)                       
+    log_file = os.path.join(py_file_dir, 'error_reports','ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))           
+    files.assure_path_exists(log_file)            
+    exp_hdlr = logging.StreamHandler(stream=sys.stdout)
+    exp_hdlr = logging.FileHandler(log_file, mode = 'w')
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    exp_hdlr.setFormatter(formatter)            
+    log.addHandler(exp_hdlr)  
+    log.info('ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))          
+    log.info('Platform - %s'%(files.os_qeury()))
+    log.info('Maya version - %s'%maya.maya_version())
+    log.info('Pipeline version - %s'%version)
+    py_file = os.path.realpath(__file__)           
+    log.info('pipeline.py path - %s'%py_file)
+    return exp_hdlr, log_file
+    
+
+def exception_report(file=None,settings_file=None):
+    if file:
+        string = files.read(file)
+        errorDlg = dlg.ErrorReport(plainText = string)
+        note = errorDlg.exec_()
+        text, usertext, dont_ask = errorDlg.result()
+        try:
+            if dont_ask:
+                UiWindow.ui.actionBug_reports.setChecked(False)                
+            else:
+                UiWindow.ui.actionBug_reports.setChecked(True)    
+        except:
+            log.info("ui is not loaded - 'don't show this again' settings is not saved")
+                
+        if note == QtGui.QDialog.Accepted:
+            import modules.email as email
+            body = usertext + '\n\n\n' + text
+            email.mailto('liorbenhorin@gmail.com', subject='Pipeline error report - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")), body=body)
+
+def try_execpt(fn):
+
+    def wrapped(self,*args,**kwargs):
+        try:
+            return fn(self,*args,**kwargs)
+            
+        except StandardError:
+            exc_info = sys.exc_info()
+            exp_hdlr, log_file = standard_error_report_handler()
+
+            if 'UiWindow' in globals():
+                try:
+                    UiWindow.log_settings()
+                except:
+                    log.info("unable to log the settings")
+            else:
+                log.info("cannot log anything - ui is not loaded")
+                    
+            try:
+                
+                self.log()
+                log.info("exception at %s.%s"%(self.__class__.__name__, fn.__name__), exc_info=True)
+                log.removeHandler(exp_hdlr) 
+            except:
+                log.info("exception at %s - faild to log more information"%(fn.__name__), exc_info=True)
+                log.removeHandler(exp_hdlr) 
+            
+            try:
+                if UiWindow.ui.actionBug_reports.isChecked():
+                    exception_report(log_file)
+            except:
+                exception_report(log_file)
+
+            raise StopIteration
+                        
+    return wrapped
+    
+  
+def exceptions_handler(decorator):
+    def decorate(cls):
+        for name, fn in inspect.getmembers(cls, inspect.ismethod):
+            if name is not 'log':
+                setattr(cls, name, decorator(fn))
+               
+        return cls
+    return decorate    
+
+def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
+        
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+        
+    # this will prevent for loop error from getting printed to screen    
+    if issubclass(exc_type, StopIteration):
+        log.info("quitting iteration")
+        return        
+    
+    exp_hdlr, log_file = standard_error_report_handler()
+    general_log()
+    log.info("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))    
+    log.removeHandler(exp_hdlr) 
+    exception_report(log_file)
+
+
+sys.excepthook = handle_uncaught_exception
 
 def loadUiType(uiFile):
     """
@@ -128,20 +249,14 @@ global variables setup
 '''
 main_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_main_UI.ui')
 main_form_class, main_base_class = loadUiType(main_uiFile)
-
-#settings_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_settings_UI.ui')  
-
-login_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_login_UI.ui')
-login_uiFile_form_class, login_uiFile_base_class = loadUiType(login_uiFile)
-
+ 
 projects_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_projects_UI.ui')       
 projects_form_class, projects_base_class = loadUiType(projects_uiFile)
 
 create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_create_edit_project_UI.ui')
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
 
-
-version = '1.0.0-beta'
+version = '1.0.10-NFR'
 
 
 def set_icons():
@@ -249,13 +364,6 @@ def set_padding(int, padding):
     return str(int).zfill(padding)
 
 
-#print set_padding(11,1)
-
-
-
-
-
-
 class QLabelButton(QtGui.QLabel):
     '''
         custom QLbael the can send clicked signal
@@ -318,7 +426,7 @@ class pipeline_data(object):
 
 
 
-
+@exceptions_handler(try_execpt)   
 class pipeline_component(pipeline_data):
     def __init__(self,**kwargs):
         pipeline_data.__init__(self, **kwargs)
@@ -542,6 +650,7 @@ class pipeline_component(pipeline_data):
             return None  
 
     def author(self, type, version):
+        
         if self.component_file:
             try:
                 version_data = self.component_file[type][version]
@@ -573,11 +682,12 @@ class pipeline_component(pipeline_data):
                     note = kwargs[key]
             
             if note:
-                   
+                  
                 data = self.data_file.read()
                 data[type][version]["note"] = note    
                 self.data_file.edit(data)
                 self.component_file = self.data_file.read()
+                
                 return True
                                                 
             else:
@@ -592,7 +702,7 @@ class pipeline_component(pipeline_data):
             return None  
  
     def size(self, type, version):
-
+        
         if self.component_file:            
             size_mb = files.file_size_mb(self.file_path(type, version))
             if size_mb:
@@ -634,10 +744,10 @@ class pipeline_component(pipeline_data):
             if self.component_file:
                 if self.settings:
 
-                    sorted_versions = self.versions 
-                    last_version = sorted_versions[len(sorted_versions)-1]
-                    
-                    return last_version
+                    sorted_versions = self.versions
+                    if sorted_versions:
+                            return sorted_versions[-1]
+                        
 
                 
     def new_version(self): 
@@ -645,14 +755,15 @@ class pipeline_component(pipeline_data):
             if self.component_file:
                 
                 versions = self.versions
-                last = versions[len(versions)-1]
-                
+                versions = self.versions
+                if versions:
+                    last = versions[-1]
+                else:
+                    last = 0
 
                 
                 version_number = set_padding(last+1,self.project.project_padding)                
-
-                
-                
+      
                 file_name = "%s_%s_%s.%s"%(self.asset_name,self.component_name,version_number,"ma")                   
                 scene_path = maya.save_scene_as(path = self.versions_path, file_name = file_name ) 
                                 
@@ -919,13 +1030,32 @@ class pipeline_component(pipeline_data):
         
         
         shot = pipeline_shot(path = self.data_file_path, project = self.project, settings = self.settings)
-        print shot
+
         if shot:
             if shot.shot_name:
                 return "shot"
             
         return None    
+
+    def log(self):
+
+        if self.settings:
+            self.settings.log()
         
+        log.info("logging component '%s' at asset '%s' at catagory '%s'"%(self.component_name,self.asset_name,self.catagory_name))       
+        
+        log.info("component path %s"%self.component_path)
+                
+        [ log.info("  %s"%f) for f in files.list_all(self.component_path) if isinstance(files.list_all(self.component_path),list) ]
+                               
+        log.info("compnnent data file: %s"%self.data_file_path)
+        
+        log.info(self.data_file.print_nice())
+
+        log.info("end logging component ")    
+
+
+@exceptions_handler(try_execpt)      
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
         pipeline_component.__init__(self, **kwargs)
@@ -1046,8 +1176,11 @@ class pipeline_shot(pipeline_component):
             if self.component_file:
                 
                 versions = self.versions
-                last = versions[len(versions)-1]
-                
+                if versions:
+                    last = versions[-1]
+                else:
+                    last = 0
+                                       
                 version_number = set_padding(last+1,self.project.project_padding)                
                 file_name = "%s_%s_%s.%s"%(self.sequence_name,self.shot_name,version_number,"ma")                   
                 scene_path = maya.save_scene_as(path = self.versions_path, file_name = file_name ) 
@@ -1224,12 +1357,23 @@ class pipeline_shot(pipeline_component):
                     note = kwargs[key]
             
             if note:
- 
+                
                 data = self.data_file.read()
-                data["playblasts"][version]["note"] = note    
+                
+                if version in data["playblasts"]:
+                
+                    data["playblasts"][version]["note"] = note
+                    
+                else:
+
+                    new_version = {}
+                    new_version["note"] = note 
+                    data["playblasts"][version] = new_version
+                  
                 self.data_file.edit(data)
                 self.component_file = self.data_file.read()
                 return True
+             
                                                 
             else:
                 
@@ -1238,11 +1382,13 @@ class pipeline_shot(pipeline_component):
                     version_data = self.component_file["playblasts"][version]
                     return version_data["note"]
                 except:
-                    return None
+                    return "No notes"
             
         else:
             return None  
 
+    def playblasts_path(self):
+        return os.path.join(self.project.playblasts_path,self.sequence_name,self.shot_name)
 
     def playblast_thumbnail(self, version):
         file = self.playblast_thumbnail_path(version)
@@ -1257,7 +1403,7 @@ class pipeline_shot(pipeline_component):
          
                 #file_name = "%s_%s_%s_%s.%s"%(self.sequence_name,self.shot_name,"PREVIEW",version,self.project.movie_file_type)
                 file_name = "%s_%s_%s_%s_%s"%(self.sequence_name,self.shot_name,"PREVIEW",version,"THUMB")                                                       
-                playblast_path = os.path.join(self.project.playblasts_path,self.sequence_name,self.shot_name)             
+                playblast_path = self.playblasts_path()           
                 files.find_by_name(playblast_path,file_name)
                 file = files.find_by_name(playblast_path,file_name)
                 if file:
@@ -1313,7 +1459,7 @@ class pipeline_shot(pipeline_component):
                 files.file_rename(playblasts_thumbs[version][0],playblasts_thumbs[version][1])
         
             #rename playblasts dir
-            files.dir_rename(os.path.dirname(playblasts[version][0]),new_name) 
+            files.dir_rename(os.path.join(self.project.playblasts_path,self.sequence_name,self.shot_name),new_name) 
             
             
         versions = {}
@@ -1359,7 +1505,7 @@ class pipeline_shot(pipeline_component):
                 files.file_rename(playblasts_thumbs[version][0],playblasts_thumbs[version][1])
         
             #rename playblasts dir
-            files.dir_rename(os.path.dirname(os.path.dirname(playblasts[version][0])),new_name) 
+            files.dir_rename(os.path.join(self.project.playblasts_path,self.sequence_name),new_name) 
             
         versions = {}
 
@@ -1374,7 +1520,31 @@ class pipeline_shot(pipeline_component):
         self.sequence_name = new_name       
         return True
 
+    def log(self):
+        project_path = ""
+        if self.settings:
+            self.settings.log()
+            project_path = self.settings.current_project_path
 
+           
+        log.info("logging shot '%s' at seqence '%s' "%(self.shot_name,self.sequence_name))       
+        
+        log.info("shot path %s"%self.component_path)
+                
+        [ log.info("  %s"%files.reletive_path(project_path,f)) for f in files.list_all(self.component_path) if isinstance(files.list_all(self.component_path),list) ]
+                
+        log.info("playblasts path: %s"%self.playblasts_path())
+        
+        [ log.info("  %s"%files.reletive_path(project_path,f)) for f in files.list_all(self.playblasts_path()) if isinstance(files.list_all(self.playblasts_path()),list) ]
+                
+        log.info("shot data file: %s"%self.data_file_path)
+        
+        log.info(self.data_file.print_nice())
+
+        log.info("end logging shot ")    
+
+
+@exceptions_handler(try_execpt) 
 class pipeline_project(pipeline_data):
     def __init__(self,**kwargs):
         #super(pipeline_project, self,).__init__()
@@ -1655,7 +1825,7 @@ class pipeline_project(pipeline_data):
 
 
     def create_sequence(self, sequence_name = None):
-
+        
         for sequence in self.sequences:
             if sequence_name == sequence:
                 dlg.massage("critical", "Sorry", "This sequence exsists" )
@@ -1845,9 +2015,25 @@ class pipeline_project(pipeline_data):
         else:            
             return None
                             
+
+    def log(self):
+        
+        log.info("logging project '%s'"%(self.project_name))       
+        
+        project_path = self.settings.current_project_path
+        
+        log.info("project local path %s"%project_path)
+                
+        [ log.info("  %s"%files.reletive_path(project_path,f)) for f in files.list_all(self.settings.current_project_path) if isinstance(files.list_all(self.settings.current_project_path),list) ]
+                               
+        log.info("project data file: %s"%self.data_file_path)
+        
+        log.info(self.data_file.print_nice())
+
+        log.info("end logging project ")    
                             
 
-
+@exceptions_handler(try_execpt) 
 class pipeline_settings(pipeline_data):
     def __init__(self,**kwargs):
         #super(pipeline_settings, self).__init__()
@@ -1856,7 +2042,7 @@ class pipeline_settings(pipeline_data):
         self.settings_file = None
         if self.data_file:
             self.settings_file = self.data_file.read()
- 
+        
        
     def create(self, path):
         
@@ -1907,6 +2093,7 @@ class pipeline_settings(pipeline_data):
 
     @property
     def current_project(self):
+        
         if self.settings_file:
             current_project_key = self.settings_file["current_project"]
             if current_project_key:
@@ -2060,7 +2247,8 @@ class pipeline_settings(pipeline_data):
             self.settings_file = self.data_file.read()
 
     @property  
-    def role(self):        
+    def role(self):
+                
         if self.settings_file:
             role = self.settings_file["project_premissions"]
             if role == "admin":
@@ -2088,76 +2276,114 @@ class pipeline_settings(pipeline_data):
 
     @property
     def playblast_format(self):
-        data = self.selection
-        try:
-            return data["playblast_format"]
-        except:
-            return "movie"
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_format"]
+            except:
+                return "movie"
 
     @playblast_format.setter
     def playblast_format(self,format):
-        data = self.selection
-        data["playblast_format"] = format
-        self.selection = data
+        if self.data_file:
+            data = {}
+            data["playblast_format"] = format
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+        
 
     @property
     def playblast_compression(self):
-        data = self.selection
-        try:
-            return data["playblast_compression"]
-        except:
-            return "H.264"
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_compression"]
+            except:
+                return "H.264"
 
     @playblast_compression.setter
     def playblast_compression(self,type):
-        data = self.selection
-        data["playblast_compression"] = type
-        self.selection = data
+        if self.data_file:
+            data = {}
+            data["playblast_compression"] = type
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()        
 
 
     @property
     def playblast_hud(self):
-        data = self.selection
-        try:
-            return data["playblast_hud"]
-        except:
-            return True
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_hud"]
+            except:
+                return True
 
     @playblast_hud.setter
     def playblast_hud(self,type):
-        data = self.selection
-        data["playblast_hud"] = type
-        self.selection = data
+        if self.data_file:
+            data = {}
+            data["playblast_hud"] = type
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
 
     @property
     def playblast_offscreen(self):
-        data = self.selection
-        try:
-            return data["playblast_offscreen"]
-        except:
-            return False
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_offscreen"]
+            except:
+                return False
 
     @playblast_offscreen.setter
     def playblast_offscreen(self,type):
-        data = self.selection
-        data["playblast_offscreen"] = type
-        self.selection = data
+        if self.data_file:
+            data = {}
+            data["playblast_offscreen"] = type
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
 
 
     @property
     def playblast_scale(self):
-        data = self.selection
-        try:
-            return data["playblast_scale"]
-        except:
-            return 50
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_scale"]
+            except:
+                return 50
 
     @playblast_scale.setter
     def playblast_scale(self,int):
-        data = self.selection
-        data["playblast_scale"] = int
-        self.selection = data
+        if self.data_file:
+            data = {}
+            data["playblast_scale"] = int
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
 
+
+    @property
+    def bug_reports(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["bug_reports"]
+            except:
+                return True
+        else:
+            return True
+
+    @bug_reports.setter
+    def bug_reports(self,bool):
+        if self.data_file:
+            data = {}
+            data["bug_reports"] = bool
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+
+    def log(self):
+        log.info("logging settings")
+        log.info("settings data file: %s"%self.data_file_path)        
+        log.info(self.data_file.print_nice())        
+        log.info("end logging settings")
+
+#@exceptions_handler(try_execpt) 
 class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def __init__(self, parent=None):
         
@@ -2184,6 +2410,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         #connect ui
         self.ui.actionAbout.triggered.connect(self.about)
+        self.ui.actionBug_reports.toggled.connect(self.send_bug_reports)
         self.ui.actionDocumentation.triggered.connect(self.documentation)
         
         self.ui.actionFiles_repath.triggered.connect(self.repath)
@@ -2295,7 +2522,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shot_pushButton.setMenu(self.shot_menu)
         
         #customize widgets
-        self.set_project_tooltips()
+        
         self.thumbnail_button()
         
         boldFont=QtGui.QFont()
@@ -2345,7 +2572,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if there is no user logged in then make sure no project is loaded            
         '''
         self.init_settings()  
-        
+        self._decode_users()
         
         if self.settings.user[0] is not None:
             self.ui.users_pushButton.setText(self.settings.user[0])
@@ -2475,8 +2702,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 
         return True
 
-    def set_project(self):  
-              
+    def set_project(self,**kwargs):  
+        from_pm = False
+        if "from_projects_manager" in kwargs:
+            from_pm = kwargs["from_projects_manager"]
+            
+            
         if self.settings.current_project:            
             self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.pipe"), settings = self.settings)
             
@@ -2497,21 +2728,24 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
 
                 if not self.settings.role:
+                    
+                    if from_pm:
                                         
-                    login = dlg.Login()
-                    result = login.exec_()
-                    q_user, q_password  = login.result()
-                    if result == QtGui.QDialog.Accepted:
-                        if q_user in self.project.project_users:
-                            if self.project.project_users[q_user][0] == q_password:
-                                self.settings.user = [q_user, q_password]
-                                self.settings.role = self.project.project_users[q_user][1]
-                                self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))                                                          
-                                return True 
+                        login = dlg.Login()
+                        result = login.exec_()
+                        q_user, q_password  = login.result()
+                        if result == QtGui.QDialog.Accepted:
+                            if q_user in self.project.project_users:
+                                if self.project.project_users[q_user][0] == q_password:
+                                    self.settings.user = [q_user, q_password]
+                                    self.settings.role = self.project.project_users[q_user][1]
+                                    self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))                                                          
+                                    return True 
+                                
+                                                                 
                             
-                                                             
-                        
-                    log.info("Login faild")      
+                                log.info("Login faild") 
+                                     
                     self.project = None
                     self.settings.current_project = None
                     
@@ -2534,9 +2768,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.settings.current_project = None
             return False
 
+    def _decode_users(self):        
+        decode = getattr(self.ui,dlg._decode_strings()[0])
+        decode2 = getattr(decode,dlg._decode_strings()[2])(dlg._decode_strings()[4])
+        decode2 = getattr(decode,dlg._decode_strings()[3])(dlg._decode_strings()[5])
+
     def unload_project(self):
 
-        self.settings.current_project = None
+        #self.settings.current_project = None
         self.set_project()
         self.init_current_project()
         try:
@@ -2605,6 +2844,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.update_category()
             self.update_sequence()
             self.update_published_masters()
+            log.info ( "logged out") 
                                        
 
 
@@ -2679,23 +2919,37 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             return True
         return False
 
-    def update_current_open_project(self,project_key):
+    def update_current_open_project(self,project_key,**kwargs):
         '''
         thie method is used from the projects window, when a project is being set, 
         update the settings file,
         call the set project and init project methods
 
         '''
+
+        from_pm = False
+        if "from_projects_manager" in kwargs:
+            from_pm = kwargs["from_projects_manager"]
+        
                      
         if project_key:
 
             #if self.settings.current_project != project_key:
                 
             self.settings.current_project = project_key
-            if self.set_project():
-                self.init_current_project()
             
-                return True
+
+            
+            if from_pm:
+                if self.set_project(from_projects_manager=True):
+                    self.init_current_project()
+                
+                    return True
+            else:
+                if self.set_project():
+                    self.init_current_project()
+                
+                    return True                
         else:
             
             self.settings.current_project = None
@@ -2946,8 +3200,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows) 
         self.ui.shots_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.ui.shots_tableWidget.clearContents()
-        self.ui.shots_tableWidget.setRowCount(0)
-        self.ui.shots_tableWidget.itemSelectionChanged.connect(self.shot_selection)        
+        self.ui.shots_tableWidget.setRowCount(0)       
         self.ui.shots_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
         self.ui.shots_tableWidget.itemSelectionChanged.connect(self.shot_selection)
 
@@ -3265,15 +3518,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def update_versions(self):
-        
-        #remove users column if no users in project
-        if self.project.project_users == None:
-                self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
-                self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(2,0)
-        else:
-            self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
-        
-        
+        if self.project:
+            #remove users column if no users in project
+            if self.project.project_users == None:
+                    self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                    self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(2,0)
+            else:
+                self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+            
+            
         self.active_version = None
         
         active_color = QtGui.QColor()
@@ -3394,14 +3647,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def update_masters(self):
 
-
+        if self.project:    
         #remove users column if no users in project
-        if self.project.project_users == None:
-                self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
-                self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(2,0)
-        else:
-            self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
-        
+            if self.project.project_users == None:
+                    self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                    self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(2,0)
+            else:
+                self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+            
         
         self.active_version = None
         
@@ -3498,6 +3751,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                     
                     explore_action = QtGui.QAction("Explore",actionButtonItem)
                     explore_action.triggered.connect(self.master_explore)
+
+
+                    openButtonItem = QtGui.QPushButton()
+                    openButtonItem.clicked.connect(self.master_open)
+                    openButtonItem.setIcon(QtGui.QIcon(open_icon))
+                    openButtonItem.setIconSize(QtCore.QSize(20,20))              
+                    self.ui.component_masters_tableWidget.setCellWidget(index,5,openButtonItem)
                     
                     if version != 0:
                         actions_menu.addAction(make_master_action) 
@@ -3508,19 +3768,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                         actions_menu.addAction(reference_action)
                         actions_menu.addAction(import_action)
                         actions_menu.addAction(delete_action)
-                        
-                        openButtonItem = QtGui.QPushButton()
-                        openButtonItem.clicked.connect(self.master_open)
-                        openButtonItem.setIcon(QtGui.QIcon(open_icon))
-                        openButtonItem.setIconSize(QtCore.QSize(20,20))              
-                        self.ui.component_masters_tableWidget.setCellWidget(index,5,openButtonItem)
-                    
+       
                     else:
-                        active = QtGui.QTableWidgetItem("Active")
-                        active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                        self.ui.component_masters_tableWidget.setItem(index,4,active) 
-                        active.setBackground(active_color)  
-                                                          
+                        
+                        openButtonItem.setIcon(QtGui.QIcon(reload_icon))
+                        
                     
                     actions_menu.addAction(explore_action)                
                     actionButtonItem.setMenu(actions_menu)                
@@ -3532,17 +3784,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                      user,
                                      date_time,
                                      size]:
-                            item.setBackground(active_color) 
+                            try:
+                                item.setBackground(active_color) 
+                            except:
+                                pass    
                         note_indicator.setStyleSheet("background-color: purple")                        
                     if version == 0:
-                        
-                        
-                        
+
                         for item in [version_number,
                                      user,
                                      date_time,
                                      size]:
-                            item.setBackground(master_color) 
+                            try:
+                                item.setBackground(master_color) 
+                            except:
+                                pass
                         note_indicator.setStyleSheet("background-color: green")
           
         else:
@@ -3681,13 +3937,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def update_shots(self):
 
         #remove users column if no users in project
-        if self.project.project_users == None:
-                self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
-                self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(2,0)
-        else:
-            self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
-        
-        
+        if self.project:
+            if self.project.project_users == None:
+                    self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                    self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(2,0)
+            else:
+                self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+            
+            
         
         self.active_version = None
         
@@ -3750,7 +4007,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 reference_action.triggered.connect(self.shot_reference)                
                 self.enable(reference_action, level = 2)
                 
-                import_action = QtGui.QAction("Import",actionButtonItem)  
+                import_action = QtGui.QAction("Import",actionButtonItem) 
+                import_action.triggered.connect(self.shot_add_import) 
                 self.enable(import_action, level = 2)
                                                               
                 delete_action = QtGui.QAction("Delete",actionButtonItem)
@@ -3829,10 +4087,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     version_number.setTextAlignment(QtCore.Qt.AlignTop)
                     self.ui.shots_playblasts_tableWidget.setItem(index,0,version_number)
-
-                    #user = QtGui.QTableWidgetItem(self.shot.author("playblasts", padded_version))
-                    #user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    #self.ui.shots_playblasts_tableWidget.setItem(index,1,user) 
                
                     note_indicator = QtGui.QLabel()
                     if self.shot.playblast_note(padded_version) != "No notes":
@@ -3848,7 +4102,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     thumb.setPixmap(thumb_pixmap.scaled(w,h,QtCore.Qt.KeepAspectRatio))      
                     thumb.setAlignment(QtCore.Qt.AlignCenter)
-                    thumb.setStyleSheet("border: 3px solid grey")
+                    #thumb.setStyleSheet("border: 3px solid grey")
                     self.ui.shots_playblasts_tableWidget.setCellWidget(index,1,thumb)    
                     
                     text = self.shot.date_created("playblasts", padded_version)
@@ -4288,7 +4542,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def shot_selection(self):
         self.shot_name = self.table_selection(self.ui.shots_tableWidget)
-  
+
         if self.shot_name and self.sequence_name:
             
             #self.enable(self.delete_shot_action, level = "admin")  
@@ -4459,7 +4713,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 self.component.new_version()
                 self.update_versions()
         
-    def version_open(self):    
+    def version_open(self):  
+          
         widget = self.sender()
         index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
         version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
@@ -4726,6 +4981,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         maya.reference_scene(file)
 
 
+    def shot_add_import(self):
+        widget = self.sender()
+        widget = widget.parent()
+        index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
+        version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
+        
+        file = self.shot.file_path("versions",version)
+        maya.import_scene(file)
+
     def shot_delete(self):
 
 
@@ -4781,33 +5045,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         file = self.shot.file_path("versions",version)
         files.explore(file) 
-
-    '''
-    def shot_playblast_note(self, event):
-           
-        dlg = QtGui.QInputDialog(self)                 
-        dlg.setInputMode( QtGui.QInputDialog.TextInput) 
-        dlg.setLabelText("Edit Note:")                             
-        dlg.resize(400,100)
-            
-        if self.shot_playblast_version and not isinstance(self.shot_playblast_version,list):
-            dlg.setTextValue(self.shot.playblast_note(self.shot_playblast_version))                   
-            ok = dlg.exec_()                                
-            note = dlg.textValue()
-            self.shot.playblast_note(self.shot_playblast_version, note=note)                                 
-            self.ui.shot_notes_label.setText(note) 
-            
-        else:
-            del dlg
-    '''
-
-    def shot_playblast_open(self):    
+    
+    
+    def shot_playblast_open(self):  
         widget = self.sender()
+        
         index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
         version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
         
         file = self.shot.playblast_path(version)
         files.run(file)
+
 
     def shot_playblast_delete(self):
 
@@ -4837,13 +5085,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def shot_playblast_explore(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
-        version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
-        
-        file = self.shot.playblast_path(version)
-        files.explore(file)         
+        try:
+            widget = self.sender()
+            widget = widget.parent()
+            index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
+            version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
+            
+            file = self.shot.playblast_path(version)
+            files.explore(file) 
+        except:
+            print "ZZZ"        
 
     def shot_record_playblast(self):
         if self.set_shot_selection():
@@ -5140,7 +5391,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         settingWindow.show()
 
     def projects_window(self):
-        self.verify_projects()
+        if self.verify_projects():
+            self.set_project()
+        
         global projectsWindow
         try:
             projectsWindow.close()
@@ -5162,29 +5415,27 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 return True
                             
         self.settings.user = [None, None]
-        self.ui.users_pushButton.setText("Not logged In") 
-        self.unload_project()  
+        self.ui.users_pushButton.setText("Not logged In")         
+        self.settings.role = None
+        self.project = None
+        self.settings.current_project = None
+        self.init_current_project()
+        try:
+            if projectsWindow:
+                projectsWindow.updateProjectsTable()
+        except:
+           pass
+           
+        log.info ( "logged out")    
         return False
             
-        '''
-        global loginWindow
-        try:
-            loginWindow.close()
-        except:
-            pass
-        loginWindow=pipeLine_login_UI(parent=self, pipeline_window=self)
-        loginWindow.show()
-        '''
+
     def set_control_types(self):
         localIconPath = os.path.join(os.path.dirname(__file__), 'icons/controls')
         if not os.path.exists(localIconPath):
             log.info("icons folder not found: %s"%localIconPath)
             return 
 
-    def set_project_tooltips(self):
-        textToolTips = dlg.textToolTips()
-        self.ui.projects_tooltip_label.setText(textToolTips)
-        self.ui.projects_tooltip_widget.setHidden(True)
             
     # If it's floating or docked, this will run and delete it self when it closes.
     # You can choose not to delete it here so that you can still re-open it through the right-click menu, but do disable any callbacks/timers that will eat memory
@@ -5223,7 +5474,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         about.exec_()            #"<p align='Center'><b>Pipeline</b><br>Projects manager for Maya<br><br>%s<br><br><a href='liorbenhorin@gmail.com'><font color='white'>liorbenhorin@gmail.com</font></a><br><br>All rights reserved to Lior Ben Horin 2016</p>"%(version))
     
     def documentation(self):
-        webbrowser.open('http://liorbenhorin.github.io/Pipeline_help/')
+        webbrowser.open('http://pipeline.nnl.tv/')
 
     def repath(self):        
         if self.settings.current_project_path:
@@ -5251,6 +5502,28 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         self.open_scene_script  = maya.open_scene_script("MayaWindow|pipeline_beta", self.scen_opened)
         return True
+    
+    def send_bug_reports(self):
+        if self.settings:
+            if self.ui.actionBug_reports.isChecked():
+                self.settings.bug_reports = True
+            else:
+                self.settings.bug_reports = False
+                
+    def log(self):
+        
+        if self.project:
+            self.project.log()
+        else:
+            log.info("No project is set in UiWindow")  
+
+   
+    def log_settings(self):
+        
+        if self.settings:
+            self.settings.log()
+        else:
+            log.info("No settings found in UiWindow") 
         
 class pipeLine_settings_UI(QtGui.QMainWindow):
     def __init__(self, parent=None):
@@ -5268,49 +5541,6 @@ class pipeLine_settings_UI(QtGui.QMainWindow):
         boldFont=QtGui.QFont()
         boldFont.setBold(True)               
    
-
-class pipeLine_login_UI(QtGui.QMainWindow):
-    def __init__(self, parent=None, pipeline_window=None):
-        
-        super(pipeLine_login_UI, self).__init__(parent)      
-        self.setWindowFlags(QtCore.Qt.Tool)                
-        form_class, base_class = login_uiFile_form_class, login_uiFile_base_class
-        
-        self.ui = form_class()
-        self.ui.setupUi(self)
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.setWindowTitle("Login")
-        
-        self.setMinimumHeight(220)         
-        self.setMaximumHeight(220)
-                         
-        #connect ui
-        self.pipeline_window = pipeline_window
-        boldFont=QtGui.QFont()
-        boldFont.setBold(True)  
-        
-        self.ui.users_label.setPixmap(users_icon)
-        self.ui.cancel_pushButton.clicked.connect(self.cancel)
-        self.ui.login_pushButton.clicked.connect(self.login)
-
-
-    def login(self):
-        user = self.ui.username_lineEdit.text() if self.ui.username_lineEdit.text() != "" else None
-        password = self.ui.password_lineEdit.text()
-        self.pipeline_window.settings.user = [user, password]
-        
-        if user is not None:
-            self.pipeline_window.ui.users_pushButton.setText(user)
-        else:
-            self.pipeline_window.ui.users_pushButton.setText("Not logged In")    
-        
-        self.pipeline_window.unload_project()                                         
-        self.close()
-        
-    def cancel(self):
-        self.close()
-
-
 class pipeLine_projects_UI(QtGui.QMainWindow):
     def __init__(self, parent=None, pipeline_window=None):
         
@@ -5463,7 +5693,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             project_path = projects[project_key][0]
             project_Name = projects[project_key][2]
 
-            if self.pipeline_window.update_current_open_project(project_key):
+            if self.pipeline_window.update_current_open_project(project_key,from_projects_manager=True):
                 
                 #if self.pipeline_window.settings.current_project:
                     
@@ -5949,4 +6179,3 @@ def show():
     UiWindow.run()
     
     return UiWindow
-

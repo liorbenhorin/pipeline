@@ -55,57 +55,54 @@ import subprocess
 import glob
 import logging
 import re
-    
+
+
 def dir_rename(dir_fullpath, new_name):
     
-    new_dir = os.path.join(os.path.dirname(dir_fullpath),new_name)
-    #create_directory(new_dir)
-    try:
-        shutil.move(dir_fullpath, new_dir)
-        return new_dir
-    except:
-        return False
+    new_dir = os.path.join(os.path.dirname(dir_fullpath),new_name)    
+    shutil.move(dir_fullpath, new_dir)
+    return new_dir
 
-def dir_move(dir_fullpath, new_dir_fullpath):
-    
-    try:
+ 
+def dir_move(dir_fullpath, new_dir_fullpath):   
+    if os.path.exists(dir_fullpath):
         shutil.move(dir_fullpath, new_dir_fullpath)
         return new_dir_fullpath
-    except:
-        return False
+    return None
+
         
-            
+             
 def file_rename(fullpath, new_name):
     '''
     input: string, fullpath of the file to rename
            string, new_name without the extension
     output True if the rename is successful        
     '''
-    dir = os.path.dirname(fullpath)
-    
-    name = file_name(fullpath)
-    file_extension = extension(name)
-    new_name_with_extension = new_name + file_extension
-    
-    new_fullpath = os.path.join(dir,new_name_with_extension)
-    
-    try:
+
+    if fullpath:
+        dir = os.path.dirname(fullpath)
+        
+        name = file_name(fullpath)
+        file_extension = extension(name)
+        new_name_with_extension = new_name + file_extension
+        
+        new_fullpath = os.path.join(dir,new_name_with_extension)
+
+
         os.rename(fullpath, new_fullpath)
         return new_fullpath
-    except:
-        return False
-    
 
+    
+ 
 def file_copy(source, dest):
-    if os.path.exists(source):
-        try:
-            return shutil.copy2(source, dest)
-        except:
-            return None
+ 
+    if os.path.exists(source):            
+        return shutil.copy2(source, dest)
     else:
         return None
 
 
+ 
 def find_by_name(path, name):
     files = []
     for file in glob.glob(os.path.join(path, "%s.*"%(name))):
@@ -116,54 +113,55 @@ def find_by_name(path, name):
     else:
         return None
         
-        
+         
 def file_name(fullPath):
     return os.path.basename(fullPath)
 
+ 
 def file_name_no_extension(file_name):
     return os.path.splitext(file_name)[0]
 
+ 
 def extension(file_name):
     return os.path.splitext(file_name)[1]
 
+ 
 def extract_asset_comp_name(file_name_, padding = None):
     if os.path.isfile(file_name_):
         fullname = file_name_no_extension(file_name(file_name_))
-        try:            
-            asset_name = fullname.split("_")[0]
-            split_name = fullname.split("_")
+           
+        asset_name = fullname.split("_")[0]
+        split_name = fullname.split("_")
 
-            master = split_name[1:][-1]
-            number = split_name[1:][-1]
-            master_version = split_name[1:][-2]
+        master = split_name[1:][-1]
+        number = split_name[1:][-1]
+        master_version = split_name[1:][-2]
 
-            if len(number) == padding and number.isdigit():
-                #print "version case"
-                component_name = ""
-                for part in split_name[1:][:-1]:
-                    component_name = component_name + part + "_"
-                component_name = component_name[:-1]
-            
-            if len(number) == padding and number.isdigit() and master_version == "MASTER":   
-                #print "master_version case"
-                component_name = ""
-                for part in split_name[1:][:-2]:
-                    component_name = component_name + part + "_"
-                component_name = component_name[:-1]
-                      
-            if master == "MASTER":
-                #print "master case"
-                component_name = ""
-                for part in split_name[1:][:-1]:
-                    component_name = component_name + part + "_"
-                component_name = component_name[:-1]
-                                
-            return asset_name, component_name                
-
-        except:
-            return False
-            
+        if len(number) == padding and number.isdigit():
+            #print "version case"
+            component_name = ""
+            for part in split_name[1:][:-1]:
+                component_name = component_name + part + "_"
+            component_name = component_name[:-1]
         
+        if len(number) == padding and number.isdigit() and master_version == "MASTER":   
+            #print "master_version case"
+            component_name = ""
+            for part in split_name[1:][:-2]:
+                component_name = component_name + part + "_"
+            component_name = component_name[:-1]
+                  
+        if master == "MASTER":
+            #print "master case"
+            component_name = ""
+            for part in split_name[1:][:-1]:
+                component_name = component_name + part + "_"
+            component_name = component_name[:-1]
+                            
+        return asset_name, component_name                
+
+            
+         
 def list_directory(path,type):
     '''
     This method return all files of given type in a folder
@@ -188,7 +186,16 @@ def list_directory(path,type):
     else:
         return None
 
+ 
+def list_all(path):
+    items = []
+    for root, directories, filenames in os.walk(path):
+        for filename in filenames: 
+            items.append( os.path.join(root,filename ))
+                                      
+    return items
 
+ 
 def list_all_directory(path):
     '''
     This method return all files in a folder
@@ -200,6 +207,7 @@ def list_all_directory(path):
     '''    
     if os.path.exists(path):        
         fullNames = []
+        #path = "dsgdsgdsgerg45t"
         for file in os.listdir(path):        
             fullNames.append(os.path.join(path, file))
 
@@ -207,25 +215,27 @@ def list_all_directory(path):
     else:
         return None
 
+ 
 def list_dir_folders(path):
     return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
-
+ 
 def assure_path_exists(path):
         dir = os.path.dirname(path)
         if not os.path.exists(dir):
                 os.makedirs(dir)
-
+ 
 def assure_folder_exists(path):
         if not os.path.exists(path):
                 os.makedirs(path)
-
+ 
 def reletive_path(absolute_path, path):
     return os.path.relpath(path, absolute_path)
 
 def is_subdir(dir,subdir):
     return subdir.startswith(os.path.abspath(dir)+'/')
 
+ 
 def create_directory(path):
                      
     if not os.path.exists(path):
@@ -235,11 +245,13 @@ def create_directory(path):
         warnings.warn("Path exists")    
         return False
 
+ 
 def create_dummy(path, file_name):
         assure_path_exists(os.path.join(path,file_name))
         file = open(os.path.join(path,file_name),'w')
         file.close()
 
+ 
 def delete(path):
     if path:                 
         if os.path.exists(path):
@@ -251,6 +263,7 @@ def delete(path):
             #warnings.warn("Unable to delete")    
             return False
 
+ 
 def delete_file(path):
     if path:
         if os.path.isfile(path):
@@ -261,16 +274,19 @@ def delete_file(path):
             #warnings.warn("Unable to delete")    
             return False    
 
+ 
 def file_size_mb(filePath):
     if filePath: 
         if os.path.exists(filePath):
             return (os.path.getsize(filePath)) / (1024 * 1024.0)
         else:
             return None
-        
+
+         
 def extract_version(file, padding):
     return file[-padding:]
 
+ 
 def dict_versions(versions,padding):
     '''
     This method return a dictionery of versions and their file path
@@ -287,18 +303,16 @@ def dict_versions(versions,padding):
     versions_dict = {}
     
     for version in versions:
-        try:
-            name = file_name_no_extension(file_name(version))
-            number = re.findall(r'\d+',name)[-1]
-            #int(name[-padding:len(name)])
+
+        name = file_name_no_extension(file_name(version))
+        number = re.findall(r'\d+',name)[-1] if len(re.findall(r'\d+',name))>0 else -1
+
+        if number is not -1:
             versions_dict[int(number.lstrip("0"))] = version
-            
-        except:
-            pass
-            #logging.info( "cant find version in %s"%version)
+
     return versions_dict
         
-
+ 
 def sort_version(versions_dict):
     '''
     @return: list of tuples: [(version, "path"),...]
@@ -309,25 +323,64 @@ def sort_version(versions_dict):
         versions.append(entry[0])
     
     return sorted(versions)
-    #return sorted(versions_dict.items(), key=operator.itemgetter(1))
 
+ 
 def os_qeury():
     return sys.platform 
-    
-def explore(path):
 
-    if os.path.exists(path):
-        path = os.path.dirname(path)
-        platform = os_qeury()
-        if platform == "darwin":
-            subprocess.Popen(['open',path])
-        elif platform == "win32":
-            os.startfile(path)
+     
+def explore(path):
+    if path:
+        if os.path.exists(path):
+            path = os.path.dirname(path)
+            platform = os_qeury()
+            if platform == "darwin":
+                subprocess.Popen(['open',path])
+                return True
+                
+            elif platform == "win32":
+                os.startfile(path)
+                return True
         
+        log.info("File dose not exist")
+        return False
         
+    log.info("No file name spacified")
+    return False
+
+        
+         
 def run(filename):
-    if sys.platform == "win32":
-        os.startfile(filename)
-    else:
-        opener ="open" if sys.platform == "darwin" else "xdg-open"
-        subprocess.call([opener, filename])            
+    if filename:
+        if os.path.exists(filename):
+            if sys.platform == "win32":
+                os.startfile(filename)
+                return True
+            else:
+                opener ="open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, filename]) 
+                return True 
+    
+        log.info("File dose not exist")
+        return False
+        
+    log.info("No file name spacified")
+    return False
+    
+    
+def read(file):
+    if file:
+        if os.path.isfile(file):
+            with open(file) as f:
+                contents = f.read()        
+            
+            f.close()
+            return  contents  
+        
+        
+def erase(file):             
+    if file:
+        if os.path.isfile(file):
+            with open(file, "w"):
+                pass        
+            return True

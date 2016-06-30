@@ -49,6 +49,8 @@ import os
 import pickle
 import string
 import random
+import json
+
 
 class pickleDict():
     def __init__(self, **kwargs): 
@@ -217,10 +219,24 @@ class pickleDict():
             if os.path.isfile(self.path):
                 with open(path, "w") as file:
                     pass
-                
-def strings():
-    return 'Tm9uIGNvbW1lcmNpYWwgdmVyc2lvbiBvZiBwaXBlbGluZQ=='
 
+    def print_nice(self):
+        try:
+            return json.dumps(self.read(),indent=2)
+        except:
+            import logging
+            logging.info("can't print the data file")
+                  
+def encoded_strings():
+    return ['cHJvamVjdHNfdG9vbHRpcF9sYWJlbA==',
+            'cHJvamVjdHNfdG9vbHRpcF93aWRnZXQ=',            
+            'c2V0VGV4dA==',
+            'c2V0SGlkZGVu',
+            'Tm9uIGNvbW1lcmNpYWwgdmVyc2lvbiBvZiBwaXBlbGluZQ==',
+            'TkZSIHZlcnNpb24gb2YgUGlwZWxpbmU=',
+            'VHJ1ZQ==',
+            'RmFsc2U='] 
+            
 def edit_key(dict = None ,key = None ,value = None):
     
     if key in dict:                                                                
@@ -231,8 +247,6 @@ def edit_key(dict = None ,key = None ,value = None):
     else:
         return None
         
-        
-
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 

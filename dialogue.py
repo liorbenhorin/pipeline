@@ -44,16 +44,13 @@ Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License:
 
 '''
 import base64
+from PySide import QtCore, QtGui
+import os
+import ast
+
 import modules.data as data
 reload(data)
 
-
-from PySide import QtCore, QtGui
-import os
-
-def textToolTips():
-    strings = data.strings()       
-    return decode64(strings)
 
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
@@ -329,7 +326,6 @@ class Note(QtGui.QDialog):
     
         layout = QtGui.QVBoxLayout(self)
         layout.addWidget(self.label)
-        layout.addWidget(self.label)
         layout.addWidget(HLine())
         layout.addWidget(self.label_Note)
         layout.addWidget(self.textNote)
@@ -355,6 +351,57 @@ class Note(QtGui.QDialog):
         if self.textNote.toPlainText() == "":
             return "No notes"
         return self.textNote.toPlainText()
+
+class ErrorReport(QtGui.QDialog):
+    def __init__(self, parent=None, plainText=None):
+        super(ErrorReport, self).__init__(parent)
+
+        self.setMaximumWidth(600) 
+        self.setMinimumWidth(600)        
+        self.setMaximumHeight(800) 
+        
+        self.label = QtGui.QLabel()
+        self.label.setPixmap(warning_icon)
+        
+        self.label_Note = QtGui.QLabel("Somthing is wrong here.<br>Considre sending this bug report for inspection.")
+        self.textNote = QtGui.QTextEdit(self)
+        self.label_what = QtGui.QLabel("Please describe what is going on: (optional)")
+        self.textMore = QtGui.QTextEdit(self)
+        
+        self.dont_ask = QtGui.QCheckBox("Don't ask me this again")
+        
+        layout = QtGui.QVBoxLayout(self)
+        layout.addWidget(self.label)
+        layout.addWidget(HLine())
+        layout.addWidget(self.label_Note)
+        layout.addWidget(self.textNote)
+        layout.addWidget(self.label_what)
+        layout.addWidget(self.textMore)
+        layout.addWidget(self.dont_ask)
+        
+        ok = QtGui.QPushButton("Email report")
+        ok.setDefault(True)
+        
+        canc = QtGui.QPushButton("Dismiss")
+        
+       
+        buttons = QtGui.QDialogButtonBox(QtCore.Qt.Horizontal)
+        buttons.addButton(ok, QtGui.QDialogButtonBox.AcceptRole)
+        buttons.addButton(canc, QtGui.QDialogButtonBox.RejectRole)
+
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+        
+        self.textNote.setPlainText(plainText)
+
+    def result(self):
+        if self.dont_ask.isChecked():
+            dont_ask = True
+        else:
+            dont_ask = False
+            
+        return self.textNote.toPlainText(), self.textMore.toPlainText(), dont_ask
 
         
 class playblast_options(QtGui.QDialog):
@@ -493,26 +540,14 @@ def crop_text(text,lines,crop_sign):
         return crop_text    
     else:
         return text
-        
-        
-class author_note_widget(QtGui.QWidget):
 
-    def __init__(self, parent=None, author_name = None, note = False):
-        super(author_note_widget,self).__init__(parent)
-
-        # add your buttons
-        self.layout = QtGui.QHBoxLayout()
-
-        # adjust spacings to your needs
-        self.layout.setContentsMargins(0,0,0,0)
-        self.layout.setSpacing(0)
-
-        self.name = QtGui.QLabel(author_name)
-        self.layout.addWidget(self.name)
-        self.note_icon = QtGui.QLabel()
-        self.note_icon.setContentsMargins(10,5,2,2)
-        if note:            
-            self.note_icon.setPixmap(comment_icon)#.scaled(20,20))
-            self.layout.addWidget(self.note_icon)
-
-        self.setLayout(self.layout)        
+def _decode_strings():
+    strings = []
+    strings.append(decode64(data.encoded_strings()[0]))
+    strings.append(decode64(data.encoded_strings()[1]))
+    strings.append(decode64(data.encoded_strings()[2]))
+    strings.append(decode64(data.encoded_strings()[3]))
+    strings.append(decode64(data.encoded_strings()[5]))
+    strings.append(ast.literal_eval(decode64(data.encoded_strings()[7])))                                                      
+    return strings
+    
