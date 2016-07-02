@@ -601,6 +601,9 @@ class test(QtGui.QDialog):
         pushButton.clicked.connect(self.remove)
         pushButton_3.clicked.connect(self.del_all_columns)
 
+        import json
+        print json.dumps(virtual_tree(),indent=2)
+        
     def add(self):
         self.add_column_at_end(self.splitter)
 
@@ -629,4 +632,76 @@ class test(QtGui.QDialog):
         return tableWidget       
         
         
+def virtual_tree():
+    tree = {}
+    tree["root"] = {
+                    "level_1":{
+                               "level_1_2": None
+                               }
+                    ,"level_2":{"level_2_2":{
+                                             "level_3_1":None
+                                             }
+                                }
+                    }
+    return tree
+    
+
+
+class test2(QtGui.QDialog):
+    def __init__(self, parent = None, title = None):
+        super(test2, self).__init__(parent)                    
+
+        layout =  QtGui.QVBoxLayout(self)
+
+        self.treeWidget = QtGui.QTreeWidget(self);
+        self.treeWidget.setAutoScrollMargin(16)
+        self.treeWidget.setIndentation(30)
+        self.treeWidget.setAnimated(False)
+        self.treeWidget.setUniformRowHeights(True)
+
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.treeWidget.setFont(font)
         
+        layout.addWidget(self.treeWidget)
+        
+        self.fill_widget(self.treeWidget, virtual_data())
+    
+    def fill_item(self,item, value):
+        item.setExpanded(True)
+        if type(value) is dict:
+            for key, val in sorted(value.iteritems()):
+                child = QtGui.QTreeWidgetItem()
+                child.setText(0, unicode(key))
+                item.addChild(child)
+                self.fill_item(child, val)
+        
+        elif type(value) is list:
+            for val in value:
+                child = QtGui.QTreeWidgetItem()
+                item.addChild(child)
+                if type(val) is dict:      
+                    child.setText(0, '[dict]')
+                    self.fill_item(child, val)
+                elif type(val) is list:
+                    child.setText(0, '[list]')
+                    self.fill_item(child, val)
+                else:
+                    child.setText(0, unicode(val))              
+                    child.setExpanded(True)
+        else:
+            child = QtGui.QTreeWidgetItem()
+            child.setText(0, unicode(value))
+            item.addChild(child)
+
+    def fill_widget(self,widget, value):
+      widget.clear()
+      self.fill_item(widget.invisibleRootItem(), value)            
+      
+def virtual_data():
+    d = { 'key1': 'value1', 
+         'key2': 'value2',
+         'key3': [1,2,3, { 1: 3, 7 : 9}],
+         'key5': { 'another key1' : 'another value1','another key2' : 'another value2'} }
+    
+    return d

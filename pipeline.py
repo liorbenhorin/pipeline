@@ -6174,7 +6174,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         
 def show():
 
-    about = dlg.test()#(None,"About",
+    about = dlg.test2()#(None,"About",
     about.exec_() 
     return
     
