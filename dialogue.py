@@ -555,12 +555,34 @@ class test(QtGui.QDialog):
     def __init__(self, parent = None, title = None):
         super(test, self).__init__(parent)                    
 
-        self.setMaximumWidth(330) 
-        self.setMinimumWidth(330)        
-        self.setMaximumHeight(300) 
+        layout =  QtGui.QHBoxLayout(self)
+        scrollArea = QtGui.QScrollArea()
 
-        layout = QtGui.QVBoxLayout(self)
-        table = QtGui.QTableWidget()
-        layout.addWidget(table)
+        scrollArea.setWidgetResizable(True)
+        scrollAreaWidgetContents = QtGui.QWidget()
+        scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 488, 208)) 
+ 
+        horizontalLayout = QtGui.QHBoxLayout(scrollAreaWidgetContents)
 
+        splitter = QtGui.QSplitter(scrollAreaWidgetContents)
+        splitter.setOrientation(QtCore.Qt.Horizontal)         
+        splitter.setHandleWidth(10)
+        splitter.setChildrenCollapsible(False)
+        
+        tableWidget = QtGui.QTableWidget(splitter)
+        tableWidget.setMinimumSize(QtCore.QSize(150, 0))
+        splitter.addWidget(tableWidget)
 
+        tableWidget_2 = QtGui.QTableWidget(splitter)
+        tableWidget_2.setMinimumSize(QtCore.QSize(150, 0))
+        splitter.addWidget(tableWidget_2)
+        
+        tableWidget_3 = QtGui.QTableWidget(splitter)
+        tableWidget_3.setMinimumSize(QtCore.QSize(150, 0))
+        splitter.addWidget(tableWidget_3)
+
+        horizontalLayout.addWidget(splitter)
+        
+        scrollArea.setWidget(scrollAreaWidgetContents)
+
+        layout.addWidget(scrollArea)
