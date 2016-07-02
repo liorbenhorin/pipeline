@@ -564,42 +564,69 @@ class test(QtGui.QDialog):
  
         horizontalLayout = QtGui.QHBoxLayout(scrollAreaWidgetContents)
 
-        splitter = QtGui.QSplitter(scrollAreaWidgetContents)
-        splitter.setOrientation(QtCore.Qt.Horizontal)         
-        splitter.setHandleWidth(10)
-        splitter.setChildrenCollapsible(False)
+        self.splitter = QtGui.QSplitter(scrollAreaWidgetContents)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)         
+        self.splitter.setHandleWidth(10)
+        self.splitter.setChildrenCollapsible(False)
         
-        tableWidget = QtGui.QTableWidget(splitter)
-        tableWidget.setMinimumSize(QtCore.QSize(150, 0))
-        splitter.addWidget(tableWidget)
-
-        tableWidget_2 = QtGui.QTableWidget(splitter)
-        tableWidget_2.setMinimumSize(QtCore.QSize(150, 0))
-        splitter.addWidget(tableWidget_2)
+        self._columns = []
         
-        tableWidget_3 = QtGui.QTableWidget(splitter)
-        tableWidget_3.setMinimumSize(QtCore.QSize(150, 0))
-        splitter.addWidget(tableWidget_3)
-
-        horizontalLayout.addWidget(splitter)
+        self.add_column_at_end(self.splitter)
         
+        horizontalLayout.addWidget(self.splitter)        
         scrollArea.setWidget(scrollAreaWidgetContents)
 
         layout.addWidget(scrollArea)
   
   
         widget = QtGui.QWidget()
-
         horizontalLayout_2 = QtGui.QHBoxLayout(widget)
 
         pushButton_2 = QtGui.QPushButton(widget)
         pushButton_2.setText("+")
 
-
-        horizontalLayout_2.addWidget(pushButton_2)
-
         pushButton = QtGui.QPushButton(widget)
         pushButton.setText("-")
+ 
+        pushButton_3 = QtGui.QPushButton(widget)
+        pushButton_3.setText("reset") 
+        
+        horizontalLayout_2.addWidget(pushButton_3)
+        horizontalLayout_2.addWidget(pushButton_2)
         horizontalLayout_2.addWidget(pushButton)      
         
         layout.addWidget(widget)
+
+        pushButton_2.clicked.connect(self.add)
+        pushButton.clicked.connect(self.remove)
+        pushButton_3.clicked.connect(self.del_all_columns)
+
+    def add(self):
+        self.add_column_at_end(self.splitter)
+
+    def remove(self):
+        self.del_column_from_end()
+        
+    def add_column_at_end(self,splitter):
+        self._columns.append(self.table_column(splitter))
+
+    def del_column_from_end(self):
+        if len(self._columns)>1:
+            self._columns[-1].setParent(None)
+            self._columns[-1].deleteLater()
+            del self._columns[-1]
+            return True
+        return False
+        
+    def del_all_columns(self):
+        while self.del_column_from_end():
+            continue
+                   
+    def table_column(self,splitter):
+        tableWidget = QtGui.QTableWidget(splitter)
+        tableWidget.setMinimumSize(QtCore.QSize(100, 100))
+        splitter.addWidget(tableWidget) 
+        return tableWidget       
+        
+        
+        
