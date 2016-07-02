@@ -551,3 +551,16 @@ def _decode_strings():
     strings.append(ast.literal_eval(decode64(data.encoded_strings()[7])))                                                      
     return strings
     
+class test(QtGui.QDialog):
+    def __init__(self, parent = None, title = None):
+        super(test, self).__init__(parent)                    
+
+        self.setMaximumWidth(330) 
+        self.setMinimumWidth(330)        
+        self.setMaximumHeight(300) 
+
+        layout = QtGui.QVBoxLayout(self)
+        table = QtGui.QTableWidget()
+        layout.addWidget(table)
+
+

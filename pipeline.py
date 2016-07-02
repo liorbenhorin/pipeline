@@ -6173,6 +6173,10 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
         
 def show():
+
+    about = dlg.test()#(None,"About",
+    about.exec_() 
+    return
     
     global UiWindow
     UiWindow=pipeLineUI(parent=maya_main_window())
