@@ -555,7 +555,7 @@ class test(QtGui.QDialog):
     def __init__(self, parent = None, title = None):
         super(test, self).__init__(parent)                    
 
-        layout =  QtGui.QHBoxLayout(self)
+        layout =  QtGui.QVBoxLayout(self)
         scrollArea = QtGui.QScrollArea()
 
         scrollArea.setWidgetResizable(True)
@@ -586,3 +586,20 @@ class test(QtGui.QDialog):
         scrollArea.setWidget(scrollAreaWidgetContents)
 
         layout.addWidget(scrollArea)
+  
+  
+        widget = QtGui.QWidget()
+
+        horizontalLayout_2 = QtGui.QHBoxLayout(widget)
+
+        pushButton_2 = QtGui.QPushButton(widget)
+        pushButton_2.setText("+")
+
+
+        horizontalLayout_2.addWidget(pushButton_2)
+
+        pushButton = QtGui.QPushButton(widget)
+        pushButton.setText("-")
+        horizontalLayout_2.addWidget(pushButton)      
+        
+        layout.addWidget(widget)
