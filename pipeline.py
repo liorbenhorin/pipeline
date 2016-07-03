@@ -72,14 +72,66 @@ import inspect
 import data as dt
 reload(dt)
 
+import data_model as dtm
+reload(dtm)
+
 root = dt.Node("ROOT")
-Assets = dt.Node("ASSETS", root)
-Animation = dt.Node("ANIMATION", root)
-Lightning = dt.Node("LIGHTNING", root)
-Rig = dt.ComponentNode("RIG", "N/A" ,Assets)
+Assets = dt.Node("a", root)
+Animation = dt.Node("b", root)
+Lightning = dt.Node("c", root)
+Rig = dt.ComponentNode("Z", "N/A" ,Assets)
+Rig2 = dt.ComponentNode("B", "N/A" ,Assets)
 
 xml = root.asXml()
 print xml
+
+import dialogue as dlg
+reload(dlg)
+
+_model = dtm.SceneGraphModel(root)
+
+
+_proxyModel = QtGui.QSortFilterProxyModel()
+
+class filterSortModel(QtGui.QSortFilterProxyModel):
+    def __init__(self,parent = None):
+        
+        super(filterSortModel, self).__init__(parent)
+    
+    def filterAcceptsRow(self,sourceRow,sourceParent):
+        if super(filterSortModel,self).filterAcceptsRow(sourceRow,sourceParent):
+            return True
+        
+        return self.hasAcceptedChildren(sourceRow,sourceParent)
+
+    def hasAcceptedChildren(self,sourceRow,sourceParent):
+        model=self.sourceModel()
+        sourceIndex=model.index(sourceRow,0,sourceParent)
+        if not sourceIndex.isValid():
+            return False
+        indexes=model.rowCount(sourceIndex)
+        for i in range(indexes):
+            if self.filterAcceptsRow(i,sourceIndex):
+                return True
+        
+        return False   
+
+_proxyModel = filterSortModel()#QtGui.QSortFilterProxyModel()
+
+"""VIEW <------> PROXY MODEL <------> DATA MODEL"""
+
+_proxyModel.setSourceModel(_model)
+_proxyModel.setDynamicSortFilter(True)
+_proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+print dtm.SceneGraphModel.sortRole
+
+_proxyModel.setSortRole(0)#dtm.SceneGraphModel.sortRole)
+_proxyModel.setFilterRole(0)#dtm.SceneGraphModel.filterRole)
+_proxyModel.setFilterKeyColumn(0)
+#print _proxyModel
+tree = dlg.treeview(model = _proxyModel)
+tree.exec_() 
 
 sys.exit()
 

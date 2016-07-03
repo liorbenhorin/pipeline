@@ -139,7 +139,8 @@ class Node(object):
         elif column is 1: return self.typeInfo()
     
     def setData(self, column, value):
-        if   column is 0: self.name = value.toPyObject()
+        print value
+        if   column is 0: self.name = value#.toPyObject()
         elif column is 1: pass
     
     def resource(self):

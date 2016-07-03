@@ -705,3 +705,32 @@ def virtual_data():
          'key5': { 'another key1' : 'another value1','another key2' : 'another value2'} }
     
     return d
+    
+      
+class treeview(QtGui.QDialog):
+    def __init__(self, parent = None, model = None):
+        super(treeview, self).__init__(parent)                    
+
+        layout =  QtGui.QVBoxLayout(self)
+
+        self.treeView = QtGui.QTreeView(self);
+        #self.treeView.setAutoScrollMargin(16)
+        #self.treeView.setIndentation(30)
+        #self.treeView.setAnimated(False)
+        #self.treeView.setUniformRowHeights(True)
+        self.treeView.setSortingEnabled(True)
+        #font = QtGui.QFont()
+        #font.setPointSize(14)
+        #self.treeView.setFont(font) 
+        self.model = model
+        self.treeView.setModel(self.model)
+        
+        line = QtGui.QLineEdit()
+        layout.addWidget(line)
+               
+        layout.addWidget(self.treeView)
+        
+        QtCore.QObject.connect(line, QtCore.SIGNAL("textChanged(QString)"), self.model.setFilterRegExp)
+        
+        
+           
