@@ -69,6 +69,21 @@ import glob
 import sys
 import inspect
 
+import data as dt
+reload(dt)
+
+root = dt.Node("ROOT")
+Assets = dt.Node("ASSETS", root)
+Animation = dt.Node("ANIMATION", root)
+Lightning = dt.Node("LIGHTNING", root)
+Rig = dt.ComponentNode("RIG", Assets)
+
+xml = root.asXml()
+print xml
+
+sys.exit()
+
+
 '''        
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
@@ -6174,9 +6189,11 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         
 def show():
 
-    about = dlg.test2()#(None,"About",
-    about.exec_() 
-    return
+
+    
+    #about = dlg.test2()#(None,"About",
+    #about.exec_() 
+    #return
     
     global UiWindow
     UiWindow=pipeLineUI(parent=maya_main_window())
