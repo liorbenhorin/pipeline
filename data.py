@@ -148,52 +148,22 @@ class Node(object):
         
 class ComponentNode(Node):
     
-    def __init__(self, name, parent=None):
+    def __init__(self, name, component, parent=None):
         super(ComponentNode, self).__init__(name, parent)
-
-        self._x = 0
-        self._y = 0
-        self._z = 0
+      
+        self._component = component
 
     def typeInfo(self):
-        return "TRANSFORM"
+        return "COMPONENT"
 
-
-    def x():
-        def fget(self): return self._x
-        def fset(self, value): self._x = value
-        return locals()
-    x = property(**x())
-
-    def y():
-        def fget(self): return self._y
-        def fset(self, value): self._y = value
-        return locals()
-    y = property(**y())
-    
-    def z():
-        def fget(self): return self._z
-        def fset(self, value): self._z = value
-        return locals()
-    z = property(**z())
-
-
-
-    def data(self, column):
-        r = super(TransformNode, self).data(column)
+    @property
+    def component(self):
+        return self._component
         
-        if   column is 2: r = self.x
-        elif column is 3: r = self.y
-        elif column is 4: r = self.z
-        
-        return r
-    
-    def setData(self, column, value):
-        super(TransformNode, self).setData(column, value)
-        
-        if   column is 2: self.x = value.toPyObject()
-        elif column is 3: self.y = value.toPyObject()
-        elif column is 4: self.z = value.toPyObject()
-    
+    @component.setter
+    def component(self, value):
+        self._component = value
+
+   
     def resource(self):
         return None

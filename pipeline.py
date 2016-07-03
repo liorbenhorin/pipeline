@@ -76,7 +76,7 @@ root = dt.Node("ROOT")
 Assets = dt.Node("ASSETS", root)
 Animation = dt.Node("ANIMATION", root)
 Lightning = dt.Node("LIGHTNING", root)
-Rig = dt.ComponentNode("RIG", Assets)
+Rig = dt.ComponentNode("RIG", "N/A" ,Assets)
 
 xml = root.asXml()
 print xml
