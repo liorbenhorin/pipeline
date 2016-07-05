@@ -74,7 +74,7 @@ reload(dt)
 
 import data_model as dtm
 reload(dtm)
-
+'''
 root = dt.Node("ROOT")
 Assets = dt.Node("a", root)
 Animation = dt.Node("b", root)
@@ -84,14 +84,12 @@ Rig2 = dt.ComponentNode("B", "N/A" ,Assets)
 
 xml = root.asXml()
 print xml
-
+'''
 import dialogue as dlg
 reload(dlg)
 
-_model = dtm.SceneGraphModel(root)
 
-
-_proxyModel = QtGui.QSortFilterProxyModel()
+#_proxyModel = QtGui.QSortFilterProxyModel()
 
 class filterSortModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
@@ -114,26 +112,27 @@ class filterSortModel(QtGui.QSortFilterProxyModel):
             if self.filterAcceptsRow(i,sourceIndex):
                 return True
         
-        return False   
+        return False
+        
+'''        
+_model = dtm.SceneGraphModel(root)
+_proxyModel = filterSortModel()
 
-_proxyModel = filterSortModel()#QtGui.QSortFilterProxyModel()
-
-"""VIEW <------> PROXY MODEL <------> DATA MODEL"""
 
 _proxyModel.setSourceModel(_model)
 _proxyModel.setDynamicSortFilter(True)
 _proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
-print dtm.SceneGraphModel.sortRole
-
-_proxyModel.setSortRole(0)#dtm.SceneGraphModel.sortRole)
-_proxyModel.setFilterRole(0)#dtm.SceneGraphModel.filterRole)
+_proxyModel.setSortRole(0)
+_proxyModel.setFilterRole(0)
 _proxyModel.setFilterKeyColumn(0)
-#print _proxyModel
-tree = dlg.treeview(model = _proxyModel)
-tree.exec_() 
 
-sys.exit()
+'''
+#print _proxyModel
+#tree = dlg.treeview(model = _proxyModel)
+#tree.exec_() 
+
+#sys.exit()
 
 
 '''        
@@ -2676,6 +2675,62 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         end_time = timer()    
         log.info( "loaded in: %s"%(round((end_time - start_time),2)) )                 
         track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
+
+
+        self.tree()
+    
+    def tree(self):
+
+        root = dt.Node("ROOT")
+        Assets = dt.Node("a", root)
+        Animation = dt.Node("b", root)
+        Lightning = dt.Node("c", root)
+        Rig = dt.ComponentNode("Z", "N/A" ,Assets)
+        Rig2 = dt.ComponentNode("B", "N/A" ,Assets)
+
+        self._model = dtm.SceneGraphModel(root)
+        self._proxyModel = filterSortModel()
+
+
+        self._proxyModel.setSourceModel(self._model)
+        self._proxyModel.setDynamicSortFilter(True)
+        self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        self._proxyModel.setSortRole(0)
+        self._proxyModel.setFilterRole(0)
+        self._proxyModel.setFilterKeyColumn(0)
+
+        #self.ui.assets_treeView.setModel(self._model)  
+        #self.ui.assets_columnView.setModel(self._proxyModel)
+        #self.ui.assets_columnView.setHidden(True)
+        
+        #self.ui.assets_treeView.setDragEnabled( True )
+        #self.ui.assets_treeView.setAcceptDrops( True )
+        #self.ui.assets_treeView.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
+         
+        #self.selModel = self.ui.assets_treeView.selectionModel()
+        #self.selModel.currentChanged.connect( self.selectInScene )
+        self.tree = QtGui.QTreeView()
+        #self.outlinerModel = OutlinerModel( gatherItems() )
+        self.tree.setModel( self._model )
+        self.tree.setDragEnabled( True )
+        self.tree.setAcceptDrops( True )
+        self.tree.setDropIndicatorShown(True)
+        self.tree.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
+         
+        #self.selModel = self.tree.selectionModel()
+        #self.selModel.currentChanged.connect( self.selectInScene )
+         
+        self.tree.expandAll()        
+        
+        self.ui.verticalLayout_18.addWidget(self.tree)
+                    
+        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
+        
+        
+    def selectInScene(self):
+        pass
         
     def set_icons(self):
         

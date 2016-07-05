@@ -1,5 +1,6 @@
 
 from PySide import QtCore, QtGui
+import cPickle
 
 import data as dt
 reload(dt)
@@ -86,9 +87,12 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     """INPUTS: QModelIndex"""
     """OUTPUT: int (flag)"""
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+        #return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
-    
+        if not index.isValid():
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled
+         
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
 
     """INPUTS: QModelIndex"""
     """OUTPUT: QModelIndex"""
@@ -106,6 +110,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     """INPUTS: int, int, QModelIndex"""
     """OUTPUT: QModelIndex"""
     """Should return a QModelIndex that corresponds to the given row, column and parent node"""
+    '''
     def index(self, row, column, parent):
         
         parentNode = self.getNode(parent)
@@ -117,7 +122,22 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return self.createIndex(row, column, childItem)
         else:
             return QtCore.QModelIndex()
+    '''
 
+    def itemFromIndex( self, index ):
+        '''Returns the TreeItem instance from a QModelIndex.'''
+        return index.internalPointer() if index.isValid() else self._rootNode
+      
+
+    
+    def index( self, row, column, parentIndex ):
+        '''Creates a QModelIndex for the given row, column, and parent.'''
+        if not self.hasIndex( row, column, parentIndex ):
+            return QtCore.QModelIndex()
+             
+        parent = self.itemFromIndex( parentIndex )
+        return self.createIndex( row, column, parent.child( row ) )
+     
 
 
     """CUSTOM"""
@@ -176,3 +196,40 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self.endRemoveRows()
         
         return success
+
+    def supportedDropActions( self ):
+        '''Items can be moved and copied (but we only provide an interface for moving items in this example.'''
+        return QtCore.Qt.MoveAction | QtCore.Qt.CopyAction
+     
+
+
+    def mimeTypes( self ):
+        '''The MimeType for the encoded data.'''
+        types = QtCore.QStringList( 'application/x-pynode-item-instance' )
+        return types
+     
+    def mimeData( self, indices ):
+        '''Encode serialized data from the item at the given index into a QMimeData object.'''
+        data = ''
+        item = self.itemFromIndex( indices[0] )
+        try:
+            data += cPickle.dumps( item )
+        except:
+            pass
+        mimedata = QtCore.QMimeData()
+        mimedata.setData( 'application/x-pynode-item-instance', data )
+        return mimedata
+     
+    def dropMimeData( self, mimedata, action, row, column, parentIndex ):
+        '''Handles the dropping of an item onto the model.
+         
+        De-serializes the data into a TreeItem instance and inserts it into the model.
+        '''
+        if not mimedata.hasFormat( 'application/x-pynode-item-instance' ):
+            return False
+        item = cPickle.loads( str( mimedata.data( 'application/x-pynode-item-instance' ) ) )
+        dropParent = self.itemFromIndex( parentIndex )
+        dropParent.addChild( item )
+        self.insertRows( dropParent.numChildren()-1, 1, parentIndex )
+        self.dataChanged.emit( parentIndex, parentIndex )
+        return True
