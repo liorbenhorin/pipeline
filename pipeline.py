@@ -90,6 +90,18 @@ reload(dlg)
 
 
 #_proxyModel = QtGui.QSortFilterProxyModel()
+'''
+class treeV(QtGui.QTreeView):
+    def __init__(self, parent=None):
+        super(treeV, self).__init__(parent)
+
+    def startDrag(self):
+        print "D"
+        
+    def dragMoveEvent(self, e):
+
+        e.accept()
+'''            
 
 class filterSortModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
@@ -2700,23 +2712,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
 
-        #self.ui.assets_treeView.setModel(self._model)  
-        #self.ui.assets_columnView.setModel(self._proxyModel)
-        #self.ui.assets_columnView.setHidden(True)
-        
-        #self.ui.assets_treeView.setDragEnabled( True )
-        #self.ui.assets_treeView.setAcceptDrops( True )
-        #self.ui.assets_treeView.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
-         
-        #self.selModel = self.ui.assets_treeView.selectionModel()
-        #self.selModel.currentChanged.connect( self.selectInScene )
         self.tree = QtGui.QTreeView()
-        #self.outlinerModel = OutlinerModel( gatherItems() )
         self.tree.setModel( self._model )
+        self.tree.setSortingEnabled(True)
         self.tree.setDragEnabled( True )
         self.tree.setAcceptDrops( True )
-        self.tree.setDropIndicatorShown(True)
-        self.tree.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
          
         #self.selModel = self.tree.selectionModel()

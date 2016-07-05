@@ -1,5 +1,5 @@
 
-from PySide import QtCore, QtGui
+from PySide import QtCore, QtGui, QtXml
 import cPickle
 
 import data as dt
@@ -82,18 +82,22 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             else:
                 return "Typeinfo"
 
-        
+    """INPUTS: QModelIndex"""
+    """OUTPUT: int (flag)"""
+
+            
     
     """INPUTS: QModelIndex"""
     """OUTPUT: int (flag)"""
     def flags(self, index):
-        #return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
-
+        
         if not index.isValid():
-            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled
-         
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
 
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled 
+
+
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
+    
     """INPUTS: QModelIndex"""
     """OUTPUT: QModelIndex"""
     """Should return the parent of the node with the given QModelIndex"""
@@ -153,7 +157,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     
     """INPUTS: int, int, QModelIndex"""
     def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
-        
+        print "insertRows"
         parentNode = self.getNode(parent)
         
         self.beginInsertRows(parent, position, position + rows - 1)
@@ -167,26 +171,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         self.endInsertRows()
 
         return success
-    '''
-    def insertLights(self, position, rows, parent=QtCore.QModelIndex()):
-        
-        parentNode = self.getNode(parent)
-        
-        self.beginInsertRows(parent, position, position + rows - 1)
-        
-        for row in range(rows):
-            
-            childCount = parentNode.childCount()
-            childNode = LightNode("light" + str(childCount))
-            success = parentNode.insertChild(position, childNode)
-        
-        self.endInsertRows()
 
-        return success
-    '''
-    """INPUTS: int, int, QModelIndex"""
     def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
-        
+        print "removeRows"
         parentNode = self.getNode(parent)
         self.beginRemoveRows(parent, position, position + rows - 1)
         
@@ -198,26 +185,37 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return success
 
     def supportedDropActions( self ):
-        '''Items can be moved and copied (but we only provide an interface for moving items in this example.'''
+
         return QtCore.Qt.MoveAction | QtCore.Qt.CopyAction
      
 
 
+
+    '''    
     def mimeTypes( self ):
-        '''The MimeType for the encoded data.'''
-        types = QtCore.QStringList( 'application/x-pynode-item-instance' )
+
+        types =  'application/x-qabstractitemmodeldatalist' 
         return types
-     
+    ''' 
     def mimeData( self, indices ):
         '''Encode serialized data from the item at the given index into a QMimeData object.'''
+        
         data = ''
         item = self.itemFromIndex( indices[0] )
         try:
             data += cPickle.dumps( item )
         except:
             pass
+            
+            
+        print item  
+        print ">>>><<<<<"  
         mimedata = QtCore.QMimeData()
-        mimedata.setData( 'application/x-pynode-item-instance', data )
+        mimedata.setData( 'application/x-qabstractitemmodeldatalist', data ) 
+        print data                   
+        print mimedata    
+        #mimedata = QtCore.QMimeData()
+        #mimedata.setData( 'application/x-qabstractitemmodeldatalist', data )
         return mimedata
      
     def dropMimeData( self, mimedata, action, row, column, parentIndex ):
@@ -225,11 +223,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
          
         De-serializes the data into a TreeItem instance and inserts it into the model.
         '''
-        if not mimedata.hasFormat( 'application/x-pynode-item-instance' ):
+        if not mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
             return False
-        item = cPickle.loads( str( mimedata.data( 'application/x-pynode-item-instance' ) ) )
+        item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
         dropParent = self.itemFromIndex( parentIndex )
         dropParent.addChild( item )
         self.insertRows( dropParent.numChildren()-1, 1, parentIndex )
         self.dataChanged.emit( parentIndex, parentIndex )
-        return True
+        return True        
