@@ -1,6 +1,18 @@
 
-from PySide import QtXml
+from PySide import QtXml, QtGui
+import os
 
+def set_icons():
+    localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
+    if not os.path.exists(localIconPath):
+        return 
+    global folder_icon
+    global cube_icon
+    
+    folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
+    cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
+
+set_icons()
 
 class Node(object):
     
@@ -144,7 +156,7 @@ class Node(object):
         elif column is 1: pass
     
     def resource(self):
-        return None
+        return folder_icon
         
         
 class ComponentNode(Node):
@@ -167,4 +179,4 @@ class ComponentNode(Node):
 
    
     def resource(self):
-        return None
+        return cube_icon
