@@ -227,7 +227,18 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return False
         item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
         dropParent = self.itemFromIndex( parentIndex )
-        dropParent.addChild( item )
-        self.insertRows( dropParent.numChildren()-1, 1, parentIndex )
-        self.dataChanged.emit( parentIndex, parentIndex )
-        return True        
+        if dropParent.name != "ROOT":
+            print dropParent
+            dropParent.addChild( item )
+            #self.insertRows( dropParent.childCount()-1, 1, parentIndex )
+            self.dataChanged.emit( parentIndex, parentIndex )
+            return True 
+        else:
+            print item.parent().row()
+            print item.parent()
+            idx = self.createIndex(item.parent().row(), 0, item.parent())
+            parent_index = self.itemFromIndex(idx)
+            print parent_index
+            parent_index.addChild( item )
+            self.dataChanged.emit( idx, idx )
+        return False

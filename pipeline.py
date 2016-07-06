@@ -2713,7 +2713,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setFilterKeyColumn(0)
 
         self.tree = QtGui.QTreeView()
-        self.tree.setModel( self._model )
+        self.tree.setModel( self._proxyModel )
         self.tree.setSortingEnabled(True)
         self.tree.setDragEnabled( True )
         self.tree.setAcceptDrops( True )
