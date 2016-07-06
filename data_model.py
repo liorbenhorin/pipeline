@@ -2,6 +2,7 @@
 from PySide import QtCore, QtGui, QtXml
 import cPickle
 
+
 import data as dt
 reload(dt)
 
@@ -137,10 +138,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def index( self, row, column, parentIndex ):
         '''Creates a QModelIndex for the given row, column, and parent.'''
         if not self.hasIndex( row, column, parentIndex ):
-            return QtCore.QModelIndex()
+            return    QtCore.QModelIndex() 
              
         parent = self.itemFromIndex( parentIndex )
-        return self.createIndex( row, column, parent.child( row ) )
+        return  self.createIndex( row, column, parent.child( row ) ) 
      
 
 
@@ -162,18 +163,29 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         
         self.beginInsertRows(parent, position, position + rows - 1)
         
+        '''
         for row in range(rows):
             
             childCount = parentNode.childCount()
             childNode = dt.Node("untitled" + str(childCount))
             success = parentNode.insertChild(position, childNode)
-        
+        '''
         self.endInsertRows()
+        self.dataChanged.emit( parent, parent )
+        return True
 
-        return success
 
+    def removeRows( self, row, count, parentIndex ):
+        '''Remove a number of rows from the model at the given row and parent.'''
+        self.beginRemoveRows( parentIndex, row, row+count-1 )
+        parent = self.itemFromIndex( parentIndex )
+        for x in range( count ):
+            parent.removeChild( row )
+        self.endRemoveRows()
+        return True
+    '''
     def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
-        print "removeRows"
+
         parentNode = self.getNode(parent)
         self.beginRemoveRows(parent, position, position + rows - 1)
         
@@ -182,8 +194,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             
         self.endRemoveRows()
         
+        self.dataChanged.emit( parent, parent )
         return success
-
+    '''
     def supportedDropActions( self ):
 
         return QtCore.Qt.MoveAction | QtCore.Qt.CopyAction
@@ -201,21 +214,19 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         '''Encode serialized data from the item at the given index into a QMimeData object.'''
         
         data = ''
+
+        parent_index =  self.parent(indices[0])
         item = self.itemFromIndex( indices[0] )
+
         try:
             data += cPickle.dumps( item )
+
         except:
             pass
-            
-            
-        print item  
-        print ">>>><<<<<"  
+
         mimedata = QtCore.QMimeData()
         mimedata.setData( 'application/x-qabstractitemmodeldatalist', data ) 
-        print data                   
-        print mimedata    
-        #mimedata = QtCore.QMimeData()
-        #mimedata.setData( 'application/x-qabstractitemmodeldatalist', data )
+   
         return mimedata
      
     def dropMimeData( self, mimedata, action, row, column, parentIndex ):
@@ -226,19 +237,13 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if not mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
             return False
         item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+
         dropParent = self.itemFromIndex( parentIndex )
-        if dropParent.name != "ROOT":
-            print dropParent
-            dropParent.addChild( item )
-            #self.insertRows( dropParent.childCount()-1, 1, parentIndex )
-            self.dataChanged.emit( parentIndex, parentIndex )
-            return True 
-        else:
-            print item.parent().row()
-            print item.parent()
-            idx = self.createIndex(item.parent().row(), 0, item.parent())
-            parent_index = self.itemFromIndex(idx)
-            print parent_index
-            parent_index.addChild( item )
-            self.dataChanged.emit( idx, idx )
-        return False
+        dropParent.addChild( item )
+        if dropParent.name == "ROOT":
+            self.insertRows( dropParent.childCount()-1, 1, parentIndex )
+        self.dataChanged.emit( parentIndex, parentIndex )
+        
+        return True 
+
+
