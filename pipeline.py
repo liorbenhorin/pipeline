@@ -2694,11 +2694,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def tree(self):
 
         root = dt.Node("ROOT")
-        Assets = dt.Node("a", root)
-        Animation = dt.Node("b", root)
-        Lightning = dt.Node("c", root)
-        Rig = dt.ComponentNode("Z", "N/A" ,Assets)
-        Rig2 = dt.ComponentNode("B", "N/A" ,Assets)
+        Assets = dt.Node("A", root)
+        Animation = dt.Node("B", root)
+        Lightning = dt.Node("C", root)
+        Lightning2 = dt.ComponentNode("D", "N/A", root)
+        Rig = dt.ComponentNode("X", "N/A" ,Assets)
+        Rig2 = dt.ComponentNode("Y", "N/A" ,Assets)
+        Rig3 = dt.ComponentNode("Z", "N/A" ,Assets)
 
         self._model = dtm.SceneGraphModel(root)
         self._proxyModel = filterSortModel()
@@ -2713,7 +2715,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setFilterKeyColumn(0)
 
         self.tree = QtGui.QTreeView()
-        self.tree.setModel( self._model )
+        self.tree.setModel( self._proxyModel )
         self.tree.setSortingEnabled(True)
         self.tree.setDragEnabled( True )
         self.tree.setAcceptDrops( True )

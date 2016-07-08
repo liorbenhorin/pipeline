@@ -182,6 +182,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         for x in range( count ):
             parent.removeChild( row )
         self.endRemoveRows()
+        self.dataChanged.emit( parentIndex, parentIndex )
         return True
     '''
     def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
@@ -239,11 +240,14 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
 
         dropParent = self.itemFromIndex( parentIndex )
+        #self.beginInsertRows()
         dropParent.addChild( item )
-        if dropParent.name == "ROOT":
-            self.insertRows( dropParent.childCount()-1, 1, parentIndex )
+        #self.endInsertRows()
+        #if dropParent.name == "ROOT":
+         #   self.insertRows( dropParent.childCount()-1, 1, parentIndex )
+            
         self.dataChanged.emit( parentIndex, parentIndex )
-        
-        return True 
 
+        return True 
+       
 
