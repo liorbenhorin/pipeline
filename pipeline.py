@@ -103,27 +103,15 @@ class treeV(QtGui.QTreeView):
         e.accept()
 '''            
 
-class treeV(QtGui.QTreeView):
-    def __init__(self,parent = None,prx = None):
-        super(treeV, self).__init__(parent)
-        self.prx = prx
+class customTreeView(QtGui.QTreeView):
+    def __init__(self,parent = None,proxyModel = None):
+        super(customTreeView, self).__init__(parent)
+        self._proxyModel = proxyModel
+
     def dropEvent(self, event):
+        super(customTreeView,self).dropEvent(event)
+        self._proxyModel.invalidate()
 
-        super(treeV,self).dropEvent(event)
-        print "DROP!"
-        self.prx.invalidate()
-
-        '''
-        {
-          QModelIndex index = indexAt(event->pos());
-          if (!index.isValid()) {  // just in case
-            event->setDropAction(Qt::IgnoreAction);
-            return;
-          }
-          QTreeWidgetItem* destination_item = itemFromIndex(index);
-          ....
-        }        
-        '''
 class filterSortModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
         
@@ -2713,7 +2701,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree()
     
     def tree(self):
-        '''
+        
         root = dt.Node("ROOT")
         Assets = dt.Node("A", root)
         Animation = dt.Node("B", root)
@@ -2722,26 +2710,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         Rig = dt.ComponentNode("X", "N/A" ,Assets)
         Rig2 = dt.ComponentNode("Y", "N/A" ,Assets)
         Rig3 = dt.ComponentNode("Z", "N/A" ,Assets)
-        '''
+        
 
-        root = dt.TreeItem("ROOT")
-        Assets = dt.TreeItem("A", root)
-        Animation = dt.TreeItem("B", root)
-        Lightning = dt.TreeItem("C", root)
-        Lightning2 = dt.TreeItem("D", root)
-        Rig = dt.TreeItem("X",  Assets)
-        Rig2 = dt.TreeItem("Y",  Assets)
-        Rig3 = dt.TreeItem("Z",  Assets)
-
-        #self._model = dtm.SceneGraphModel(root)
-        self._model = dtm.OutlinerModel(root)
-
-        #self._proxyModel = dtm.CustomSortFilterProxyModel()
+        self._model = dtm.SceneGraphModel(root)
         self._proxyModel = filterSortModel()
-        #self._proxyModel = QtGui.QSortFilterProxyModel()
-        
-
-        
+       
         self._proxyModel.setSourceModel(self._model)
         self._proxyModel.setDynamicSortFilter(True)
         self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
@@ -2750,7 +2723,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
         
-        self.tree = treeV(prx = self._proxyModel)#QtGui.QTreeView()
+        self.tree = customTreeView(proxyModel = self._proxyModel)
         self.tree.setModel( self._proxyModel )
         self.tree.setSortingEnabled(True)
         self.tree.setDragEnabled( True )
@@ -2758,14 +2731,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
          
         #self.selModel = self.tree.selectionModel()
-        #self.selModel.currentChanged.connect( self.selectInScene )
-         
+        #self.selModel.currentChanged.connect( self.selectInScene )        
         self.tree.expandAll()        
         
         self.ui.verticalLayout_18.addWidget(self.tree)
                     
         QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
-        QtCore.QObject.connect(self._model, QtCore.SIGNAL("dataChanged( QtCore.QModelIndex(), QtCore.QModelIndex() )"), self._proxyModel.invalidateFilter)
+        #QtCore.QObject.connect(self._model, QtCore.SIGNAL("dataChanged( QtCore.QModelIndex(), QtCore.QModelIndex() )"), self._proxyModel.invalidateFilter)
         
     def selectInScene(self):
         pass
