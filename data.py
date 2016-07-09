@@ -149,7 +149,7 @@ class Node(object):
     def data(self, column):
         
         if   column is 0: return self.name
-        elif column is 1: return self.typeInfo()
+        elif column is 1: return None#self.typeInfo()
     
     def setData(self, column, value):
         print value

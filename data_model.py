@@ -133,7 +133,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     """INPUTS: QModelIndex"""
     """OUTPUT: int"""
     def columnCount(self, parent):
-        return 2
+        return 1
     
 
     
