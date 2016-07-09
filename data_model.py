@@ -12,7 +12,7 @@ class customTreeView(QtGui.QTreeView):
         self._proxyModel = proxyModel
         
         self.setAlternatingRowColors(True)
-        
+
         #self.setStyleSheet(
         '''
                            

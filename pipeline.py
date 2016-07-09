@@ -2645,7 +2645,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree.setDragEnabled( True )
         self.tree.setAcceptDrops( True )
         self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
-         
+        self.tree.resizeColumnToContents(True) 
         #self.selModel = self.tree.selectionModel()
         #self.selModel.currentChanged.connect( self.selectInScene )        
         
