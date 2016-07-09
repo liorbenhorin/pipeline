@@ -2629,7 +2629,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         Rig = dt.ComponentNode("Man", "N/A" ,Assets)
         Rig2 = dt.ComponentNode("Woman", "N/A" ,Assets)
         Rig3 = dt.ComponentNode("Dog", "N/A" ,Assets)
-        
+        #[x = dt.Node("
 
         treeModel = dtm.SceneGraphModel(root)
         self._model = dtm.SceneGraphModel(root)
