@@ -94,6 +94,9 @@ reload(track)
 import dialogue as dlg
 reload(dlg)
 
+
+global treeModel
+
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
 hdlr = logging.StreamHandler(stream=sys.stdout)
@@ -2628,10 +2631,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         Rig3 = dt.ComponentNode("Dog", "N/A" ,Assets)
         
 
+        treeModel = dtm.SceneGraphModel(root)
         self._model = dtm.SceneGraphModel(root)
         self._proxyModel = dtm.filterSortModel()
        
-        self._proxyModel.setSourceModel(self._model)
+        self._proxyModel.setSourceModel(treeModel)
         self._proxyModel.setDynamicSortFilter(True)
         self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
@@ -2653,7 +2657,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree.expandAll()                
         self.ui.verticalLayout_18.addWidget(self.tree)                   
         QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
-   
+        
+        
     def selectInScene(self):
         pass
         
@@ -5493,6 +5498,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     # Delete any instances of this class
     def deleteInstances(self):
 
+            
         # Go through main window's children to find any previous instances
         for obj in maya_main_window().children():
 
@@ -6221,7 +6227,12 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         
 def show():
 
+    try:
+        print "delete model"
+        del treeModel
 
+    except:
+        print "cant delete model"
     
     #about = dlg.test2()#(None,"About",
     #about.exec_() 
