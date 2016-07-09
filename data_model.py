@@ -6,13 +6,41 @@ import cPickle
 import data as dt
 reload(dt)
 
-
 class customTreeView(QtGui.QTreeView):
     def __init__(self,parent = None,proxyModel = None):
         super(customTreeView, self).__init__(parent)
         self._proxyModel = proxyModel
         
         self.setAlternatingRowColors(True)
+        self.setStyleSheet('''
+                           
+                           QTreeView::branch:has-siblings:!adjoins-item {
+                                border-image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/vline.svg) 0;
+                           }
+                           
+                           QTreeView::branch:has-siblings:adjoins-item {
+                                border-image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-more.svg) 0;
+                           }
+                           
+                           QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+                                border-image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-end.svg) 0;
+                           }
+
+                           QTreeView::branch:has-children:!has-siblings:closed,
+                           QTreeView::branch:closed:has-children:has-siblings {
+                                border-image: none;
+                                image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-closed.svg) 0;
+                           }
+
+                           QTreeView::branch:open:has-children:!has-siblings,
+                           QTreeView::branch:open:has-children:has-siblings  {
+                                border-image: none;
+                                image: url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-open.svg) 0;
+                           }
+                                                               
+                           ''')
+                           
+        
     def dropEvent(self, event):
         super(customTreeView,self).dropEvent(event)
         self._proxyModel.invalidate()
@@ -133,9 +161,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
             if section == 0:
-                return "Scenegraph"
+                return "Name"
             else:
-                return "Typeinfo"
+                return "Type"
 
     """INPUTS: QModelIndex"""
     """OUTPUT: int (flag)"""
