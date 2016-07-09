@@ -1,10 +1,29 @@
 
 from PySide import QtCore, QtGui, QtXml
 import cPickle
-
+import os
 
 import data as dt
 reload(dt)
+
+def set_icons():
+    localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview')
+    if not os.path.exists(localIconPath):
+        return 
+    global branch_more
+    global branch_closed
+    global branch_open
+    global branch_end
+    global vline
+    
+    branch_more = os.path.join(localIconPath,"branch-more.png")
+    branch_closed = os.path.join(localIconPath,"branch-closed.png")
+    branch_open = os.path.join(localIconPath,"branch-open.png")
+    branch_end = os.path.join(localIconPath,"branch-end.png")
+    vline = os.path.join(localIconPath,"vline.png")
+                    
+    
+set_icons()
 
 class customTreeView(QtGui.QTreeView):
     def __init__(self,parent = None,proxyModel = None):
@@ -13,34 +32,33 @@ class customTreeView(QtGui.QTreeView):
         
         self.setAlternatingRowColors(True)
 
-        #self.setStyleSheet(
-        '''
+        self.setStyleSheet('''  
                            
                            QTreeView::branch:has-siblings:!adjoins-item {
-                                border-image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/vline.svg) 0;
+                                border-image:url(''' + vline + ''') 0;
                            }
                            
                            QTreeView::branch:has-siblings:adjoins-item {
-                                border-image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-more.svg) 0;
+                                border-image:url(''' + branch_more + ''') 0;
                            }
                            
                            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                                border-image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-end.svg) 0;
+                                border-image:url(''' + branch_end + ''') 0;
                            }
 
                            QTreeView::branch:has-children:!has-siblings:closed,
                            QTreeView::branch:closed:has-children:has-siblings {
                                 border-image: none;
-                                image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-closed.svg) 0;
+                                image:url(''' + branch_closed + ''') 0;
                            }
 
                            QTreeView::branch:open:has-children:!has-siblings,
                            QTreeView::branch:open:has-children:has-siblings  {
                                 border-image: none;
-                                image: url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-open.svg) 0;
+                                image: url(''' + branch_open + ''') 0;
                            }
                                                                
-                           '''#)
+                           ''')
                            
         
     def dropEvent(self, event):
