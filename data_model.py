@@ -11,7 +11,8 @@ class customTreeView(QtGui.QTreeView):
     def __init__(self,parent = None,proxyModel = None):
         super(customTreeView, self).__init__(parent)
         self._proxyModel = proxyModel
-
+        
+        self.setAlternatingRowColors(True)
     def dropEvent(self, event):
         super(customTreeView,self).dropEvent(event)
         self._proxyModel.invalidate()
