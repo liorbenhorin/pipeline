@@ -141,10 +141,10 @@ class Node(object):
         output += "\n"
         
         return output
-    '''
+    
     def __repr__(self):
         return self.log()
-    '''
+    
 
     def data(self, column):
         

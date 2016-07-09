@@ -159,7 +159,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     """INPUTS: int, int, QModelIndex"""
     def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
         print "insertRows"
-        parentNode = self.getNode(parent)
+        #parentNode = self.getNode(parent)
         
         self.beginInsertRows(parent, position, position + rows - 1)
         
@@ -171,7 +171,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             success = parentNode.insertChild(position, childNode)
         '''
         self.endInsertRows()
-        self.dataChanged.emit( parent, parent )
+        #self.dataChanged.emit( parent, parent )
         return True
 
 
@@ -238,16 +238,14 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if not mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
             return False
         item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
-
         dropParent = self.itemFromIndex( parentIndex )
-        #self.beginInsertRows()
         dropParent.addChild( item )
-        #self.endInsertRows()
+        print dropParent
         #if dropParent.name == "ROOT":
-         #   self.insertRows( dropParent.childCount()-1, 1, parentIndex )
+        self.insertRows( dropParent.childCount()-1, 1, parentIndex )
             
         self.dataChanged.emit( parentIndex, parentIndex )
-
+         
         return True 
        
 
