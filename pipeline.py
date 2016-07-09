@@ -2623,7 +2623,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         Assets = dt.Node("Charachters", root)
         Animation = dt.Node("Loactions", root)
         Lightning = dt.Node("Props", root)
-        Lightning2 = dt.ComponentNode("D", "N/A", root)
         Rig = dt.ComponentNode("Man", "N/A" ,Assets)
         Rig2 = dt.ComponentNode("Woman", "N/A" ,Assets)
         Rig3 = dt.ComponentNode("Dog", "N/A" ,Assets)

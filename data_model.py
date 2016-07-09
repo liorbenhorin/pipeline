@@ -12,7 +12,9 @@ class customTreeView(QtGui.QTreeView):
         self._proxyModel = proxyModel
         
         self.setAlternatingRowColors(True)
-        self.setStyleSheet('''
+        
+        #self.setStyleSheet(
+        '''
                            
                            QTreeView::branch:has-siblings:!adjoins-item {
                                 border-image:url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/vline.svg) 0;
@@ -38,7 +40,7 @@ class customTreeView(QtGui.QTreeView):
                                 image: url(/Users/liorbenhorin/Documents/Projects/2016/GitHub/pipeline/branch-open.svg) 0;
                            }
                                                                
-                           ''')
+                           '''#)
                            
         
     def dropEvent(self, event):
