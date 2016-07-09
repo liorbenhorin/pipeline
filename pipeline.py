@@ -2616,14 +2616,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     
     def tree(self):
         
-        root = dt.Node("ROOT")
-        Assets = dt.Node("A", root)
-        Animation = dt.Node("B", root)
-        Lightning = dt.Node("C", root)
+        
+        self.ui.searchIcon_label.setPixmap(search_icon)
+        
+        root = dt.Node("Project")
+        Assets = dt.Node("Charachters", root)
+        Animation = dt.Node("Loactions", root)
+        Lightning = dt.Node("Props", root)
         Lightning2 = dt.ComponentNode("D", "N/A", root)
-        Rig = dt.ComponentNode("X", "N/A" ,Assets)
-        Rig2 = dt.ComponentNode("Y", "N/A" ,Assets)
-        Rig3 = dt.ComponentNode("Z", "N/A" ,Assets)
+        Rig = dt.ComponentNode("Man", "N/A" ,Assets)
+        Rig2 = dt.ComponentNode("Woman", "N/A" ,Assets)
+        Rig3 = dt.ComponentNode("Dog", "N/A" ,Assets)
         
 
         self._model = dtm.SceneGraphModel(root)
