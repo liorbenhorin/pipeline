@@ -74,97 +74,11 @@ reload(dt)
 
 import data_model as dtm
 reload(dtm)
-'''
-root = dt.Node("ROOT")
-Assets = dt.Node("a", root)
-Animation = dt.Node("b", root)
-Lightning = dt.Node("c", root)
-Rig = dt.ComponentNode("Z", "N/A" ,Assets)
-Rig2 = dt.ComponentNode("B", "N/A" ,Assets)
 
-xml = root.asXml()
-print xml
-'''
 import dialogue as dlg
 reload(dlg)
 
 
-#_proxyModel = QtGui.QSortFilterProxyModel()
-'''
-class treeV(QtGui.QTreeView):
-    def __init__(self, parent=None):
-        super(treeV, self).__init__(parent)
-
-    def startDrag(self):
-        print "D"
-        
-    def dragMoveEvent(self, e):
-
-        e.accept()
-'''            
-
-class customTreeView(QtGui.QTreeView):
-    def __init__(self,parent = None,proxyModel = None):
-        super(customTreeView, self).__init__(parent)
-        self._proxyModel = proxyModel
-
-    def dropEvent(self, event):
-        super(customTreeView,self).dropEvent(event)
-        self._proxyModel.invalidate()
-
-class filterSortModel(QtGui.QSortFilterProxyModel):
-    def __init__(self,parent = None):
-        
-        super(filterSortModel, self).__init__(parent)
-    
-    def filterAcceptsRow(self,sourceRow,sourceParent):
-        if super(filterSortModel,self).filterAcceptsRow(sourceRow,sourceParent):
-            return True
-        
-        return self.hasAcceptedChildren(sourceRow,sourceParent)
-
-    def hasAcceptedChildren(self,sourceRow,sourceParent):
-        model=self.sourceModel()
-        sourceIndex=model.index(sourceRow,0,sourceParent)
-        if not sourceIndex.isValid():
-            return False
-        indexes=model.rowCount(sourceIndex)
-        for i in range(indexes):
-            if self.filterAcceptsRow(i,sourceIndex):
-                return True
-        
-        return False
-        
-'''        
-_model = dtm.SceneGraphModel(root)
-_proxyModel = filterSortModel()
-
-
-_proxyModel.setSourceModel(_model)
-_proxyModel.setDynamicSortFilter(True)
-_proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-
-_proxyModel.setSortRole(0)
-_proxyModel.setFilterRole(0)
-_proxyModel.setFilterKeyColumn(0)
-
-'''
-#print _proxyModel
-#tree = dlg.treeview(model = _proxyModel)
-#tree.exec_() 
-
-#sys.exit()
-
-
-'''        
-log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
-log = logging.getLogger(__name__)
-hdlr = logging.FileHandler(log_file, mode = 'w')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-log.handlers[:] = [hdlr]
-log.setLevel(logging.DEBUG)
-'''
 global start_time
 global end_time
 start_time = timer()
@@ -2713,7 +2627,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
 
         self._model = dtm.SceneGraphModel(root)
-        self._proxyModel = filterSortModel()
+        self._proxyModel = dtm.filterSortModel()
        
         self._proxyModel.setSourceModel(self._model)
         self._proxyModel.setDynamicSortFilter(True)
@@ -2723,7 +2637,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
         
-        self.tree = customTreeView(proxyModel = self._proxyModel)
+        self.tree = dtm.customTreeView(proxyModel = self._proxyModel)
         self.tree.setModel( self._proxyModel )
         self.tree.setSortingEnabled(True)
         self.tree.setDragEnabled( True )
@@ -2732,13 +2646,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
          
         #self.selModel = self.tree.selectionModel()
         #self.selModel.currentChanged.connect( self.selectInScene )        
-        self.tree.expandAll()        
         
-        self.ui.verticalLayout_18.addWidget(self.tree)
-                    
+        self._proxyModel.treeView = self.tree
+        self.tree.expandAll()                
+        self.ui.verticalLayout_18.addWidget(self.tree)                   
         QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
-        #QtCore.QObject.connect(self._model, QtCore.SIGNAL("dataChanged( QtCore.QModelIndex(), QtCore.QModelIndex() )"), self._proxyModel.invalidateFilter)
-        
+   
     def selectInScene(self):
         pass
         

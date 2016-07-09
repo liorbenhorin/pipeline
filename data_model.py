@@ -6,6 +6,59 @@ import cPickle
 import data as dt
 reload(dt)
 
+
+class customTreeView(QtGui.QTreeView):
+    def __init__(self,parent = None,proxyModel = None):
+        super(customTreeView, self).__init__(parent)
+        self._proxyModel = proxyModel
+
+    def dropEvent(self, event):
+        super(customTreeView,self).dropEvent(event)
+        self._proxyModel.invalidate()
+
+
+class filterSortModel(QtGui.QSortFilterProxyModel):
+    def __init__(self,parent = None):
+        
+        super(filterSortModel, self).__init__(parent)
+        self._treeView = None
+        
+    @property
+    def treeView(self):
+        if self._treeView:
+            return self._treeView
+        else:
+            return None
+            
+    @treeView.setter
+    def treeView(self, object):
+        self._treeView = object
+                    
+    def filterAcceptsRow(self,sourceRow,sourceParent):
+        if super(filterSortModel,self).filterAcceptsRow(sourceRow,sourceParent):
+            return True
+        
+        return self.hasAcceptedChildren(sourceRow,sourceParent)
+
+    def hasAcceptedChildren(self,sourceRow,sourceParent):
+        model=self.sourceModel()
+        sourceIndex=model.index(sourceRow,0,sourceParent)
+        if not sourceIndex.isValid():
+            return False
+        indexes=model.rowCount(sourceIndex)
+        for i in range(indexes):
+            if self.filterAcceptsRow(i,sourceIndex):
+                return True
+        
+        return False
+
+    def setFilterRegExp(self, exp):
+        super(filterSortModel, self).setFilterRegExp(exp)
+        if self.treeView:        
+            self.treeView.expandAll()
+
+            
+            
 class SceneGraphModel(QtCore.QAbstractItemModel):
     
     
