@@ -143,7 +143,7 @@ class Node(object):
         return output
     
     def __repr__(self):
-        return self.log()
+        return self.log() + "\n END"
     
 
     def data(self, column):
@@ -189,3 +189,79 @@ class ComponentNode(Node):
    
     def resource(self):
         return cube_icon
+        
+        
+class TreeItem( object ):
+    '''Wraps a PyNode to provide an interface to the QAbstractItemModel'''
+     
+    def __init__( self, node=None, parent = None ):
+        '''
+        Instantiates a new tree item wrapping a PyNode DAG object.
+        '''
+        self.node = node
+         
+        self.parent = parent
+        self.children = []
+        if parent is not None:
+            self.parent.addChild(self)
+
+         
+    @property
+    def displayName( self ):
+        '''Returns the wrapped PyNode's name.'''
+        return self.node
+    @displayName.setter
+    def displayName( self, name ):
+        '''Renames the wrapped PyNode.'''
+        self.node = name
+     
+    def addChild( self, child ):
+        '''Adds a given item as a child of this item.
+         
+        Also handles parenting of the PyNode in the maya scene
+        '''
+        self.children.append( child )
+        child.parent = self
+         
+         
+    def numChildren( self ):
+        '''Returns the number of child items.'''
+        return len( self.children )
+         
+    def removeChildAtRow( self, row ):
+        '''Removes an item at the given index from the list of children.'''
+        self.children.pop( row )
+     
+    def childAtRow( self, row ):
+        '''Retrieves the item at the given index from the list of children.'''
+        return self.children[row]
+         
+    def row( self ):
+        '''Get this item's index in its parent item's child list.'''
+        if self.parent:
+            return self.parent.children.index( self )
+        return 0
+             
+    def log( self, level=-1 ):
+        '''Returns a textual representation of an item's hierarchy.'''
+        level += 1
+         
+        output = ''
+        for i in range( level ):
+            output += '\t'
+         
+        output += self.node if self.node is not None else 'Root'
+        output += '\n'
+         
+        for child in self.children:
+            output += child.log( level )
+         
+        level -= 1
+         
+        return output        
+        
+    def __repr__(self):
+        return self.log()
+        
+    def resource(self):
+        return cube_icon      
