@@ -64,6 +64,17 @@ class customTreeView(QtGui.QTreeView):
         
     def dropEvent(self, event):
         super(customTreeView,self).dropEvent(event)
+        #QTreeView.dropEvent(self, evt)
+        if not event.isAccepted():
+            # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
+            # by target widget, it sets accept() to true, which causes the executed
+            # action to be reported as "move", which causes the view to remove the
+            # source rows even though the target widget didn't like the drop.
+            # Maybe it's better for the model to check drop-okay-ness during the
+            # drag rather than only on drop; but the check involves not-insignificant work.
+            event.setDropAction(QtCore.Qt.IgnoreAction)
+        
+        
         self._proxyModel.invalidate()
 
    
@@ -175,7 +186,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         self._rootNode = root
-    
+        self._tempIndex = None
+        
     @property
     def rootNode(self):
         return self._rootNode
@@ -258,7 +270,11 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
             return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled 
 
-
+        if index.isValid():
+            node = self.getNode(index)
+            if node.typeInfo() == "COMPONENT":
+                return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+    
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
     
     """INPUTS: QModelIndex"""
@@ -357,7 +373,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         parent_index =  self.parent(indices[0])
         item = self.getNode( indices[0] )
-
+        self._tempIndex = indices[0]
         try:
             data += cPickle.dumps( item )
 
@@ -376,8 +392,17 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         '''
         if not mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
             return False
+            
+        print self.rootNode
         item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
         dropParent = self.getNode( parentIndex )
+        
+        # do not allow a folder to be dropped on an asset...
+        if dropParent.typeInfo() == "ASSET":
+            if item.typeInfo() == "NODE":
+                return False
+
+               
         dropParent.addChild( item )
         self.insertRows( dropParent.childCount()-1, 1, parentIndex )
             

@@ -25,7 +25,7 @@ class Node(object):
         self._name = name
         self._children = []
         self._parent = parent
-        self._model_index = None
+
         
         if parent is not None:
             parent.addChild(self)
@@ -161,13 +161,7 @@ class Node(object):
     def resource(self):
         return folder_icon
         
-    @property    
-    def model_index(self):
-        return self._model_index
-        
-    @model_index.setter
-    def model_index(self, index):
-        self._model_index = index
+
 
 
 class AssetNode(Node):
