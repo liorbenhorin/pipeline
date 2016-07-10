@@ -77,7 +77,7 @@ class Node(object):
         for i in self._children:
             i._recurseXml(doc, node)
 
-
+    
     def typeInfo(self):
         return "NODE"
 

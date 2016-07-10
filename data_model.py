@@ -2,6 +2,7 @@
 from PySide import QtCore, QtGui, QtXml
 import cPickle
 import os
+import functools
 
 import data as dt
 reload(dt)
@@ -65,55 +66,62 @@ class customTreeView(QtGui.QTreeView):
         super(customTreeView,self).dropEvent(event)
         self._proxyModel.invalidate()
 
+   
     def contextMenuEvent(self, event):
 
         handled = True
         index = self.indexAt(event.pos())
-        menu = QtGui.QMenu()
-        
+        menu = QtGui.QMenu()        
         node = None
+        mdl =  self.model().sourceModel()
+        
         
         if index.isValid():
-
-            mdl =  self.model().sourceModel()
-            src = index.model().mapToSource(index)
-                  
+            src = index.model().mapToSource(index)                  
             node =  mdl.getNode(src)
             
-            
+        actions = [] 
+           
         if node:
-            #an action for everyone
 
-            if node.typeInfo() == "NODE":  #treat the Nth column special row...
-                action_1 = QtGui.QAction("NODE", menu)#, triggered = SOME_FUNCTION_TO_CALL )
-                menu.addActions([action_1])
-
+            if node.typeInfo() == "NODE": 
+                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl) ))
+                actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl) ))
                 
             elif node.typeInfo() == "ASSET":
-                action_1 = QtGui.QAction("ASSET", menu)#, triggered = YET_ANOTHER_FUNCTION)
-                menu.addActions([action_1])
-
-                
+                actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl) ))
+               
             elif node.typeInfo() == "COMPONENT":
-                action_1 = QtGui.QAction("COMPONENT", menu)#, triggered = YET_ANOTHER_FUNCTION)
-                menu.addActions([action_1])
+                pass
 
-
-        every = QtGui.QAction("I'm for everyone", menu)#, triggered = FOO)
-      
+        else:
+            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,mdl) ))
+            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl) ))
+            actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl) ))
+        
+        menu.addActions(actions)      
 
         if handled:
-            menu.addAction(every)
+
             menu.exec_(event.globalPos())
             event.accept() #TELL QT IVE HANDLED THIS THING
             
         else:
             event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
-            
-            
+                   
         return
 
-     
+    def create_new_folder(self, parent):
+        node = dt.Node("folder",parent.rootNode)
+        self._proxyModel.invalidate()
+
+    def create_new_asset(self, parent):
+        node = dt.AssetNode("asset","",parent.rootNode)
+        self._proxyModel.invalidate()
+    
+    def create_new_component(self, parent):
+        node = dt.ComponentNode("component","",parent.rootNode)
+        self._proxyModel.invalidate()
 
 class filterSortModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
@@ -167,7 +175,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def __init__(self, root, parent=None):
         super(SceneGraphModel, self).__init__(parent)
         self._rootNode = root
-
+    
+    @property
+    def rootNode(self):
+        return self._rootNode
 
     """INPUTS: QModelIndex"""
     """OUTPUT: int"""
