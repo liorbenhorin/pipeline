@@ -2630,8 +2630,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         model = dt.ComponentNode("Model", "N/A" ,dog)
         simple = dt.ComponentNode("Simple", "N/A" ,root)
         sorted = dt.ComponentNode("Sorted_component", "N/A" ,Animation)
-        #[x = dt.Node("
-
+        
+        '''
+        asts = []
+        cmps = []
+        for i in range(30):
+            v = dt.AssetNode("asset_%s"%(str(i)),"N/A", root)
+            asts.append(v)
+            for x in range(5):
+                z = dt.ComponentNode("components_%s"%(str(x)),"N/A", v)
+                cmps.append(z)
+        '''
         treeModel = dtm.SceneGraphModel(root)
         self._model = dtm.SceneGraphModel(root)
         self._proxyModel = dtm.filterSortModel()
@@ -2651,6 +2660,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree.setAcceptDrops( True )
         self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
         self.tree.resizeColumnToContents(True) 
+        
         #self.selModel = self.tree.selectionModel()
         #self.selModel.currentChanged.connect( self.selectInScene )        
         

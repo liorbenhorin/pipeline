@@ -29,7 +29,7 @@ class customTreeView(QtGui.QTreeView):
     def __init__(self,parent = None,proxyModel = None):
         super(customTreeView, self).__init__(parent)
         self._proxyModel = proxyModel
-        
+        self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.setAlternatingRowColors(True)
 
         self.setStyleSheet('''  
@@ -65,6 +65,42 @@ class customTreeView(QtGui.QTreeView):
         super(customTreeView,self).dropEvent(event)
         self._proxyModel.invalidate()
 
+    def contextMenuEvent(self, event):
+
+        handled = True
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()
+
+        mdl =  self.model().sourceModel()
+        src = index.model().mapToSource(index)
+
+        print mdl.getNode(src)
+        
+        #an action for everyone
+        every = QtGui.QAction("I'm for everyone", menu)#, triggered = FOO)
+        if index.column() == 0:  #treat the Nth column special row...
+            action_1 = QtGui.QAction("Something Awesome", menu)#, triggered = SOME_FUNCTION_TO_CALL )
+            action_2 = QtGui.QAction("Something Else Awesome", menu)#, triggered = SOME_OTHER_FUNCTION )
+            menu.addActions([action_1, action_2])
+            #handled = True
+            
+        elif index.column() == 3:
+            action_1 = QtGui.QAction("Uh Oh", menu)#, triggered = YET_ANOTHER_FUNCTION)
+            menu.addActions([action_1])
+            #handled = True
+            
+
+        if handled:
+            menu.addAction(every)
+            menu.exec_(event.globalPos())
+            event.accept() #TELL QT IVE HANDLED THIS THING
+            
+        else:
+            event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
+            
+        return
+
+     
 
 class filterSortModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
@@ -326,3 +362,5 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return True 
        
 
+
+        
