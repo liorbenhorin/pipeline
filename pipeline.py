@@ -2623,12 +2623,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.searchIcon_label.setPixmap(search_icon)
         
         root = dt.Node("Project")
-        Assets = dt.Node("Charachters", root)
-        Animation = dt.Node("Loactions", root)
-        Lightning = dt.Node("Props", root)
-        Rig = dt.ComponentNode("Man", "N/A" ,Assets)
-        Rig2 = dt.ComponentNode("Woman", "N/A" ,Assets)
-        Rig3 = dt.ComponentNode("Dog", "N/A" ,Assets)
+        char = dt.Node("Charachters", root)
+        dog = dt.AssetNode("Dog","N/A", char)
+        Animation = dt.Node("Animation", root)
+        rig = dt.ComponentNode("Rig", "N/A" ,dog)
+        model = dt.ComponentNode("Model", "N/A" ,dog)
+        simple = dt.ComponentNode("Simple", "N/A" ,root)
+        sorted = dt.ComponentNode("Sorted_component", "N/A" ,Animation)
         #[x = dt.Node("
 
         treeModel = dtm.SceneGraphModel(root)

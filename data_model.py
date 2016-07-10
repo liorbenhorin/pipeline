@@ -181,7 +181,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     def headerData(self, section, orientation, role):
         if role == QtCore.Qt.DisplayRole:
             if section == 0:
-                return "Name"
+                return "Project"
             else:
                 return "Type"
 

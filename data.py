@@ -8,9 +8,11 @@ def set_icons():
         return 
     global folder_icon
     global cube_icon
+    global cube_icon_full
     
     folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
     cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
+    cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
 
 set_icons()
 
@@ -166,6 +168,30 @@ class Node(object):
     @model_index.setter
     def model_index(self, index):
         self._model_index = index
+
+
+class AssetNode(Node):
+    
+    def __init__(self, name, component, parent=None):
+        super(AssetNode, self).__init__(name, parent)
+      
+        self._component = component
+
+    def typeInfo(self):
+        return "ASSET"
+
+    @property
+    def component(self):
+        return self._component
+        
+    @component.setter
+    def component(self, value):
+        self._component = value
+
+   
+    def resource(self):
+        return cube_icon_full
+        
 
         
 class ComponentNode(Node):

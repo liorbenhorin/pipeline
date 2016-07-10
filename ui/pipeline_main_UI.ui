@@ -153,7 +153,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>10</height>
+        <height>200</height>
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_18">
