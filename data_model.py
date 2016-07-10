@@ -70,25 +70,37 @@ class customTreeView(QtGui.QTreeView):
         handled = True
         index = self.indexAt(event.pos())
         menu = QtGui.QMenu()
-
-        mdl =  self.model().sourceModel()
-        src = index.model().mapToSource(index)
-
-        print mdl.getNode(src)
         
-        #an action for everyone
+        node = None
+        
+        if index.isValid():
+
+            mdl =  self.model().sourceModel()
+            src = index.model().mapToSource(index)
+                  
+            node =  mdl.getNode(src)
+            
+            
+        if node:
+            #an action for everyone
+
+            if node.typeInfo() == "NODE":  #treat the Nth column special row...
+                action_1 = QtGui.QAction("NODE", menu)#, triggered = SOME_FUNCTION_TO_CALL )
+                menu.addActions([action_1])
+
+                
+            elif node.typeInfo() == "ASSET":
+                action_1 = QtGui.QAction("ASSET", menu)#, triggered = YET_ANOTHER_FUNCTION)
+                menu.addActions([action_1])
+
+                
+            elif node.typeInfo() == "COMPONENT":
+                action_1 = QtGui.QAction("COMPONENT", menu)#, triggered = YET_ANOTHER_FUNCTION)
+                menu.addActions([action_1])
+
+
         every = QtGui.QAction("I'm for everyone", menu)#, triggered = FOO)
-        if index.column() == 0:  #treat the Nth column special row...
-            action_1 = QtGui.QAction("Something Awesome", menu)#, triggered = SOME_FUNCTION_TO_CALL )
-            action_2 = QtGui.QAction("Something Else Awesome", menu)#, triggered = SOME_OTHER_FUNCTION )
-            menu.addActions([action_1, action_2])
-            #handled = True
-            
-        elif index.column() == 3:
-            action_1 = QtGui.QAction("Uh Oh", menu)#, triggered = YET_ANOTHER_FUNCTION)
-            menu.addActions([action_1])
-            #handled = True
-            
+      
 
         if handled:
             menu.addAction(every)
@@ -97,6 +109,7 @@ class customTreeView(QtGui.QTreeView):
             
         else:
             event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
+            
             
         return
 
