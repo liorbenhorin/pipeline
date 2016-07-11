@@ -2622,7 +2622,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         self.ui.searchIcon_label.setPixmap(search_icon)
         
-        root = dt.Node("Project")
+        _root = dt.Node("root")
+        root = dt.Node("Project",_root)
         char = dt.Node("Charachters", root)
         dog = dt.AssetNode("Dog","N/A", char)
         Animation = dt.Node("Animation", root)
@@ -2641,8 +2642,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 z = dt.ComponentNode("components_%s"%(str(x)),"N/A", v)
                 cmps.append(z)
         '''
-        treeModel = dtm.SceneGraphModel(root)
-        self._model = dtm.SceneGraphModel(root)
+        treeModel = dtm.SceneGraphModel(_root)
+        #self._model = dtm.SceneGraphModel(_root)
         self._proxyModel = dtm.filterSortModel()
        
         self._proxyModel.setSourceModel(treeModel)
@@ -2665,9 +2666,29 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.selModel.currentChanged.connect( self.selectInScene )        
         
         self._proxyModel.treeView = self.tree
+        #print self.tree.rootIndex()
+        #i =  treeModel.index(0,0,self.tree.rootIndex())
+        #print treeModel.getNode(i).name
+        #self.tree.setExpanded(i,True)
         self.tree.saveState()
-        #self.tree.expandAll()                
-        self.ui.verticalLayout_18.addWidget(self.tree)                   
+        
+        #self.tree.expandAll() 
+        
+        
+        self.list = QtGui.QListView()
+        self.list.setViewMode(QtGui.QListView.IconMode)
+        
+        
+        self.splitter1 = QtGui.QSplitter()
+        self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
+        self.splitter1.setHandleWidth(10)
+        self.splitter1.setChildrenCollapsible(False)
+                       
+        self.ui.verticalLayout_18.addWidget(self.splitter1) 
+
+        self.splitter1.addWidget(self.tree)
+        self.splitter1.addWidget(self.list)
+                           
         QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState);
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState);

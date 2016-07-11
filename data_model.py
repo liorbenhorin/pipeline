@@ -34,6 +34,8 @@ class customTreeView(QtGui.QTreeView):
         self.setAlternatingRowColors(True)
         self._state = None
         self._ignoreExpentions = False
+       
+
         
         self.setStyleSheet('''  
                            
@@ -67,6 +69,16 @@ class customTreeView(QtGui.QTreeView):
                            
                             ''')
 
+
+    def setModel(self,model):
+        super(customTreeView,self).setModel(model)
+        self.collapseAll()
+        #print self.rootIndex()
+        i =  self.model().sourceModel().index(0,0,self.rootIndex())
+        i2 =  self.model().sourceModel().index(0,0,i)
+        #print self.model().sourceModel().getNode(i).name
+        self.setExpanded(i2,True)
+        print i
 
     
     def saveState(self):
