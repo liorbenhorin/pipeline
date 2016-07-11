@@ -32,7 +32,9 @@ class customTreeView(QtGui.QTreeView):
         self._proxyModel = proxyModel
         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.setAlternatingRowColors(True)
-
+        self._state = None
+        self._ignoreExpentions = False
+        
         self.setStyleSheet('''  
                            
                            QTreeView::item:focus {
@@ -65,6 +67,52 @@ class customTreeView(QtGui.QTreeView):
                            
                             ''')
 
+
+    
+    def saveState(self):
+        if self._ignoreExpentions == True:
+            return  
+                 
+        def rec( dict, mdl, index):
+            
+            for row in range(mdl.rowCount(index)):
+                 
+                   
+                i = mdl.index(row,0, index)
+                node = mdl.data(i, 165)
+                
+                if self.isExpanded(i):
+                    dict[node] = True
+                else:
+                    dict[node] = False  
+                      
+                rec(dict, mdl, i)     
+            
+        
+        mdl = self.model()
+        self.expended_states = {}
+        rec(self.expended_states,mdl,self.rootIndex())
+
+        
+    def restoreState(self):    
+
+        def rec(  mdl, index):
+            
+            for row in range(mdl.rowCount(index)):
+                 
+                   
+                i = mdl.index(row,0, index)
+                node = mdl.data(i, 165)
+                
+                if self.expended_states[node] == True:
+                    self.setExpanded(i, True)
+
+                     
+                rec( mdl, i)     
+                    
+        self.collapseAll()
+        mdl = self.model()
+        rec(mdl,self.rootIndex())        
         
     def dropEvent(self, event):
         super(customTreeView,self).dropEvent(event)
@@ -82,7 +130,7 @@ class customTreeView(QtGui.QTreeView):
 
    
     def contextMenuEvent(self, event):
-
+        
         handled = True
         index = self.indexAt(event.pos())
         menu = QtGui.QMenu()        
@@ -95,7 +143,8 @@ class customTreeView(QtGui.QTreeView):
             node =  mdl.getNode(src)
             
         actions = [] 
-           
+        print mdl.persistentIndexList() 
+          
         if node:
 
             if node.typeInfo() == "NODE": 
@@ -186,9 +235,17 @@ class filterSortModel(QtGui.QSortFilterProxyModel):
         return False
 
     def setFilterRegExp(self, exp):
+              
         super(filterSortModel, self).setFilterRegExp(exp)
-        if self.treeView:        
-            self.treeView.expandAll()
+        if self.treeView:
+            if len(exp)>0:        
+                self.treeView._ignoreExpentions = True
+                self.treeView.expandAll()
+                self.treeView._ignoreExpentions = False
+            else:
+                self.treeView._ignoreExpentions = True
+                self.treeView.restoreState()          
+                self.treeView._ignoreExpentions = False         
 
             
             
@@ -197,6 +254,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     
     sortRole   = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
+    expendedRole = QtCore.Qt.UserRole + 2
     
     """INPUTS: Node, QObject"""
     def __init__(self, root, parent=None):
@@ -250,7 +308,15 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.SizeHintRole:
             return QtCore.QSize(0,19)
-            
+        
+        # this is for expending state - the result must be uniqe!!!
+        if role == 165:
+            return node.name
+        
+        if role == SceneGraphModel.expendedRole:
+            print "R"
+            return self.isExpended(index)
+               
         #if role == QtCore.Qt.FontRole:
          #  if node.typeInfo() == "COMPONENT":
           #     boldFont = QtGui.QFont()
@@ -267,6 +333,9 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
                 node.setData(index.column(), value)
                 self.dataChanged.emit(index, index)
+            if role == SceneGraphModel.expendedRole:
+                node.expendedState(self.isExpended(index))
+                self.dataChanged.emit(index, index)               
                 return True
             
         return False

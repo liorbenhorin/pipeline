@@ -2665,10 +2665,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.selModel.currentChanged.connect( self.selectInScene )        
         
         self._proxyModel.treeView = self.tree
-        self.tree.expandAll()                
+        self.tree.saveState()
+        #self.tree.expandAll()                
         self.ui.verticalLayout_18.addWidget(self.tree)                   
         QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
-        
+        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState);
+        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState);
         
     def selectInScene(self):
         pass

@@ -25,7 +25,7 @@ class Node(object):
         self._name = name
         self._children = []
         self._parent = parent
-
+        self.expendedState = False
         
         if parent is not None:
             parent.addChild(self)
@@ -174,7 +174,13 @@ class Node(object):
 
     def delete_me(self):
         print "***DELETE ALL IN" + self._name + "\n"
-
+    
+    @property
+    def expendedState(self):
+        return self._expendedState
+    @expendedState.setter
+    def expendedState(self, state):    
+        self._expendedState = state
 
 class AssetNode(Node):
     
