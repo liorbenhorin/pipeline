@@ -142,8 +142,7 @@ class customTreeView(QtGui.QTreeView):
             src = index.model().mapToSource(index)                  
             node =  mdl.getNode(src)
             
-        actions = [] 
-        print mdl.persistentIndexList() 
+        actions = []  
           
         if node:
 
@@ -487,13 +486,12 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if not mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
             return False
             
-        print self.rootNode
         item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
         dropParent = self.getNode( parentIndex )
         
         # do not allow a folder to be dropped on an asset...
         if dropParent.typeInfo() == "ASSET":
-            if item.typeInfo() == "NODE":
+            if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
                 return False
 
                
