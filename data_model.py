@@ -99,19 +99,22 @@ class customTreeView(QtGui.QTreeView):
         if node:
 
             if node.typeInfo() == "NODE": 
-                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl) ))
-                actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl) ))
+                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,node) ))
+                actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
                 
             elif node.typeInfo() == "ASSET":
-                actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl) ))
-               
+                actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
+                
             elif node.typeInfo() == "COMPONENT":
-                pass
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src, node) ))
+                
 
         else:
-            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,mdl) ))
-            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl) ))
-            actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl) ))
+            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,mdl.rootNode) ))
+            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl.rootNode) ))
+            actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl.rootNode) ))
         
         menu.addActions(actions)      
 
@@ -125,16 +128,26 @@ class customTreeView(QtGui.QTreeView):
                    
         return
 
+
+    def delete(self, model, index,node):
+        node.delete()
+        parentIndex = model.parent(index)
+        if node._children != []:
+            model.removeRows(node.row(),model.rowCount(index),parentIndex)
+        else:
+            model.removeRows(node.row(),1,parentIndex)
+
     def create_new_folder(self, parent):
-        node = dt.Node("folder",parent.rootNode)
+
+        node = dt.Node("folder",parent)
         self._proxyModel.invalidate()
 
     def create_new_asset(self, parent):
-        node = dt.AssetNode("asset","",parent.rootNode)
+        node = dt.AssetNode("asset","",parent)
         self._proxyModel.invalidate()
     
     def create_new_component(self, parent):
-        node = dt.ComponentNode("component","",parent.rootNode)
+        node = dt.ComponentNode("component","",parent)
         self._proxyModel.invalidate()
 
 class filterSortModel(QtGui.QSortFilterProxyModel):
@@ -363,6 +376,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
 
     def removeRows( self, row, count, parentIndex ):
+
         '''Remove a number of rows from the model at the given row and parent.'''
         self.beginRemoveRows( parentIndex, row, row+count-1 )
         parent = self.getNode( parentIndex )

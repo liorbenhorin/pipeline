@@ -99,11 +99,14 @@ class Node(object):
         if position < 0 or position > len(self._children):
             return False
         
-        child = self._children.pop(position)
-        child._parent = None
+        if self._children != []:
+            child = self._children.pop(position)
+            child._parent = None
 
-        return True
-
+            return True
+        else:
+            return False
+            
     @property
     def name(self):
         return self._name
@@ -144,8 +147,8 @@ class Node(object):
         
         return output
     
-    def __repr__(self):
-        return self.log() + "\n END"
+    #def __repr__(self):
+    #    return self.log() + "\n END"
     
 
     def data(self, column):
@@ -161,7 +164,16 @@ class Node(object):
     def resource(self):
         return folder_icon
         
+    def delete(self):
 
+        self.delete_me()
+        
+        for child in self._children:
+            
+            child.delete()
+
+    def delete_me(self):
+        print "***DELETE ALL IN" + self._name + "\n"
 
 
 class AssetNode(Node):
