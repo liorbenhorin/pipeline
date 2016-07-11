@@ -8,7 +8,7 @@ import data as dt
 reload(dt)
 
 def set_icons():
-    localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview')
+    localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
     if not os.path.exists(localIconPath):
         return 
     global branch_more
@@ -17,11 +17,11 @@ def set_icons():
     global branch_end
     global vline
     
-    branch_more = os.path.join(localIconPath,"branch-more.png")
-    branch_closed = os.path.join(localIconPath,"branch-closed.png")
-    branch_open = os.path.join(localIconPath,"branch-open.png")
-    branch_end = os.path.join(localIconPath,"branch-end.png")
-    vline = os.path.join(localIconPath,"vline.png")
+    branch_more = os.path.join(localIconPath,"branch-more.svg")
+    branch_closed = os.path.join(localIconPath,"branch-closed.svg")
+    branch_open = os.path.join(localIconPath,"branch-open.svg")
+    branch_end = os.path.join(localIconPath,"branch-end.svg")
+    vline = os.path.join(localIconPath,"vline.svg")
                     
     
 set_icons()
@@ -35,6 +35,8 @@ class customTreeView(QtGui.QTreeView):
 
         self.setStyleSheet('''  
                            
+                           QTreeView::item:focus {
+                           }
                            QTreeView::branch:has-siblings:!adjoins-item {
                                 border-image:url(''' + vline + ''') 0;
                            }
@@ -58,9 +60,11 @@ class customTreeView(QtGui.QTreeView):
                                 border-image: none;
                                 image: url(''' + branch_open + ''') 0;
                            }
-                                                               
-                           ''')
                            
+
+                           
+                            ''')
+
         
     def dropEvent(self, event):
         super(customTreeView,self).dropEvent(event)
@@ -73,8 +77,7 @@ class customTreeView(QtGui.QTreeView):
             # Maybe it's better for the model to check drop-okay-ness during the
             # drag rather than only on drop; but the check involves not-insignificant work.
             event.setDropAction(QtCore.Qt.IgnoreAction)
-        
-        
+                
         self._proxyModel.invalidate()
 
    
@@ -232,6 +235,14 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if role == SceneGraphModel.filterRole:
             return node.typeInfo()
 
+        if role == QtCore.Qt.SizeHintRole:
+            return QtCore.QSize(0,19)
+            
+        #if role == QtCore.Qt.FontRole:
+         #  if node.typeInfo() == "COMPONENT":
+          #     boldFont = QtGui.QFont()
+           #    boldFont.setBold(True)
+            #   return boldFont
 
     """INPUTS: QModelIndex, QVariant, int (flag)"""
     def setData(self, index, value, role=QtCore.Qt.EditRole):
