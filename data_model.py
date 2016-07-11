@@ -72,14 +72,16 @@ class customTreeView(QtGui.QTreeView):
 
     def setModel(self,model):
         super(customTreeView,self).setModel(model)
-        self.collapseAll()
-        #print self.rootIndex()
-        i =  self.model().sourceModel().index(0,0,self.rootIndex())
-        i2 =  self.model().sourceModel().index(0,0,i)
-        #print self.model().sourceModel().getNode(i).name
-        self.setExpanded(i2,True)
-        print i
-
+        
+        self.expandAll()
+        i =  self.model().index(0,0,self.rootIndex())
+        
+        for row in range(self.model().rowCount(i)):
+            x = self.model().index(row,0,i)
+            self.setExpanded(x,False)
+        
+        self.saveState()
+    
     
     def saveState(self):
         if self._ignoreExpentions == True:
