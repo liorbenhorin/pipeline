@@ -2,6 +2,10 @@
 from PySide import QtXml, QtGui
 import os
 
+import modules.data as data
+reload(data)
+
+
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
     if not os.path.exists(localIconPath):
@@ -26,6 +30,7 @@ class Node(object):
         self._children = []
         self._parent = parent
         self.expendedState = False
+        self._id = data.id_generator()
         
         if parent is not None:
             parent.addChild(self)
@@ -181,6 +186,10 @@ class Node(object):
     @expendedState.setter
     def expendedState(self, state):    
         self._expendedState = state
+
+    @property
+    def id(self):
+        return self._id
 
 class AssetNode(Node):
     
