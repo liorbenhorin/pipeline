@@ -26,6 +26,41 @@ def set_icons():
     
 set_icons()
 
+
+class customListView(QtGui.QListView):
+    def __init__(self,parent = None,proxyModel = None):
+        super(customListView, self).__init__(parent)
+        
+        self.setViewMode(QtGui.QListView.IconMode)
+
+    def update(self, treeView , index, col):
+
+        mdl =  treeView.model().sourceModel()
+        src = index.model().mapToSource(index)                  
+        
+        list = []
+        
+        for row in range(mdl.rowCount(src)):
+
+            item_index = mdl.index(row,0,src)
+            node = mdl.getNode(item_index)
+            
+            if node.typeInfo() == "COMPONENT": 
+                list.append(node)
+            
+        if len(list) > 0:
+            listModel = componentsModel(list)
+         
+            print listModel
+            
+            self.setModel(listModel)
+            
+            return True
+            
+        self.setModel(None)
+        return None
+            
+            
 class customTreeView(QtGui.QTreeView):
     def __init__(self,parent = None,proxyModel = None):
         super(customTreeView, self).__init__(parent)
@@ -526,5 +561,119 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return True 
        
 
+'''
+class componentsModel(QtCore.QAbstractListModel):
+    def __init__(self, list = [], parent=None):
+        super(componentsModel, self).__init__(parent)
+        #self.list = []
+        #for name, dob, house_no in (
+        #("Neil", datetime.date(1969,12,9), 23),
+        #("John", datetime.date(1952,5,3), 2543),
+        #("Ilona", datetime.date(1975,4,6), 1)):
+        #    self.list.append(person(name, dob, house_no))
+        self.setSupportedDragActions(QtCore.Qt.MoveAction)
 
+    def rowCount(self, parent=QtCore.QModelIndex()):
+        return len(self.list)
+
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        if role == QtCore.Qt.DisplayRole: #show just the name
+            return self.list[index.row()].name
+
+        elif role == QtCore.Qt.UserRole:  #return the whole python object
+            return self.list[index.row()]
+            
+    def removeRow(self, position):
+        self.list = self.list[:position] + self.list[position+1:]
+        self.reset()
+'''
+
+class componentsModel(QtCore.QAbstractListModel):
+    
+    def __init__(self, components = [], parent = None):
+        QtCore.QAbstractListModel.__init__(self, parent)
+        self.__components = components
+
+
+
+    def headerData(self, section, orientation, role):
+        
+        if role == QtCore.Qt.DisplayRole:
+            
+            if orientation == QtCore.Qt.Horizontal:
+                return QtCore.QString("Palette")
+            else:
+                return QtCore.QString("Color %1").arg(section)
+
+
+    def rowCount(self, parent):
+        return len(self.__components)
+
+
+    def data(self, index, role):
+        
+        
+        if role == QtCore.Qt.EditRole:
+            return self.__components[index.row()].name
+        
+        
+        if role == QtCore.Qt.DecorationRole:
+            if index.column() == 0:
+                resource = self.__components[index.row()].resource()
+                return QtGui.QIcon(QtGui.QPixmap(resource))
+              
+        if role == QtCore.Qt.DisplayRole:
+            
+            row = index.row()
+            return self.__components[row].name
+
+
+    def flags(self, index):
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        
+        
+        
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            
+            row = index.row()
+            #color = QtGui.QColor(value)
+            
+            #if color.isValid():
+            #    self.__components[row] = color
+            #    self.dataChanged.emit(index, index)
+            #    return True
+
+            
+            if role == QtCore.Qt.EditRole:
+                self.__components[row].name = value #node.setData(index.column(), value)
+                self.dataChanged.emit(index, index)
+             
+                return True
+
+            
+        return False
+
+    #=====================================================#
+    #INSERTING & REMOVING
+    #=====================================================#
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+        self.endInsertRows()
+        
+        return True
+   
+    def removeRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, position, position + rows - 1)
+        
+        for i in range(rows):
+            value = self.__components[position]
+            self.__components.remove(value)
+             
+        self.endRemoveRows()
+        return True
         

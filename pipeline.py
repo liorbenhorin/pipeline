@@ -68,6 +68,7 @@ import webbrowser
 import glob
 import sys
 import inspect
+import functools
 
 import data as dt
 reload(dt)
@@ -2662,20 +2663,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
         self.tree.resizeColumnToContents(True) 
         
-        #self.selModel = self.tree.selectionModel()
-        #self.selModel.currentChanged.connect( self.selectInScene )        
+        
+               
         
         self._proxyModel.treeView = self.tree
-        
-        #self.tree.saveState()
-        
-        #self.tree.expandAll() 
-        
-        
-        self.list = QtGui.QListView()
-        self.list.setViewMode(QtGui.QListView.IconMode)
-        
-        
+               
+        self.list = dtm.customListView() #QtGui.QListView()
+               
         self.splitter1 = QtGui.QSplitter()
         self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
         self.splitter1.setHandleWidth(10)
@@ -2689,7 +2683,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)
+        
+        self.selModel.currentChanged.connect( functools.partial(self.list.update,self.tree) ) 
+        #QtCore.QObject.connect(self.tree, QtCore.SIGNAL("clicked(QModelIndex)"), functools.partial(self.list.update,self.tree))
+        #QtCore.QObject.connect(self.tree, QtCore.SIGNAL("currentChanged(QModelIndex,QModelIndex)"), functools.partial(self.list.update,self.tree))
+        #Object::connect(treeview,SIGNAL(Clicked),this,SLOT(treeViewClickProgress()));
         #self.tree.start()
+        self.selModel = self.tree.selectionModel()
+        self.ui.assets_selection_frame.setHidden(True)
         
     def selectInScene(self):
         pass
