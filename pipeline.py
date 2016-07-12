@@ -2663,12 +2663,32 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
         self.tree.resizeColumnToContents(True) 
         
-        
-               
-        
+      
         self._proxyModel.treeView = self.tree
+
+        '''
+        self._proxyModel_LIST = dtm.filterSortModel_LIST()
+       
+        self._proxyModel_LIST.setSourceModel(treeModel)
+        self._proxyModel_LIST.setDynamicSortFilter(True)
+        self._proxyModel_LIST.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        self._proxyModel_LIST.setSortRole(0)
+        self._proxyModel_LIST.setFilterRole(0)
+        self._proxyModel_LIST.setFilterKeyColumn(0)
+        '''
                
-        self.list = dtm.customListView() #QtGui.QListView()
+        self.list = dtm.ListTreeView() #QtGui.QListView()
+        self._listProxyModel = dtm.list_filterSortModel()
+        self._listProxyModel.setSourceModel(treeModel)
+        self._listProxyModel.setDynamicSortFilter(True)
+        self._listProxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        self._listProxyModel.setSortRole(0)
+        self._listProxyModel.setFilterRole(0)
+        self._listProxyModel.setFilterKeyColumn(0)        
+        
+        self.list.setModel(self._listProxyModel)
                
         self.splitter1 = QtGui.QSplitter()
         self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
@@ -2684,12 +2704,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)
         
+        self.selModel = self.tree.selectionModel()
         self.selModel.currentChanged.connect( functools.partial(self.list.update,self.tree) ) 
+        
+        
         #QtCore.QObject.connect(self.tree, QtCore.SIGNAL("clicked(QModelIndex)"), functools.partial(self.list.update,self.tree))
         #QtCore.QObject.connect(self.tree, QtCore.SIGNAL("currentChanged(QModelIndex,QModelIndex)"), functools.partial(self.list.update,self.tree))
         #Object::connect(treeview,SIGNAL(Clicked),this,SLOT(treeViewClickProgress()));
         #self.tree.start()
-        self.selModel = self.tree.selectionModel()
+        
+        
+        #self.selModel = self.tree.selectionModel()
         self.ui.assets_selection_frame.setHidden(True)
         
     def selectInScene(self):

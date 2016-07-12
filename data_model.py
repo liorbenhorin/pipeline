@@ -34,9 +34,16 @@ class customListView(QtGui.QListView):
         self.setViewMode(QtGui.QListView.IconMode)
 
     def update(self, treeView , index, col):
-
+        
         mdl =  treeView.model().sourceModel()
         src = index.model().mapToSource(index)                  
+        
+        self.setRootIndex(src)
+        print mdl.getNode(src).name
+        print self.model()
+        
+        return
+        '''
         
         list = []
         
@@ -58,9 +65,33 @@ class customListView(QtGui.QListView):
             return True
             
         self.setModel(None)
-        return None
+        return None'''
             
-            
+class ListTreeView(QtGui.QTreeView):
+    def __init__(self,parent = None,proxyModel = None):
+        super(ListTreeView, self).__init__(parent)
+        #self._proxyModel = proxyModel
+        #self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.setAlternatingRowColors(True)
+        self.expandAll()
+        self.setIndentation(0)
+        #self.header().hide() 
+        
+
+    def update(self, treeView , index, col):
+        mdl = treeView.model()
+        src = index.model().mapToSource(index)
+        self.setRootIndex(index)
+        return
+        
+        mdl =  treeView.model().sourceModel()
+        src = index.model().mapToSource(index)                  
+        
+        self.setRootIndex(src)
+        print mdl.getNode(src).name
+        return
+        
+                    
 class customTreeView(QtGui.QTreeView):
     def __init__(self,parent = None,proxyModel = None):
         super(customTreeView, self).__init__(parent)
@@ -69,7 +100,7 @@ class customTreeView(QtGui.QTreeView):
         self.setAlternatingRowColors(True)
         self._state = None
         self._ignoreExpentions = False
-       
+        
 
         
         self.setStyleSheet('''  
@@ -302,7 +333,22 @@ class filterSortModel(QtGui.QSortFilterProxyModel):
                 self.treeView.restoreState()          
                 self.treeView._ignoreExpentions = False         
 
+
+class list_filterSortModel(QtGui.QSortFilterProxyModel):
+    def __init__(self,parent = None):
+        
+        super(list_filterSortModel, self).__init__(parent)
+                    
+    def filterAcceptsRow(self,sourceRow,sourceParent):
+        # hide components from the treeview
+        id =  self.sourceModel().index(sourceRow,0,sourceParent)    
+
+        if super(filterSortModel,self).filterAcceptsRow(sourceRow,sourceParent): 
             
+            if self.sourceModel().getNode(id).typeInfo() == "COMPONENT":
+                return True
+                      
+            return False
             
 class SceneGraphModel(QtCore.QAbstractItemModel):
     
