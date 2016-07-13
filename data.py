@@ -13,11 +13,13 @@ def set_icons():
     global folder_icon
     global cube_icon
     global cube_icon_full
-    
+    global add_icon
+    global large_image_icon
     folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
     cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
     cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
-
+    add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
+    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
 set_icons()
 
 class Node(object):
@@ -235,6 +237,17 @@ class ComponentNode(Node):
 
    
     def resource(self):
-        return cube_icon
+        return large_image_icon# cube_icon
         
         
+class AddComponent(Node):
+    
+    def __init__(self, name, parent=None):
+        super(AddComponent, self).__init__(name, parent)
+        self.name = "New..."
+
+    def typeInfo(self):
+        return "ADD-COMPONENT"
+  
+    def resource(self):
+        return large_image_icon

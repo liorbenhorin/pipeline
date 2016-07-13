@@ -30,8 +30,14 @@ set_icons()
 class customListView(QtGui.QListView):
     def __init__(self,parent = None,proxyModel = None):
         super(customListView, self).__init__(parent)
-        
-        self.setViewMode(QtGui.QListView.IconMode)
+        self.setAlternatingRowColors(True)
+        #self.setViewMode(QtGui.QListView.IconMode)
+        self.setWordWrap(True)
+        self.setUniformItemSizes(True)
+        self.setSpacing(5)
+        self.setResizeMode(QtGui.QListView.Adjust)
+        #self.setWrapping(True)
+        self.setIconSize(QtCore.QSize(48,48))
         self._tree = None
         self._treeSortModel = None
         self._treeModel = None
@@ -44,10 +50,13 @@ class customListView(QtGui.QListView):
     def change(self, index):
 
         node = self.model().getNode(index)
-        print node.name
-        treeIndex = self._treeModel.indexFromNode(node,self._tree.rootIndex())
-        print self._treeModel.getNode(treeIndex).name
-        
+        #print node.name
+        if not node.typeInfo() == "ADD-COMPONENT":
+            treeIndex = self._treeModel.indexFromNode(node,self._tree.rootIndex())
+            print self._treeModel.getNode(treeIndex).name
+        else:
+            print "add comp"
+                
     def update(self, index, col):
         
         mdl =  self._tree.model().sourceModel()
@@ -55,20 +64,23 @@ class customListView(QtGui.QListView):
  
         
         list = []
-        
+
         for row in range(mdl.rowCount(src)):
 
             item_index = mdl.index(row,0,src)
             node = mdl.getNode(item_index)
             
-            #if node.typeInfo() == "COMPONENT" or node.typeInfo() == "ASSET": 
-            list.append(node)
+            if node.typeInfo() == "COMPONENT":# or node.typeInfo() == "ASSET": 
+                list.append(node)
             
-        if len(list) > 0:
-            listModel = componentsModel(list)            
-            self.setModel(listModel)
-            
-            return True
+        
+        
+        list.append(dt.AddComponent("new"))    
+        #if len(list) > 0:
+        listModel = componentsModel(list)            
+        self.setModel(listModel)
+        
+        return True
             
         self.setModel(None)
         return None
@@ -756,11 +768,11 @@ class componentsModel(QtCore.QAbstractListModel):
 
 
     def headerData(self, section, orientation, role):
-        
+
         if role == QtCore.Qt.DisplayRole:
             
             if orientation == QtCore.Qt.Horizontal:
-                return QtCore.QString("Palette")
+                return QtCore.QString("Components")
             else:
                 return QtCore.QString("Color %1").arg(section)
 
@@ -779,7 +791,7 @@ class componentsModel(QtCore.QAbstractListModel):
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
                 resource = self.__components[index.row()].resource()
-                return QtGui.QIcon(QtGui.QPixmap(resource))
+                return QtGui.QIcon(QtGui.QPixmap(resource))#.scaled(200,200))
               
         if role == QtCore.Qt.DisplayRole:
             
