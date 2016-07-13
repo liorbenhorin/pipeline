@@ -244,10 +244,35 @@ class AddComponent(Node):
     
     def __init__(self, name, parent=None):
         super(AddComponent, self).__init__(name, parent)
-        self.name = "New..."
+        self.name = "New component..."
 
     def typeInfo(self):
         return "ADD-COMPONENT"
   
     def resource(self):
-        return large_image_icon
+        return cube_icon
+        
+class AddAsset(Node):
+    
+    def __init__(self, name, parent=None):
+        super(AddAsset, self).__init__(name, parent)
+        self.name = "New asset..."
+
+    def typeInfo(self):
+        return "ADD-ASSET"
+  
+    def resource(self):
+        return cube_icon_full 
+        
+class AddFolder(Node):
+    
+    def __init__(self, name, parent=None):
+        super(AddFolder, self).__init__(name, parent)
+        self.name = "New folder..."
+
+    def typeInfo(self):
+        return "ADD-FOLDER"
+  
+    def resource(self):
+        return folder_icon                
+        

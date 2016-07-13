@@ -91,11 +91,11 @@ class customListView(QtGui.QTableView):#QListView):
 
         node = self.model().getNode(index)
         #print node.name
-        if not node.typeInfo() == "ADD-COMPONENT":
+        if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
             treeIndex = self._treeModel.indexFromNode(node,self._tree.rootIndex())
             print self._treeModel.getNode(treeIndex).name
         else:
-            print "add comp"
+            print "add..."
                 
     def update(self, index, col):
         
@@ -115,7 +115,9 @@ class customListView(QtGui.QTableView):#QListView):
             
         
         
-        list.append(dt.AddComponent("new"))    
+        list.append(dt.AddComponent("new"))  
+        list.append(dt.AddAsset("new")) 
+        list.append(dt.AddFolder("new"))   
         #if len(list) > 0:
         listModel = componentsModel(list)            
         self.setModel(listModel)
@@ -168,8 +170,8 @@ class customTreeView(QtGui.QTreeView):
         self.setAlternatingRowColors(True)
         self._state = None
         self._ignoreExpentions = False
+        self._selModel = None
         
-
         
         self.setStyleSheet('''  
                            
@@ -215,7 +217,7 @@ class customTreeView(QtGui.QTreeView):
             self.setExpanded(x,False)
         
         self.saveState()
-    
+        self.setCurrentIndex(self.model().index(0,0,self.rootIndex()))
     
     def saveState(self):
         if self._ignoreExpentions == True:
@@ -817,7 +819,7 @@ class componentsModel(QtCore.QAbstractTableModel):
             
             if orientation == QtCore.Qt.Horizontal:
                 if section == 0:
-                    return "Components"
+                    return "Items"
                 if section == 1:
                     return "Info"
             else:
