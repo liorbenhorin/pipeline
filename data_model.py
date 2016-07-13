@@ -27,17 +27,27 @@ def set_icons():
 set_icons()
 
 
-class customListView(QtGui.QListView):
+class customListView(QtGui.QTableView):#QListView):
     def __init__(self,parent = None,proxyModel = None):
         super(customListView, self).__init__(parent)
         self.setAlternatingRowColors(True)
-        #self.setViewMode(QtGui.QListView.IconMode)
+        #<<<<self.setViewMode(QtGui.QListView.IconMode)
         self.setWordWrap(True)
-        self.setUniformItemSizes(True)
-        self.setSpacing(5)
-        self.setResizeMode(QtGui.QListView.Adjust)
-        #self.setWrapping(True)
-        self.setIconSize(QtCore.QSize(48,48))
+        self.setShowGrid(False)
+        #self.setUniformItemSizes(True)
+        #self.setSpacing(5)
+        #self.setResizeMode(QtGui.QListView.Adjust)
+        #<<<<<<self.setWrapping(True)
+        self.setIconSize(QtCore.QSize(60,60))
+        #self.setRowHeight(40)
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+        self.verticalHeader().setDefaultSectionSize(60)
+        
+        
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.verticalHeader().hide()
+        
+        
         self._tree = None
         self._treeSortModel = None
         self._treeModel = None
@@ -772,9 +782,9 @@ class componentsModel(QtCore.QAbstractListModel):
         if role == QtCore.Qt.DisplayRole:
             
             if orientation == QtCore.Qt.Horizontal:
-                return QtCore.QString("Components")
+                return "Components"
             else:
-                return QtCore.QString("Color %1").arg(section)
+                return 
 
 
     def rowCount(self, parent):
