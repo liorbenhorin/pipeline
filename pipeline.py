@@ -2734,7 +2734,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.listSlider.setMinimum(32)
         self.listSlider.setMaximum(96)
         self.listSlider.setValue(32)
-        self.listSlider.sliderMoved.connect(self.list.icons_size) 
+        self.listSlider.valueChanged.connect(self.list.icons_size) 
+        #self.listSlider.sliderPressed.connect(self.list.icons_size) 
         #self.listSlider.setValue(20)
         slideLayout.addWidget(self.listSlider)
         

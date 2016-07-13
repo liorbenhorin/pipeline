@@ -22,9 +22,23 @@ def set_icons():
     branch_open = os.path.join(localIconPath,"branch-open.svg")
     branch_end = os.path.join(localIconPath,"branch-end.svg")
     vline = os.path.join(localIconPath,"vline.svg")
+
+    global folder_icon
+    global cube_icon
+    global cube_icon_full
+    global add_icon
+    global large_image_icon
+    folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
+    cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
+    cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
+    add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
+    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
                     
     
 set_icons()
+
+
+
 
 
 class customListView(QtGui.QTableView):#QListView):
@@ -106,7 +120,7 @@ class customListView(QtGui.QTableView):#QListView):
         listModel = componentsModel(list)            
         self.setModel(listModel)
         
-        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.ResizeToContents)
+        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
 
         self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
         
@@ -573,7 +587,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
             return node.id
         
         if role == SceneGraphModel.expendedRole:
-            print "R"
+
             return self.isExpended(index)
                
         #if role == QtCore.Qt.FontRole:
@@ -809,12 +823,22 @@ class componentsModel(QtCore.QAbstractTableModel):
             else:
                 return 
 
+        if role == QtCore.Qt.DecorationRole:
+
+            if orientation == QtCore.Qt.Horizontal:
+                if section == 0:
+                    return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+                if section == 1:
+                    return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+            else:
+                return 
+
 
     def rowCount(self, parent):
         return len(self.__components)
 
     def columnCount(self, parent):
-        return 2
+        return 1
         
     def data(self, index, role):
         
