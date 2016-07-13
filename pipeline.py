@@ -2676,6 +2676,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.list.treeView(self.tree)
         QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.change)
         
+        
+
          #QtGui.QListView()
         #self._listProxyModel = dtm.list_filterSortModel()
         #self._listProxyModel.setSourceModel(flat)
@@ -2689,13 +2691,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
 
         #self.list.setModel(self._listProxyModel)
+ 
+        self.navWidget = QtGui.QWidget()        
+        h_layout = QtGui.QVBoxLayout()   
+        h_layout.setContentsMargins(0, 0, 0, 0)      
+        self.navWidget.setLayout(h_layout) 
+ 
                
         self.splitter1 = QtGui.QSplitter()
         self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
         self.splitter1.setHandleWidth(10)
         self.splitter1.setChildrenCollapsible(False)
+        
+        h_layout.addWidget(self.splitter1)
                        
-        self.ui.verticalLayout_18.addWidget(self.splitter1) 
+        self.ui.verticalLayout_18.addWidget(self.navWidget) 
 
         self.splitter1.addWidget(self.tree)
         self.splitter1.addWidget(self.list)
@@ -2709,6 +2719,32 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         self.selModel = self.tree.selectionModel()
         self.selModel.currentChanged.connect( self.list.update ) 
+        
+        slideWidget = QtGui.QWidget() 
+        slideLayout = QtGui.QHBoxLayout()
+        slideLayout.setContentsMargins(0, 0, 0, 0)        
+        slideWidget.setLayout(slideLayout)
+        slideLayout.setAlignment(QtCore.Qt.AlignRight)
+                
+
+        self.listSlider = QtGui.QSlider()
+        self.listSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.listSlider.setMaximumWidth(100)
+        self.listSlider.setMinimumWidth(100)
+        self.listSlider.setMinimum(32)
+        self.listSlider.setMaximum(96)
+        self.listSlider.setValue(32)
+        self.listSlider.sliderMoved.connect(self.list.icons_size) 
+        #self.listSlider.setValue(20)
+        slideLayout.addWidget(self.listSlider)
+        
+        
+        
+          
+        
+        h_layout.addWidget(slideWidget)
+        
+
         
         #self.listselModel = self.list.selectionModel()
         #self.listselModel.currentChanged.connect( self.list.change ) 

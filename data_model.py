@@ -38,19 +38,35 @@ class customListView(QtGui.QTableView):#QListView):
         #self.setSpacing(5)
         #self.setResizeMode(QtGui.QListView.Adjust)
         #<<<<<<self.setWrapping(True)
-        self.setIconSize(QtCore.QSize(60,60))
-        #self.setRowHeight(40)
+
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
-        self.verticalHeader().setDefaultSectionSize(60)
         
+        self.icons_size(32)
         
-        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.setMinimumWidth(250)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.setSortingEnabled(True)
+        self.horizontalHeader().setOffset(10)
+
+            
+          
         self.verticalHeader().hide()
         
         
         self._tree = None
         self._treeSortModel = None
         self._treeModel = None
+        
+        
+
+
+            
+
+    def icons_size(self, int):
+
+        self.setIconSize(QtCore.QSize(int ,int)  )       
+        self.verticalHeader().setDefaultSectionSize(int )
+
                
     def treeView(self, view):
         self._tree = view
@@ -89,6 +105,10 @@ class customListView(QtGui.QTableView):#QListView):
         #if len(list) > 0:
         listModel = componentsModel(list)            
         self.setModel(listModel)
+        
+        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.ResizeToContents)
+
+        self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
         
         return True
             
@@ -769,10 +789,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
 
 
-class componentsModel(QtCore.QAbstractListModel):
+class componentsModel(QtCore.QAbstractTableModel):
     
     def __init__(self, components = [], parent = None):
-        QtCore.QAbstractListModel.__init__(self, parent)
+        QtCore.QAbstractTableModel.__init__(self, parent)
         self.__components = components
 
 
@@ -782,7 +802,10 @@ class componentsModel(QtCore.QAbstractListModel):
         if role == QtCore.Qt.DisplayRole:
             
             if orientation == QtCore.Qt.Horizontal:
-                return "Components"
+                if section == 0:
+                    return "Components"
+                if section == 1:
+                    return "Info"
             else:
                 return 
 
@@ -790,7 +813,9 @@ class componentsModel(QtCore.QAbstractListModel):
     def rowCount(self, parent):
         return len(self.__components)
 
-
+    def columnCount(self, parent):
+        return 2
+        
     def data(self, index, role):
         
         
@@ -806,8 +831,10 @@ class componentsModel(QtCore.QAbstractListModel):
         if role == QtCore.Qt.DisplayRole:
             
             row = index.row()
-            return self.__components[row].name
-
+            if index.column() == 0:
+                return self.__components[row].name
+            if index.column() == 1:
+                return "test test test test test test"
 
     def flags(self, index):
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
