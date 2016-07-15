@@ -2655,6 +2655,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
         
+        
+        self.list = dtm.customListView()
+        
         self.tree = dtm.customTreeView(proxyModel = self._proxyModel)
         self.tree.setModel( self._proxyModel )
         self.tree.setSortingEnabled(True)
@@ -2672,7 +2675,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         
                
-        self.list = dtm.customListView()
+        
         self.list.treeView(self.tree)
         QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.change)
         
@@ -2714,12 +2717,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)
         
+        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.change)
+        
         
 
         
         self.selModel = self.tree.selectionModel()
+        self.selModel.currentChanged.connect( self.tree.saveSelection ) 
         self.selModel.currentChanged.connect( self.list.update ) 
-        self.tree._selModel = self.selModel
+        
+        
+        self.tree.selectRoot()
+        #self.tree._selModel = self.selModel
         
         slideWidget = QtGui.QWidget() 
         slideLayout = QtGui.QHBoxLayout()
