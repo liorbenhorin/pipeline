@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 20.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#F9F9F9;}
+	.st0{display:none;fill:#F9F9F9;}
+	.st1{fill:#504F4F;}
+	.st2{fill:#BDBDBD;}
+	.st3{fill:#716F6F;}
 </style>
-<path class="st0" d="M21,16.5c0,0.4-0.2,0.7-0.5,0.9l-7.9,4.4C12.4,21.9,12.2,22,12,22s-0.4-0.1-0.6-0.2l-7.9-4.4
-	C3.2,17.2,3,16.9,3,16.5v-9c0-0.4,0.2-0.7,0.5-0.9l7.9-4.4C11.6,2.1,11.8,2,12,2s0.4,0.1,0.6,0.2l7.9,4.4C20.8,6.8,21,7.1,21,7.5
-	V16.5 M12,4.2L6,7.5l6,3.4l6-3.4L12,4.2z"/>
+<g id="Layer_1">
+	<path class="st0" d="M21,16.5c0,0.4-0.2,0.7-0.5,0.9l-7.9,4.4C12.4,21.9,12.2,22,12,22s-0.4-0.1-0.6-0.2l-7.9-4.4
+		C3.2,17.2,3,16.9,3,16.5v-9c0-0.4,0.2-0.7,0.5-0.9l7.9-4.4C11.6,2.1,11.8,2,12,2s0.4,0.1,0.6,0.2l7.9,4.4C20.8,6.8,21,7.1,21,7.5
+		V16.5 M12,4.2L6,7.5l6,3.4l6-3.4L12,4.2z"/>
+</g>
+<g id="Layer_2">
+	<path class="st1" d="M21.2,16.6c0,0.4-0.2,0.7-0.5,0.9l-8.1,4.5c-0.2,0.1-0.4,0.2-0.6,0.2s-0.4-0.1-0.6-0.2l-8.1-4.5
+		C3,17.3,2.8,17,2.8,16.6V7.4C2.8,7,3,6.7,3.3,6.5l8.1-4.5c0.2-0.1,0.4-0.2,0.6-0.2s0.4,0.1,0.6,0.2l8.1,4.5C21,6.7,21.2,7,21.2,7.4
+		V16.6"/>
+	<polygon class="st2" points="18.9,6.5 12.3,2.9 12,2.7 11.7,2.9 5.1,6.5 4.2,7 5.1,7.5 11.7,11.3 12,11.4 12.3,11.3 18.9,7.5 
+		19.8,7 	"/>
+	<polygon class="st3" points="11.2,12.2 4.5,8.4 3.7,7.9 3.7,8.9 3.7,16.3 3.7,16.6 4,16.8 10.6,20.6 11.4,21 11.4,20.1 11.4,12.7 
+		11.4,12.3 	"/>
+	<polygon class="st2" points="19.5,8.4 12.8,12.2 12.6,12.3 12.6,12.7 12.6,20.1 12.6,21 13.4,20.6 20,16.8 20.3,16.6 20.3,16.3 
+		20.3,8.9 20.3,7.9 	"/>
+	
+		<image style="overflow:visible;" width="223" height="89" xlink:href="../../../../../../Dropbox/Screenshots/Screenshot 2016-07-16 20.54.01.png"  transform="matrix(1 0 0 1 -113.0833 27.375)">
+	</image>
+</g>
 </svg>
