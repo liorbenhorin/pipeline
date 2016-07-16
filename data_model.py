@@ -97,8 +97,8 @@ class customListView(QtGui.QTableView):#QListView):
         else:
             print "add..."
                 
-    def update(self, index, col):
-        
+    def update(self, idx):#, col):
+        index = idx.indexes()[0]
         if index.model():
         
             mdl =  self._tree.model().sourceModel()
@@ -122,8 +122,8 @@ class customListView(QtGui.QTableView):#QListView):
                 item_index = mdl.index(row,0,src)
                 node = mdl.getNode(item_index)
                 
-                if node.typeInfo() == "COMPONENT":# or node.typeInfo() == "ASSET": 
-                    list.append(node)
+                #if node.typeInfo() == "COMPONENT":# or node.typeInfo() == "ASSET": 
+                list.append(node)
                 
             
             
@@ -185,7 +185,8 @@ class customTreeView(QtGui.QTreeView):
         self._ignoreExpentions = False
         self._selModel = None
         self._last_selection = None
-        
+        self._tableView = None
+         
         self.setStyleSheet('''  
                            
                            QTreeView::item:focus {
@@ -220,8 +221,10 @@ class customTreeView(QtGui.QTreeView):
 
 
     def setModel(self,model):
+
         super(customTreeView,self).setModel(model)
-        
+        self._model = self.model()
+        self._sModel = self._model.sourceModel()        
         self.expandAll()
         i =  self.model().index(0,0,self.rootIndex())
         
@@ -237,12 +240,11 @@ class customTreeView(QtGui.QTreeView):
         self.setCurrentIndex(self.model().index(0,0,self.rootIndex()))
 
     def saveSelection(self):
-        self._last_selection = self.selectedIndexes()[0]
-
+        self._last_selection = self._model.mapToSource(self.selectedIndexes()[0])
         #self._xx = self.model().sourceModel().staticIndex(self._last_selection[0])
         #print self._xx, "----xx----"
         print self._last_selection, "<--- saved"        
-        
+        print self._sModel.getNode(self._model.mapToSource(self.selectedIndexes()[0])).name, "<--- node name"
         #self._last_selection_static = self._xx
         
     def saveState(self):
@@ -364,6 +366,8 @@ class customTreeView(QtGui.QTreeView):
 
 
     def delete(self, model, index,node):
+        self._tableView.update(QtCore.QModelIndex(),QtCore.QModelIndex())
+        
         node.delete()
         parentIndex = model.parent(index)
         if node._children != []:

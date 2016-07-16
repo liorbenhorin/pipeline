@@ -12,11 +12,14 @@ def set_icons():
         return 
     global folder_icon
     global cube_icon
+    global add_cube_icon
+    
     global cube_icon_full
     global add_icon
     global large_image_icon
     folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
-    cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
+    cube_icon = os.path.join(localIconPath, "%s.svg"%"cube") 
+    add_cube_icon = os.path.join(localIconPath, "%s.svg"%"add_cube")     
     cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
