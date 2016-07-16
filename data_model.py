@@ -468,13 +468,13 @@ class customTreeView(QtGui.QTreeView):
         node = dt.Node("folder")
         #self._proxyModel.invalidate()
         
-        self._sModel.insertRows( parent.childCount()-1, 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        self._sModel.insertRows( parent.childCount(), 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
         
 
     def create_new_asset(self, parent):
         node = dt.AssetNode("asset","")
         #self._proxyModel.invalidate()
-        self._sModel.insertRows( parent.childCount()-1, 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        self._sModel.insertRows( parent.childCount(), 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
     #def create_new_component(self, parent):
     #    node = dt.ComponentNode("component","",parent)
     #    self._proxyModel.invalidate()
