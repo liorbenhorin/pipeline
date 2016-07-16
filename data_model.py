@@ -508,7 +508,15 @@ class pipelineTreeView(QtGui.QTreeView):
         #self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
     
     def select(self, index):
+        '''
+        selects a tree branch and expand the parant branch to see the selected branch    
+        '''
+        modelIndex = self.sourceModel.parent(self.asModelIndex(index))
+        proxyIndex = self.fromProxyIndex(modelIndex)
+        self.setExpanded(proxyIndex, True)
+
         self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
+        
         
     def dropEvent(self, event):
         super(pipelineTreeView,self).dropEvent(event)
