@@ -98,45 +98,48 @@ class customListView(QtGui.QTableView):#QListView):
             print "add..."
                 
     def update(self, idx):#, col):
-        index = idx.indexes()[0]
-        if index.model():
-        
-            mdl =  self._tree.model().sourceModel()
-            src = index.model().mapToSource(index)                          
-            node = mdl.getNode(src)
+        if len(idx.indexes()):
+            index = idx.indexes()[0]
+            if index.model():
             
-            list = []
-            list.append(dt.AddComponent("new"))  
-            
-            if node.typeInfo() == "NODE":
+                mdl =  self._tree.model().sourceModel()
+                print self._tree.model()
+                print mdl
+                src = index.model().mapToSource(index)                          
+                node = mdl.getNode(src)
                 
-                list.append(dt.AddAsset("new")) 
-                list.append(dt.AddFolder("new")) 
-            
-            #elif node.typeInfo() == "ASSET":             
-            
-            
-
-            for row in range(mdl.rowCount(src)):
-
-                item_index = mdl.index(row,0,src)
-                node = mdl.getNode(item_index)
+                list = []
+                list.append(dt.AddComponent("new"))  
                 
-                #if node.typeInfo() == "COMPONENT":# or node.typeInfo() == "ASSET": 
-                list.append(node)
+                if node.typeInfo() == "NODE":
+                    
+                    list.append(dt.AddAsset("new")) 
+                    list.append(dt.AddFolder("new")) 
                 
-            
-            
-     
-            #if len(list) > 0:
-            listModel = componentsModel(list)            
-            self.setModel(listModel)
-            
-            self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+                #elif node.typeInfo() == "ASSET":             
+                
+                
 
-            self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
-            
-            return True
+                for row in range(mdl.rowCount(src)):
+
+                    item_index = mdl.index(row,0,src)
+                    node = mdl.getNode(item_index)
+                    
+                    #if node.typeInfo() == "COMPONENT":# or node.typeInfo() == "ASSET": 
+                    list.append(node)
+                    
+                
+                
+         
+                #if len(list) > 0:
+                listModel = componentsModel(list)            
+                self.setModel(listModel)
+                
+                self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+
+                self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
+                
+                return True
                 
         else:
             
@@ -239,13 +242,20 @@ class customTreeView(QtGui.QTreeView):
     def selectRoot(self):
         self.setCurrentIndex(self.model().index(0,0,self.rootIndex()))
 
-    def saveSelection(self):
-        self._last_selection = self._model.mapToSource(self.selectedIndexes()[0])
+    def saveSelection(self):#, idx):
+        #print self._ignoreExpentions, "<--- expentions mode"
+        #if not self._ignoreExpentions:
+        #if len(idx.indexes()) > 0 :
+        #self._last_selection = idx.indexes()[0]
+        if len(self.selectedIndexes()):
+            self._last_selection = self._model.mapToSource(self.selectedIndexes()[0])
         #self._xx = self.model().sourceModel().staticIndex(self._last_selection[0])
         #print self._xx, "----xx----"
-        print self._last_selection, "<--- saved"        
-        print self._sModel.getNode(self._model.mapToSource(self.selectedIndexes()[0])).name, "<--- node name"
-        #self._last_selection_static = self._xx
+            print self._last_selection, "<--- saved"        
+            print self._sModel.getNode(self._last_selection).name, "<--- node name"
+                #self._last_selection_static = self._xx
+        else:
+            print "not saving"
         
     def saveState(self):
         if self._ignoreExpentions == True:
@@ -295,12 +305,11 @@ class customTreeView(QtGui.QTreeView):
         mdl = self.model()
         rec(mdl,self.rootIndex())
                 
-        try:
-            print self._last_selection  , "<--- resotrin"
-            self.setCurrentIndex(self._last_selection)
-        except:
-            print "unable to restore..."
-            pass
+        
+        print self._selModel, " <--> ", self._last_selection  , "<--- resotrin"
+        idx = self._model.mapFromSource(self._last_selection)
+        self._selModel.select(idx, QtGui.QItemSelectionModel.ClearAndSelect)
+
         
     def dropEvent(self, event):
         super(customTreeView,self).dropEvent(event)
@@ -436,7 +445,9 @@ class filterSortModel(QtGui.QSortFilterProxyModel):
              
         super(filterSortModel, self).setFilterRegExp(exp)
         if self.treeView:
-            if len(exp)>0:        
+            if len(exp)>0:  
+                #self.treeView._ignoreSelections = True
+                      
                 self.treeView._ignoreExpentions = True
                 self.treeView.expandAll()
                 self.treeView._ignoreExpentions = False

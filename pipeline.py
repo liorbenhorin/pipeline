@@ -2725,12 +2725,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         
         self.selModel = self.tree.selectionModel()
-        self.selModel.selectionChanged.connect( self.tree.saveSelection ) 
+        self.tree.clicked.connect( self.tree.saveSelection ) 
         self.selModel.selectionChanged.connect( self.list.update ) 
         
         
         self.tree.selectRoot()
-        #self.tree._selModel = self.selModel
+        self.tree._selModel = self.selModel
         
         slideWidget = QtGui.QWidget() 
         slideLayout = QtGui.QHBoxLayout()
