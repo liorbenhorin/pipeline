@@ -2674,7 +2674,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.list.treeView = self.tree      
         
         self.tree.setModel( self._proxyModel )
-     
+        self.list.init_treeView()
+        
         self._proxyModel.treeView = self.tree
  
         #flat = dtm.FlatProxyModel()
@@ -2684,7 +2685,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
                
         
-        self.list.treeView(self.tree)
+        #self.list.treeView(self.tree)
         QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.click)
         
         
@@ -2725,7 +2726,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
         QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)
         
-        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.change)
+        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.click)
         
         
 

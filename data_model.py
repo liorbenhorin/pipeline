@@ -75,11 +75,13 @@ class PipelineContentsView(QtGui.QTableView):
     @treeView.setter
     def treeView(self, view):
         self._treeView = view
-        self.init_treeView() 
 
     @property
     def treeProxyModel(self):
-        return self._treeProxyModel
+        if self._treeProxyModel:
+            return self._treeProxyModel
+        
+        return None
     
     @treeProxyModel.setter
     def treeProxyModel(self, model):
@@ -87,14 +89,16 @@ class PipelineContentsView(QtGui.QTableView):
 
     @property
     def treeSourceModel(self):
-        return self._treeSourceModel
+        if self._treeSourceModel:
+            return self._treeSourceModel
+            
+        return None
     
     @treeSourceModel.setter
     def treeSourceModel(self, model):
         self._treeSourceModel = model   
 
     def init_treeView(self):
-
         self.treeProxyModel = self.treeView.model()
         self.treeSourceModel = self.treeProxyModel.sourceModel()        
 
@@ -109,6 +113,9 @@ class PipelineContentsView(QtGui.QTableView):
     def getNode(self, index):
         return self.model().getNode(index)
 
+    def asTreeModelIndex(self, index):
+        return self.treeView.asModelIndex(index)  
+
     def click(self, index):
 
         node = self.getNode(index)
@@ -122,11 +129,7 @@ class PipelineContentsView(QtGui.QTableView):
     
     index: QItemSelection
     '''
-    
-
-    def asTreeModelIndex(self, index):
-        return self.treeView.asModelIndex(index)  
-              
+      
     def update(self, selection):
         #if the selection is not empty
         if len(selection.indexes())>0:
@@ -138,75 +141,62 @@ class PipelineContentsView(QtGui.QTableView):
                 the index is from the tree's proxymodel
                 we need to convert it to the source index
                 '''
-
+                
+                treeModel = self.treeSourceModel
                 src = self.asTreeModelIndex(index) 
                 node =  self.treeView.asModelNode(src)
-                                       
-                node = mdl.getNode(src)
-                
-                list = []
 
-                
-                self._treeParent = node
+                contenetsList = []
+    
                 self._treeParentIndex = src
-                
-                for row in range(mdl.rowCount(src)):
+                self._treeParent = node
+                                
+                for row in range(treeModel.rowCount(src)):
 
-                    item_index = mdl.index(row,0,src)
-                    n = mdl.getNode(item_index)
+                    item_index = treeModel.index(row,0,src)
+                    treeNode = treeModel.getNode(item_index) 
+                    contenetsList.append(treeNode)
                     
-                    #if node.typeInfo() == "COMPONENT":# or node.typeInfo() == "ASSET": 
-                    list.append(n)
-                    
-                
+                # ----> this is the section to append 'add' buttons to the list
+                #
                 #list.append(dt.AddComponent("new"))  
-
-                #if node.typeInfo() == "NODE":
-                    
+                #if node.typeInfo() == "NODE":                   
                 #    list.append(dt.AddAsset("new")) 
                 #    list.append(dt.AddFolder("new"))                 
          
-                if len(list) > 0:
-                    listModel = PipelineContentsModel(list)            
-                    self.setModel(listModel)
+                if len(contenetsList) > 0:         
+                    self.setModel(PipelineContentsModel(contenetsList))
                 
+                    # resize the table headers to the new content
                     self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
-
                     self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
                 
                     return True
-                    
-                    
-                
-        
-            
-        self.clearModel()
-        
+                         
+        # in case the selection is empty, or the index was invalid, clear the table            
+        self.clearModel()        
         return False
     
     def clearModel(self):
         self.setModel(None)
 
     def contextMenuEvent(self, event):
-
-        
+     
         handled = True
-        index = self.indexAt(event.pos())
-        menu = QtGui.QMenu()        
         node = None
-        
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()            
         actions = []
         
         if index.isValid():
             
-            loacl_node = self.model().getNode(index)                
+            tableModelNode = self.model().getNode(index)                
             src = self.asTreeIndex(index)                 
-            node =  self._treeModel.getNode(src)
-      
-              
+            node =  self.treeSourceModel.getNode(src)
+                   
         if node:
-            
-            if loacl_node.typeInfo()[0:3] != "ADD":
+
+            if tableModelNode.typeInfo()[0:3] != "ADD":
                 
                 if node.typeInfo() == "NODE": 
                     actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
@@ -220,35 +210,32 @@ class PipelineContentsView(QtGui.QTableView):
                     actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
                 
             else:
+                pass
+                '''
+                ---> this is for if we use the table buttons to add nodes to the tree...
             
-                if loacl_node.typeInfo() == "ADD-COMPONENT":
+                
+                if tableModelNode.typeInfo() == "ADD-COMPONENT":
                     actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParent) ))
-                elif loacl_node.typeInfo() == "ADD-ASSET":
+                elif tableModelNode.typeInfo() == "ADD-ASSET":
                     actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))  
-                elif loacl_node.typeInfo() == "ADD-FOLDER":
+                elif tableModelNode.typeInfo() == "ADD-FOLDER":
                     actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self._treeParent) ))     
-                   
-                
-
+                '''
+                    
         else:
-            
-
-                
+                       
             actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParent) ))
             
             if self._treeParent.typeInfo() == "NODE":
             
                 actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder, self._treeParent) ))
                 actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))
-                
-        
-       
+   
         menu.addActions(actions)      
-
-
-        
+       
         if handled:
-
+            
             menu.exec_(event.globalPos())
             event.accept() #TELL QT IVE HANDLED THIS THING
             
@@ -259,36 +246,37 @@ class PipelineContentsView(QtGui.QTableView):
 
     def delete(self,  index,node):
         self.clearModel()
-        self._tree.delete(index,node)        
-        self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree.userSelection)
+        self.treeView.delete(index,node)        
+        self.treeView.restoreSelection()
+        
+        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))
 
     def create_new_folder(self, parent):
         
         self.clearModel()             
-        self._tree.create_new_folder(parent)        
-       
-        self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree.userSelection)
+        self.treeView.create_new_folder(parent)               
+        self.treeView.restoreSelection()
+        
+        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))
 
     def create_new_asset(self, parent):
         
         self.clearModel()             
-        self._tree.create_new_asset(parent)        
-       
-        self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree.userSelection)
+        self.treeView.create_new_asset(parent)              
+        self.treeView.restoreSelection()
+        
+        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))
         
     def create_new_component(self, parent):
         
         self.clearModel()             
-        self._tree.create_new_component(parent)        
-       
-        self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree.userSelection)
+        self.treeView.create_new_component(parent)              
+        self.treeView.restoreSelection()
+        
+        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))        
 
 
