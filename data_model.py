@@ -103,18 +103,11 @@ class customListView(QtGui.QTableView):#QListView):
             if index.model():
             
                 mdl =  self._tree.model().sourceModel()
-                print self._tree.model()
-                print mdl
                 src = index.model().mapToSource(index)                          
                 node = mdl.getNode(src)
                 
                 list = []
-                list.append(dt.AddComponent("new"))  
-                
-                if node.typeInfo() == "NODE":
-                    
-                    list.append(dt.AddAsset("new")) 
-                    list.append(dt.AddFolder("new")) 
+
                 
                 #elif node.typeInfo() == "ASSET":             
                 
@@ -129,7 +122,12 @@ class customListView(QtGui.QTableView):#QListView):
                     list.append(node)
                     
                 
+                list.append(dt.AddComponent("new"))  
                 
+                if node.typeInfo() == "NODE":
+                    
+                    list.append(dt.AddAsset("new")) 
+                    list.append(dt.AddFolder("new"))                 
          
                 #if len(list) > 0:
                 listModel = componentsModel(list)            
@@ -241,6 +239,7 @@ class customTreeView(QtGui.QTreeView):
 
     def selectRoot(self):
         self.setCurrentIndex(self.model().index(0,0,self.rootIndex()))
+        self.saveSelection()
 
     def saveSelection(self):#, idx):
         #print self._ignoreExpentions, "<--- expentions mode"
@@ -375,7 +374,7 @@ class customTreeView(QtGui.QTreeView):
 
 
     def delete(self, model, index,node):
-        self._tableView.update(QtCore.QModelIndex(),QtCore.QModelIndex())
+        self._tableView.update(QtGui.QItemSelection())
         
         node.delete()
         parentIndex = model.parent(index)
@@ -875,7 +874,7 @@ class componentsModel(QtCore.QAbstractTableModel):
             
             if orientation == QtCore.Qt.Horizontal:
                 if section == 0:
-                    return "Items"
+                    return "Contents"
                 if section == 1:
                     return "Info"
             else:
