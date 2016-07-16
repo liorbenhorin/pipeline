@@ -135,7 +135,7 @@ class customListView(QtGui.QTableView):#QListView):
                     
                 
                 list.append(dt.AddComponent("new"))  
-                print node.typeInfo()
+
                 if node.typeInfo() == "NODE":
                     
                     list.append(dt.AddAsset("new")) 
@@ -162,42 +162,60 @@ class customListView(QtGui.QTableView):#QListView):
 
     def contextMenuEvent(self, event):
 
-        #self._treeParent = node
-        #self._treeParentIndex = src
         
         handled = True
         index = self.indexAt(event.pos())
         menu = QtGui.QMenu()        
         node = None
-
+        
+        actions = []
+        
         if index.isValid():
+            
+            loacl_node = self.model().getNode(index)                
             src = self.treeIndex(index)                 
             node =  self._treeModel.getNode(src)
-  
-        actions = []  
+      
+              
         if node:
+            
+            if loacl_node.typeInfo()[0:3] != "ADD":
+                
+                if node.typeInfo() == "NODE": 
+                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
 
-            if node.typeInfo() == "NODE": 
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
-                #actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,node) ))
-                #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
-                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
+                    
+                if node.typeInfo() == "ASSET":
+                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+
+                    
+                if node.typeInfo() == "COMPONENT":
+                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
                 
-            if node.typeInfo() == "ASSET":
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
-                #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
-                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
-                
-            if node.typeInfo() == "COMPONENT":
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+            else:
+            
+                if loacl_node.typeInfo() == "ADD-COMPONENT":
+                    actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParent) ))
+                elif loacl_node.typeInfo() == "ADD-ASSET":
+                    actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))  
+                elif loacl_node.typeInfo() == "ADD-FOLDER":
+                    actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self._treeParent) ))     
+                   
                 
 
         else:
             
-            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder, self._treeParent) ))
-            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))
+
+                
             actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParent) ))
+            
+            if self._treeParent.typeInfo() == "NODE":
+            
+                actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder, self._treeParent) ))
+                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))
+                
         
+       
         menu.addActions(actions)      
 
 
