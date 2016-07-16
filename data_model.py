@@ -134,28 +134,30 @@ class customListView(QtGui.QTableView):#QListView):
                     list.append(n)
                     
                 
-                list.append(dt.AddComponent("new"))  
+                #list.append(dt.AddComponent("new"))  
 
-                if node.typeInfo() == "NODE":
+                #if node.typeInfo() == "NODE":
                     
-                    list.append(dt.AddAsset("new")) 
-                    list.append(dt.AddFolder("new"))                 
+                #    list.append(dt.AddAsset("new")) 
+                #    list.append(dt.AddFolder("new"))                 
          
-                #if len(list) > 0:
-                listModel = componentsModel(list)            
-                self.setModel(listModel)
+                if len(list) > 0:
+                    listModel = componentsModel(list)            
+                    self.setModel(listModel)
                 
-                self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+                    self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
 
-                self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
+                    self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
                 
-                return True
+                    return True
+                    
+                    
                 
-        else:
+        
             
-            self.clearModel()
-            
-            return False
+        self.clearModel()
+        
+        return False
     
     def clearModel(self):
         self.setModel(None)
@@ -265,49 +267,24 @@ class customListView(QtGui.QTableView):#QListView):
         self.update(QtGui.QItemSelection(idx,idx))        
 
 
-'''            
-class ListTreeView(QtGui.QTreeView):
-    def __init__(self,parent = None,proxyModel = None):
-        super(ListTreeView, self).__init__(parent)
-        #self._proxyModel = proxyModel
-        #self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.setAlternatingRowColors(True)
-        #self.expandAll()
-        #self.setIndentation(0)
-        #self.header().hide() 
-
-    def update(self, treeView , index, col):
-        print "UPDATE"
-        mdl = treeView.model()
-        #src = index.model().mapToSource(index)
-        #self.setRootIndex(index)
-        #return
-
-        
-        src = index.model().mapToSource(index)                  
-        
-        
-        this_id = self.model().mapFromSource(src)       
-        self.setRootIndex(this_id)
-        self.model().invalidate()     
-        self.expandAll()
-        #print mdl.getNode(id).name , " ---> index"
-        
-        return'''
-        
+  
                     
-class customTreeView(QtGui.QTreeView):
-    def __init__(self,parent = None,proxyModel = None):
-        super(customTreeView, self).__init__(parent)
-        self._proxyModel = proxyModel
+class pipelineTreeView(QtGui.QTreeView):
+    def __init__(self,parent = None):
+        super(pipelineTreeView, self).__init__(parent)
+        # display options
         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.setAlternatingRowColors(True)
+        
+        #local variables
         self._state = None
         self._ignoreExpentions = False
         self._selModel = None
         self._last_selection = None
         self._tableView = None
-         
+        self._proxyModel = None
+        self._sourceModel = None
+        #stylesheet 
         self.setStyleSheet('''  
                            
                            QTreeView::item:focus {
@@ -340,12 +317,13 @@ class customTreeView(QtGui.QTreeView):
                            
                             ''')
 
+    
 
     def setModel(self,model):
 
-        super(customTreeView,self).setModel(model)
-        self._model = self.model()
-        self._sModel = self._model.sourceModel()        
+        super(pipelineTreeView,self).setModel(model)
+        self._proxyModel = self.model()
+        self._sourceModel = self._proxyModel.sourceModel()        
         self.expandAll()
         i =  self.model().index(0,0,self.rootIndex())
         
@@ -355,7 +333,7 @@ class customTreeView(QtGui.QTreeView):
         
         self.saveState()
         
-        
+    
 
     def selectRoot(self):
         self.setCurrentIndex(self.model().index(0,0,self.rootIndex()))
@@ -367,7 +345,7 @@ class customTreeView(QtGui.QTreeView):
         #if len(idx.indexes()) > 0 :
         #self._last_selection = idx.indexes()[0]
         if len(self.selectedIndexes()):
-            self._last_selection = self._model.mapToSource(self.selectedIndexes()[0])
+            self._last_selection = self._proxyModel.mapToSource(self.selectedIndexes()[0])
         #self._xx = self.model().sourceModel().staticIndex(self._last_selection[0])
         #print self._xx, "----xx----"
             #print self._last_selection, "<--- saved"        
@@ -435,7 +413,7 @@ class customTreeView(QtGui.QTreeView):
 
         
     def dropEvent(self, event):
-        super(customTreeView,self).dropEvent(event)
+        super(pipelineTreeView,self).dropEvent(event)
         #QTreeView.dropEvent(self, evt)
         if not event.isAccepted():
             # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
@@ -446,7 +424,7 @@ class customTreeView(QtGui.QTreeView):
             # drag rather than only on drop; but the check involves not-insignificant work.
             event.setDropAction(QtCore.Qt.IgnoreAction)
                 
-        self._proxyModel.invalidate()
+        #self._proxyModel.invalidate()
 
    
     def contextMenuEvent(self, event):
@@ -499,10 +477,10 @@ class customTreeView(QtGui.QTreeView):
 
     def delete(self,  index,node):
         self._tableView.update(QtGui.QItemSelection())
-        parentIndex = self._sModel.indexFromNode(node.parent(),self.rootIndex())
-        self._sModel.removeRows(node.row(),1,parentIndex)
+        parentIndex = self._sourceModel.indexFromNode(node.parent(),self.rootIndex())
+        self._sourceModel.removeRows(node.row(),1,parentIndex)
         return True
-        #model = self._sModel
+        #model = self._sourceModel
         #node.delete()
         parentIndex = model.parent(index)
         if node._children != []:
@@ -515,18 +493,18 @@ class customTreeView(QtGui.QTreeView):
         node = dt.Node("folder")
         #self._proxyModel.invalidate()
         
-        self._sModel.insertRows( parent.childCount(), 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        self._sourceModel.insertRows( parent.childCount(), 1, parent = self._sourceModel.indexFromNode(parent,self.rootIndex()) , node = node)
         
 
     def create_new_asset(self, parent):
         node = dt.AssetNode("asset","")
         #self._proxyModel.invalidate()
-        self._sModel.insertRows( parent.childCount(), 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        self._sourceModel.insertRows( parent.childCount(), 1, parent = self._sourceModel.indexFromNode(parent,self.rootIndex()) , node = node)
 
     def create_new_component(self, parent):
         node = dt.ComponentNode("component","")
         #self._proxyModel.invalidate()
-        self._sModel.insertRows( parent.childCount(), 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        self._sourceModel.insertRows( parent.childCount(), 1, parent = self._sourceModel.indexFromNode(parent,self.rootIndex()) , node = node)
 
 
     #def create_new_component(self, parent):

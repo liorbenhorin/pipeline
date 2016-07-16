@@ -70,11 +70,7 @@ import sys
 import inspect
 import functools
 
-import data as dt
-reload(dt)
 
-import data_model as dtm
-reload(dtm)
 
 import dialogue as dlg
 reload(dlg)
@@ -2620,9 +2616,26 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     
     def tree(self):
         
-        
         self.ui.searchIcon_label.setPixmap(search_icon)
         
+        '''
+        import modules
+        '''
+        import data as dt
+        reload(dt)
+
+        import data_model as dtm
+        reload(dtm)
+               
+    
+        
+        '''
+        MODELS
+        '''
+        
+        '''
+        generate some tree nodes for testing
+        '''
         _root = dt.Node("root")
         root = dt.Node("Diving",_root)
         char = dt.Node("Charachters", root)
@@ -2630,35 +2643,32 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         Animation = dt.Node("Animation", root)
         rig = dt.ComponentNode("Rig", "N/A" ,dog)
         model = dt.ComponentNode("Model", "N/A" ,dog)
-        #simple = dt.ComponentNode("Simple", "N/A" ,root)
         sorted = dt.ComponentNode("Sorted_component", "N/A" ,Animation)
         
         '''
-        asts = []
-        cmps = []
-        for i in range(30):
-            v = dt.AssetNode("asset_%s"%(str(i)),"N/A", root)
-            asts.append(v)
-            for x in range(5):
-                z = dt.ComponentNode("components_%s"%(str(x)),"N/A", v)
-                cmps.append(z)
+        creating the tree model,
+        it's the main tree model object, its global so it is deleted every restart of Pipeline
         '''
-        treeModel = dtm.SceneGraphModel(_root)
-        #self._model = dtm.SceneGraphModel(_root)
-        self._proxyModel = dtm.filterSortModel()
-       
+        treeModel = dtm.SceneGraphModel(_root) 
+
+        '''
+        _proxymodel is the sortFilterProxyModel object that is connected to the tree model
+        '''
+        self._proxyModel = dtm.filterSortModel()      
         self._proxyModel.setSourceModel(treeModel)
         self._proxyModel.setDynamicSortFilter(True)
         self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-
         self._proxyModel.setSortRole(0)
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
         
+        '''
+        VIEWS
         
-        self.list = dtm.customListView()
+        '''
+        self.list = dtm.customListView()        
+        self.tree = dtm.pipelineTreeView()#proxyModel = self._proxyModel)
         
-        self.tree = dtm.customTreeView(proxyModel = self._proxyModel)
         self.tree._tableView = self.list
         
         self.tree.setModel( self._proxyModel )
