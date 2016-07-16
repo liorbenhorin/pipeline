@@ -2636,7 +2636,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         generate some tree nodes for testing
         '''
-        _root = dt.Node("root")
+        _root = dt.RootNode("root")
         root = dt.Node("Diving",_root)
         char = dt.Node("Charachters", root)
         dog = dt.AssetNode("Dog","N/A", char)

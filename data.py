@@ -111,7 +111,7 @@ class Node(object):
         
         if self._children != []:
             child = self._children.pop(position)
-            child.delete()
+            #child.delete()
             child._parent = None
 
             return True
@@ -199,6 +199,18 @@ class Node(object):
     @property
     def id(self):
         return self._id
+
+
+class RootNode(Node):
+    
+    def __init__(self, name, parent=None):
+        super(RootNode, self).__init__(name, parent)
+        self.name = name
+    def typeInfo(self):
+        return "ROOT"
+  
+    def resource(self):
+        return folder_icon
 
 class AssetNode(Node):
     

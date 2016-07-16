@@ -492,16 +492,14 @@ class pipelineTreeView(QtGui.QTreeView):
         if index.isValid():
             src = self.asModelIndex(index)
             node = self.asModelNode(src)
-            #src = index.model().mapToSource(index)                  
-            #node =  self.sourceModel.getNode(src)
-            
+
         actions = []  
           
         if node:
 
             if node.typeInfo() == "NODE": 
-                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,node) ))
-                actions.append(QtGui.QAction("Create new Folder", menu, triggered = functools.partial(self.create_new_folder,node) ))
+                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset, src) ))
+                actions.append(QtGui.QAction("Create new Folder", menu, triggered = functools.partial(self.create_new_folder, src) ))
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
             elif node.typeInfo() == "ASSET":
@@ -510,8 +508,8 @@ class pipelineTreeView(QtGui.QTreeView):
                 
 
         else:
-            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self.sourceModel.rootNode) ))
-            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self.sourceModel.rootNode) ))
+            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,QtCore.QModelIndex()) ))
+            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,QtCore.QModelIndex()) ))
 
         menu.addActions(actions)      
 
@@ -525,40 +523,33 @@ class pipelineTreeView(QtGui.QTreeView):
                    
         return
 
-
+    '''
+    functions to add/remove tree nodes
+    this is we will want some user input...
+    
+    '''
     def delete(self,  index):
         # clear the table view              
         self.tableView.update(QtGui.QItemSelection())
         
         node = self.asModelNode(index)
         parentIndex = self.sourceModel.parent(index)
-        self.sourceModel.removeRows(node.row(),1,parentIndex)
+        self.sourceModel.removeRows(node.row(),1,parentIndex, kill=True)
         
         return True
-
-
     def create_new_folder(self, parent):
-
-        node = dt.Node("folder")
-        #self._proxyModel.invalidate()
+        node = dt.Node("folder")        
+        self.sourceModel.insertRows( 1, 1, parent = parent , node = node)
         
-        self._sourceModel.insertRows( parent.childCount(), 1, parent = self._sourceModel.indexFromNode(parent,self.rootIndex()) , node = node)
-        
-
     def create_new_asset(self, parent):
         node = dt.AssetNode("asset","")
-        #self._proxyModel.invalidate()
-        self._sourceModel.insertRows( parent.childCount(), 1, parent = self._sourceModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        self._sourceModel.insertRows( 1, 1, parent = parent , node = node)
 
     def create_new_component(self, parent):
         node = dt.ComponentNode("component","")
-        #self._proxyModel.invalidate()
-        self._sourceModel.insertRows( parent.childCount(), 1, parent = self._sourceModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        self._sourceModel.insertRows( 1, 1, parent = parent , node = node)
 
 
-    #def create_new_component(self, parent):
-    #    node = dt.ComponentNode("component","",parent)
-    #    self._proxyModel.invalidate()
 
 class filterSortModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
@@ -858,6 +849,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
         if index.isValid():
             node = self.getNode(index)
+            
+            if node.typeInfo() == "ROOT":
+                return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
+            
             if node.typeInfo() == "COMPONENT":
                 return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
     
@@ -938,12 +933,21 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         return True
 
 
-    def removeRows( self, row, count, parentIndex ):
+    def removeRows( self, row, count, parentIndex, **kwargs ):
 
         '''Remove a number of rows from the model at the given row and parent.'''
         self.beginRemoveRows( parentIndex, row, row+count-1 )
         parent = self.getNode( parentIndex )
         for x in range( count ):
+            
+            # remove rows is being called in every drop action,
+            # we need to know if the remove is with the intention to actually delete the data in the nodes
+            
+            if "kill" in kwargs:
+                if kwargs["kill"] == True:            
+                    parent.child(row).delete()
+                    
+                    
             parent.removeChild( row )
         self.endRemoveRows()
         self.dataChanged.emit( parentIndex, parentIndex )
@@ -988,7 +992,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         if dropParent.typeInfo() == "ASSET":
             if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
                 return False
-
+        
+        if dropParent.typeInfo() == "ROOT":
+            return False
+            
                
         #dropParent.addChild( item )
         self.insertRows( dropParent.childCount(), 1, parent = parentIndex , node = item)
