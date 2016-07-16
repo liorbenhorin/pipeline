@@ -455,7 +455,10 @@ class customTreeView(QtGui.QTreeView):
 
     def delete(self,  index,node):
         self._tableView.update(QtGui.QItemSelection())
-        model = self._sModel
+        parentIndex = self._sModel.indexFromNode(node.parent(),self.rootIndex())
+        self._sModel.removeRows(node.row(),1,parentIndex)
+        return True
+        #model = self._sModel
         #node.delete()
         parentIndex = model.parent(index)
         if node._children != []:
