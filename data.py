@@ -111,6 +111,7 @@ class Node(object):
         
         if self._children != []:
             child = self._children.pop(position)
+            child.delete()
             child._parent = None
 
             return True
@@ -126,8 +127,11 @@ class Node(object):
         self._name = value
 
     def child(self, row):
+        #try:
         return self._children[row]
-    
+        #except:
+        #    return None
+            
     def childCount(self):
         return len(self._children)
 

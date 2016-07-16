@@ -45,6 +45,7 @@ class customListView(QtGui.QTableView):#QListView):
     def __init__(self,parent = None,proxyModel = None):
         super(customListView, self).__init__(parent)
         self.setAlternatingRowColors(True)
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
         #<<<<self.setViewMode(QtGui.QListView.IconMode)
         self.setWordWrap(True)
         self.setShowGrid(False)
@@ -87,19 +88,26 @@ class customListView(QtGui.QTableView):#QListView):
         self._treeSortModel = view.model()
         self._treeModel = self._treeSortModel.sourceModel()
 
+    def treeIndex(self, index):
+        node = self.model().getNode(index)
+        return self._treeModel.indexFromNode(node,self._tree.rootIndex())
+
     def change(self, index):
 
         node = self.model().getNode(index)
         #print node.name
         if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
             treeIndex = self._treeModel.indexFromNode(node,self._tree.rootIndex())
-            print self._treeModel.getNode(treeIndex).name
+            #print self._treeModel.getNode(treeIndex).name
         else:
-            print "add..."
+            pass
+            #print "add..."
                 
     def update(self, idx):#, col):
         if len(idx.indexes()):
             index = idx.indexes()[0]
+  
+            
             if index.model():
             
                 mdl =  self._tree.model().sourceModel()
@@ -141,9 +149,77 @@ class customListView(QtGui.QTableView):#QListView):
                 
         else:
             
-            self.setModel(None)
+            self.clearModel()
             
             return False
+    
+    def clearModel(self):
+        self.setModel(None)
+
+    def contextMenuEvent(self, event):
+        
+        handled = True
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()        
+        node = None
+
+        if index.isValid():
+            src = self.treeIndex(index)                 
+            node =  self._treeModel.getNode(src)
+  
+        actions = []  
+        if node:
+
+            if node.typeInfo() == "NODE": 
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+                #actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,node) ))
+                #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
+                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
+                
+            if node.typeInfo() == "ASSET":
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+                #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
+                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
+                
+            if node.typeInfo() == "COMPONENT":
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+                
+
+        else:
+            pass
+            #actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,mdl.rootNode) ))
+            #actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl.rootNode) ))
+            #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl.rootNode) ))
+        
+        menu.addActions(actions)      
+
+
+        
+        if handled:
+
+            menu.exec_(event.globalPos())
+            event.accept() #TELL QT IVE HANDLED THIS THING
+            
+        else:
+            event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
+                   
+        return
+
+    def delete(self,  index,node):
+        self.clearModel()
+        #self._tableView.update(QtGui.QItemSelection())
+        self._tree.delete(index,node)
+        
+        self._tree.restoreSelection()
+        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        self.update(QtGui.QItemSelection(idx,idx))
+        #node.delete()
+        #parentIndex = model.parent(index)
+        #if node._children != []:
+        #    model.removeRows(node.row(),model.rowCount(index),parentIndex)
+        #else:
+        #    model.removeRows(node.row(),1,parentIndex)
+
 
 '''            
 class ListTreeView(QtGui.QTreeView):
@@ -250,11 +326,12 @@ class customTreeView(QtGui.QTreeView):
             self._last_selection = self._model.mapToSource(self.selectedIndexes()[0])
         #self._xx = self.model().sourceModel().staticIndex(self._last_selection[0])
         #print self._xx, "----xx----"
-            print self._last_selection, "<--- saved"        
-            print self._sModel.getNode(self._last_selection).name, "<--- node name"
+            #print self._last_selection, "<--- saved"        
+            #print self._sModel.getNode(self._last_selection).name, "<--- node name"
                 #self._last_selection_static = self._xx
         else:
-            print "not saving"
+            pass
+            #print "not saving"
         
     def saveState(self):
         if self._ignoreExpentions == True:
@@ -304,8 +381,11 @@ class customTreeView(QtGui.QTreeView):
         mdl = self.model()
         rec(mdl,self.rootIndex())
                 
-        
-        print self._selModel, " <--> ", self._last_selection  , "<--- resotrin"
+        self.restoreSelection()
+        #print self._selModel, " <--> ", self._last_selection  , "<--- resotrin"
+
+    def restoreSelection(self):
+        print ""
         idx = self._model.mapFromSource(self._last_selection)
         self._selModel.select(idx, QtGui.QItemSelectionModel.ClearAndSelect)
 
@@ -344,12 +424,12 @@ class customTreeView(QtGui.QTreeView):
 
             if node.typeInfo() == "NODE": 
                 actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,node) ))
-                #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
+                actions.append(QtGui.QAction("Create new Folder", menu, triggered = functools.partial(self.create_new_folder,node) ))
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src,node) ))
                 
             elif node.typeInfo() == "ASSET":
                 #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src,node) ))
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src,node) ))
                 
             #elif node.typeInfo() == "COMPONENT":
             #    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src, node) ))
@@ -373,10 +453,10 @@ class customTreeView(QtGui.QTreeView):
         return
 
 
-    def delete(self, model, index,node):
+    def delete(self,  index,node):
         self._tableView.update(QtGui.QItemSelection())
-        
-        node.delete()
+        model = self._sModel
+        #node.delete()
         parentIndex = model.parent(index)
         if node._children != []:
             model.removeRows(node.row(),model.rowCount(index),parentIndex)
@@ -385,13 +465,16 @@ class customTreeView(QtGui.QTreeView):
 
     def create_new_folder(self, parent):
 
-        node = dt.Node("folder",parent)
-        self._proxyModel.invalidate()
+        node = dt.Node("folder")
+        #self._proxyModel.invalidate()
+        
+        self._sModel.insertRows( parent.childCount()-1, 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+        
 
     def create_new_asset(self, parent):
-        node = dt.AssetNode("asset","",parent)
-        self._proxyModel.invalidate()
-    
+        node = dt.AssetNode("asset","")
+        #self._proxyModel.invalidate()
+        self._sModel.insertRows( parent.childCount()-1, 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
     #def create_new_component(self, parent):
     #    node = dt.ComponentNode("component","",parent)
     #    self._proxyModel.invalidate()
@@ -757,18 +840,19 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
 
     
     """INPUTS: int, int, QModelIndex"""
-    def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
-        #parentNode = self.getNode(parent)
+    def insertRows(self, position, rows, parent=QtCore.QModelIndex(), node = None):
+        parentNode = self.getNode(parent)
 
         self.beginInsertRows(parent, position, position + rows - 1)
         
-        '''
+        
         for row in range(rows):
             
             childCount = parentNode.childCount()
-            childNode = dt.Node("untitled" + str(childCount))
+            childNode = node
             success = parentNode.insertChild(position, childNode)
-        '''
+            print success
+        
         self.endInsertRows()
         return True
 
@@ -825,8 +909,8 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 return False
 
                
-        dropParent.addChild( item )
-        self.insertRows( dropParent.childCount()-1, 1, parentIndex )
+        #dropParent.addChild( item )
+        self.insertRows( dropParent.childCount(), 1, parent = parentIndex , node = item)
             
         self.dataChanged.emit( parentIndex, parentIndex )
          
@@ -853,8 +937,10 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         
         data = []
         rec(data, rootIndex)
-        return data[0]#list(filter(().__ne__, data))[0]
-
+        if len(data)>0:
+            return data[0]#list(filter(().__ne__, data))[0]
+        else:
+            return QtCore.QModelIndex()
 
 
 

@@ -2727,7 +2727,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.selModel = self.tree.selectionModel()
         self.tree.clicked.connect( self.tree.saveSelection ) 
         self.selModel.selectionChanged.connect( self.list.update ) 
-        
+        #self.selModel.currentChanged.connect( self.list.update )
         
         self.tree.selectRoot()
         self.tree._selModel = self.selModel
