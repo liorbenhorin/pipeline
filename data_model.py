@@ -120,7 +120,7 @@ class PipelineContentsView(QtGui.QTableView):
 
         node = self.getNode(index)
         if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
-            treeIndex = self.asTreeIndex(node)
+            treeIndex = self.asTreeIndex(index)
             print treeIndex
     
     '''
@@ -199,15 +199,15 @@ class PipelineContentsView(QtGui.QTableView):
             if tableModelNode.typeInfo()[0:3] != "ADD":
                 
                 if node.typeInfo() == "NODE": 
-                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
                     
                 if node.typeInfo() == "ASSET":
-                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
                     
                 if node.typeInfo() == "COMPONENT":
-                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src, node) ))
+                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
             else:
                 pass
@@ -225,12 +225,12 @@ class PipelineContentsView(QtGui.QTableView):
                     
         else:
                        
-            actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParent) ))
+            actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParentIndex) ))
             
             if self._treeParent.typeInfo() == "NODE":
             
-                actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder, self._treeParent) ))
-                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))
+                actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
+                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
    
         menu.addActions(actions)      
        
@@ -244,44 +244,41 @@ class PipelineContentsView(QtGui.QTableView):
                    
         return
 
-    def delete(self,  index,node):
-        self.clearModel()
-        self.treeView.delete(index,node)        
+
+    def restoreTreeViewtSelection(self):
+        # restore the table from the tree with up to date data
+        # using the tree view's last selection
         self.treeView.restoreSelection()
-        
-        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
-        self.update(QtGui.QItemSelection(idx,idx))
+        treeLastIndex =  self.treeView.fromProxyIndex(self.treeView.userSelection)
+        treeLastIndexSelection = QtGui.QItemSelection(treeLastIndex, treeLastIndex)
+        self.update(treeLastIndexSelection)        
+
+    def delete(self,  index):
+        # clear the table before the action to prevent data being invalid
+        self.clearModel()
+        self.treeView.delete(index)        
+        self.restoreTreeViewtSelection()
 
     def create_new_folder(self, parent):
-        
         self.clearModel()             
         self.treeView.create_new_folder(parent)               
-        self.treeView.restoreSelection()
-        
-        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
-        self.update(QtGui.QItemSelection(idx,idx))
+        self.restoreTreeViewtSelection()        
 
     def create_new_asset(self, parent):
         
         self.clearModel()             
         self.treeView.create_new_asset(parent)              
-        self.treeView.restoreSelection()
-        
-        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
-        self.update(QtGui.QItemSelection(idx,idx))
-        
+        self.restoreTreeViewtSelection()
+               
     def create_new_component(self, parent):
         
         self.clearModel()             
         self.treeView.create_new_component(parent)              
-        self.treeView.restoreSelection()
+        self.restoreTreeViewtSelection()
         
-        idx = self.treeView._model.mapFromSource(self.treeView.userSelection)
-        self.update(QtGui.QItemSelection(idx,idx))        
 
 
-  
-                    
+                   
 class pipelineTreeView(QtGui.QTreeView):
     def __init__(self,parent = None):
         super(pipelineTreeView, self).__init__(parent)
@@ -425,7 +422,7 @@ class pipelineTreeView(QtGui.QTreeView):
         
         if len(self.selectedIndexes())>0:
             self.userSelection = self.asModelIndex(self.selectedIndexes()[0])
-        
+            print self.sourceModel.getNode(self.userSelection).name, " <--saveing selection"
     
     def saveState(self):
         '''
@@ -466,8 +463,9 @@ class pipelineTreeView(QtGui.QTreeView):
                 i = mdl.index(row,0, index)
                 node = mdl.data(i, 165)
                 
-                if self._expended_states[node] == True:
-                    self.setExpanded(i, True)
+                if node in self._expended_states:
+                    if self._expended_states[node] == True:
+                        self.setExpanded(i, True)
 
                      
                 rec( mdl, i)     
@@ -556,15 +554,15 @@ class pipelineTreeView(QtGui.QTreeView):
         return True
     def create_new_folder(self, parent):
         node = dt.Node("folder")        
-        self.sourceModel.insertRows( 1, 1, parent = parent , node = node)
+        self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
         
     def create_new_asset(self, parent):
         node = dt.AssetNode("asset","")
-        self._sourceModel.insertRows( 1, 1, parent = parent , node = node)
+        self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
 
     def create_new_component(self, parent):
         node = dt.ComponentNode("component","")
-        self._sourceModel.insertRows( 1, 1, parent = parent , node = node)
+        self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
 
 
 
@@ -627,10 +625,10 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
                 resource = node.resource()
                 return QtGui.QIcon(QtGui.QPixmap(resource))
             
-        if role == SceneGraphModel.sortRole:
+        if role == PipelineProjectModel.sortRole:
             return node.typeInfo()
 
-        if role == SceneGraphModel.filterRole:
+        if role == PipelineProjectModel.filterRole:
             return node.typeInfo()
 
         if role == QtCore.Qt.SizeHintRole:
@@ -640,7 +638,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         if role == 165:
             return node.id
         
-        if role == SceneGraphModel.expendedRole:
+        if role == PipelineProjectModel.expendedRole:
 
             return self.isExpended(index)
                
@@ -660,7 +658,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
                 node.setData(index.column(), value)
                 self.dataChanged.emit(index, index)
-            if role == SceneGraphModel.expendedRole:
+            if role == PipelineProjectModel.expendedRole:
                 node.expendedState(self.isExpended(index))
                 self.dataChanged.emit(index, index)               
                 return True
@@ -752,7 +750,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             childCount = parentNode.childCount()
             childNode = node
             success = parentNode.insertChild(position, childNode)
-            print success
+            print success, "<--- inser rows"
         
         self.endInsertRows()
         return True
