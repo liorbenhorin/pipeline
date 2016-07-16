@@ -140,7 +140,8 @@ class PipelineContentsView(QtGui.QTableView):
                 '''
 
                 src = self.asTreeModelIndex(index) 
-                node =                         
+                node =  self.treeView.asModelNode(src)
+                                       
                 node = mdl.getNode(src)
                 
                 list = []
