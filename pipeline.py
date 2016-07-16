@@ -2649,12 +2649,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         creating the tree model,
         it's the main tree model object, its global so it is deleted every restart of Pipeline
         '''
-        treeModel = dtm.SceneGraphModel(_root) 
+        treeModel = dtm.PipelineProjectModel(_root) 
 
         '''
         _proxymodel is the sortFilterProxyModel object that is connected to the tree model
         '''
-        self._proxyModel = dtm.filterSortModel()      
+        self._proxyModel = dtm.PipelineProjectProxyModel()      
         self._proxyModel.setSourceModel(treeModel)
         self._proxyModel.setDynamicSortFilter(True)
         self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)

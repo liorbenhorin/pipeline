@@ -142,7 +142,7 @@ class customListView(QtGui.QTableView):#QListView):
                 #    list.append(dt.AddFolder("new"))                 
          
                 if len(list) > 0:
-                    listModel = componentsModel(list)            
+                    listModel = PipelineContentsModel(list)            
                     self.setModel(listModel)
                 
                     self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
@@ -551,183 +551,9 @@ class pipelineTreeView(QtGui.QTreeView):
 
 
 
-class filterSortModel(QtGui.QSortFilterProxyModel):
-    def __init__(self,parent = None):
-        
-        super(filterSortModel, self).__init__(parent)
-        self._treeView = None
-        
-    @property
-    def treeView(self):
-        if self._treeView:
-            return self._treeView
-        else:
-            return None
-            
-    @treeView.setter
-    def treeView(self, object):
-        self._treeView = object
-                    
-    def filterAcceptsRow(self,sourceRow,sourceParent):
 
-        # hide components from the treeview
-        id =  self.sourceModel().index(sourceRow,0,sourceParent)    
 
-        if super(filterSortModel,self).filterAcceptsRow(sourceRow,sourceParent): 
-            
-            if self.sourceModel().getNode(id).typeInfo() == "COMPONENT":
-                return False
-                      
-            return True
-        
-        return self.hasAcceptedChildren(sourceRow,sourceParent)
-
-    def hasAcceptedChildren(self,sourceRow,sourceParent):
-
-        model=self.sourceModel()
-        sourceIndex=model.index(sourceRow,0,sourceParent)
-        if not sourceIndex.isValid():
-            return False
-        indexes=model.rowCount(sourceIndex)
-        for i in range(indexes):
-            if self.filterAcceptsRow(i,sourceIndex):
-                return True
-        
-        return False
-
-    def setFilterRegExp(self, exp):
-             
-        super(filterSortModel, self).setFilterRegExp(exp)
-        if self.treeView:
-            if len(exp)>0:  
-                #self.treeView._ignoreSelections = True
-                      
-                self.treeView._ignoreExpentions = True
-                self.treeView.expandAll()
-                self.treeView._ignoreExpentions = False
-            else:
-                self.treeView._ignoreExpentions = True
-                self.treeView.restoreState()          
-                self.treeView._ignoreExpentions = False         
-
-'''
-class list_filterSortModel(QtGui.QSortFilterProxyModel):
-    def __init__(self,parent = None):
-        
-        super(list_filterSortModel, self).__init__(parent)
-                    
-    def filterAcceptsRow(self,sourceRow,sourceParent):
-        #print self.sourceModel().sourceModel()
-        
-        #i = self.mapToSource(sourceParent)
-        #id = self.sourceModel().mapToSource(i)
-        #print i
-        #print id
-        print sourceParent , " | ",sourceRow," -----> INDEX"
-        Model = self.sourceModel().sourceModel()
-        flatModel = self.sourceModel()
-        print Model , "<-- MODEL ", flatModel , "<--- flat"
-        flatIndex = self.mapToSource(sourceParent)
-        
-        treeIndex = flatModel.mapToSource(flatIndex)
-        print treeIndex , "<-- MODEL ", flatIndex , "<--- flat"
-        
-        node = Model.getNode(treeIndex)
-        print node.name
-        
-        
-        #print sModel
-        #print sourceParent
-        #print sourceRow
-        #id =  self.sourceModel().sourceModel().index(sourceRow,0,sourceParent)    
-        #print sModel.getNode(id).name
-        if super(list_filterSortModel,self).filterAcceptsRow(sourceRow,sourceParent): 
-            print ">>"
-            
-            
-            return True
-         #print self.sourceModel().sourceModel().getNode(id).name
-            
-            #if self.sourceModel().sourceModel().getNode(id).typeInfo() == "COMPONENT":
-                #return False
-        
-            #if self.sourceModel().sourceModel().getNode(id).typeInfo() == "NODE":
-            #    return False
-                #return True
-        
-        return self.hasAcceptedChildren(sourceRow,sourceParent)
-
-    def hasAcceptedChildren(self,sourceRow,sourceParent):
-        print ">"
-        model=self.sourceModel()
-        sourceIndex=model.index(sourceRow,0,sourceParent)
-        if not sourceIndex.isValid():
-            return False
-        indexes=model.rowCount(sourceIndex)
-        for i in range(indexes):
-            
-            if self.filterAcceptsRow(i,sourceIndex):
-                return True
-        
-        return False
-'''
-'''
-class FlatProxyModel(QtGui.QAbstractProxyModel):
-    @QtCore.Slot(QtCore.QModelIndex, QtCore.QModelIndex)
-    def sourceDataChanged(self, topLeft, bottomRight):
-        self.dataChanged.emit(self.mapFromSource(topLeft), \
-                              self.mapFromSource(bottomRight))
-    def buildMap(self, model, parent = QtCore.QModelIndex(), row = 0):
-        if row == 0:
-            self.m_rowMap = {}
-            self.m_indexMap = {}
-        rows = model.rowCount(parent)
-        for r in range(rows):
-            index = model.index(r, 0, parent)
-            #print('row', row, 'item', model.data(index))
-            self.m_rowMap[index] = row
-            self.m_indexMap[row] = index
-            row = row + 1
-            if model.hasChildren(index):
-                row = self.buildMap(model, index, row)
-        return row
-        
-    def setSourceModel(self, model):
-        self.m_indexMap = {}
-        QtGui.QAbstractProxyModel.setSourceModel(self, model)
-        self.buildMap(model)
-        #print(flush = True)
-        model.dataChanged.connect(self.sourceDataChanged)
-        
-    def mapFromSource(self, index):
-        if index not in self.m_rowMap: return QtCore.QModelIndex()
-        #print('mapping to row', self.m_rowMap[index], flush = True)
-        return self.createIndex(self.m_rowMap[index], index.column())
-    def mapToSource(self, index):
-        if not index.isValid() or index.row() not in self.m_indexMap:
-            return QtCore.QModelIndex()
-        #print('mapping from row', index.row(), flush = True)
-        return self.m_indexMap[index.row()]
-   
-    def columnCount(self, parent):
-        #return 1
-        return QtGui.QAbstractProxyModel.sourceModel(self).columnCount(self.mapToSource(parent))
-    
-            
-    def rowCount(self, parent):
-        #print('rows:', len(self.m_rowMap), flush=True)
-        return len(self.m_rowMap) if not parent.isValid() else 0
-    def index(self, row, column, parent):
-        #print('index for:', row, column)#, flush=True)
-        if parent.isValid(): return QtCore.QModelIndex()
-        i = self.createIndex(row, column)
-        return i
-    def parent(self, index):
-        return QtCore.QModelIndex()
-    def __init__(self, parent = None):
-        super(FlatProxyModel, self).__init__(parent)
- '''           
-class SceneGraphModel(QtCore.QAbstractItemModel):
+class PipelineProjectModel(QtCore.QAbstractItemModel):
     
     
     sortRole   = QtCore.Qt.UserRole
@@ -736,7 +562,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     
     """INPUTS: Node, QObject"""
     def __init__(self, root, parent=None):
-        super(SceneGraphModel, self).__init__(parent)
+        super(PipelineProjectModel, self).__init__(parent)
         self._rootNode = root
         self._tempIndex = None
 
@@ -874,25 +700,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
     """INPUTS: int, int, QModelIndex"""
     """OUTPUT: QModelIndex"""
     """Should return a QModelIndex that corresponds to the given row, column and parent node"""
-    '''
-    def index(self, row, column, parent):
-        
-        parentNode = self.getNode(parent)
-
-        childItem = parentNode.child(row)
-
-
-        if childItem:
-            return self.createIndex(row, column, childItem)
-        else:
-            return QtCore.QModelIndex()
     
-    '''
-    '''
-    def itemFromIndex( self, index ):
-        return index.internalPointer() if index.isValid() else self._rootNode
-    '''  
-
     
     def index( self, row, column, parentIndex ):
         
@@ -901,7 +709,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
              
         parent = self.getNode( parentIndex )
         return  self.createIndex( row, column, parent.child( row ) ) 
-    ''
+    
 
 
     """CUSTOM"""
@@ -1006,8 +814,12 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
        
 
     def indexFromNode(self, node, rootIndex):
-
-                 
+        '''
+        recursive function to get Index from a node,
+        we use a unique node id to do this
+        the id is stored as a UserRole int 165
+        
+        '''                
         def rec(d, index):
             
             for row in range(self.rowCount(index)):
@@ -1018,7 +830,7 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
                 if id == node.id:
                     d.append(i)
                 else:
-                    pass#d.append(False)
+                    pass
                           
                 rec(d, i)     
             
@@ -1026,20 +838,17 @@ class SceneGraphModel(QtCore.QAbstractItemModel):
         data = []
         rec(data, rootIndex)
         if len(data)>0:
-            return data[0]#list(filter(().__ne__, data))[0]
+            return data[0]
         else:
+            # if the node is not in the tree return an empty index
             return QtCore.QModelIndex()
 
 
-
-
-class componentsModel(QtCore.QAbstractTableModel):
+class PipelineContentsModel(QtCore.QAbstractTableModel):
     
     def __init__(self, components = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self.__components = components
-
-
 
 
     def headerData(self, section, orientation, role):
@@ -1081,7 +890,7 @@ class componentsModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
                 resource = self.__components[index.row()].resource()
-                return QtGui.QIcon(QtGui.QPixmap(resource))#.scaled(200,200))
+                return QtGui.QIcon(QtGui.QPixmap(resource))
               
         if role == QtCore.Qt.DisplayRole:
             
@@ -1106,16 +915,9 @@ class componentsModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.EditRole:
             
             row = index.row()
-            #color = QtGui.QColor(value)
-            
-            #if color.isValid():
-            #    self.__components[row] = color
-            #    self.dataChanged.emit(index, index)
-            #    return True
-
             
             if role == QtCore.Qt.EditRole:
-                self.__components[row].name = value #node.setData(index.column(), value)
+                self.__components[row].name = value 
                 self.dataChanged.emit(index, index)
              
                 return True
@@ -1142,4 +944,64 @@ class componentsModel(QtCore.QAbstractTableModel):
              
         self.endRemoveRows()
         return True
+
+class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
+    def __init__(self,parent = None):
+        
+        super(PipelineProjectProxyModel, self).__init__(parent)
+        self._treeView = None
+        
+    @property
+    def treeView(self):
+        if self._treeView:
+            return self._treeView
+        else:
+            return None
+            
+    @treeView.setter
+    def treeView(self, object):
+        self._treeView = object
+                    
+    def filterAcceptsRow(self,sourceRow,sourceParent):
+
+        # hide components from the treeview
+        id =  self.sourceModel().index(sourceRow,0,sourceParent)    
+
+        if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent): 
+            
+            if self.sourceModel().getNode(id).typeInfo() == "COMPONENT":
+                return False
+                      
+            return True
+        
+        return self.hasAcceptedChildren(sourceRow,sourceParent)
+
+    def hasAcceptedChildren(self,sourceRow,sourceParent):
+
+        model=self.sourceModel()
+        sourceIndex=model.index(sourceRow,0,sourceParent)
+        if not sourceIndex.isValid():
+            return False
+        indexes=model.rowCount(sourceIndex)
+        for i in range(indexes):
+            if self.filterAcceptsRow(i,sourceIndex):
+                return True
+        
+        return False
+
+    def setFilterRegExp(self, exp):
+             
+        super(PipelineProjectProxyModel, self).setFilterRegExp(exp)
+        if self.treeView:
+            if len(exp)>0:  
+                #self.treeView._ignoreSelections = True
+                      
+                self.treeView._ignoreExpentions = True
+                self.treeView.expandAll()
+                self.treeView._ignoreExpentions = False
+            else:
+                self.treeView._ignoreExpentions = True
+                self.treeView.restoreState()          
+                self.treeView._ignoreExpentions = False         
+
         
