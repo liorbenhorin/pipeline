@@ -236,7 +236,7 @@ class customListView(QtGui.QTableView):#QListView):
         self.clearModel()
         self._tree.delete(index,node)        
         self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        idx = self._tree._model.mapFromSource(self._tree.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))
 
     def create_new_folder(self, parent):
@@ -245,7 +245,7 @@ class customListView(QtGui.QTableView):#QListView):
         self._tree.create_new_folder(parent)        
        
         self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        idx = self._tree._model.mapFromSource(self._tree.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))
 
     def create_new_asset(self, parent):
@@ -254,7 +254,7 @@ class customListView(QtGui.QTableView):#QListView):
         self._tree.create_new_asset(parent)        
        
         self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        idx = self._tree._model.mapFromSource(self._tree.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))
         
     def create_new_component(self, parent):
@@ -263,7 +263,7 @@ class customListView(QtGui.QTableView):#QListView):
         self._tree.create_new_component(parent)        
        
         self._tree.restoreSelection()
-        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        idx = self._tree._model.mapFromSource(self._tree.userSelection)
         self.update(QtGui.QItemSelection(idx,idx))        
 
 
@@ -277,10 +277,13 @@ class pipelineTreeView(QtGui.QTreeView):
         self.setAlternatingRowColors(True)
         
         #local variables
-        self._state = None
+        #self._state = None
         self._ignoreExpentions = False
-        self._selModel = None
-        self._last_selection = None
+
+        self._expended_states = None
+        
+        self._userSelection = None
+        
         self._tableView = None
         self._proxyModel = None
         self._sourceModel = None
@@ -322,8 +325,15 @@ class pipelineTreeView(QtGui.QTreeView):
     def setModel(self,model):
 
         super(pipelineTreeView,self).setModel(model)
-        self._proxyModel = self.model()
-        self._sourceModel = self._proxyModel.sourceModel()        
+        
+        self.proxyModel = self.model()
+        self.sourceModel = self.proxyModel.sourceModel()        
+        
+        '''
+        this will expend the tree only on the first level, which should be
+        the projects name folder
+        the rest will be collapsed
+        '''
         self.expandAll()
         i =  self.model().index(0,0,self.rootIndex())
         
@@ -331,31 +341,80 @@ class pipelineTreeView(QtGui.QTreeView):
             x = self.model().index(row,0,i)
             self.setExpanded(x,False)
         
-        self.saveState()
         
-    
+        '''
+        save the expended state of the tree
+        '''
+        self.saveState()
 
+
+    @property
+    def tableView(self):
+        return self._tableView
+    
+    @tableView.setter
+    def tableView(self, view):
+        self._tableView = view 
+
+    @property
+    def proxyModel(self):
+        return self._proxyModel
+    
+    @proxyModel.setter
+    def proxyModel(self, model):
+        self._proxyModel = model        
+
+    @property
+    def sourceModel(self):
+        return self._sourceModel
+    
+    @sourceModel.setter
+    def sourceModel(self, model):
+        self._sourceModel = model   
+
+
+    @property
+    def userSelection(self):
+        return self._userSelection
+    
+    @userSelection.setter
+    def userSelection(self, selection):
+        self._userSelection = selection   
+
+    def asProxyIndex(self,index):
+        return self.proxyModel.index(0,0,index)
+
+    
+    def asModelIndex(self, index):
+        return self.proxyModel.mapToSource(index)
+
+    def fromProxyIndex(self, index):
+        return self.proxyModel.mapFromSource(index)
+
+    def asModelNode(self, index):
+        return self.sourceModel.getNode(index)
+        
+        
+        
+    def modelIndexFromNode(self, node):
+        return self.sourceModel.indexFromNode(node,self.rootIndex())
+    
     def selectRoot(self):
-        self.setCurrentIndex(self.model().index(0,0,self.rootIndex()))
+        
+        self.setCurrentIndex(self.asProxyIndex(self.rootIndex()))
         self.saveSelection()
 
-    def saveSelection(self):#, idx):
-        #print self._ignoreExpentions, "<--- expentions mode"
-        #if not self._ignoreExpentions:
-        #if len(idx.indexes()) > 0 :
-        #self._last_selection = idx.indexes()[0]
-        if len(self.selectedIndexes()):
-            self._last_selection = self._proxyModel.mapToSource(self.selectedIndexes()[0])
-        #self._xx = self.model().sourceModel().staticIndex(self._last_selection[0])
-        #print self._xx, "----xx----"
-            #print self._last_selection, "<--- saved"        
-            #print self._sModel.getNode(self._last_selection).name, "<--- node name"
-                #self._last_selection_static = self._xx
-        else:
-            pass
-            #print "not saving"
+    def saveSelection(self):
         
+        if len(self.selectedIndexes())>0:
+            self.userSelection = self.asModelIndex(self.selectedIndexes()[0])
+        
+    
     def saveState(self):
+        '''
+        recursive function to save the expention state fo the tree to a dictionary
+        '''
+    
         if self._ignoreExpentions == True:
             return  
                         
@@ -373,17 +432,15 @@ class pipelineTreeView(QtGui.QTreeView):
                     dict[node] = False  
                       
                 rec(dict, mdl, i)     
-            
-        
-        mdl = self.model()
-        
-        
-        self.expended_states = {}
-        rec(self.expended_states,mdl,self.rootIndex())
+                   
+        self._expended_states = {}
+        rec(self._expended_states,self.proxyModel,self.rootIndex())
 
         
     def restoreState(self):    
-
+        '''
+        recursive function to restore the expention state fo the tree to a dictionary
+        '''
         def rec(  mdl, index):
             
             for row in range(mdl.rowCount(index)):
@@ -392,24 +449,20 @@ class pipelineTreeView(QtGui.QTreeView):
                 i = mdl.index(row,0, index)
                 node = mdl.data(i, 165)
                 
-                if self.expended_states[node] == True:
+                if self._expended_states[node] == True:
                     self.setExpanded(i, True)
 
                      
                 rec( mdl, i)     
-                    
-        
+                            
         self.collapseAll()
-        mdl = self.model()
-        rec(mdl,self.rootIndex())
-                
+        rec(self.proxyModel,self.rootIndex())                
         self.restoreSelection()
-        #print self._selModel, " <--> ", self._last_selection  , "<--- resotrin"
 
     def restoreSelection(self):
-        print ""
-        idx = self._model.mapFromSource(self._last_selection)
-        self._selModel.select(idx, QtGui.QItemSelectionModel.ClearAndSelect)
+
+        index = self.fromProxyIndex(self.userSelection)
+        self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
 
         
     def dropEvent(self, event):
@@ -424,6 +477,7 @@ class pipelineTreeView(QtGui.QTreeView):
             # drag rather than only on drop; but the check involves not-insignificant work.
             event.setDropAction(QtCore.Qt.IgnoreAction)
                 
+        # this was required when i misused the insert rows function of the model...
         #self._proxyModel.invalidate()
 
    
@@ -433,12 +487,13 @@ class pipelineTreeView(QtGui.QTreeView):
         index = self.indexAt(event.pos())
         menu = QtGui.QMenu()        
         node = None
-        mdl =  self.model().sourceModel()
-        
+
         
         if index.isValid():
-            src = index.model().mapToSource(index)                  
-            node =  mdl.getNode(src)
+            src = self.asModelIndex(index)
+            node = self.asModelNode(src)
+            #src = index.model().mapToSource(index)                  
+            #node =  self.sourceModel.getNode(src)
             
         actions = []  
           
@@ -447,21 +502,17 @@ class pipelineTreeView(QtGui.QTreeView):
             if node.typeInfo() == "NODE": 
                 actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,node) ))
                 actions.append(QtGui.QAction("Create new Folder", menu, triggered = functools.partial(self.create_new_folder,node) ))
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src,node) ))
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
             elif node.typeInfo() == "ASSET":
-                #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,node) ))
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src,node) ))
-                
-            #elif node.typeInfo() == "COMPONENT":
-            #    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete,mdl, src, node) ))
+
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
 
         else:
-            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,mdl.rootNode) ))
-            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl.rootNode) ))
-            #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl.rootNode) ))
-        
+            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self.sourceModel.rootNode) ))
+            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self.sourceModel.rootNode) ))
+
         menu.addActions(actions)      
 
         if handled:
@@ -475,18 +526,16 @@ class pipelineTreeView(QtGui.QTreeView):
         return
 
 
-    def delete(self,  index,node):
-        self._tableView.update(QtGui.QItemSelection())
-        parentIndex = self._sourceModel.indexFromNode(node.parent(),self.rootIndex())
-        self._sourceModel.removeRows(node.row(),1,parentIndex)
+    def delete(self,  index):
+        # clear the table view              
+        self.tableView.update(QtGui.QItemSelection())
+        
+        node = self.asModelNode(index)
+        parentIndex = self.sourceModel.parent(index)
+        self.sourceModel.removeRows(node.row(),1,parentIndex)
+        
         return True
-        #model = self._sourceModel
-        #node.delete()
-        parentIndex = model.parent(index)
-        if node._children != []:
-            model.removeRows(node.row(),model.rowCount(index),parentIndex)
-        else:
-            model.removeRows(node.row(),1,parentIndex)
+
 
     def create_new_folder(self, parent):
 

@@ -2667,9 +2667,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         '''
         self.list = dtm.customListView()        
-        self.tree = dtm.pipelineTreeView()#proxyModel = self._proxyModel)
-        
-        self.tree._tableView = self.list
+        self.tree = dtm.pipelineTreeView()        
+        self.tree.tableView = self.list
         
         self.tree.setModel( self._proxyModel )
         self.tree.setSortingEnabled(True)
@@ -2740,7 +2739,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.selModel.currentChanged.connect( self.list.update )
         
         self.tree.selectRoot()
-        self.tree._selModel = self.selModel
+        #self.tree._selModel = self.selModel
         
         slideWidget = QtGui.QWidget() 
         slideLayout = QtGui.QHBoxLayout()
