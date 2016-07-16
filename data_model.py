@@ -71,7 +71,8 @@ class customListView(QtGui.QTableView):#QListView):
         self._tree = None
         self._treeSortModel = None
         self._treeModel = None
-        
+        self._treeParent = None
+        self._treeParentIndex = None
         
 
 
@@ -117,6 +118,9 @@ class customListView(QtGui.QTableView):#QListView):
                 list = []
 
                 
+                self._treeParent = node
+                self._treeParentIndex = src
+                
                 #elif node.typeInfo() == "ASSET":             
                 
                 
@@ -124,14 +128,14 @@ class customListView(QtGui.QTableView):#QListView):
                 for row in range(mdl.rowCount(src)):
 
                     item_index = mdl.index(row,0,src)
-                    node = mdl.getNode(item_index)
+                    n = mdl.getNode(item_index)
                     
                     #if node.typeInfo() == "COMPONENT":# or node.typeInfo() == "ASSET": 
-                    list.append(node)
+                    list.append(n)
                     
                 
                 list.append(dt.AddComponent("new"))  
-                
+                print node.typeInfo()
                 if node.typeInfo() == "NODE":
                     
                     list.append(dt.AddAsset("new")) 
@@ -157,6 +161,9 @@ class customListView(QtGui.QTableView):#QListView):
         self.setModel(None)
 
     def contextMenuEvent(self, event):
+
+        #self._treeParent = node
+        #self._treeParentIndex = src
         
         handled = True
         index = self.indexAt(event.pos())
@@ -186,10 +193,10 @@ class customListView(QtGui.QTableView):#QListView):
                 
 
         else:
-            pass
-            #actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,mdl.rootNode) ))
-            #actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,mdl.rootNode) ))
-            #actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,mdl.rootNode) ))
+            
+            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder, self._treeParent) ))
+            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))
+            actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParent) ))
         
         menu.addActions(actions)      
 
@@ -207,18 +214,37 @@ class customListView(QtGui.QTableView):#QListView):
 
     def delete(self,  index,node):
         self.clearModel()
-        #self._tableView.update(QtGui.QItemSelection())
-        self._tree.delete(index,node)
-        
+        self._tree.delete(index,node)        
         self._tree.restoreSelection()
         idx = self._tree._model.mapFromSource(self._tree._last_selection)
         self.update(QtGui.QItemSelection(idx,idx))
-        #node.delete()
-        #parentIndex = model.parent(index)
-        #if node._children != []:
-        #    model.removeRows(node.row(),model.rowCount(index),parentIndex)
-        #else:
-        #    model.removeRows(node.row(),1,parentIndex)
+
+    def create_new_folder(self, parent):
+        
+        self.clearModel()             
+        self._tree.create_new_folder(parent)        
+       
+        self._tree.restoreSelection()
+        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        self.update(QtGui.QItemSelection(idx,idx))
+
+    def create_new_asset(self, parent):
+        
+        self.clearModel()             
+        self._tree.create_new_asset(parent)        
+       
+        self._tree.restoreSelection()
+        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        self.update(QtGui.QItemSelection(idx,idx))
+        
+    def create_new_component(self, parent):
+        
+        self.clearModel()             
+        self._tree.create_new_component(parent)        
+       
+        self._tree.restoreSelection()
+        idx = self._tree._model.mapFromSource(self._tree._last_selection)
+        self.update(QtGui.QItemSelection(idx,idx))        
 
 
 '''            
@@ -478,6 +504,13 @@ class customTreeView(QtGui.QTreeView):
         node = dt.AssetNode("asset","")
         #self._proxyModel.invalidate()
         self._sModel.insertRows( parent.childCount(), 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+
+    def create_new_component(self, parent):
+        node = dt.ComponentNode("component","")
+        #self._proxyModel.invalidate()
+        self._sModel.insertRows( parent.childCount(), 1, parent = self._sModel.indexFromNode(parent,self.rootIndex()) , node = node)
+
+
     #def create_new_component(self, parent):
     #    node = dt.ComponentNode("component","",parent)
     #    self._proxyModel.invalidate()
