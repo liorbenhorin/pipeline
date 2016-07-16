@@ -2674,78 +2674,45 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.list.treeView = self.tree      
         
         self.tree.setModel( self._proxyModel )
-        self.list.init_treeView()
-        
+        self.list.init_treeView()        
         self._proxyModel.treeView = self.tree
- 
-        #flat = dtm.FlatProxyModel()
-        #flat.setSourceModel(treeModel)
-        
-        
-        
-               
-        
-        #self.list.treeView(self.tree)
+
+        #connect the tree and the table signals
         QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.click)
-        
-        
+        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
+        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
+        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)        
+        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.click)
 
-         #QtGui.QListView()
-        #self._listProxyModel = dtm.list_filterSortModel()
-        #self._listProxyModel.setSourceModel(flat)
-        #self._listProxyModel.setDynamicSortFilter(True)
-        #self._listProxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-
-        #self._listProxyModel.setSortRole(0)
-        #self._listProxyModel.setFilterRole(0)
-        #self._listProxyModel.setFilterKeyColumn(0)        
+        self.selModel = self.tree.selectionModel()
+        self.tree.clicked.connect( self.tree.saveSelection ) 
+        self.selModel.selectionChanged.connect( self.list.update )        
         
+        # select the tree root
+        self.tree.selectRoot()
         
-
-        #self.list.setModel(self._listProxyModel)
- 
+        '''
+        UI LAYOUTS, SPLITTER, AND ICONS SCALE SLIDER
+        '''
         self.navWidget = QtGui.QWidget()        
         h_layout = QtGui.QVBoxLayout()   
         h_layout.setContentsMargins(0, 0, 0, 0)      
         self.navWidget.setLayout(h_layout) 
- 
                
         self.splitter1 = QtGui.QSplitter()
         self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
         self.splitter1.setHandleWidth(10)
         self.splitter1.setChildrenCollapsible(False)
-        
-        h_layout.addWidget(self.splitter1)
-                       
-        self.ui.verticalLayout_18.addWidget(self.navWidget) 
-
         self.splitter1.addWidget(self.tree)
-        self.splitter1.addWidget(self.list)
-                           
-        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
-        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
-        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)
-        
-        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.click)
-        
-        
-
-        
-        self.selModel = self.tree.selectionModel()
-        self.tree.clicked.connect( self.tree.saveSelection ) 
-        self.selModel.selectionChanged.connect( self.list.update ) 
-        #self.selModel.currentChanged.connect( self.list.update )
-        
-        self.tree.selectRoot()
-        #self.tree._selModel = self.selModel
-        
+        self.splitter1.addWidget(self.list)        
+        h_layout.addWidget(self.splitter1)
+            
         slideWidget = QtGui.QWidget() 
         slideLayout = QtGui.QHBoxLayout()
         slideLayout.setContentsMargins(0, 0, 0, 0)        
         slideWidget.setLayout(slideLayout)
         slideLayout.setAlignment(QtCore.Qt.AlignRight)
                 
-
         self.listSlider = QtGui.QSlider()
         self.listSlider.setOrientation(QtCore.Qt.Horizontal)
         self.listSlider.setMaximumWidth(100)
@@ -2754,28 +2721,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.listSlider.setMaximum(96)
         self.listSlider.setValue(32)
         self.listSlider.valueChanged.connect(self.list.icons_size) 
-        #self.listSlider.sliderPressed.connect(self.list.icons_size) 
-        #self.listSlider.setValue(20)
-        slideLayout.addWidget(self.listSlider)
-        
-        
-        
-          
-        
-        h_layout.addWidget(slideWidget)
-        
 
-        
-        #self.listselModel = self.list.selectionModel()
-        #self.listselModel.currentChanged.connect( self.list.change ) 
-        #self.list.currentChanged.connect(self.list.change)
-        #QtCore.QObject.connect(self.tree, QtCore.SIGNAL("clicked(QModelIndex)"), functools.partial(self.list.update,self.tree))
-        #QtCore.QObject.connect(self.tree, QtCore.SIGNAL("currentChanged(QModelIndex,QModelIndex)"), functools.partial(self.list.update,self.tree))
-        #Object::connect(treeview,SIGNAL(Clicked),this,SLOT(treeViewClickProgress()));
-        #self.tree.start()
-        
-        
-        #self.selModel = self.tree.selectionModel()
+        slideLayout.addWidget(self.listSlider)
+        h_layout.addWidget(slideWidget)
+
+        # add to the designer ui
+        self.ui.verticalLayout_18.addWidget(self.navWidget)
+        # ----> temp!!! hide the old selection options
         self.ui.assets_selection_frame.setHidden(True)
         
     def selectInScene(self):

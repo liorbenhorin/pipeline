@@ -121,7 +121,7 @@ class PipelineContentsView(QtGui.QTableView):
         node = self.getNode(index)
         if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
             treeIndex = self.asTreeIndex(index)
-            print treeIndex
+            print treeIndex, " <--- table clicked"
     
     '''
     updates the table view with a new model
@@ -422,7 +422,6 @@ class pipelineTreeView(QtGui.QTreeView):
         
         if len(self.selectedIndexes())>0:
             self.userSelection = self.asModelIndex(self.selectedIndexes()[0])
-            print self.sourceModel.getNode(self.userSelection).name, " <--saveing selection"
     
     def saveState(self):
         '''
