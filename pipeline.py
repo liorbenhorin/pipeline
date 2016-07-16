@@ -302,6 +302,8 @@ def set_icons():
     global camrea_icon
     global play_icon
     global comment_icon
+    global large_icon
+    global small_icon
     
     global large_image_icon
     global large_image_icon_dark
@@ -346,6 +348,10 @@ def set_icons():
     camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
     play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
     comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
+    
+    large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
+    small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
+    
     
     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
     large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark")) 
@@ -2706,6 +2712,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.splitter1.addWidget(self.tree)
         self.splitter1.addWidget(self.list)        
         h_layout.addWidget(self.splitter1)
+
+        large_lable = QtGui.QLabel()
+        large_lable.setMaximumSize(QtCore.QSize(16, 16)) 
+        large_lable.setPixmap(large_icon)
+        small_lable = QtGui.QLabel()
+        small_lable.setMaximumSize(QtCore.QSize(16, 16)) 
+        small_lable.setPixmap(small_icon)
             
         slideWidget = QtGui.QWidget() 
         slideLayout = QtGui.QHBoxLayout()
@@ -2715,14 +2728,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 
         self.listSlider = QtGui.QSlider()
         self.listSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.listSlider.setMaximumWidth(100)
-        self.listSlider.setMinimumWidth(100)
+        self.listSlider.setMaximumWidth(80)
+        self.listSlider.setMinimumWidth(80)
         self.listSlider.setMinimum(32)
         self.listSlider.setMaximum(96)
         self.listSlider.setValue(32)
         self.listSlider.valueChanged.connect(self.list.icons_size) 
 
+        slideLayout.addWidget(small_lable)
         slideLayout.addWidget(self.listSlider)
+        slideLayout.addWidget(large_lable)
         h_layout.addWidget(slideWidget)
 
         # add to the designer ui

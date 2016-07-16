@@ -494,6 +494,11 @@ class pipelineTreeView(QtGui.QTreeView):
         # this was required when i misused the insert rows function of the model...
         #self._proxyModel.invalidate()
 
+    def projectRootIndex(self):
+        modelRootIndex = self.asModelIndex(self.rootIndex())
+        # get the first childe of the model's root                                   
+        return self.sourceModel.index(0,0,modelRootIndex)
+      
    
     def contextMenuEvent(self, event):
         
@@ -522,10 +527,11 @@ class pipelineTreeView(QtGui.QTreeView):
                 
 
         else:
-            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,QtCore.QModelIndex()) ))
-            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,QtCore.QModelIndex()) ))
+            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self.projectRootIndex()) ))
+            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self.projectRootIndex()) ))
 
         menu.addActions(actions)      
+        
 
         if handled:
 
