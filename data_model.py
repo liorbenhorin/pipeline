@@ -180,6 +180,27 @@ class PipelineContentsView(QtGui.QTableView):
     def clearModel(self):
         self.setModel(None)
 
+    def mouseDoubleClickEvent(self, event):
+        index = self.indexAt(event.pos())
+        node = None
+        if index.isValid():
+            tableModelNode = self.model().getNode(index)  
+            src = self.asTreeIndex(index)
+            node =  self.treeSourceModel.getNode(src)
+        
+        if node:
+            if tableModelNode.typeInfo() != "COMPONENT":   
+             
+                treeIndex = self.treeView.fromProxyIndex(self.asTreeIndex(index))       
+                self.setTreeViewtSelection(treeIndex)  
+                
+            else:
+                
+                pass
+                '''
+                -----> double click on a component... what shoud we do?
+                '''
+            
     def contextMenuEvent(self, event):
      
         handled = True
@@ -245,13 +266,20 @@ class PipelineContentsView(QtGui.QTableView):
         return
 
 
+    def setTreeViewtSelection(self,index):
+        
+        self.treeView.select(index)
+        selection = QtGui.QItemSelection(index, index)        
+        self.update(selection)    
+
+
     def restoreTreeViewtSelection(self):
         # restore the table from the tree with up to date data
         # using the tree view's last selection
         self.treeView.restoreSelection()
-        treeLastIndex =  self.treeView.fromProxyIndex(self.treeView.userSelection)
-        treeLastIndexSelection = QtGui.QItemSelection(treeLastIndex, treeLastIndex)
-        self.update(treeLastIndexSelection)        
+        treeLastIndex =  self.treeView.fromProxyIndex(self.treeView.userSelection)       
+        self.setTreeViewtSelection(treeLastIndex)
+      
 
     def delete(self,  index):
         # clear the table before the action to prevent data being invalid
@@ -476,8 +504,11 @@ class pipelineTreeView(QtGui.QTreeView):
     def restoreSelection(self):
 
         index = self.fromProxyIndex(self.userSelection)
+        self.select(index)
+        #self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
+    
+    def select(self, index):
         self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
-
         
     def dropEvent(self, event):
         super(pipelineTreeView,self).dropEvent(event)
