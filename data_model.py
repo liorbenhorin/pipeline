@@ -755,7 +755,6 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             childCount = parentNode.childCount()
             childNode = node
             success = parentNode.insertChild(position, childNode)
-            print success, "<--- inser rows"
         
         self.endInsertRows()
         return True
