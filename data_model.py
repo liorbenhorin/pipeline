@@ -41,78 +41,106 @@ set_icons()
 
 
 
-class customListView(QtGui.QTableView):#QListView):
-    def __init__(self,parent = None,proxyModel = None):
-        super(customListView, self).__init__(parent)
+class PipelineContentsView(QtGui.QTableView):
+    def __init__(self,parent = None):
+        super(PipelineContentsView, self).__init__(parent)
+        
+        #display options
+        
         self.setAlternatingRowColors(True)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
-        #<<<<self.setViewMode(QtGui.QListView.IconMode)
         self.setWordWrap(True)
         self.setShowGrid(False)
-        #self.setUniformItemSizes(True)
-        #self.setSpacing(5)
-        #self.setResizeMode(QtGui.QListView.Adjust)
-        #<<<<<<self.setWrapping(True)
-
-        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
-        
-        self.icons_size(32)
-        
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
+        self.icons_size(32)       
         self.setMinimumWidth(250)
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.setSortingEnabled(True)
         self.horizontalHeader().setOffset(10)
-
-            
-          
         self.verticalHeader().hide()
         
+        #local variables
+        self._treeView = None        
+        self._treeProxyModel = None
+        self._treeSourceModel = None
         
-        self._tree = None
-        self._treeSortModel = None
-        self._treeModel = None
         self._treeParent = None
         self._treeParentIndex = None
-        
 
 
-            
+    @property
+    def treeView(self):
+        return self._treeView
+    
+    @treeView.setter
+    def treeView(self, view):
+        self._treeView = view
+        self.init_treeView() 
+
+    @property
+    def treeProxyModel(self):
+        return self._treeProxyModel
+    
+    @treeProxyModel.setter
+    def treeProxyModel(self, model):
+        self._treeProxyModel = model        
+
+    @property
+    def treeSourceModel(self):
+        return self._treeSourceModel
+    
+    @treeSourceModel.setter
+    def treeSourceModel(self, model):
+        self._treeSourceModel = model   
+
+    def init_treeView(self):
+
+        self.treeProxyModel = self.treeView.model()
+        self.treeSourceModel = self.treeProxyModel.sourceModel()        
+
+    def asTreeIndex(self, index):
+        node = self.getNode(index)
+        return self.treeSourceModel.indexFromNode(node,self.treeView.rootIndex())
 
     def icons_size(self, int):
-
         self.setIconSize(QtCore.QSize(int ,int)  )       
         self.verticalHeader().setDefaultSectionSize(int )
-
                
-    def treeView(self, view):
-        self._tree = view
-        self._treeSortModel = view.model()
-        self._treeModel = self._treeSortModel.sourceModel()
+    def getNode(self, index):
+        return self.model().getNode(index)
 
-    def treeIndex(self, index):
-        node = self.model().getNode(index)
-        return self._treeModel.indexFromNode(node,self._tree.rootIndex())
+    def click(self, index):
 
-    def change(self, index):
-
-        node = self.model().getNode(index)
-        #print node.name
+        node = self.getNode(index)
         if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
-            treeIndex = self._treeModel.indexFromNode(node,self._tree.rootIndex())
-            #print self._treeModel.getNode(treeIndex).name
-        else:
-            pass
-            #print "add..."
-                
-    def update(self, idx):#, col):
-        if len(idx.indexes()):
-            index = idx.indexes()[0]
-  
-            
-            if index.model():
-            
-                mdl =  self._tree.model().sourceModel()
-                src = index.model().mapToSource(index)                          
+            treeIndex = self.asTreeIndex(node)
+            print treeIndex
+    
+    '''
+    updates the table view with a new model
+    the model is a custom table model, bulit from the childs of the selected branch in the treeview
+    
+    index: QItemSelection
+    '''
+    
+
+    def asTreeModelIndex(self, index):
+        return self.treeView.asModelIndex(index)  
+              
+    def update(self, selection):
+        #if the selection is not empty
+        if len(selection.indexes())>0:
+            # using only the first selection for this task
+            index = selection.indexes()[0]
+             
+            if index.isValid():
+                '''
+                the index is from the tree's proxymodel
+                we need to convert it to the source index
+                '''
+
+                src = self.asTreeModelIndex(index) 
+                node =                         
                 node = mdl.getNode(src)
                 
                 list = []
@@ -121,10 +149,6 @@ class customListView(QtGui.QTableView):#QListView):
                 self._treeParent = node
                 self._treeParentIndex = src
                 
-                #elif node.typeInfo() == "ASSET":             
-                
-                
-
                 for row in range(mdl.rowCount(src)):
 
                     item_index = mdl.index(row,0,src)
@@ -175,7 +199,7 @@ class customListView(QtGui.QTableView):#QListView):
         if index.isValid():
             
             loacl_node = self.model().getNode(index)                
-            src = self.treeIndex(index)                 
+            src = self.asTreeIndex(index)                 
             node =  self._treeModel.getNode(src)
       
               
@@ -272,21 +296,25 @@ class customListView(QtGui.QTableView):#QListView):
 class pipelineTreeView(QtGui.QTreeView):
     def __init__(self,parent = None):
         super(pipelineTreeView, self).__init__(parent)
+        
         # display options
         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.setAlternatingRowColors(True)
-        
+        self.setSortingEnabled(True)
+        self.setDragEnabled( True )
+        self.setAcceptDrops( True )
+        self.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
+        self.resizeColumnToContents(True) 
+                
         #local variables
-        #self._state = None
-        self._ignoreExpentions = False
 
-        self._expended_states = None
-        
-        self._userSelection = None
-        
+        self._ignoreExpentions = False
+        self._expended_states = None        
+        self._userSelection = None       
         self._tableView = None
         self._proxyModel = None
         self._sourceModel = None
+        
         #stylesheet 
         self.setStyleSheet('''  
                            

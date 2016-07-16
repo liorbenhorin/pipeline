@@ -2666,18 +2666,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         VIEWS
         
         '''
-        self.list = dtm.customListView()        
-        self.tree = dtm.pipelineTreeView()        
-        self.tree.tableView = self.list
+        self.list = dtm.PipelineContentsView()        
+        self.tree = dtm.pipelineTreeView()  
+        
+        #connect the tree to the table views and vice versa     
+        self.tree.tableView = self.list 
+        self.list.treeView = self.tree      
         
         self.tree.setModel( self._proxyModel )
-        self.tree.setSortingEnabled(True)
-        self.tree.setDragEnabled( True )
-        self.tree.setAcceptDrops( True )
-        self.tree.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
-        self.tree.resizeColumnToContents(True) 
-        
-      
+     
         self._proxyModel.treeView = self.tree
  
         #flat = dtm.FlatProxyModel()
@@ -2688,7 +2685,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                
         
         self.list.treeView(self.tree)
-        QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.change)
+        QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.click)
         
         
 
