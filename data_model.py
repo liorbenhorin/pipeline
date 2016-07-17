@@ -96,49 +96,81 @@ class PipelineContentsView(QtGui.QTableView):
         
         treeModel = self.treeSourceModel
         i = self.indexAt(event.pos())
-        if i.isValid():
+
+        #if i.isValid():
             
-            if event.source().__class__.__name__ == "PipelineContentsView":
-                '''
-                this is intercepting drops from within this view
-                '''    
-     
-                drop_node = self.model().getNode(i)
-                tree_index = treeModel.indexFromNode(drop_node, QtCore.QModelIndex())
+        if event.source().__class__.__name__ == "PipelineContentsView":
+            '''
+            this is intercepting drops from within this view
+            '''    
+ 
+            drop_node = self.model().getNode(i)
+            tree_index = treeModel.indexFromNode(drop_node, QtCore.QModelIndex())
+            
+            if tree_index.isValid():
                 
-                if tree_index.isValid():
-                    
-                    tree_node = treeModel.getNode(tree_index)
-                    mime = event.mimeData()
-                    
-                    
-                    item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
-                    item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
-                    item_parent = treeModel.parent( item_index )
+                tree_node = treeModel.getNode(tree_index)
+                mime = event.mimeData()
+                
+                
+                item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+                item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
+                item_parent = treeModel.parent( item_index )
 
-                    self.clearModel()
-                    treeModel.removeRows(item_index.row(),1,item_parent)            
-                    self.treeView._proxyModel.invalidate()
+                self.clearModel()
+                treeModel.removeRows(item_index.row(),1,item_parent)            
+                self.treeView._proxyModel.invalidate()
 
-                    treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
-                    self.restoreTreeViewtSelection()  
-                    
-                    event.accept()     
-                    
+                treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
+                self.restoreTreeViewtSelection()  
+                
+                event.accept()     
+                return
     
-                
-            if event.source().__class__.__name__ == "pipelineTreeView":
+        
+        elif event.source().__class__.__name__ == "pipelineTreeView":
+            
+            '''
+            this is intercepting drops from within the tree view
+            '''  
+                        
+            mime = event.mimeData()
+            item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+            item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
+            item_parent = treeModel.parent( item_index )            
+            
+            '''
+            make sure the dropped item is not the root of the table
+            '''
+            HierarchyNodes = []
+            for i in treeModel.listHierarchy(self._treeParentIndex):
+                HierarchyNodes.append(treeModel.getNode(i).id)
+            
+            if item.id in HierarchyNodes:
                 
                 event.setDropAction(QtCore.Qt.IgnoreAction)
                 event.ignore()
-        
+                return
+                
+            else:    
+                '''
+                the droped item is an ancestor of the the table root
+                '''
+                self.clearModel()
+                
+                print treeModel.getNode(item_parent).name, "<-- parent"
+                print treeModel.getNode(item_index).name, "<-- item", item_index.row(), "<-- row"
+                
+                treeModel.removeRows(item_index.row(),0,item_parent)            
+                self.treeView._proxyModel.invalidate()
 
-        else:
-            
-            event.ignore()
+                treeModel.dropMimeData(mime, event.dropAction,0,0,self._treeParentIndex)                
+                
+                #self.restoreTreeViewtSelection() 
+                event.accept()
+                return
         
         
-        return
 
 
     @property
@@ -249,6 +281,9 @@ class PipelineContentsView(QtGui.QTableView):
                     return True
                          
         # in case the selection is empty, or the index was invalid, clear the table            
+        #self.setModel(None)
+        #self.setModel(PipelineContentsModel([]))
+        
         self.clearModel()        
         return False
     
@@ -531,6 +566,7 @@ class pipelineTreeView(QtGui.QTreeView):
     def selectRoot(self):
         
         self.setCurrentIndex(self.asProxyIndex(self.rootIndex()))
+        self.tableView.update(self.selectionModel().selection())        
         self.saveSelection()
 
     def saveSelection(self):
@@ -671,10 +707,13 @@ class pipelineTreeView(QtGui.QTreeView):
         # get the first childe of the model's root                                   
         return self.sourceModel.index(0,0,modelRootIndex)
       
+    
     def mouseReleaseEvent(self, event):
+        super(pipelineTreeView, self).mouseReleaseEvent(event)
         self.saveSelection()
         self.tableView.update(self.selectionModel().selection())
-
+        #event.accept()
+        #return
    
     def contextMenuEvent(self, event):
         
@@ -730,20 +769,23 @@ class pipelineTreeView(QtGui.QTreeView):
         node = self.asModelNode(index)
         parentIndex = self.sourceModel.parent(index)
         self.sourceModel.removeRows(node.row(),1,parentIndex, kill=True)
-        
+        self._proxyModel.invalidate()
         return True
+        
     def create_new_folder(self, parent):
         node = dt.Node("folder")        
         self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
+        self._proxyModel.invalidate()
         
     def create_new_asset(self, parent):
         node = dt.AssetNode("asset","")
         self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
-
+        self._proxyModel.invalidate()
+        
     def create_new_component(self, parent):
         node = dt.ComponentNode("component","")
         self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
-
+        self._proxyModel.invalidate()
 
 
 
@@ -1040,6 +1082,25 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         else:
             # if the node is not in the tree return an empty index
             return QtCore.QModelIndex()
+
+    def listHierarchy(self, index):
+        
+        def rec(d, index):
+            
+            i = self.parent(index)
+            if i != QtCore.QModelIndex():
+                d.append(self.parent(index))
+                rec(d, i)
+            else:
+                return
+        
+        data = [index]
+        rec(data, index)
+        if len(data)>0:
+            return data
+        else:
+            # if the node is not in the tree return an empty index
+            return [QtCore.QModelIndex()]       
 
 
 class PipelineContentsModel(QtCore.QAbstractTableModel):
