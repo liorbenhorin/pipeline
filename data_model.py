@@ -297,6 +297,7 @@ class PipelineContentsView(QtGui.QTableView):
         self.treeView.restoreSelection()
         treeLastIndex =  self.treeView.fromProxyIndex(self.treeView.userSelection)       
         self.setTreeViewtSelection(treeLastIndex)
+        
       
 
     def delete(self,  index):
@@ -336,6 +337,7 @@ class pipelineTreeView(QtGui.QTreeView):
         self.setDragEnabled( True )
         self.setAcceptDrops( True )
         self.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
+        self.setDropIndicatorShown(True)
         self.resizeColumnToContents(True) 
                 
         #local variables
@@ -642,7 +644,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
 class PipelineProjectModel(QtCore.QAbstractItemModel):
     
-    
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
     sortRole   = QtCore.Qt.UserRole
     filterRole = QtCore.Qt.UserRole + 1
     expendedRole = QtCore.Qt.UserRole + 2
@@ -850,10 +852,13 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
     def supportedDropActions( self ):
 
         return  QtCore.Qt.CopyAction | QtCore.Qt.MoveAction 
-     
+    
 
     def mimeData( self, indices ):
         '''Encode serialized data from the item at the given index into a QMimeData object.'''
+        
+        
+
         
         data = ''
 
@@ -867,20 +872,20 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             pass
 
         mimedata = QtCore.QMimeData()
-        mimedata.setData( 'application/x-qabstractitemmodeldatalist', data ) 
+        mimedata.setData( PipelineProjectModel.MIMEDATA , data ) 
    
         return mimedata
      
     def dropMimeData( self, mimedata, action, row, column, parentIndex ):
-        
+
         '''Handles the dropping of an item onto the model.
          
         De-serializes the data into a TreeItem instance and inserts it into the model.
         '''
-        if not mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
+        if not mimedata.hasFormat( PipelineProjectModel.MIMEDATA ):
             return False
             
-        item = cPickle.loads( str( mimedata.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+        item = cPickle.loads( str( mimedata.data( PipelineProjectModel.MIMEDATA ) ) )
         dropParent = self.getNode( parentIndex )
         
         # do not allow a folder to be dropped on an asset...
@@ -898,8 +903,8 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         self.dataChanged.emit( parentIndex, parentIndex )
          
         return True 
+ 
        
-
     def indexFromNode(self, node, rootIndex):
         '''
         recursive function to get Index from a node,
@@ -932,6 +937,8 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
 
 
 class PipelineContentsModel(QtCore.QAbstractTableModel):
+    
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
     
     def __init__(self, components = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self, parent)
@@ -1054,11 +1061,11 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
             pass
 
         mimedata = QtCore.QMimeData()
-        mimedata.setData( 'application/x-qabstractitemmodeldatalist', data ) 
+        mimedata.setData( PipelineContentsModel.MIMEDATA , data ) 
 
-        if mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
+        if mimedata.hasFormat( PipelineContentsModel.MIMEDATA ):
             print "good format"
-   
+
         return mimedata
 
     def dropMimeData( self, mimedata, action, row, column, parentIndex ):
