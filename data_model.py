@@ -61,7 +61,7 @@ class PipelineContentsView(QtGui.QTableView):
         
         self.setSortingEnabled(True)
         self.setDragEnabled( True )
-        #self.setAcceptDrops( True )
+        self.setAcceptDrops( True )
         self.setDragDropMode( QtGui.QAbstractItemView.DragDrop )#QtGui.QAbstractItemView.DragDrop )InternalMove
         
         
@@ -75,8 +75,9 @@ class PipelineContentsView(QtGui.QTableView):
         self._treeParentIndex = None
 
     def dropEvent(self, event):
-        super(PipelineContentsView,self).dropEvent(event)
-        #QTreeView.dropEvent(self, evt)
+
+        #super(PipelineContentsView,self).dropEvent(event)
+        '''
         if not event.isAccepted():
             # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
             # by target widget, it sets accept() to true, which causes the executed
@@ -85,6 +86,60 @@ class PipelineContentsView(QtGui.QTableView):
             # Maybe it's better for the model to check drop-okay-ness during the
             # drag rather than only on drop; but the check involves not-insignificant work.
             event.setDropAction(QtCore.Qt.IgnoreAction)
+        '''
+        
+        '''
+        this event is catching drops onto the contents view
+        
+        '''
+
+        
+        treeModel = self.treeSourceModel
+        i = self.indexAt(event.pos())
+        if i.isValid():
+            
+            if event.source().__class__.__name__ == "PipelineContentsView":
+                '''
+                this is intercepting drops from within this view
+                '''    
+     
+                drop_node = self.model().getNode(i)
+                tree_index = treeModel.indexFromNode(drop_node, QtCore.QModelIndex())
+                
+                if tree_index.isValid():
+                    
+                    tree_node = treeModel.getNode(tree_index)
+                    mime = event.mimeData()
+                    
+                    
+                    item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+                    item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
+                    item_parent = treeModel.parent( item_index )
+
+                    self.clearModel()
+                    treeModel.removeRows(item_index.row(),1,item_parent)            
+                    self.treeView._proxyModel.invalidate()
+
+                    treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
+                    self.restoreTreeViewtSelection()  
+                    
+                    event.accept()     
+                    
+    
+                
+            if event.source().__class__.__name__ == "pipelineTreeView":
+                
+                event.setDropAction(QtCore.Qt.IgnoreAction)
+                event.ignore()
+        
+
+        else:
+            
+            event.ignore()
+        
+        
+        return
+
 
     @property
     def treeView(self):
@@ -140,6 +195,8 @@ class PipelineContentsView(QtGui.QTableView):
         if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
             treeIndex = self.asTreeIndex(index)
             print treeIndex, " <--- table clicked"
+
+
     
     '''
     updates the table view with a new model
@@ -564,7 +621,8 @@ class pipelineTreeView(QtGui.QTreeView):
         '''
         if the drop is coming from the contents view - this is how i handle this...
         it's UGLY, but for now it's the only way i can make this work...
-        '''       
+        '''   
+        #print event.possibleActions() , "<<"   
         if event.source().__class__.__name__ == 'PipelineContentsView':        
                                  
             i = self.indexAt(event.pos())         
@@ -582,6 +640,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 source.clearModel()
                 self.sourceModel.removeRows(item_index.row(),1,item_parent)            
                 self._proxyModel.invalidate()
+
                 self.sourceModel.dropMimeData(mime, event.dropAction,0,0,model_index)
                 source.restoreTreeViewtSelection()        
         
@@ -612,6 +671,10 @@ class pipelineTreeView(QtGui.QTreeView):
         # get the first childe of the model's root                                   
         return self.sourceModel.index(0,0,modelRootIndex)
       
+    def mouseReleaseEvent(self, event):
+        self.saveSelection()
+        self.tableView.update(self.selectionModel().selection())
+
    
     def contextMenuEvent(self, event):
         
@@ -619,8 +682,7 @@ class pipelineTreeView(QtGui.QTreeView):
         index = self.indexAt(event.pos())
         menu = QtGui.QMenu()        
         node = None
-
-        
+       
         if index.isValid():
             src = self.asModelIndex(index)
             node = self.asModelNode(src)
@@ -1107,10 +1169,39 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
         mimedata = QtCore.QMimeData()
         mimedata.setData( PipelineContentsModel.MIMEDATA , data ) 
 
-        if mimedata.hasFormat( PipelineContentsModel.MIMEDATA ):
-            print "good format"
 
         return mimedata
+
+    '''
+    def dropMimeData( self, mimedata, action, row, column, parentIndex ):
+        #print mimedata, action, row, column, parentIndex
+        print self.getNode(parentIndex).name
+        return
+
+        if not mimedata.hasFormat( PipelineProjectModel.MIMEDATA ):
+            return False
+            
+        
+        
+        
+        item = cPickle.loads( str( mimedata.data( PipelineProjectModel.MIMEDATA ) ) )
+        dropParent = self.getNode( parentIndex )
+        
+        # do not allow a folder to be dropped on an asset...
+        if dropParent.typeInfo() == "ASSET":
+            if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
+                return False
+        
+        if dropParent.typeInfo() == "ROOT":
+            return False
+            
+               
+        #dropParent.addChild( item )
+        self.insertRows( dropParent.childCount(), 1, parent = parentIndex )
+            
+        self.dataChanged.emit( parentIndex, parentIndex )
+         
+        return True '''
 
         
 class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
