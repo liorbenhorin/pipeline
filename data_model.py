@@ -142,6 +142,8 @@ class PipelineContentsView(QtGui.QTableView):
             for i in treeModel.listHierarchy(self._treeParentIndex):
                 HierarchyNodes.append(treeModel.getNode(i).id)
             
+            print HierarchyNodes
+            print item.id
             if item.id in HierarchyNodes:
                 
                 event.setDropAction(QtCore.Qt.IgnoreAction)
@@ -152,15 +154,16 @@ class PipelineContentsView(QtGui.QTableView):
                 '''
                 the droped item is an ancestor of the the table root
                 '''
-
+                
                 treeModel.removeRows(item_index.row(),0,item_parent)            
                 self.treeView._proxyModel.invalidate()
 
                 treeModel.dropMimeData(mime, event.dropAction,0,0,self._treeParentIndex)                
-
+                self.treeView._proxyModel.invalidate()
                 event.accept()
                 x = self.treeView.fromProxyIndex(self._treeParentIndex)
                 selection = QtGui.QItemSelection(x, x)        
+                print treeModel.rowCount(self._treeParentIndex), "<-- rowcount"
                 self.update(selection)
                 self.treeView.setExpanded(x, True)
                 
@@ -256,6 +259,7 @@ class PipelineContentsView(QtGui.QTableView):
 
                     item_index = treeModel.index(row,0,src)
                     treeNode = treeModel.getNode(item_index) 
+                    print treeNode, "---", row
                     contenetsList.append(treeNode)
                     
                 # ----> this is the section to append 'add' buttons to the list
@@ -1085,6 +1089,9 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
                 return
         
         data = [index]
+        for i in range(self.rowCount(index)):
+            data.append(self.index(i, 0, index))
+            
         rec(data, index)
         if len(data)>0:
             return data
