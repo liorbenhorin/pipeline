@@ -294,4 +294,16 @@ class AddFolder(Node):
   
     def resource(self):
         return folder_icon                
-        
+
+class DummyNode(Node):
+    
+    def __init__(self, name, parent=None):
+        super(DummyNode, self).__init__(name, parent)
+
+
+    def typeInfo(self):
+        return "DUMMY"
+  
+    def resource(self):
+        return None               
+                

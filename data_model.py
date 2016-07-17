@@ -91,9 +91,7 @@ class PipelineContentsView(QtGui.QTableView):
         '''
         this event is catching drops onto the contents view
         
-        '''
-
-        
+        '''     
         treeModel = self.treeSourceModel
         i = self.indexAt(event.pos())
 
@@ -116,14 +114,11 @@ class PipelineContentsView(QtGui.QTableView):
                 item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
                 item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
                 item_parent = treeModel.parent( item_index )
-
-                #self.clearModel()
                 treeModel.removeRows(item_index.row(),1,item_parent)            
                 self.treeView._proxyModel.invalidate()
 
                 treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
-                #self.restoreTreeViewtSelection()  
-                
+                 
                 event.accept() 
                 self.update(self.treeView.selectionModel().selection())    
                 return
@@ -157,32 +152,20 @@ class PipelineContentsView(QtGui.QTableView):
                 '''
                 the droped item is an ancestor of the the table root
                 '''
-                
-                
-                print treeModel.getNode(item_parent).name, "<-- parent"
-                print treeModel.getNode(item_index).name, "<-- item", item_index.row(), "<-- row"
-                
+
                 treeModel.removeRows(item_index.row(),0,item_parent)            
                 self.treeView._proxyModel.invalidate()
 
                 treeModel.dropMimeData(mime, event.dropAction,0,0,self._treeParentIndex)                
-                
-                #self.treeView.select(self.treeView.fromProxyIndex(self._treeParentIndex)) 
+
                 event.accept()
-                #self.update(self.treeView.selectionModel().selection())
-                #self.setTreeViewtSelection(self._treeParentIndex)
-                id = treeModel.indexFromNode(item, QtCore.QModelIndex())
-                
-                print treeModel.getNode(self._treeParentIndex).name
                 x = self.treeView.fromProxyIndex(self._treeParentIndex)
                 selection = QtGui.QItemSelection(x, x)        
                 self.update(selection)
                 self.treeView.setExpanded(x, True)
-                #self.update(self.treeView.selectionModel().selection())
+                
                 return
         
-        
-
 
     @property
     def treeView(self):
@@ -292,10 +275,8 @@ class PipelineContentsView(QtGui.QTableView):
                     return True
                          
         # in case the selection is empty, or the index was invalid, clear the table            
-        #self.setModel(None)
-        #self.setModel(PipelineContentsModel([]))
-        
-        self.clearModel()        
+        self.setModel(PipelineContentsModel([dt.DummyNode("")]))        
+        #self.clearModel()        
         return False
     
     def clearModel(self):
