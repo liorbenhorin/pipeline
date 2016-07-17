@@ -549,6 +549,7 @@ class pipelineTreeView(QtGui.QTreeView):
         
         
     def dropEvent(self, event):
+
         super(pipelineTreeView,self).dropEvent(event)
         #QTreeView.dropEvent(self, evt)
         if not event.isAccepted():
@@ -559,10 +560,53 @@ class pipelineTreeView(QtGui.QTreeView):
             # Maybe it's better for the model to check drop-okay-ness during the
             # drag rather than only on drop; but the check involves not-insignificant work.
             event.setDropAction(QtCore.Qt.IgnoreAction)
+        
+        '''
+        if the drop is coming from the contents view - this is how i handle this...
+        it's UGLY, but for now it's the only way i can make this work...
+        '''       
+        if event.source().__class__.__name__ == 'PipelineContentsView':        
+                                 
+            i = self.indexAt(event.pos())         
+            model_index = self.asModelIndex(i)
+                                  
+            if model_index.isValid():
                 
+                mime = event.mimeData()
+                source = event.source()
+                
+                item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+                item_index = self.sourceModel.indexFromNode( item , QtCore.QModelIndex())
+                item_parent = self.sourceModel.parent( item_index )
+
+                source.clearModel()
+                self.sourceModel.removeRows(item_index.row(),1,item_parent)            
+                self._proxyModel.invalidate()
+                self.sourceModel.dropMimeData(mime, event.dropAction,0,0,model_index)
+                source.restoreTreeViewtSelection()        
+        
         # this was required when i misused the insert rows function of the model...
         #self._proxyModel.invalidate()
 
+
+    '''
+    here i am detecting if a drop is coming from the contents view, to mark it as acepted, otherwise the drop will be blocked.
+    it's UGLY, but for now it's the only way i can make this work...
+    '''  
+    def dragEnterEvent(self, event):
+
+        super(pipelineTreeView,self).dragEnterEvent(event)
+
+        if event.source().__class__.__name__ == 'PipelineContentsView':        
+            return event.setAccepted(True)
+
+    '''
+    def dragMoveEvent(self, event):
+
+        super(pipelineTreeView,self).dragMoveEvent(event)
+        #return event.setAccepted(True)
+    '''
+    
     def projectRootIndex(self):
         modelRootIndex = self.asModelIndex(self.rootIndex())
         # get the first childe of the model's root                                   
@@ -1068,9 +1112,6 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
 
         return mimedata
 
-    def dropMimeData( self, mimedata, action, row, column, parentIndex ):
-        print mimedata         
-        return False
         
 class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
