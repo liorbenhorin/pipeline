@@ -59,6 +59,13 @@ class PipelineContentsView(QtGui.QTableView):
         self.horizontalHeader().setOffset(10)
         self.verticalHeader().hide()
         
+        self.setSortingEnabled(True)
+        self.setDragEnabled( True )
+        #self.setAcceptDrops( True )
+        self.setDragDropMode( QtGui.QAbstractItemView.DragDrop )#QtGui.QAbstractItemView.DragDrop )InternalMove
+        
+        
+        
         #local variables
         self._treeView = None        
         self._treeProxyModel = None
@@ -67,6 +74,17 @@ class PipelineContentsView(QtGui.QTableView):
         self._treeParent = None
         self._treeParentIndex = None
 
+    def dropEvent(self, event):
+        super(PipelineContentsView,self).dropEvent(event)
+        #QTreeView.dropEvent(self, evt)
+        if not event.isAccepted():
+            # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
+            # by target widget, it sets accept() to true, which causes the executed
+            # action to be reported as "move", which causes the view to remove the
+            # source rows even though the target widget didn't like the drop.
+            # Maybe it's better for the model to check drop-okay-ness during the
+            # drag rather than only on drop; but the check involves not-insignificant work.
+            event.setDropAction(QtCore.Qt.IgnoreAction)
 
     @property
     def treeView(self):
@@ -361,9 +379,19 @@ class pipelineTreeView(QtGui.QTreeView):
 
                            
                             ''')
+        '''
+        self.viewport().installEventFilter(self)
 
+    def eventFilter(self, object, event):
+        if object is self.viewport():
+            if event.type() == QtCore.QEvent.DragMove:
+                print "Moved!"
+            elif event.type() == QtCore.QEvent.Drop:
+                print "Dropped!"
+        
+        return super(pipelineTreeView, self).eventFilter(object, event)
+    '''
     
-
     def setModel(self,model):
 
         super(pipelineTreeView,self).setModel(model)
@@ -740,7 +768,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             
             if node.typeInfo() == "COMPONENT":
                 return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
-    
+        
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
     
     """INPUTS: QModelIndex"""
@@ -821,7 +849,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
 
     def supportedDropActions( self ):
 
-        return QtCore.Qt.MoveAction | QtCore.Qt.CopyAction
+        return  QtCore.Qt.CopyAction | QtCore.Qt.MoveAction 
      
 
     def mimeData( self, indices ):
@@ -844,6 +872,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         return mimedata
      
     def dropMimeData( self, mimedata, action, row, column, parentIndex ):
+        
         '''Handles the dropping of an item onto the model.
          
         De-serializes the data into a TreeItem instance and inserts it into the model.
@@ -959,7 +988,7 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
                 return "test test test test test test"
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled
         
     """CUSTOM"""
     """INPUTS: QModelIndex"""
@@ -1003,6 +1032,39 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
         self.endRemoveRows()
         return True
 
+    def supportedDropActions( self ):
+
+        return QtCore.Qt.MoveAction | QtCore.Qt.CopyAction
+
+    #def mimeTypes( self ):
+    #    '''The MimeType for the encoded data.'''
+    #    types =  'application/x-qabstractitemmodeldatalist' 
+    #    return types
+        
+    def mimeData( self, indices ):
+        '''Encode serialized data from the item at the given index into a QMimeData object.'''
+        
+        data = ''
+        item = self.getNode( indices[0] )
+
+        try:
+            data += cPickle.dumps( item )
+
+        except:
+            pass
+
+        mimedata = QtCore.QMimeData()
+        mimedata.setData( 'application/x-qabstractitemmodeldatalist', data ) 
+
+        if mimedata.hasFormat( 'application/x-qabstractitemmodeldatalist' ):
+            print "good format"
+   
+        return mimedata
+
+    def dropMimeData( self, mimedata, action, row, column, parentIndex ):
+        print mimedata         
+        return False
+        
 class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
     def __init__(self,parent = None):
         
