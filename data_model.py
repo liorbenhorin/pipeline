@@ -764,24 +764,32 @@ class pipelineTreeView(QtGui.QTreeView):
         parentIndex = self.sourceModel.parent(index)
         self.sourceModel.removeRows(node.row(),1,parentIndex, kill=True)
         self._proxyModel.invalidate()
+        
+        #self.updateTable( parentIndex)
+        self.updateTable( self.fromProxyIndex(parentIndex))
         return True
         
     def create_new_folder(self, parent):
         node = dt.Node("folder")        
         self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
         self._proxyModel.invalidate()
+        self.updateTable( self.fromProxyIndex(parent))
         
     def create_new_asset(self, parent):
         node = dt.AssetNode("asset","")
         self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
         self._proxyModel.invalidate()
+        self.updateTable( self.fromProxyIndex(parent))
         
     def create_new_component(self, parent):
         node = dt.ComponentNode("component","")
         self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
         self._proxyModel.invalidate()
+        self.updateTable( self.fromProxyIndex(parent))
 
-
+    def updateTable(self, index):
+        selection = QtGui.QItemSelection(index, index)        
+        self.tableView.update(selection)
 
 
 class PipelineProjectModel(QtCore.QAbstractItemModel):
