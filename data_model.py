@@ -279,7 +279,9 @@ class PipelineContentsView(QtGui.QTableView):
                     return True
                          
         # in case the selection is empty, or the index was invalid, clear the table            
-        self.setModel(PipelineContentsModel([dt.DummyNode("")]))        
+        self.setModel(PipelineContentsModel([dt.DummyNode("")]))  
+        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+        self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)      
         #self.clearModel()        
         return False
     
@@ -393,6 +395,9 @@ class PipelineContentsView(QtGui.QTableView):
         self.clearModel()
         self.treeView.delete(index)        
         self.restoreTreeViewtSelection()
+        #i = self.asTreeIndex(index)
+        #ii = self.treeView.fromProxyIndex(i)
+        #self.updateTable(ii)
 
     def create_new_folder(self, parent):
         self.clearModel()             
@@ -411,7 +416,9 @@ class PipelineContentsView(QtGui.QTableView):
         self.treeView.create_new_component(parent)              
         self.restoreTreeViewtSelection()
         
-
+    def updateTable(self, index):
+        selection = QtGui.QItemSelection(index, index)        
+        self.update(selection)
 
                    
 class pipelineTreeView(QtGui.QTreeView):
