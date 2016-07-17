@@ -117,14 +117,15 @@ class PipelineContentsView(QtGui.QTableView):
                 item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
                 item_parent = treeModel.parent( item_index )
 
-                self.clearModel()
+                #self.clearModel()
                 treeModel.removeRows(item_index.row(),1,item_parent)            
                 self.treeView._proxyModel.invalidate()
 
                 treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
-                self.restoreTreeViewtSelection()  
+                #self.restoreTreeViewtSelection()  
                 
-                event.accept()     
+                event.accept() 
+                self.update(self.treeView.selectionModel().selection())    
                 return
     
         
@@ -156,7 +157,7 @@ class PipelineContentsView(QtGui.QTableView):
                 '''
                 the droped item is an ancestor of the the table root
                 '''
-                self.clearModel()
+                
                 
                 print treeModel.getNode(item_parent).name, "<-- parent"
                 print treeModel.getNode(item_index).name, "<-- item", item_index.row(), "<-- row"
@@ -166,8 +167,18 @@ class PipelineContentsView(QtGui.QTableView):
 
                 treeModel.dropMimeData(mime, event.dropAction,0,0,self._treeParentIndex)                
                 
-                #self.restoreTreeViewtSelection() 
+                #self.treeView.select(self.treeView.fromProxyIndex(self._treeParentIndex)) 
                 event.accept()
+                #self.update(self.treeView.selectionModel().selection())
+                #self.setTreeViewtSelection(self._treeParentIndex)
+                id = treeModel.indexFromNode(item, QtCore.QModelIndex())
+                
+                print treeModel.getNode(self._treeParentIndex).name
+                x = self.treeView.fromProxyIndex(self._treeParentIndex)
+                selection = QtGui.QItemSelection(x, x)        
+                self.update(selection)
+                self.treeView.setExpanded(x, True)
+                #self.update(self.treeView.selectionModel().selection())
                 return
         
         
@@ -637,7 +648,6 @@ class pipelineTreeView(QtGui.QTreeView):
         modelIndex = self.sourceModel.parent(self.asModelIndex(index))
         proxyIndex = self.fromProxyIndex(modelIndex)
         self.setExpanded(proxyIndex, True)
-
         self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
         
         
@@ -712,8 +722,7 @@ class pipelineTreeView(QtGui.QTreeView):
         super(pipelineTreeView, self).mouseReleaseEvent(event)
         self.saveSelection()
         self.tableView.update(self.selectionModel().selection())
-        #event.accept()
-        #return
+
    
     def contextMenuEvent(self, event):
         
