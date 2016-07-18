@@ -496,6 +496,7 @@ class pipelineTreeView(QtGui.QTreeView):
         self._tableView = None
         self._proxyModel = None
         self._sourceModel = None
+        self._tree_as_flat_list = None
         
         #stylesheet 
         self.setStyleSheet('''  
@@ -684,6 +685,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
         index = self.fromProxyIndex(self.userSelection)
         self.select(index)
+        self.updateTable( index)
         #self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
     
     def select(self, index):
@@ -888,6 +890,28 @@ class pipelineTreeView(QtGui.QTreeView):
         selection = QtGui.QItemSelection(index, index)        
         self.tableView.update(selection)
 
+    @property
+    def tree_as_flat_list(self):
+        return self._tree_as_flat_list
+    
+    @tree_as_flat_list.setter 
+    def tree_as_flat_list(self, list):
+        self._tree_as_flat_list = list
+
+    def list_flat_hierarchy(self):
+        print "<---listing"
+        self.tree_as_flat_list = self.sourceModel.listHierarchy(QtCore.QModelIndex()) 
+
+    def filterContents(self):
+        
+        if self.tree_as_flat_list:
+            self.tableView.clearModel()
+            print self.tree_as_flat_list
+         
+        
+        
+        #self.updateTable( self.fromProxyIndex(parent))
+        
 
 class PipelineProjectModel(QtCore.QAbstractItemModel):
     
@@ -1449,8 +1473,18 @@ class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
              
         super(PipelineProjectProxyModel, self).setFilterRegExp(exp)
         if self.treeView:
-            if len(exp)>0:  
-                #self.treeView._ignoreSelections = True
+
+            
+            if len(exp)>0:
+                '''
+                i dont need to read the tree in each text change
+                only once
+                ----> this can be more elegant
+                '''  
+                if len(exp) == 1:
+                    self.treeView.list_flat_hierarchy()  
+                
+                self.treeView.filterContents()
                       
                 self.treeView._ignoreExpentions = True
                 self.treeView.expandAll()
@@ -1460,4 +1494,65 @@ class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
                 self.treeView.restoreState()          
                 self.treeView._ignoreExpentions = False         
 
+
+class PipelineContentsProxyModel(QtGui.QSortFilterProxyModel):
+    def __init__(self,parent = None):
+        
+        super(PipelineContentsProxyModel, self).__init__(parent)
+    '''
+        self._treeView = None
+        
+    @property
+    def treeView(self):
+        if self._treeView:
+            return self._treeView
+        else:
+            return None
+            
+    @treeView.setter
+    def treeView(self, object):
+        self._treeView = object
+                    
+    def filterAcceptsRow(self,sourceRow,sourceParent):
+
+        # hide components from the treeview
+        id =  self.sourceModel().index(sourceRow,0,sourceParent)    
+
+        if super(PipelineContentsProxyModel,self).filterAcceptsRow(sourceRow,sourceParent): 
+            
+            if self.sourceModel().getNode(id).typeInfo() == "COMPONENT":
+                return False
+                      
+            return True
+        
+        return self.hasAcceptedChildren(sourceRow,sourceParent)
+
+    def hasAcceptedChildren(self,sourceRow,sourceParent):
+
+        model=self.sourceModel()
+        sourceIndex=model.index(sourceRow,0,sourceParent)
+        if not sourceIndex.isValid():
+            return False
+        indexes=model.rowCount(sourceIndex)
+        for i in range(indexes):
+            if self.filterAcceptsRow(i,sourceIndex):
+                return True
+        
+        return False
+
+    def setFilterRegExp(self, exp):
+             
+        super(PipelineContentsProxyModel, self).setFilterRegExp(exp)
+        if self.treeView:
+            if len(exp)>0:  
+                
+                self.treeView.tableView.clearModel()
+                      
+                self.treeView._ignoreExpentions = True
+                self.treeView.expandAll()
+                self.treeView._ignoreExpentions = False
+            else:
+                self.treeView._ignoreExpentions = True
+                self.treeView.restoreState()          
+                self.treeView._ignoreExpentions = False '''        
         
