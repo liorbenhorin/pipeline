@@ -125,7 +125,8 @@ class PipelineContentsView(QtGui.QTableView):
                         event.setDropAction(QtCore.Qt.IgnoreAction)
                         event.ignore()
                         return 
-                
+
+            
                 
                 treeModel.removeRows(item_index.row(),1,item_parent)            
                 self.treeView._proxyModel.invalidate()
@@ -679,8 +680,8 @@ class pipelineTreeView(QtGui.QTreeView):
             i = self.indexAt(event.pos())         
             model_index = self.asModelIndex(i)
             model_id = self.sourceModel.getNode(model_index).id
-            model_namne = self.sourceModel.getNode(model_index).name
-            print model_namne, "<----- droped onto"
+            model_node = self.sourceModel.getNode(model_index)
+           
                
             if model_index.isValid():
                 
@@ -691,6 +692,17 @@ class pipelineTreeView(QtGui.QTreeView):
                 item_index = self.sourceModel.indexFromNode( item , QtCore.QModelIndex())
                 item_parent = self.sourceModel.parent( item_index )
                 item_id = item.id
+                
+                
+                '''
+                ignore drops of folders into assets
+                '''
+                if model_node.typeInfo() == "ASSET":
+                    if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
+                        
+                        event.setDropAction(QtCore.Qt.IgnoreAction)
+                        event.ignore()
+                        return 
                 
                 
                 '''
@@ -707,6 +719,10 @@ class pipelineTreeView(QtGui.QTreeView):
                     return
                 
                 else:
+                    
+                    
+                    
+                    
                     
                     source.clearModel()
                     self.sourceModel.removeRows(item_index.row(),1,item_parent)            
