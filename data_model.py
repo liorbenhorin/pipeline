@@ -139,7 +139,7 @@ class PipelineContentsView(QtGui.QTableView):
             make sure the dropped item is not the root of the table
             '''
             HierarchyNodes = []
-            for i in treeModel.listHierarchy(self._treeParentIndex):
+            for i in treeModel.listAncestos(self._treeParentIndex):
                 HierarchyNodes.append(treeModel.getNode(i).id)
             
             print HierarchyNodes
@@ -665,7 +665,10 @@ class pipelineTreeView(QtGui.QTreeView):
                                  
             i = self.indexAt(event.pos())         
             model_index = self.asModelIndex(i)
-                                  
+            model_id = self.sourceModel.getNode(model_index).id
+            model_namne = self.sourceModel.getNode(model_index).name
+            print model_namne, "<----- droped onto"
+               
             if model_index.isValid():
                 
                 mime = event.mimeData()
@@ -674,13 +677,31 @@ class pipelineTreeView(QtGui.QTreeView):
                 item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
                 item_index = self.sourceModel.indexFromNode( item , QtCore.QModelIndex())
                 item_parent = self.sourceModel.parent( item_index )
+                item_id = item.id
+                
+                
+                '''
+                this is to make sure the dropped item is not already a child in the downstream of branches
+                '''
+                descending_id = []
+                for i in self.sourceModel.listHierarchy(item_index):
+                    descending_id.append(self.sourceModel.getNode(i).id)
+                
+                if model_id in descending_id:
+                    
+                    event.setDropAction(QtCore.Qt.IgnoreAction)
+                    event.ignore()
+                    return
+                
+                else:
+                    
+                    source.clearModel()
+                    self.sourceModel.removeRows(item_index.row(),1,item_parent)            
+                    self._proxyModel.invalidate()
 
-                source.clearModel()
-                self.sourceModel.removeRows(item_index.row(),1,item_parent)            
-                self._proxyModel.invalidate()
-
-                self.sourceModel.dropMimeData(mime, event.dropAction,0,0,model_index)
-                source.restoreTreeViewtSelection()        
+                    self.sourceModel.dropMimeData(mime, event.dropAction,0,0,model_index)
+                    source.restoreTreeViewtSelection() 
+                    return       
         
         # this was required when i misused the insert rows function of the model...
         #self._proxyModel.invalidate()
@@ -1059,6 +1080,13 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             
         self.dataChanged.emit( parentIndex, parentIndex )
          
+         
+        descending_id = []
+        for i in self.listHierarchy(parentIndex):
+            descending_id.append(self.getNode(i).name)
+
+        print "---->", descending_id, "<--- descending_id" 
+         
         return True 
  
        
@@ -1092,8 +1120,10 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             # if the node is not in the tree return an empty index
             return QtCore.QModelIndex()
 
-    def listHierarchy(self, index):
-        
+    def listAncestos(self, index):
+        '''
+        returns a list of all parents all the way to the top level, from the given index
+        '''
         def rec(d, index):
             
             i = self.parent(index)
@@ -1113,6 +1143,28 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         else:
             # if the node is not in the tree return an empty index
             return [QtCore.QModelIndex()]       
+
+
+    def listHierarchy(self, index):
+        '''
+        returns a flat list of all descending childs from the given index
+        '''     
+        def rec(d, index):
+            
+            if self.rowCount(index)>0:
+                
+                for row in range(self.rowCount(index)):
+                    
+                    i = self.index(row,0, index) 
+                    d.append(i)                 
+                    rec(d, i) 
+            else:
+                 pass
+                  
+        data = [index]
+        rec(data, index)
+        return data
+
 
 
 class PipelineContentsModel(QtCore.QAbstractTableModel):
