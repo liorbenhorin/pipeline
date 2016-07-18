@@ -38,9 +38,6 @@ def set_icons():
 set_icons()
 
 
-
-
-
 class PipelineContentsView(QtGui.QTableView):
     def __init__(self,parent = None):
         super(PipelineContentsView, self).__init__(parent)
@@ -107,6 +104,9 @@ class PipelineContentsView(QtGui.QTableView):
             
             if tree_index.isValid():
                 
+                
+
+                
                 tree_node = treeModel.getNode(tree_index)
                 mime = event.mimeData()
                 
@@ -114,6 +114,19 @@ class PipelineContentsView(QtGui.QTableView):
                 item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
                 item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
                 item_parent = treeModel.parent( item_index )
+                
+                
+                '''
+                ignore drops of folders into assets
+                '''
+                if tree_node.typeInfo() == "ASSET":
+                    if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
+                        
+                        event.setDropAction(QtCore.Qt.IgnoreAction)
+                        event.ignore()
+                        return 
+                
+                
                 treeModel.removeRows(item_index.row(),1,item_parent)            
                 self.treeView._proxyModel.invalidate()
 
@@ -259,7 +272,7 @@ class PipelineContentsView(QtGui.QTableView):
 
                     item_index = treeModel.index(row,0,src)
                     treeNode = treeModel.getNode(item_index) 
-                    print treeNode, "---", row
+                    #print treeNode, "---", row
                     contenetsList.append(treeNode)
                     
                 # ----> this is the section to append 'add' buttons to the list
@@ -1079,14 +1092,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         self.insertRows( dropParent.childCount(), 1, parent = parentIndex , node = item)
             
         self.dataChanged.emit( parentIndex, parentIndex )
-         
-         
-        descending_id = []
-        for i in self.listHierarchy(parentIndex):
-            descending_id.append(self.getNode(i).name)
 
-        print "---->", descending_id, "<--- descending_id" 
-         
         return True 
  
        
