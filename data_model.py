@@ -126,7 +126,16 @@ class PipelineContentsView(QtGui.QTableView):
                         event.ignore()
                         return 
 
-            
+                '''
+                ignore drops of folders into assets or components
+                '''
+                if tree_node.typeInfo() == "COMPONENT":
+
+                        event.setDropAction(QtCore.Qt.IgnoreAction)
+                        event.ignore()
+                        return 
+
+                         
                 
                 treeModel.removeRows(item_index.row(),1,item_parent)            
                 self.treeView._proxyModel.invalidate()
@@ -232,12 +241,18 @@ class PipelineContentsView(QtGui.QTableView):
     def asTreeModelIndex(self, index):
         return self.treeView.asModelIndex(index)  
 
-    def click(self, index):
-
-        node = self.getNode(index)
-        if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
-            treeIndex = self.asTreeIndex(index)
-            print treeIndex, " <--- table clicked"
+    def mouseReleaseEvent(self, event):
+        super(PipelineContentsView, self).mouseReleaseEvent(event)
+        index = self.indexAt(event.pos())
+        if index.isValid():
+            node = self.getNode(index)
+            if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
+                treeIndex = self.asTreeIndex(index)
+                print treeIndex, " <--- table clicked"
+                event.accept()
+                return
+        event.ignore()
+        return
 
 
     
@@ -303,23 +318,33 @@ class PipelineContentsView(QtGui.QTableView):
         self.setModel(None)
 
     def mouseDoubleClickEvent(self, event):
+        
+        
         index = self.indexAt(event.pos())
         node = None
         if index.isValid():
+
+            
             tableModelNode = self.model().getNode(index)  
             src = self.asTreeIndex(index)
             node =  self.treeSourceModel.getNode(src)
-        
+            
         if node:
             if tableModelNode.typeInfo() != "COMPONENT":   
-             
+                '''
+                ---> double click on a folder or asset to open it
+                '''
                 treeIndex = self.treeView.fromProxyIndex(self.asTreeIndex(index))       
                 self.setTreeViewtSelection(treeIndex)  
+                self.treeView.saveSelection()
                 
+                event.accept()
+                return 
             else:
                 '''
                 -----> double click on a component... what shoud we do?
                 '''
+                super(PipelineContentsView, self).mouseDoubleClickEvent(event)
                 event.accept()
                 return
         
@@ -775,7 +800,7 @@ class pipelineTreeView(QtGui.QTreeView):
       
     
     def mouseReleaseEvent(self, event):
-        print event
+        
         super(pipelineTreeView, self).mouseReleaseEvent(event)
         self.saveSelection()
         self.tableView.update(self.selectionModel().selection())
