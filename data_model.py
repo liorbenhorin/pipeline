@@ -317,11 +317,15 @@ class PipelineContentsView(QtGui.QTableView):
                 self.setTreeViewtSelection(treeIndex)  
                 
             else:
-                
-                pass
                 '''
                 -----> double click on a component... what shoud we do?
                 '''
+                event.accept()
+                return
+        
+        event.accept()
+        return
+
             
     def contextMenuEvent(self, event):
      
@@ -330,16 +334,25 @@ class PipelineContentsView(QtGui.QTableView):
         index = self.indexAt(event.pos())
         menu = QtGui.QMenu()            
         actions = []
+        append_defult_options = True
         
         if index.isValid():
             
             tableModelNode = self.model().getNode(index)                
             src = self.asTreeIndex(index)                 
             node =  self.treeSourceModel.getNode(src)
+            
+            if tableModelNode.typeInfo() == "DUMMY":
+                append_defult_options = True
+            else:
+                append_defult_options = False    
+            
                    
         if node:
-
+            
             if tableModelNode.typeInfo()[0:3] != "ADD":
+                
+                
                 
                 if node.typeInfo() == "NODE": 
                     actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
@@ -352,8 +365,7 @@ class PipelineContentsView(QtGui.QTableView):
                 if node.typeInfo() == "COMPONENT":
                     actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
-            else:
-                pass
+                
                 '''
                 ---> this is for if we use the table buttons to add nodes to the tree...
             
@@ -365,9 +377,10 @@ class PipelineContentsView(QtGui.QTableView):
                 elif tableModelNode.typeInfo() == "ADD-FOLDER":
                     actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self._treeParent) ))     
                 '''
-                    
-        else:
-                       
+       
+        
+        if append_defult_options:
+                           
             actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParentIndex) ))
             
             if self._treeParent.typeInfo() == "NODE":
@@ -377,14 +390,15 @@ class PipelineContentsView(QtGui.QTableView):
    
         menu.addActions(actions)      
        
-        if handled:
+        #if handled:
             
-            menu.exec_(event.globalPos())
-            event.accept() #TELL QT IVE HANDLED THIS THING
+        menu.exec_(event.globalPos())
+         #TELL QT IVE HANDLED THIS THING
             
-        else:
-            event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
-                   
+        #else:
+            #event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
+        
+        event.accept()           
         return
 
 
@@ -761,10 +775,11 @@ class pipelineTreeView(QtGui.QTreeView):
       
     
     def mouseReleaseEvent(self, event):
+        print event
         super(pipelineTreeView, self).mouseReleaseEvent(event)
         self.saveSelection()
         self.tableView.update(self.selectionModel().selection())
-
+        event.accept
    
     def contextMenuEvent(self, event):
         
@@ -798,13 +813,13 @@ class pipelineTreeView(QtGui.QTreeView):
         menu.addActions(actions)      
         
 
-        if handled:
+        #if handled:
 
-            menu.exec_(event.globalPos())
-            event.accept() #TELL QT IVE HANDLED THIS THING
+        menu.exec_(event.globalPos())
+        event.accept() #TELL QT IVE HANDLED THIS THING
             
-        else:
-            event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
+        #else:
+            #event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
                    
         return
 
@@ -991,7 +1006,11 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         if parentNode == self._rootNode:
             return QtCore.QModelIndex()
         
-        return self.createIndex(parentNode.row(), 0, parentNode)
+        if parentNode:
+            return self.createIndex(parentNode.row(), 0, parentNode)
+        
+        else:
+            return QtCore.QModelIndex()
         
     """INPUTS: int, int, QModelIndex"""
     """OUTPUT: QModelIndex"""
@@ -1248,6 +1267,12 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
                 return "test test test test test test"
 
     def flags(self, index):
+        
+        if index.isValid():
+        
+            if self.getNode(index).typeInfo() == "DUMMY":
+                return QtCore.Qt.NoItemFlags
+        
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled
         
     """CUSTOM"""
