@@ -290,22 +290,28 @@ class PipelineContentsView(QtGui.QTableView):
                     treeNode = treeModel.getNode(item_index) 
                     #print treeNode, "---", row
                     contenetsList.append(treeNode)
-                    
+
                 # ----> this is the section to append 'add' buttons to the list
                 #
                 #list.append(dt.AddComponent("new"))  
                 #if node.typeInfo() == "NODE":                   
                 #    list.append(dt.AddAsset("new")) 
-                #    list.append(dt.AddFolder("new"))                 
+                #    list.append(dt.AddFolder("new"))  
+                    
+                model = PipelineContentsModel(contenetsList)
+                self.populateTable(model)
+
+    def populateTable(self, model = None):
+               
          
-                if len(contenetsList) > 0:         
-                    self.setModel(PipelineContentsModel(contenetsList))
-                
-                    # resize the table headers to the new content
-                    self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
-                    self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
-                
-                    return True
+        if model:         
+            self.setModel(model)
+        
+            # resize the table headers to the new content
+            self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+            self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
+        
+            return True
                          
         # in case the selection is empty, or the index was invalid, clear the table            
         self.setModel(PipelineContentsModel([dt.DummyNode("")]))  
@@ -900,17 +906,21 @@ class pipelineTreeView(QtGui.QTreeView):
 
     def list_flat_hierarchy(self):
         print "<---listing"
-        self.tree_as_flat_list = self.sourceModel.listHierarchy(QtCore.QModelIndex()) 
+        list = []
+        for i in self.sourceModel.listHierarchy(QtCore.QModelIndex()):
+            list.append(self.sourceModel.getNode(i))
+        
+        self.tree_as_flat_list = list
 
     def filterContents(self):
         
         if self.tree_as_flat_list:
             self.tableView.clearModel()
-            print self.tree_as_flat_list
-         
-        
-        
-        #self.updateTable( self.fromProxyIndex(parent))
+            
+            model = PipelineContentsModel(self.tree_as_flat_list)
+            self.tableView.populateTable(model)
+            
+
         
 
 class PipelineProjectModel(QtCore.QAbstractItemModel):
