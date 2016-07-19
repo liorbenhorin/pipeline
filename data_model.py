@@ -7,13 +7,13 @@ import functools
 import data as dt
 reload(dt)
 
+global  _stage_
+global _asset_
+global _folder_
 
-
-global _stage_ = "stage"
-global _asset_ = "asset"
-global _folder_ = "folder" 
-
-
+_stage_ = "stage"
+_asset_ = "asset"
+_folder_ = "folder" 
 
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
@@ -127,17 +127,17 @@ class PipelineContentsView(QtGui.QTableView):
                 '''
                 ignore drops of folders into assets
                 '''
-                if tree_node.typeInfo() == "ASSET":
-                    if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
+                if tree_node.typeInfo() == _asset_:
+                    if item.typeInfo() == _folder_ or item.typeInfo() == _asset_:
                         
                         event.setDropAction(QtCore.Qt.IgnoreAction)
                         event.ignore()
                         return 
 
                 '''
-                ignore drops of folders into assets or components
+                ignore drag drop for stages
                 '''
-                if tree_node.typeInfo() == "COMPONENT":
+                if tree_node.typeInfo() == _stage_:
 
                         event.setDropAction(QtCore.Qt.IgnoreAction)
                         event.ignore()
@@ -254,11 +254,12 @@ class PipelineContentsView(QtGui.QTableView):
         index = self.indexAt(event.pos())
         if index.isValid():
             node = self.getNode(index)
-            if not node.typeInfo() == "ADD-COMPONENT" and not node.typeInfo() == "ADD-ASSET" and not node.typeInfo() == "ADD-FOLDER":
-                treeIndex = self.asTreeIndex(index)
-                print treeIndex, " <--- table clicked"
-                event.accept()
-                return
+            
+            treeIndex = self.asTreeIndex(index)
+            print treeIndex, " <--- table clicked"
+            event.accept()
+            return
+                
         event.ignore()
         return
 
@@ -344,7 +345,7 @@ class PipelineContentsView(QtGui.QTableView):
             node =  self.treeSourceModel.getNode(src)
             
         if node:
-            if tableModelNode.typeInfo() != "COMPONENT":   
+            if tableModelNode.typeInfo() != _stage_:   
                 '''
                 ---> double click on a folder or asset to open it
                 '''
@@ -381,7 +382,7 @@ class PipelineContentsView(QtGui.QTableView):
             src = self.asTreeIndex(index)                 
             node =  self.treeSourceModel.getNode(src)
             
-            if tableModelNode.typeInfo() == "DUMMY":
+            if tableModelNode.typeInfo() == _dummy_:
                 append_defult_options = True
             else:
                 append_defult_options = False    
@@ -389,43 +390,27 @@ class PipelineContentsView(QtGui.QTableView):
                    
         if node:
             
-            if tableModelNode.typeInfo()[0:3] != "ADD":
-                
-                
-                
-                if node.typeInfo() == "NODE": 
-                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+               
+            if node.typeInfo() == _folder_: 
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
-                    
-                if node.typeInfo() == "ASSET":
-                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+                
+            if node.typeInfo() == _asset_:
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
-                    
-                if node.typeInfo() == "COMPONENT":
-                    actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
-                
-                '''
-                ---> this is for if we use the table buttons to add nodes to the tree...
-            
-                
-                if tableModelNode.typeInfo() == "ADD-COMPONENT":
-                    actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParent) ))
-                elif tableModelNode.typeInfo() == "ADD-ASSET":
-                    actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParent) ))  
-                elif tableModelNode.typeInfo() == "ADD-FOLDER":
-                    actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self._treeParent) ))     
-                '''
-       
+            if node.typeInfo() == _stage_:
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+                        
         
         if append_defult_options:
                            
-            actions.append(QtGui.QAction("Create new Component", menu, triggered = functools.partial(self.create_new_component,self._treeParentIndex) ))
+            actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
             
-            if self._treeParent.typeInfo() == "NODE":
+            if self._treeParent.typeInfo() == _folder_:
             
-                actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
-                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
+                actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
+                actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
    
         menu.addActions(actions)      
        
@@ -477,10 +462,10 @@ class PipelineContentsView(QtGui.QTableView):
         self.treeView.create_new_asset(parent)              
         self.restoreTreeViewtSelection()
                
-    def create_new_component(self, parent):
+    def create_new_stage(self, parent):
         
         self.clearModel()             
-        self.treeView.create_new_component(parent)              
+        self.treeView.create_new_stage(parent)              
         self.restoreTreeViewtSelection()
         
     def updateTable(self, index):
@@ -837,19 +822,18 @@ class pipelineTreeView(QtGui.QTreeView):
           
         if node:
 
-            if node.typeInfo() == "NODE": 
-                actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset, src) ))
-                actions.append(QtGui.QAction("Create new Folder", menu, triggered = functools.partial(self.create_new_folder, src) ))
+            if node.typeInfo() == _folder_: 
+                actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_asset, src) ))
+                actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, src) ))
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
-            elif node.typeInfo() == "ASSET":
+            elif node.typeInfo() == _asset_:
 
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-                
 
         else:
-            actions.append(QtGui.QAction("Create new folder", menu, triggered = functools.partial(self.create_new_folder,self.projectRootIndex()) ))
-            actions.append(QtGui.QAction("Create new Asset", menu, triggered = functools.partial(self.create_new_asset,self.projectRootIndex()) ))
+            actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder,self.projectRootIndex()) ))
+            actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self.projectRootIndex()) ))
 
         menu.addActions(actions)      
         
@@ -883,19 +867,19 @@ class pipelineTreeView(QtGui.QTreeView):
         return True
         
     def create_new_folder(self, parent):
-        node = dt.Node("folder")        
+        node = dt.FolderNode(_folder_)        
         self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
         self._proxyModel.invalidate()
         self.updateTable( self.fromProxyIndex(parent))
         
     def create_new_asset(self, parent):
-        node = dt.AssetNode("asset","")
+        node = dt.AssetNode(_asset_)
         self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
         self._proxyModel.invalidate()
         self.updateTable( self.fromProxyIndex(parent))
         
-    def create_new_component(self, parent):
-        node = dt.ComponentNode("component","")
+    def create_new_stage(self, parent):
+        node = dt.StageNode(_stage_)
         self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
         self._proxyModel.invalidate()
         self.updateTable( self.fromProxyIndex(parent))
@@ -1054,11 +1038,11 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         if index.isValid():
             node = self.getNode(index)
             
-            if node.typeInfo() == "ROOT":
+            if node.typeInfo() == _root_:
                 return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
             
-            if node.typeInfo() == "COMPONENT":
-                return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+            if node.typeInfo() == _stage_:
+                return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
         
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
     
@@ -1182,11 +1166,11 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         dropParent = self.getNode( parentIndex )
         
         # do not allow a folder to be dropped on an asset...
-        if dropParent.typeInfo() == "ASSET":
-            if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
+        if dropParent.typeInfo() == _asset_:
+            if item.typeInfo() == _folder_ or item.typeInfo() == _asset_:
                 return False
         
-        if dropParent.typeInfo() == "ROOT":
+        if dropParent.typeInfo() == _root_:
             return False
             
                
@@ -1337,7 +1321,7 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
         
         if index.isValid():
         
-            if self.getNode(index).typeInfo() == "DUMMY":
+            if self.getNode(index).typeInfo() == _dummy_:
                 return QtCore.Qt.NoItemFlags
         
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled
@@ -1467,9 +1451,10 @@ class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
 
         if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent): 
             
-            if self.sourceModel().getNode(id).typeInfo() == "COMPONENT":
+            '''
+            if self.sourceModel().getNode(id).typeInfo() == _stage_:
                 return False
-                      
+            '''          
             return True
         
         return self.hasAcceptedChildren(sourceRow,sourceParent)

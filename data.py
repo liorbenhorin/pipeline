@@ -5,6 +5,20 @@ import os
 import modules.data as data
 reload(data)
 
+global _node_
+global _root_
+global  _stage_
+global _asset_
+global _folder_
+global _dummy_
+
+_node_ = "node"
+_root_ = "root"
+_stage_ = "stage"
+_asset_ = "asset"
+_folder_ = "folder" 
+_dummy_ = "dummy"
+
 
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
@@ -89,7 +103,7 @@ class Node(object):
 
     
     def typeInfo(self):
-        return "NODE"
+        return _node_
 
     def addChild(self, child):
         self._children.append(child)
@@ -127,11 +141,8 @@ class Node(object):
         self._name = value
 
     def child(self, row):
-        #try:
         return self._children[row]
-        #except:
-        #    return None
-            
+
     def childCount(self):
         return len(self._children)
 
@@ -160,19 +171,16 @@ class Node(object):
         output += "\n"
         
         return output
-    
-    #def __repr__(self):
-    #    return self.log() + "\n END"
-    
+      
 
     def data(self, column):
         
         if   column is 0: return self.name
-        elif column is 1: return None#self.typeInfo()
+        elif column is 1: return None
     
     def setData(self, column, value):
         print value
-        if   column is 0: self.name = value#.toPyObject()
+        if   column is 0: self.name = value
         elif column is 1: pass
     
     def resource(self):
@@ -206,94 +214,64 @@ class RootNode(Node):
     def __init__(self, name, parent=None):
         super(RootNode, self).__init__(name, parent)
         self.name = name
+    
     def typeInfo(self):
-        return "ROOT"
+        return _root__
   
     def resource(self):
         return folder_icon
 
-class AssetNode(Node):
+
+class FolderNode(Node):
     
-    def __init__(self, name, component, parent=None):
-        super(AssetNode, self).__init__(name, parent)
+    def __init__(self, name,  parent=None):
+        super(FolderNode, self).__init__(name, parent)
       
-        self._component = component
 
     def typeInfo(self):
-        return "ASSET"
+        return _folder_
+          
+    def resource(self):
+        return cube_icon_full
 
-    @property
-    def component(self):
-        return self._component
-        
-    @component.setter
-    def component(self, value):
-        self._component = value
 
-   
+class AssetNode(Node):
+    
+    def __init__(self, name,  parent=None):
+        super(AssetNode, self).__init__(name, parent)
+      
+
+    def typeInfo(self):
+        return _asset_
+          
     def resource(self):
         return cube_icon_full
         
 
         
-class ComponentNode(Node):
+class StageNode(Node):
     
-    def __init__(self, name, component, parent=None):
+    def __init__(self, name, stage = None, parent=None):
         super(ComponentNode, self).__init__(name, parent)
       
-        self._component = component
+        self._stage = stage
 
     def typeInfo(self):
-        return "COMPONENT"
+        return _stage_
 
     @property
-    def component(self):
-        return self._component
+    def stage(self):
+        return self._stage
         
-    @component.setter
-    def component(self, value):
-        self._component = value
+    @stage.setter
+    def stage(self, value):
+        self._stage = value
 
    
     def resource(self):
-        return large_image_icon# cube_icon
+        return large_image_icon
         
-        
-class AddComponent(Node):
-    
-    def __init__(self, name, parent=None):
-        super(AddComponent, self).__init__(name, parent)
-        self.name = "New component..."
-
-    def typeInfo(self):
-        return "ADD-COMPONENT"
-  
-    def resource(self):
-        return cube_icon
-        
-class AddAsset(Node):
-    
-    def __init__(self, name, parent=None):
-        super(AddAsset, self).__init__(name, parent)
-        self.name = "New asset..."
-
-    def typeInfo(self):
-        return "ADD-ASSET"
-  
-    def resource(self):
-        return cube_icon_full 
-        
-class AddFolder(Node):
-    
-    def __init__(self, name, parent=None):
-        super(AddFolder, self).__init__(name, parent)
-        self.name = "New folder..."
-
-    def typeInfo(self):
-        return "ADD-FOLDER"
-  
-    def resource(self):
-        return folder_icon                
+                    
 
 class DummyNode(Node):
     
@@ -302,7 +280,7 @@ class DummyNode(Node):
 
 
     def typeInfo(self):
-        return "DUMMY"
+        return _dummy_
   
     def resource(self):
         return None               

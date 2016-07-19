@@ -2643,13 +2643,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         generate some tree nodes for testing
         '''
         _root = dt.RootNode("root")
-        root = dt.Node("Diving",_root)
-        char = dt.Node("Charachters", root)
-        dog = dt.AssetNode("Dog","N/A", char)
-        Animation = dt.Node("Animation", root)
-        rig = dt.ComponentNode("Rig", "N/A" ,dog)
-        model = dt.ComponentNode("Model", "N/A" ,dog)
-        sorted = dt.ComponentNode("Sorted_component", "N/A" ,Animation)
+        root = dt.FolderNode("Diving",_root)
+        char = dt.FolderNode("Charachters", root)
+        dog = dt.AssetNode("Dog", char)
+        Animation = dt.FolderNode("Animation", root)
+        rig = dt.StageNode("Rig", dog)
+        model = dt.StageNode("Model", dog)
+        sorted = dt.StageNode("Sorted_component",Animation)
         
         '''
         creating the tree model,
