@@ -951,7 +951,7 @@ class pipelineTreeView(QtGui.QTreeView):
         if self.tree_as_flat_list:
             self.tableView.clearModel()
             
-            model = PipelineContentsModel(self.tree_as_flat_list)
+            model = dtm.PipelineContentsModel(self.tree_as_flat_list)
             self.tableView.populateTable(model)
             
 

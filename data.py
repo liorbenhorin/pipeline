@@ -2,6 +2,9 @@
 from PySide import QtXml, QtGui
 import os
 
+import data_model as dtm
+reload(dtm)
+
 import modules.data as data
 reload(data)
 
@@ -217,7 +220,7 @@ class RootNode(Node):
         self.name = name
     
     def typeInfo(self):
-        return _root__
+        return _root_
   
     def resource(self):
         return folder_icon
