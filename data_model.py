@@ -10,7 +10,8 @@ reload(dt)
 
 
 global _stage_ = "stage"
-global _x = ""
+global _asset_ = "asset"
+global _folder_ = "folder" 
 
 
 
