@@ -147,9 +147,7 @@ class PipelineContentsView(QtGui.QTableView):
         self.setDragEnabled( True )
         self.setAcceptDrops( True )
         self.setDragDropMode( QtGui.QAbstractItemView.DragDrop )#QtGui.QAbstractItemView.DragDrop )InternalMove
-        
-        
-        
+
         #local variables
         self._treeView = None        
         self._treeProxyModel = None
@@ -340,6 +338,27 @@ class PipelineContentsView(QtGui.QTableView):
     def asTreeModelIndex(self, index):
         return self.treeView.asModelIndex(index)  
 
+
+    def selection(self, selction, selection2):
+        print selction, "-->", selction2
+        print "signal"
+        return
+        if len(selection.indexes())>0:
+            # using only the first selection for this task
+            index = selection.indexes()[0]
+             
+            if index.isValid():
+                node = self.getNode(index)
+                
+                treeIndex = self.asTreeIndex(index)
+                #print treeIndex, " <--- table clicked"
+                
+                if node.typeInfo() == _stage_:
+                    self.updateVersionsTable(node)
+                else:
+                    self.updateVersionsTable()  
+                          
+    '''
     def mouseReleaseEvent(self, event):
         super(PipelineContentsView, self).mouseReleaseEvent(event)
         index = self.indexAt(event.pos())
@@ -351,14 +370,36 @@ class PipelineContentsView(QtGui.QTableView):
             
             if node.typeInfo() == _stage_:
                 self.updateVersionsTable(node)
+            else:
+                self.updateVersionsTable()
+                
+            event.accept()
+            return
+                
+        event.ignore()
+        return'''
+
+    
+    def mousePressEvent(self, event):
+
+        super(PipelineContentsView, self).mousePressEvent(event)
+        index = self.indexAt(event.pos())
+        if index.isValid():
+            node = self.getNode(index)
             
+            treeIndex = self.asTreeIndex(index)
+            #print treeIndex, " <--- table clicked"
+            
+            if node.typeInfo() == _stage_:
+                self.updateVersionsTable(node)
+            else:
+                self.updateVersionsTable()
+                
             event.accept()
             return
                 
         event.ignore()
         return
-
-
     
     '''
     updates the table view with a new model
@@ -404,19 +445,20 @@ class PipelineContentsView(QtGui.QTableView):
                     
                 model = dtm.PipelineContentsModel(contenetsList)
                 self.populateTable(model)
+                self.updateVersionsTable()
 
     def populateTable(self, model = None):
                
          
         if model:         
             self.setModel(model)
-        
+
             # resize the table headers to the new content
             self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
             self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
         
             return True
-                         
+                           
         # in case the selection is empty, or the index was invalid, clear the table            
         self.setModel(dtm.PipelineContentsModel([dt.DummyNode("")]))  
         self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
@@ -427,6 +469,7 @@ class PipelineContentsView(QtGui.QTableView):
     def clearModel(self):
         self.setModel(None)
 
+    
     def mouseDoubleClickEvent(self, event):
         
         
@@ -569,9 +612,18 @@ class PipelineContentsView(QtGui.QTableView):
         selection = QtGui.QItemSelection(index, index)        
         self.update(selection)
 
-    def updateVersionsTable(self, node):
-        versionModel = dtm.PipelineVersionsModel(node._versions)
-        self.versionsView.setModel(versionModel)
+    def updateVersionsTable(self, node = None):
+        
+        if self.versionsView:
+            if node:
+                versionModel = dtm.PipelineVersionsModel(node._versions)
+                self.versionsView.setModel(versionModel)
+            else:
+                try:
+                    del versionModel
+                except:
+                    pass
+                self.versionsView.setModel(None)
                    
 class pipelineTreeView(QtGui.QTreeView):
     def __init__(self,parent = None):

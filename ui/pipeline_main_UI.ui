@@ -366,13 +366,6 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="import_version_pushButton">
-                <property name="text">
-                 <string>Import</string>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QPushButton" name="save_master_pushButton">
                 <property name="text">
                  <string>Save Master</string>
@@ -383,6 +376,13 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                <widget class="QPushButton" name="save_master_pushButton_2">
                 <property name="text">
                  <string>Save Playblast</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="import_version_pushButton">
+                <property name="text">
+                 <string>Import</string>
                 </property>
                </widget>
               </item>

@@ -713,10 +713,10 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
             
             if orientation == QtCore.Qt.Horizontal:
                 if section == 0:
-                    return "Version"
+                    return "Author"
                 if section == 1:
                     return "Date Saved"
-                if section == 1:
+                if section == 2:
                     return "Note"
                                         
             if orientation == QtCore.Qt.Vertical:                    
