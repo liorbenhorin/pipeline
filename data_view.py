@@ -57,7 +57,7 @@ set_icons()
 
 
         
-class ButtonDelegate(QtGui.QItemDelegate):
+class loadButtonDelegate(QtGui.QItemDelegate):
     """
     A delegate that places a fully functioning QPushButton in every
     cell of the column to which it's applied
@@ -82,11 +82,43 @@ class ButtonDelegate(QtGui.QItemDelegate):
                     "Open",
                     index.data(), 
                     self.parent(), 
-                    clicked=self.parent().cellButtonClicked
+                    clicked=self.parent().loadButtonClicked
                 )
             )     
 
+class OptionsButtonDelegate(QtGui.QItemDelegate):
+    """
+    A delegate that places a fully functioning QPushButton in every
+    cell of the column to which it's applied
+    """
+    def __init__(self, parent):
+        # The parent is not an optional argument for the delegate as
+        # we need to reference it in the paint method (see below)
+        QtGui.QItemDelegate.__init__(self, parent)
+ 
+    def paint(self, painter, option, index):
+        # This method will be called every time a particular cell is
+        # in view and that view is changed in some way. We ask the 
+        # delegates parent (in this case a table view) if the index
+        # in question (the table cell) already has a widget associated 
+        # with it. If not, create one with the text for this index and
+        # connect its clicked signal to a slot in the parent view so 
+        # we are notified when its used and can do something. 
+        if not self.parent().indexWidget(index):
+            
+            
+            button = QtGui.QPushButton(
+                    index.data(), 
+                    self.parent()
+                )
+            
+            self.parent().setIndexWidget(index, button)  
 
+            menu = QtGui.QMenu(button)
+            deleteAction = QtGui.QAction("Delete",button, triggered = self.parent().deletActionClicked) 
+            menu.addAction( deleteAction )          
+            button.setMenu(menu)
+    
 class PipelineVersionsView(QtGui.QTableView):
     def __init__(self,parent = None):
         super(PipelineVersionsView, self).__init__(parent)
@@ -104,25 +136,46 @@ class PipelineVersionsView(QtGui.QTableView):
         self.setSortingEnabled(True)
 
         # Set the delegate for column 0 of our table
-        self.setItemDelegateForColumn(3,  ButtonDelegate(self))
+        self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
+        self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
+        
 
     def setModel(self,model):
 
         super(PipelineVersionsView,self).setModel(model)
-        
-        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+        # size the options button column
+        self.horizontalHeader().resizeSection(4,25)
+        self.horizontalHeader().setResizeMode(4,QtGui.QHeaderView.Fixed)   
+        # size the load button column
+        self.horizontalHeader().resizeSection(3,60)
+        self.horizontalHeader().setResizeMode(3,QtGui.QHeaderView.Fixed)   
+        # size the note button column
+        self.horizontalHeader().resizeSection(2,25)
+        self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
+              
+        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
         self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)        
-        self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Stretch) 
-        self.horizontalHeader().setResizeMode(3,QtGui.QHeaderView.Stretch) 
+
+
+ 
          
     @QtCore.Slot()
-    def cellButtonClicked(self):
+    def loadButtonClicked(self):
         # This slot will be called when our button is clicked. 
         # self.sender() returns a refence to the QPushButton created
         # by the delegate, not the delegate itself.
         button = self.sender()
         index = self.indexAt(button.pos())
-        print self.model().getNode(index).name, " --->" , self.model().getNode(index).number
+        print self.model().getNode(index).name, " load --->" , self.model().getNode(index).number
+
+    @QtCore.Slot()
+    def deletActionClicked(self):
+        # This slot will be called when our button is clicked. 
+        # self.sender() returns a refence to the QPushButton created
+        # by the delegate, not the delegate itself.
+        button = self.sender().parent()
+        index = self.indexAt(button.pos())
+        print self.model().getNode(index).name, " delete action on --->" , self.model().getNode(index).number
 
 
 class PipelineContentsView(QtGui.QTableView):
@@ -137,7 +190,7 @@ class PipelineContentsView(QtGui.QTableView):
         self.setShowGrid(False)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
         self.icons_size(32)       
-        self.setMinimumWidth(250)
+        #self.setMinimumWidth(250)
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.setSortingEnabled(True)
         self.horizontalHeader().setOffset(10)
@@ -885,8 +938,8 @@ class pipelineTreeView(QtGui.QTreeView):
                 '''
                 ignore drops of folders into assets
                 '''
-                if model_node.typeInfo() == "ASSET":
-                    if item.typeInfo() == "NODE" or item.typeInfo() == "ASSET":
+                if model_node.typeInfo() == _asset_:
+                    if item.typeInfo() == _folder_ or item.typeInfo() == _asset_:
                         
                         event.setDropAction(QtCore.Qt.IgnoreAction)
                         event.ignore()

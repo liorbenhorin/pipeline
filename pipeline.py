@@ -2721,7 +2721,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.splitter1 = QtGui.QSplitter()
         self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
         self.splitter1.setHandleWidth(10)
-        self.splitter1.setChildrenCollapsible(False)
+        self.splitter1.setChildrenCollapsible(True)
         self.splitter1.addWidget(self.tree)
         self.splitter1.addWidget(self.list)        
         h_layout.addWidget(self.splitter1)

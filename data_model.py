@@ -181,7 +181,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
                 return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
             
             if node.typeInfo() == _stage_:
-                return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+                return  QtCore.Qt.ItemIsEnabled #| QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
         
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
     
@@ -462,6 +462,9 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
         
             if self.getNode(index).typeInfo() == _dummy_:
                 return QtCore.Qt.NoItemFlags
+
+            if self.getNode(index).typeInfo() == _stage_:
+                return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
         
         return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled
         
@@ -739,7 +742,7 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         return len(self.__items)
 
     def columnCount(self, parent):
-        return 4
+        return 5
         
     def data(self, index, role):
         
