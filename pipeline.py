@@ -2647,9 +2647,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         char = dt.FolderNode("Charachters", root)
         dog = dt.AssetNode("Dog", char)
         Animation = dt.FolderNode("Animation", root)
-        rig = dt.StageNode("Rig", dog)
-        model = dt.StageNode("Model", dog)
-        sorted = dt.StageNode("Sorted_component",Animation)
+        rig = dt.StageNode("Rig", parent = dog)
+        model = dt.StageNode("Model", parent = dog)
+        sorted = dt.StageNode("Sorted_component", parent = dog)
         
         '''
         creating the tree model,

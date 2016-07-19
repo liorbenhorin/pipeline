@@ -7,13 +7,20 @@ import functools
 import data as dt
 reload(dt)
 
+global _node_
+global _root_
 global  _stage_
 global _asset_
 global _folder_
+global _dummy_
 
+_node_ = "node"
+_root_ = "root"
 _stage_ = "stage"
 _asset_ = "asset"
 _folder_ = "folder" 
+_dummy_ = "dummy"
+
 
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
@@ -404,10 +411,12 @@ class PipelineContentsView(QtGui.QTableView):
                         
         
         if append_defult_options:
-                           
-            actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
             
-            if self._treeParent.typeInfo() == _folder_:
+            if self._treeParent.typeInfo() == _asset_:
+                           
+                actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
+            
+            elif self._treeParent.typeInfo() == _folder_:
             
                 actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
                 actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
@@ -529,18 +538,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
                            
                             ''')
-        '''
-        self.viewport().installEventFilter(self)
 
-    def eventFilter(self, object, event):
-        if object is self.viewport():
-            if event.type() == QtCore.QEvent.DragMove:
-                print "Moved!"
-            elif event.type() == QtCore.QEvent.Drop:
-                print "Dropped!"
-        
-        return super(pipelineTreeView, self).eventFilter(object, event)
-    '''
     
     def setModel(self,model):
 
@@ -554,12 +552,17 @@ class pipelineTreeView(QtGui.QTreeView):
         the projects name folder
         the rest will be collapsed
         '''
+        
+        
         self.expandAll()
         i =  self.model().index(0,0,self.rootIndex())
         
         for row in range(self.model().rowCount(i)):
             x = self.model().index(row,0,i)
             self.setExpanded(x,False)
+        
+        
+        
         
         
         '''
@@ -622,8 +625,9 @@ class pipelineTreeView(QtGui.QTreeView):
     def selectRoot(self):
         
         self.setCurrentIndex(self.asProxyIndex(self.rootIndex()))
-        self.tableView.update(self.selectionModel().selection())        
+        self.tableView.update(self.selectionModel().selection())    
         self.saveSelection()
+        
 
     def saveSelection(self):
         
@@ -657,7 +661,8 @@ class pipelineTreeView(QtGui.QTreeView):
         rec(self._expended_states,self.proxyModel,self.rootIndex())
 
         
-    def restoreState(self):    
+    def restoreState(self):  
+          
         '''
         recursive function to restore the expention state fo the tree to a dictionary
         '''
@@ -823,12 +828,12 @@ class pipelineTreeView(QtGui.QTreeView):
         if node:
 
             if node.typeInfo() == _folder_: 
-                actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_asset, src) ))
+                actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, src) ))
                 actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, src) ))
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
                 
             elif node.typeInfo() == _asset_:
-
+                actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage, src) ))
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
         else:

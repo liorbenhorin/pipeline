@@ -232,7 +232,7 @@ class FolderNode(Node):
         return _folder_
           
     def resource(self):
-        return cube_icon_full
+        return folder_icon
 
 
 class AssetNode(Node):
@@ -252,7 +252,7 @@ class AssetNode(Node):
 class StageNode(Node):
     
     def __init__(self, name, stage = None, parent=None):
-        super(ComponentNode, self).__init__(name, parent)
+        super(StageNode, self).__init__(name, parent)
       
         self._stage = stage
 
