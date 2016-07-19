@@ -18,6 +18,7 @@ _stage_ = "stage"
 _asset_ = "asset"
 _folder_ = "folder" 
 _dummy_ = "dummy"
+_version_ = "version"
 
 
 def set_icons():
@@ -271,7 +272,16 @@ class StageNode(Node):
     def resource(self):
         return large_image_icon
         
-                    
+class VersionNode(Node):
+    
+    def __init__(self, name, parent=None):
+        super(VersionNode, self).__init__(name, parent)
+      
+    def typeInfo(self):
+        return _version_
+   
+    def resource(self):
+        return large_image_icon                    
 
 class DummyNode(Node):
     

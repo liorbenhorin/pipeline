@@ -2643,7 +2643,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         import data_model as dtm
         reload(dtm)
-               
+ 
+        import data_view as dtv
+        reload(dtv)               
     
         
         '''
@@ -2683,8 +2685,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         VIEWS
         
         '''
-        self.list = dtm.PipelineContentsView()        
-        self.tree = dtm.pipelineTreeView()  
+        self.list = dtv.PipelineContentsView()        
+        self.tree = dtv.pipelineTreeView()  
         
         #connect the tree to the table views and vice versa     
         self.tree.tableView = self.list 
@@ -2758,7 +2760,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         # ----> temp!!! hide the old selection options
         #self.ui.assets_selection_frame.setHidden(True)
         
-        self.versionsTable = dtm.PipelineVersionsView()
+        self.versionsTable = dtv.PipelineVersionsView()
         self.list.versionsView = self.versionsTable
         
         
