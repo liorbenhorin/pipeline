@@ -247,7 +247,6 @@ class AssetNode(Node):
     def resource(self):
         return cube_icon_full
         
-
         
 class StageNode(Node):
     
@@ -255,6 +254,7 @@ class StageNode(Node):
         super(StageNode, self).__init__(name, parent)
       
         self._stage = stage
+        self._versions = []
 
     def typeInfo(self):
         return _stage_

@@ -52,6 +52,22 @@ def set_icons():
     
 set_icons()
 
+class PipelineVersionsView(QtGui.QTableView):
+    def __init__(self,parent = None):
+        super(PipelineVersionsView, self).__init__(parent)
+        self.setAlternatingRowColors(True)
+        #self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.setWordWrap(True)
+        #self.setShowGrid(False)
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
+        #self.icons_size(32)       
+        #self.setMinimumWidth(250)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        #self.setSortingEnabled(True)
+        #self.horizontalHeader().setOffset(10)
+        #self.verticalHeader().hide()        
+        self.setSortingEnabled(True)
+
 
 class PipelineContentsView(QtGui.QTableView):
     def __init__(self,parent = None):
@@ -85,6 +101,9 @@ class PipelineContentsView(QtGui.QTableView):
         
         self._treeParent = None
         self._treeParentIndex = None
+
+        self._versionsView = None
+
 
     def dropEvent(self, event):
 
@@ -207,6 +226,15 @@ class PipelineContentsView(QtGui.QTableView):
                 
                 return
         
+
+    @property
+    def versionsView(self):
+        return self._versionsView
+    
+    @versionsView.setter
+    def versionsView(self, view):
+        self._versionsView = view
+
 
     @property
     def treeView(self):

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>462</width>
-    <height>1516</height>
+    <width>461</width>
+    <height>984</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -81,13 +81,6 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
         <number>6</number>
        </property>
        <item>
-        <widget class="QPushButton" name="asset_scenes_switch_pushButton">
-         <property name="text">
-          <string>Scenes Mode</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="projects_pushButton">
          <property name="text">
           <string>No Project</string>
@@ -149,159 +142,51 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="treeWidget" native="true">
+     <widget class="QWidget" name="widget_2" native="true">
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>200</height>
+        <height>300</height>
        </size>
       </property>
-      <layout class="QHBoxLayout" name="verticalLayout_18"/>
-     </widget>
-    </item>
-    <item>
-     <widget class="Line" name="line_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="assets_main_widget" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QSplitter" name="assets_splitter">
+        <widget class="QSplitter" name="splitter">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="handleWidth">
           <number>10</number>
          </property>
-         <property name="childrenCollapsible">
-          <bool>false</bool>
-         </property>
-         <widget class="QFrame" name="assets_selection_frame">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QWidget" name="project_widget" native="true">
           <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>150</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="baseSize">
            <size>
             <width>0</width>
             <height>0</height>
            </size>
           </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QSplitter" name="splitter">
-             <property name="lineWidth">
-              <number>1</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="handleWidth">
-              <number>10</number>
-             </property>
-             <widget class="QWidget" name="verticalLayoutWidget">
-              <layout class="QVBoxLayout" name="verticalLayout_10">
-               <item>
-                <widget class="QPushButton" name="catagory_pushButton">
-                 <property name="text">
-                  <string>Category</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QTableWidget" name="category_tableWidget">
-                 <attribute name="horizontalHeaderVisible">
-                  <bool>true</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderVisible">
-                  <bool>false</bool>
-                 </attribute>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="verticalLayoutWidget_2">
-              <layout class="QVBoxLayout" name="verticalLayout_13">
-               <item>
-                <widget class="QPushButton" name="asset_pushButton">
-                 <property name="text">
-                  <string>Asset</string>
-                 </property>
-                 <property name="checkable">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QTableWidget" name="assets_tableWidget"/>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="verticalLayoutWidget_3">
-              <layout class="QVBoxLayout" name="verticalLayout_14">
-               <item>
-                <widget class="QPushButton" name="component_pushButton">
-                 <property name="text">
-                  <string>Component</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QTableWidget" name="components_tableWidget"/>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-           </item>
-          </layout>
+          <layout class="QHBoxLayout" name="verticalLayout_18"/>
          </widget>
-         <widget class="QFrame" name="component_frame">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+         <widget class="QWidget" name="stage_widget" native="true">
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>350</height>
+            <height>0</height>
            </size>
           </property>
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <property name="spacing">
-            <number>6</number>
-           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
             <widget class="QWidget" name="widget_3" native="true">
              <layout class="QHBoxLayout" name="component_data_horizontalLayout">
@@ -421,38 +306,18 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
             </widget>
            </item>
            <item>
-            <widget class="QTabWidget" name="asset_component_files_tabWidget">
+            <widget class="QTabWidget" name="stage_tabWidget">
              <property name="currentIndex">
               <number>0</number>
              </property>
-             <widget class="QWidget" name="tab">
+             <widget class="QWidget" name="versionsTab">
               <attribute name="title">
                <string>Versions</string>
               </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_7">
+              <layout class="QVBoxLayout" name="versionsTabLayout">
                <property name="spacing">
                 <number>6</number>
                </property>
-               <item>
-                <widget class="QTableWidget" name="component_versions_tableWidget">
-                 <property name="rowCount">
-                  <number>1</number>
-                 </property>
-                 <attribute name="horizontalHeaderCascadingSectionResizes">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderDefaultSectionSize">
-                  <number>60</number>
-                 </attribute>
-                 <attribute name="horizontalHeaderStretchLastSection">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderVisible">
-                  <bool>false</bool>
-                 </attribute>
-                 <row/>
-                </widget>
-               </item>
               </layout>
              </widget>
              <widget class="QWidget" name="tab_2">
@@ -471,24 +336,17 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                 </widget>
                </item>
                <item>
-                <widget class="QTableWidget" name="component_masters_tableWidget">
-                 <property name="rowCount">
-                  <number>1</number>
-                 </property>
-                 <attribute name="horizontalHeaderCascadingSectionResizes">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderDefaultSectionSize">
-                  <number>60</number>
-                 </attribute>
-                 <attribute name="horizontalHeaderStretchLastSection">
-                  <bool>false</bool>
-                 </attribute>
-                 <attribute name="verticalHeaderVisible">
-                  <bool>false</bool>
-                 </attribute>
-                 <row/>
-                </widget>
+                <widget class="QTableView" name="mastersTableView"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_3">
+              <attribute name="title">
+               <string>Playblasts</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QTableView" name="playblastsTableView"/>
                </item>
               </layout>
              </widget>
@@ -496,7 +354,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
            </item>
            <item>
             <widget class="QWidget" name="widget_4" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0">
+             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0,0">
               <property name="spacing">
                <number>6</number>
               </property>
@@ -521,314 +379,10 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                 </property>
                </widget>
               </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="scenes_main_widget" native="true">
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <widget class="QSplitter" name="scenes_splitter">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="handleWidth">
-          <number>10</number>
-         </property>
-         <property name="childrenCollapsible">
-          <bool>false</bool>
-         </property>
-         <widget class="QTabWidget" name="shots_assets_tabWidget">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>200</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="tab_3">
-           <attribute name="title">
-            <string>Scenes</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_17">
-            <property name="leftMargin">
-             <number>12</number>
-            </property>
-            <property name="topMargin">
-             <number>12</number>
-            </property>
-            <property name="rightMargin">
-             <number>12</number>
-            </property>
-            <property name="bottomMargin">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QSplitter" name="splitter_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="handleWidth">
-               <number>10</number>
-              </property>
-              <widget class="QWidget" name="verticalLayoutWidget_4">
-               <layout class="QVBoxLayout" name="verticalLayout_15">
-                <item>
-                 <widget class="QPushButton" name="sequence_pushButton">
-                  <property name="text">
-                   <string>Sequence</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QTableWidget" name="sequences_tableWidget">
-                  <attribute name="horizontalHeaderVisible">
-                   <bool>true</bool>
-                  </attribute>
-                  <attribute name="verticalHeaderVisible">
-                   <bool>false</bool>
-                  </attribute>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="verticalLayoutWidget_5">
-               <layout class="QVBoxLayout" name="verticalLayout_16">
-                <item>
-                 <widget class="QPushButton" name="shot_pushButton">
-                  <property name="text">
-                   <string>Shot</string>
-                  </property>
-                  <property name="checkable">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QTableWidget" name="shots_tableWidget"/>
-                </item>
-               </layout>
-              </widget>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_4">
-           <attribute name="title">
-            <string>Reference asset</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_9">
-            <item>
-             <widget class="QTableWidget" name="published_assets_tableWidget"/>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-         <widget class="QFrame" name="shot_frame">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <item>
-            <widget class="QWidget" name="shot_data_widget" native="true">
-             <layout class="QHBoxLayout" name="shot_data_horizontalLayout">
-              <property name="spacing">
-               <number>6</number>
-              </property>
               <item>
-               <widget class="QWidget" name="widget_2" native="true">
-                <property name="minimumSize">
-                 <size>
-                  <width>100</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_5">
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="shot_name_label">
-                   <property name="text">
-                    <string>Component Name</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="1">
-                  <widget class="QLabel" name="shot_notes_label">
-                   <property name="text">
-                    <string>Comment</string>
-                   </property>
-                   <property name="wordWrap">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0" colspan="3">
-                  <widget class="Line" name="line_2">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="shot_user_label">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>20</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <widget class="QLabel" name="shot_info_label">
-                   <property name="text">
-                    <string>author</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="shot_icon_label">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>20</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="shot_note_label">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>20</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QTabWidget" name="tabWidget">
-             <property name="currentIndex">
-              <number>0</number>
-             </property>
-             <widget class="QWidget" name="tab_5">
-              <attribute name="title">
-               <string>Versions</string>
-              </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_11">
-               <item>
-                <widget class="QTableWidget" name="shots_versions_tableWidget"/>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="tab_6">
-              <attribute name="title">
-               <string>Playblasts</string>
-              </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_12">
-               <item>
-                <widget class="QTableWidget" name="shots_playblasts_tableWidget"/>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_6" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,0">
-              <property name="spacing">
-               <number>6</number>
-              </property>
-              <item>
-               <widget class="QPushButton" name="save_shot_version_pushButton">
+               <widget class="QPushButton" name="save_master_pushButton_2">
                 <property name="text">
-                 <string>Save Version</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="import_shot_version_pushButton">
-                <property name="text">
-                 <string>Import</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="export_shot_pushButton">
-                <property name="text">
-                 <string>Export</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="playblast_shot_pushButton">
-                <property name="minimumSize">
-                 <size>
-                  <width>110</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="contextMenuPolicy">
-                 <enum>Qt::ActionsContextMenu</enum>
-                </property>
-                <property name="text">
-                 <string>Playblast</string>
+                 <string>Save Playblast</string>
                 </property>
                </widget>
               </item>
@@ -849,7 +403,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>462</width>
+     <width>461</width>
      <height>22</height>
     </rect>
    </property>

@@ -80,6 +80,7 @@ global start_time
 global end_time
 start_time = timer()
 
+'''
 import modules.data as data
 reload(data)
 import modules.files as files
@@ -90,7 +91,7 @@ import modules.track as track
 reload(track)
 import dialogue as dlg
 reload(dlg)
-
+'''
 
 global treeModel
 
@@ -2409,7 +2410,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
               
         
-        
+        '''
         self.set_icons()
         
         self.ui.assets_splitter.setSizes([150,600])
@@ -2571,12 +2572,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.init_publishedAssetsTable()
         self.init_shots_versionsTable()
         self.init_shots_playblastsTable()
+        
+        '''
+        
 
         '''
         >>> startup:
             finds the settings file or create one
             
             if there is no user logged in then make sure no project is loaded            
+        '''
+        
         '''
         self.init_settings()  
         self._decode_users()
@@ -2591,12 +2597,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'       
             self.set_project() # if the user logged in matchs with the settings active project, create a project object
+        
+        '''
+        
         '''
         project object:
             containg all data relevent to the project:
                 users, assets, shots, etc
         '''
-        self.init_current_project()   #init the ui tabels with the project's data    
+        #self.init_current_project()   #init the ui tabels with the project's data    
     
         '''
         
@@ -2608,6 +2617,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             then later returns to the script to save version, the button will work as expected and save the version to 
             the correct component
         '''     
+        
+        '''
         self.init_assets_selection()  
         self.setObjectName("pipeline_beta")
         self.open_scene_script = None
@@ -2616,7 +2627,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         end_time = timer()    
         log.info( "loaded in: %s"%(round((end_time - start_time),2)) )                 
         track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
-
+        '''
 
         self.tree()
     
@@ -2721,6 +2732,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         small_lable.setPixmap(small_icon)
             
         slideWidget = QtGui.QWidget() 
+        slideWidget.setMaximumHeight(20)
         slideLayout = QtGui.QHBoxLayout()
         slideLayout.setContentsMargins(0, 0, 0, 0)        
         slideWidget.setLayout(slideLayout)
@@ -2730,6 +2742,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.listSlider.setOrientation(QtCore.Qt.Horizontal)
         self.listSlider.setMaximumWidth(80)
         self.listSlider.setMinimumWidth(80)
+        self.listSlider.setMaximumHeight(10)
         self.listSlider.setMinimum(32)
         self.listSlider.setMaximum(96)
         self.listSlider.setValue(32)
@@ -2743,7 +2756,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         # add to the designer ui
         self.ui.verticalLayout_18.addWidget(self.navWidget)
         # ----> temp!!! hide the old selection options
-        self.ui.assets_selection_frame.setHidden(True)
+        #self.ui.assets_selection_frame.setHidden(True)
+        
+        self.versionsTable = dtm.PipelineVersionsView()
+        self.list.versionsView = self.versionsTable
+        
+        
+        
+        self.ui.versionsTabLayout.addWidget(self.versionsTable)
+        
+        
         
     def selectInScene(self):
         pass
