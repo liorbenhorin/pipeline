@@ -56,6 +56,36 @@ def set_icons():
 set_icons()
 
 
+        
+class ButtonDelegate(QtGui.QItemDelegate):
+    """
+    A delegate that places a fully functioning QPushButton in every
+    cell of the column to which it's applied
+    """
+    def __init__(self, parent):
+        # The parent is not an optional argument for the delegate as
+        # we need to reference it in the paint method (see below)
+        QtGui.QItemDelegate.__init__(self, parent)
+ 
+    def paint(self, painter, option, index):
+        # This method will be called every time a particular cell is
+        # in view and that view is changed in some way. We ask the 
+        # delegates parent (in this case a table view) if the index
+        # in question (the table cell) already has a widget associated 
+        # with it. If not, create one with the text for this index and
+        # connect its clicked signal to a slot in the parent view so 
+        # we are notified when its used and can do something. 
+        if not self.parent().indexWidget(index):
+            self.parent().setIndexWidget(
+                index, 
+                QtGui.QPushButton(
+                    "Open",
+                    index.data(), 
+                    self.parent(), 
+                    clicked=self.parent().cellButtonClicked
+                )
+            )     
+
 
 class PipelineVersionsView(QtGui.QTableView):
     def __init__(self,parent = None):
@@ -72,6 +102,27 @@ class PipelineVersionsView(QtGui.QTableView):
         #self.horizontalHeader().setOffset(10)
         #self.verticalHeader().hide()        
         self.setSortingEnabled(True)
+
+        # Set the delegate for column 0 of our table
+        self.setItemDelegateForColumn(3,  ButtonDelegate(self))
+
+    def setModel(self,model):
+
+        super(PipelineVersionsView,self).setModel(model)
+        
+        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+        self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)        
+        self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Stretch) 
+        self.horizontalHeader().setResizeMode(3,QtGui.QHeaderView.Stretch) 
+         
+    @QtCore.Slot()
+    def cellButtonClicked(self):
+        # This slot will be called when our button is clicked. 
+        # self.sender() returns a refence to the QPushButton created
+        # by the delegate, not the delegate itself.
+        button = self.sender()
+        index = self.indexAt(button.pos())
+        print self.model().getNode(index).name, " --->" , self.model().getNode(index).number
 
 
 class PipelineContentsView(QtGui.QTableView):
@@ -296,7 +347,11 @@ class PipelineContentsView(QtGui.QTableView):
             node = self.getNode(index)
             
             treeIndex = self.asTreeIndex(index)
-            print treeIndex, " <--- table clicked"
+            #print treeIndex, " <--- table clicked"
+            
+            if node.typeInfo() == _stage_:
+                self.updateVersionsTable(node)
+            
             event.accept()
             return
                 
@@ -514,10 +569,9 @@ class PipelineContentsView(QtGui.QTableView):
         selection = QtGui.QItemSelection(index, index)        
         self.update(selection)
 
-    def updateVersionsTable(self, index):
-        node = index #<----
-        node.versionsModel = PipelineContentsModel(contenetsList)
-        self.versionsView.setModel(node.versionsModel)
+    def updateVersionsTable(self, node):
+        versionModel = dtm.PipelineVersionsModel(node._versions)
+        self.versionsView.setModel(versionModel)
                    
 class pipelineTreeView(QtGui.QTreeView):
     def __init__(self,parent = None):

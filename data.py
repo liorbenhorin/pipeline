@@ -258,10 +258,19 @@ class StageNode(Node):
         super(StageNode, self).__init__(name, parent)
       
         self._stage = stage
-        self._versions = []
+
+        self._versions = [] 
+               
+        [self._versions.append(VersionNode(self.name, author = "autor" ,number = i, date = i, note = "no note")) for i in range(10)]
+     
+    @property
+    def versions(self):
+        return self._versions
+
 
     def typeInfo(self):
         return _stage_
+
 
     @property
     def stage(self):
@@ -274,17 +283,45 @@ class StageNode(Node):
    
     def resource(self):
         return large_image_icon
-        
+                           
+
 class VersionNode(Node):
     
-    def __init__(self, name, parent=None):
+    def __init__(self, name, number = None, author = None, date = None, note = None, parent=None):
         super(VersionNode, self).__init__(name, parent)
-      
+        
+        self._number = number
+        self._date = date
+        self._note = note
+        self._author = author
+
+    @property
+    def number(self):
+        return self._number
+
+    @property
+    def date(self):
+        return self._date
+
+    @property
+    def author(self):
+        return self._author
+
+    @property
+    def note(self):
+        return self._note
+        
+    @note.setter
+    def note(self, note):
+        self._note = note
+
+
     def typeInfo(self):
         return _version_
-   
+  
     def resource(self):
-        return large_image_icon                    
+        return None  
+
 
 class DummyNode(Node):
     
