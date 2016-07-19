@@ -7,6 +7,13 @@ import functools
 import data as dt
 reload(dt)
 
+
+
+global _stage_ = "stage"
+global _x = ""
+
+
+
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
     if not os.path.exists(localIconPath):
