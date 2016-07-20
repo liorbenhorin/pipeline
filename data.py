@@ -183,7 +183,7 @@ class Node(object):
         elif column is 1: return None
     
     def setData(self, column, value):
-        print value
+        #print value
         if   column is 0: self.name = value
         elif column is 1: pass
     
