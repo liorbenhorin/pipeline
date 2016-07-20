@@ -78,9 +78,10 @@ start_time = timer()
 
 import modules.data as data
 reload(data)
-'''
+
 import modules.files as files
 reload(files)
+'''
 import modules.maya_warpper as maya
 reload(maya)
 import modules.track as track
@@ -1479,7 +1480,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             containg all data relevent to the project:
                 users, assets, shots, etc
         '''
-        #self.init_current_project()   #init the ui tabels with the project's data    
+        self.init_current_project()   #init the ui tabels with the project's data    
     
         '''
         
@@ -1506,6 +1507,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree()
     
     def tree(self):
+        print self.settings.current_project_path
         
         self.ui.searchIcon_label.setPixmap(search_icon)
         
@@ -1521,14 +1523,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         import data_view as dtv
         reload(dtv)               
     
-        
+    
         '''
         MODELS
         '''
         
         '''
         generate some tree nodes for testing
-        '''
+        
         _root = dt.RootNode("root")
         root = dt.FolderNode("Diving",_root)
         char = dt.FolderNode("Charachters", root)
@@ -1538,15 +1540,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         model = dt.StageNode("Model", parent = dog)
         sorted = dt.StageNode("Sorted_component", parent = dog)
         
-        '''
+        
         creating the tree model,
         it's the main tree model object, its global so it is deleted every restart of Pipeline
         '''
-        treeModel = dtm.PipelineProjectModel(_root) 
-
+        
+        treeModel = dtm.PipelineProjectFileSystem()#dtm.PipelineProjectModel(_root) 
+        
         '''
         _proxymodel is the sortFilterProxyModel object that is connected to the tree model
-        '''
+        
+        
         self._proxyModel = dtm.PipelineProjectProxyModel()      
         self._proxyModel.setSourceModel(treeModel)
         self._proxyModel.setDynamicSortFilter(True)
@@ -1555,13 +1559,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
         
-        '''
+        
         VIEWS
         
         '''
-        self.list = dtv.PipelineContentsView()        
-        self.tree = dtv.pipelineTreeView()  
-        
+        self.list = dtv.PipelineFileContentsView()        
+        self.tree = dtv.pipelineFileTreeView() 
+        self.tree.setModel( treeModel )
+         
+        '''
         #connect the tree to the table views and vice versa     
         self.tree.tableView = self.list 
         self.list.treeView = self.tree      
@@ -1583,7 +1589,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         # select the tree root
         self.tree.selectRoot()
-        
+        '''
         '''
         UI LAYOUTS, SPLITTER, AND ICONS SCALE SLIDER
         '''
@@ -1622,7 +1628,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.listSlider.setMinimum(32)
         self.listSlider.setMaximum(96)
         self.listSlider.setValue(32)
-        self.listSlider.valueChanged.connect(self.list.icons_size) 
+        #self.listSlider.valueChanged.connect(self.list.icons_size) 
 
         slideLayout.addWidget(small_lable)
         slideLayout.addWidget(self.listSlider)
@@ -1635,10 +1641,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.ui.assets_selection_frame.setHidden(True)
         
         self.versionsTable = dtv.PipelineVersionsView()
-        self.list.versionsView = self.versionsTable
-        
-        
-        
+        #self.list.versionsView = self.versionsTable
+    
         self.ui.versionsTabLayout.addWidget(self.versionsTable)
         
         

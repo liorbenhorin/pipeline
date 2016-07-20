@@ -817,5 +817,11 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
              
         self.endRemoveRows()
         return True        
+
+
+def PipelineProjectFileSystem(parent=None):
+    return QtGui.QFileSystemModel(parent)
+
+
         
    
