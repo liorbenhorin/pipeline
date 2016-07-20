@@ -66,7 +66,7 @@ from timeit import default_timer as timer
 import logging
 #import webbrowser
 #import glob
-#import sys
+import sys
 #import inspect
 #import functools
 
@@ -75,18 +75,20 @@ global start_time
 global end_time
 start_time = timer()
 
-'''
+
 import modules.data as data
 reload(data)
+'''
 import modules.files as files
 reload(files)
 import modules.maya_warpper as maya
 reload(maya)
 import modules.track as track
 reload(track)
+'''
 import dialogue as dlg
 reload(dlg)
-'''
+
 
 global treeModel
 
@@ -241,13 +243,13 @@ global variables setup
 '''
 main_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_main_UI.ui')
 main_form_class, main_base_class = loadUiType(main_uiFile)
-''' 
+ 
 projects_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_projects_UI.ui')       
 projects_form_class, projects_base_class = loadUiType(projects_uiFile)
 
 create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_create_edit_project_UI.ui')
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
-'''
+
 version = '1.0.10-NFR'
 
 
@@ -424,7 +426,493 @@ class pipeline_data(object):
 
 
 
+class pipeline_project(pipeline_data):
+    def __init__(self,**kwargs):
+        #super(pipeline_project, self,).__init__()
+        pipeline_data.__init__(self, **kwargs)
 
+
+
+        self.project_file = None
+        if self.data_file:
+            self.project_file = self.data_file.read()
+
+        self.project_file_name = 'project.pipe'
+   
+        self.settings = None
+        for key in kwargs:
+            if key == "settings":
+                self.settings = kwargs[key] 
+   
+        
+    def create(self, 
+               project_path, 
+               name = "My_Project",
+               padding = 3,
+               file_type = "ma",
+               fps = 25,
+               users = {"Admin":(1234,"admin")},
+               playblast_outside = False):
+        
+        project_settings_file = os.path.join(project_path, self.project_file_name) 
+        
+        project_key = data.id_generator()
+        project_data = {}
+        project_data["project_name"] = name
+        project_data["project_key"] = project_key
+        project_data["padding"] = padding
+        project_data["fps"] = fps
+        project_data["defult_file_type"] = file_type
+        project_data["users"] = users
+        project_data["playblast_outside"] = playblast_outside
+                     
+        folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
+                   "sound", "clips", "renderData", "cache"]
+        
+        for folder in folders:
+            project_data[folder] = folder
+            files.create_directory(os.path.join(project_path, folder)) 
+            
+        #render folders:
+        r_folders = ["renderData", "depth", "iprimages", "shaders"]
+        for r_folder in r_folders[1:]:
+            files.create_directory(os.path.join(project_path, r_folders[0], r_folder))
+        
+        fur_folders = ["renderData", "fur", "furFiles", "furImages", "furEqualMap", "furAttrMap", "furShadowMap" ]
+        for f_folder in fur_folders[2:]:
+            files.create_directory(os.path.join(project_path, fur_folders[0], fur_folders[1], f_folder))
+         
+        #cache folders:
+        c_folders = ["cache", "particles", "nCache", "bifrost"]
+        for c_folder in c_folders[1:]:
+            files.create_directory(os.path.join(project_path, c_folders[0], c_folder))            
+
+        fl_folders = ["cache", "nCache", "fluid"]
+        for fl_folder in fl_folders[2:]:
+            files.create_directory(os.path.join(project_path, fl_folders[0], fl_folders[1], fl_folder))              
+
+        
+        self.data_file = data.pickleDict().create(project_settings_file, project_data)  
+        self.project_file = self.data_file.read()
+        
+        return self 
+
+
+
+    def project_file_key(self, key = None):
+        if self.project_file:
+            return self.project_file[key]
+        else:
+            return None
+        
+    @property
+    def project_name(self):
+        if self.project_file:
+            return self.project_file["project_name"]
+        else:
+            return None           
+
+    @property
+    def project_fps(self):
+        if self.project_file:
+            if "fps" in self.project_file.keys():
+                return self.project_file["fps"]
+            else:
+                return None  
+        else:
+            return None  
+
+
+    @project_fps.setter
+    def project_fps(self,fps):
+       
+        if self.data_file:
+            data = {}
+            data["fps"] = fps
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+
+    @property
+    def project_key(self):
+        if self.project_file:
+            return self.project_file["project_key"]
+        else:
+            return None  
+
+    @property
+    def project_padding(self):
+        if self.project_file:
+            return self.project_file["padding"]
+        else:
+            return None 
+            
+    @property
+    def project_file_type(self):
+        if self.project_file:
+            return self.project_file["defult_file_type"]
+        else:
+            return None             
+
+
+    @project_file_type.setter
+    def project_file_type(self,type):
+       
+        if self.data_file:
+            data = {}
+            data["defult_file_type"] = type
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+    
+    @property
+    def movie_file_type(self):
+        if self.project_file:
+            return "mov"
+        else:
+            return None    
+
+    @property
+    def project_users(self):
+        if self.project_file:
+            if "users" in self.project_file.keys():
+                return self.project_file["users"]
+            else:
+                return None    
+        else:
+            return None  
+
+    @project_users.setter
+    def project_users(self,users):
+       
+        if self.data_file:
+            data = {}
+            data["users"] = users
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+
+    @property
+    def playblast_outside(self):
+        if self.project_file:
+            if "playblast_outside" in self.project_file.keys():
+                return self.project_file["playblast_outside"]
+            else:
+                return False    
+        else:
+            return None  
+
+    @playblast_outside.setter
+    def playblast_outside(self,playblast_outside):
+        
+
+        old_path = self.playblasts_path
+                      
+        if self.data_file:
+            data = {}
+            data["playblast_outside"] = playblast_outside
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+            files.dir_move(old_path, self.playblasts_path)
+            
+        
+            
+
+
+    @property
+    def assets_dir(self):
+        if self.project_file:
+            return self.project_file_key(key = "assets")
+        else:
+            return None  
+
+
+
+
+
+    def catagories(self, project_path = None):
+        if self.project_file:
+
+            if os.path.exists(project_path):
+                if self.assets_dir:
+                    assets_catagories_path = os.path.join(project_path, self.assets_dir)
+                    return files.list_dir_folders(assets_catagories_path)
+        return None         
+
+    def assets(self, project_path = None, catagory_name = None):
+        if self.project_file:
+
+            if os.path.exists(project_path):
+                if self.assets_dir:
+                    catagory_path = os.path.join(project_path,self.assets_dir, catagory_name)
+                    if os.path.exists(catagory_path):
+                        return files.list_dir_folders(catagory_path)
+        return None  
+
+    def components(self, project_path = None, catagory_name = None, asset_name = None):
+        if self.project_file:
+
+            if os.path.exists(project_path):
+                if self.assets_dir:
+                    asset_path = os.path.join(project_path,self.assets_dir, catagory_name, asset_name)
+                    if os.path.exists(asset_path):
+                        return files.list_dir_folders(asset_path)
+        return None  
+    
+    @property
+    def scenes_path(self):
+        if self.settings:
+            path = os.path.join(self.settings.current_project_path,"scenes")
+            if os.path.exists(path):
+                return path
+        return None
+
+    @property
+    def playblasts_path(self):
+        if self.settings:
+            if self.playblast_outside:            
+                path = os.path.join(os.path.dirname(self.settings.current_project_path),"%s_playblasts"%(self.project_name))
+           
+            else:
+                path = os.path.join(self.settings.current_project_path,"playblasts")
+            
+            
+            return path
+        return None
+    
+    @property
+    def sequences(self):
+        if self.project_file:
+             
+            path = self.scenes_path
+            if os.path.exists(path):
+                folders = files.list_dir_folders(path)
+                sequences = []
+                for folder in folders:
+                    if os.path.isfile(os.path.join(path, folder, "sequence.pipe")):
+                        sequences.append(folder)
+                return sequences
+        return None  
+
+    def shots(self, sequence_name = None):
+        if self.project_file:
+            if sequence_name:
+                path = os.path.join(self.scenes_path, sequence_name)
+                if os.path.exists(path):
+                    return files.list_dir_folders(path)
+        
+        return None 
+
+
+
+    def create_sequence(self, sequence_name = None):
+        
+        for sequence in self.sequences:
+            if sequence_name == sequence:
+                dlg.massage("critical", "Sorry", "This sequence exsists" )
+                return False
+
+        path = os.path.join(self.scenes_path, sequence_name)    
+        if files.create_directory(path):
+            files.create_dummy(path, "sequence.pipe")
+            return True
+
+
+    def delete_sequence(self, sequence_name = None):
+
+        path = os.path.join(self.scenes_path,sequence_name)       
+        if files.delete(path):
+            
+            path = os.path.join(self.playblasts_path,sequence_name)   
+            if files.delete(path):
+                
+                return True
+            
+            return True
+            
+        
+        return False  
+
+    def delete_shot(self, sequence_name = None, shot_name = None):
+
+        path = os.path.join(self.scenes_path,sequence_name, shot_name)       
+        if files.delete(path):
+            
+            path = os.path.join(self.playblasts_path,sequence_name, shot_name)   
+            if files.delete(path):
+                
+                return True
+            
+            return True
+        
+        return False  
+
+    def create_shot(self, sequence_name = None, shot_name = None, create_from = None):
+        for shot in self.shots(sequence_name = sequence_name):
+            if shot_name == shot:
+                dlg.massage("critical", "Sorry", "This Shot exsists" )
+                return False
+
+        path = os.path.join(self.scenes_path,sequence_name,shot_name)       
+        if files.create_directory(path):
+            shot = pipeline_shot().create(path, sequence_name, shot_name, self, self.settings, create_from)
+            return shot
+ 
+
+    def create_catagory(self, project_path = None, catagory_name = None):
+        for catagory in self.catagories(project_path = project_path):
+            if catagory_name == catagory:
+                dlg.massage("critical", "Sorry", "This Catagory exsists" )
+                return False
+
+        path = os.path.join(project_path,self.assets_dir,catagory_name)       
+        if files.create_directory(path):
+            return True
+        
+    def delete_catagory(self, project_path = None, catagory_name = None):
+
+        path = os.path.join(project_path,self.assets_dir,catagory_name)       
+        if files.delete(path):
+            return True
+        
+        return False    
+
+    def create_asset(self, project_path = None, catagory_name = None, asset_name = None):
+        for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
+            if asset_name == asset:
+                dlg.massage("critical", "Sorry", "This Asset exsists" )
+                return False
+
+        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)       
+        if files.create_directory(path):
+            return True
+            
+    def delete_asset(self, project_path = None, catagory_name = None, asset_name = None):
+
+        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)       
+        if files.delete(path):
+            return True
+        
+        return False  
+
+    def create_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None, create_from = None):
+        for component in self.components(project_path = project_path, catagory_name = catagory_name, asset_name = asset_name):
+            if component_name == component:
+                dlg.massage("critical", "Sorry", "This Component exsists" )
+                return False
+
+        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)       
+        if files.create_directory(path):
+            component = pipeline_component().create(path, catagory_name, asset_name, component_name, self, self.settings, create_from)
+            return component
+
+    def delete_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None):
+
+        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)       
+        if files.delete(path):
+            return True
+        
+        return False  
+
+
+    def rename_sequence(self, project_path = None,sequence_name = None, new_name=True):
+                
+        for shot in self.shots( sequence_name ):
+            
+            path = os.path.join(project_path,self.scenes_path,sequence_name,shot,  ("%s.%s"%(shot,"pipe")))
+            if os.path.isfile(path):
+                shot_object = pipeline_shot(path = path, project = self, settings = self.settings) 
+                shot_object.rename_sequence(new_name)
+        
+        path = os.path.join(project_path,self.scenes_path,sequence_name)       
+        path = files.file_rename(path,new_name) 
+        
+        return True  
+
+    def rename_catagory(self, project_path = None, catagory_name = None, new_name=True):
+        
+        for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
+        
+            for component in self.components(project_path, catagory_name, asset):
+                
+                path = os.path.join(project_path,self.assets_dir,catagory_name,asset, component, ("%s.%s"%(component,"pipe")))
+                if os.path.isfile(path):
+                    component_object = pipeline_component(path = path, project = self, settings = self.settings) 
+                    component_object.catagory_name = new_name
+        
+        path = os.path.join(project_path,self.assets_dir,catagory_name)       
+        path = files.file_rename(path,new_name) 
+        
+        return True  
+
+    def rename_asset(self, project_path = None, catagory_name = None, asset_name = None, new_name=True):
+                
+        for component in self.components(project_path, catagory_name, asset_name):
+            path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component, ("%s.%s"%(component,"pipe")))
+            if os.path.isfile(path):
+                component_object = pipeline_component(path = path, project = self, settings = self.settings) 
+                component_object.rename_asset(new_name)
+
+        
+        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)       
+        path = files.file_rename(path,new_name)   
+        
+        return True
+    
+
+
+    @property
+    def masters(self):
+        if self.project_file:
+            masters = {}            
+            project_path = self.settings.current_project_path
+            
+            for catagory in self.catagories(project_path=project_path):                
+                for asset in self.assets(project_path=project_path, catagory_name = catagory):                    
+                    for component in self.components(project_path = project_path, catagory_name = catagory, asset_name = asset):                    
+                        component_object = pipeline_component                        
+                        component_file_path = os.path.join(project_path,
+                            self.assets_dir,
+                            catagory,
+                            asset,
+                            component,
+                            "%s.%s"%(component,"pipe")
+                            )
+            
+                        component_object = pipeline_component(path = component_file_path, project = self, settings = self.settings)
+                        if component_object.component_public_state:
+                            master_padded_version = set_padding(0, self.project_padding)
+                            master_file = component_object.master
+                            if master_file:
+                                masters["%s_%s"%(asset,component)] = [master_file, 
+                                                     component_object.thumbnail, 
+                                                     component_object.author("masters",master_padded_version), 
+                                                     component_object.date_created("masters",master_padded_version),
+                                                     ]
+                            
+                        del component_object
+                           
+            return masters        
+        else:            
+            return None
+                            
+
+    def log(self):
+        
+        log.info("logging project '%s'"%(self.project_name))       
+        
+        project_path = self.settings.current_project_path
+        
+        log.info("project local path %s"%project_path)
+                
+        [ log.info("  %s"%files.reletive_path(project_path,f)) for f in files.list_all(self.settings.current_project_path) if isinstance(files.list_all(self.settings.current_project_path),list) ]
+                               
+        log.info("project data file: %s"%self.data_file_path)
+        
+        log.info(self.data_file.print_nice())
+
+        log.info("end logging project ")    
+                            
 
                             
 
@@ -960,14 +1448,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.init_shots_playblastsTable()
         
         '''
-        
-
+    
         '''
+        
         >>> startup:
             finds the settings file or create one
             
             if there is no user logged in then make sure no project is loaded            
-        '''
+        
         
         '''
         self.init_settings()  
@@ -984,7 +1472,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'       
             self.set_project() # if the user logged in matchs with the settings active project, create a project object
         
-        '''
+        
         
         '''
         project object:
@@ -1298,6 +1786,46 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.settings.current_project = None
             return False
 
+    def update_current_open_project(self,project_key,**kwargs):
+        '''
+        thie method is used from the projects window, when a project is being set, 
+        update the settings file,
+        call the set project and init project methods
+
+        '''
+
+        from_pm = False
+        if "from_projects_manager" in kwargs:
+            from_pm = kwargs["from_projects_manager"]
+        
+                     
+        if project_key:
+
+            #if self.settings.current_project != project_key:
+                
+            self.settings.current_project = project_key
+            
+
+            
+            if from_pm:
+                if self.set_project(from_projects_manager=True):
+                    self.init_current_project()
+                
+                    return True
+            else:
+                if self.set_project():
+                    self.init_current_project()
+                
+                    return True                
+        else:
+            
+            self.settings.current_project = None
+            self.set_project()
+            self.init_current_project()            
+            #return True
+        
+        return False
+
     def _decode_users(self):        
         decode = getattr(self.ui,dlg._decode_strings()[0])
         decode2 = getattr(decode,dlg._decode_strings()[2])(dlg._decode_strings()[4])
@@ -1343,37 +1871,40 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #if self.settings.current_project_name: 
         if self.project:             
             self.ui.projects_pushButton.setText(self.settings.current_project_name)  
-            self.enable(self.ui.assets_selection_frame)  
-            self.enable(self.ui.shots_assets_tabWidget)               
+            #self.enable(self.ui.assets_selection_frame)  
+            #self.enable(self.ui.shots_assets_tabWidget)               
 
              
 
             self.enable(self.ui.save_master_pushButton, level = 1)        
             self.enable(self.ui.save_version_pushButton, level = 1)
             self.enable(self.ui.import_version_pushButton, level = 1)
-            self.enable(self.ui.save_shot_version_pushButton, level = 2)
-            self.enable(self.ui.import_shot_version_pushButton, level = 2)
+            #self.enable(self.ui.save_shot_version_pushButton, level = 2)
+            #self.enable(self.ui.import_shot_version_pushButton, level = 2)
             
+            '''
             if self.settings.role > 1 and self.settings.role < 3:
+                
                 if self.ui.scenes_main_widget.isHidden():
                     self.asset_scenes_switch()            
-                self.ui.asset_scenes_switch_pushButton.setHidden(True)
+                #self.ui.asset_scenes_switch_pushButton.setHidden(True)
             else:
-                self.ui.asset_scenes_switch_pushButton.setHidden(False)
+                pass
+                #self.ui.asset_scenes_switch_pushButton.setHidden(False)
+               '''     
                     
                     
-                    
-            self.update_category()
-            self.update_sequence()
-            self.update_published_masters()
+            #self.update_category()
+            #self.update_sequence()
+            #self.update_published_masters()
 
         else:
             self.ui.projects_pushButton.setText("No Project")
-            self.disable(self.ui.assets_selection_frame)  
-            self.disable(self.ui.shots_assets_tabWidget)
-            self.update_category()
-            self.update_sequence()
-            self.update_published_masters()
+            #self.disable(self.ui.assets_selection_frame)  
+            #self.disable(self.ui.shots_assets_tabWidget)
+            #self.update_category()
+            #self.update_sequence()
+            #self.update_published_masters()
             log.info ( "logged out") 
                                        
 
