@@ -811,19 +811,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.actionCollect_component.triggered.connect(self.collect_component)
         self.disable(self.ui.actionCollect_component)
         
-        
+        '''
         self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
-        self.ui.asset_component_files_tabWidget.currentChanged.connect(self.update_component_files_tab)
+        #self.ui.asset_component_files_tabWidget.currentChanged.connect(self.update_component_files_tab)
         self.ui.component_note_label.mousePressEvent = self.version_note        
-        self.ui.shot_notes_label.mousePressEvent = self.shot_note   
+        #self.ui.shot_notes_label.mousePressEvent = self.shot_note   
         self.ui.save_version_pushButton.clicked.connect(self.version_save)
         self.ui.save_master_pushButton.clicked.connect(self.master_save)
         self.ui.import_version_pushButton.clicked.connect(self.version_import)                
-        self.ui.import_shot_version_pushButton.clicked.connect(self.shot_import)  
-        self.ui.save_shot_version_pushButton.clicked.connect(self.shot_version_save)
+        #self.ui.import_shot_version_pushButton.clicked.connect(self.shot_import)  
+        #self.ui.save_shot_version_pushButton.clicked.connect(self.shot_version_save)
         #self.ui.playblast_shot_pushButton.clicked.connect(self.shot_record_playblast)
-        self.ui.asset_scenes_switch_pushButton.clicked.connect(self.asset_scenes_switch)
+        #self.ui.asset_scenes_switch_pushButton.clicked.connect(self.asset_scenes_switch)
         self.ui.publicMaster_checkBox.clicked.connect(self.public_master_toggle)
         
         self.playblast_menu = QtGui.QMenu(parent = self.ui.playblast_shot_pushButton)
@@ -837,7 +837,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.playblast_shot_pushButton.setMenu(self.playblast_menu)     
         #self.ui.playblast_shot_pushButton.addAction(self.ui.playblast_shot_options)
         #self.ui.playblast_shot_options.triggered.connect(self.shot_record_playblast_options)
-        
+        '''
         #create menus
         self.catagories_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
         self.catagories_menu.addAction(new_folder_icon,'New',self.create_catagory)       
