@@ -1646,6 +1646,31 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.versionsTabLayout.addWidget(self.versionsTable)
         
         
+        level_dict = ["TYPE","ASSET"]
+        
+        
+        levels = [None]
+        #[levels.append(dtv.ComboWidget("<LEVEL>_%s"%(str(i)), name = "<LEVEL>_%s"%(str(i)), parentLevel = levels[i]), parent = self.ui.navScrollLayout) for i in range(5)]
+        self.ui.navScrollLayout.setAlignment(QtCore.Qt.AlignLeft)
+        
+        dirs = []  
+        dir = os.path.join(self.settings.current_project_path, "assets")
+        
+        [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
+        
+        
+        
+        
+        real = os.path.relpath(dir, self.settings.current_project_path)
+        depth = real.count(os.sep) 
+        
+        level0 = dtv.ComboWidget(level_dict[depth], name = level_dict[depth], relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navScrollLayout)
+        
+        self.ui.navScrollLayout.addWidget(level0)
+        #[self.ui.navScrollLayout.addWidget(levels[l+1]) for l in range(len(levels)-1)]
+
+        
+        
         
     def selectInScene(self):
         pass

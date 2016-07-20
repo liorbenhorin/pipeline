@@ -1119,3 +1119,60 @@ class pipelineTreeView(QtGui.QTreeView):
             self.tableView.populateTable(model)
             
 
+class ComboWidget(QtGui.QWidget):
+    def __init__(self,label = None, name = None, relpath = None, items = None, parentLevel = None, parentLayout = None, parent = None):
+        super(ComboWidget, self).__init__(parent)
+        
+        self._items = items
+        self._relpath = relpath
+        self._name = name
+        self._child = None
+        self._parent = parentLevel
+        if self._parent:
+            self._parent.setChild = self
+        
+        
+        self.layout = QtGui.QVBoxLayout(self)
+        self.layout.setAlignment(QtCore.Qt.AlignLeft)
+        self.label = QtGui.QLabel(label,self)
+        self.comboBox = QtGui.QComboBox(self)
+        self.comboBox.setMinimumHeight(30)
+        self.comboBox.setMinimumWidth(60)
+
+        list = []
+        for i in range(len(self._items)):
+            n = os.path.split(self._items[i])[1]
+            list.append(dt.FolderNode(n))
+        
+        RemoveOption = False
+        if len(list)>0:
+            RemoveOption = True
+        
+        list.append(dt.AddNode("Add..."))
+        if RemoveOption:
+            list.append(dt.AddNode("Remove..."))
+        
+        self.model = dtm.PipelineListModel(list)        
+        self.comboBox.setModel(self.model)
+        self.comboBox.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+        
+        self.layout.setContentsMargins(0, 0, 0, 0)      
+        self.setLayout(self.layout) 
+        
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.comboBox)
+        
+        
+        self.comboBox.currentIndexChanged.connect(self.update)
+                
+    def setChild(self, child):
+        self._child = child
+        
+    def update(self):
+        print self.comboBox.currentText()
+        
+        
+    
+    
+    
+    

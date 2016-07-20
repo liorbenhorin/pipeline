@@ -335,3 +335,14 @@ class DummyNode(Node):
     def resource(self):
         return None               
                 
+class AddNode(Node):
+    
+    def __init__(self, name, parent=None):
+        super(AddNode, self).__init__(name, parent)
+
+
+    def typeInfo(self):
+        return _dummy_
+  
+    def resource(self):
+        return add_icon                    

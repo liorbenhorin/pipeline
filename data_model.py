@@ -819,9 +819,81 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         return True        
 
 
-def PipelineProjectFileSystem(parent=None):
-    return QtGui.QFileSystemModel(parent)
+class PipelineListModel(QtCore.QAbstractListModel):
+    
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
+    
+    def __init__(self, items = [], parent = None):
+        QtCore.QAbstractListModel.__init__(self, parent)
+        self.__items = items
 
+
+    def rowCount(self, parent):
+        return len(self.__items)
 
         
+    def data(self, index, role):
+        
+        
+        if role == QtCore.Qt.EditRole:
+            return self.__items[index.row()].name
+        
+        
+        if role == QtCore.Qt.DecorationRole:
+            resource = self.__items[index.row()].resource()
+            return QtGui.QIcon(QtGui.QPixmap(resource))
+              
+        if role == QtCore.Qt.DisplayRole:
+            
+            row = index.row()
+            return self.__items[row].name
+
+
+    def flags(self, index):
+        
+        if index.isValid():       
+            return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+        
+    """CUSTOM"""
+    """INPUTS: QModelIndex"""
+    def getNode(self, index):
+        if index.isValid():
+            return self.__items[index.row()]
+
+        return None        
+        
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+            
+            row = index.row()
+            
+            if role == QtCore.Qt.EditRole:
+                self.__items[row].name = value 
+                self.dataChanged.emit(index, index)
+             
+                return True
+
+            
+        return False
+
+    #=====================================================#
+    #INSERTING & REMOVING
+    #=====================================================#
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+        self.endInsertRows()
+        
+        return True
+   
+    def removeRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, position, position + rows - 1)
+        
+        for i in range(rows):
+            value = self.__items[position]
+            self.__items.remove(value)
+             
+        self.endRemoveRows()
+        return True
+      
    
