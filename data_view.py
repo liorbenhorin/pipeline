@@ -1120,7 +1120,7 @@ class pipelineTreeView(QtGui.QTreeView):
             
 
 class ComboWidget(QtGui.QWidget):
-    def __init__(self,label = None, name = None, relpath = None, items = None, parentLevel = None, parentLayout = None, parent = None):
+    def __init__(self,label = None, name = None, path = None, relpath = None, items = None, parentLevel = None, parentLayout = None, parent = None):
         super(ComboWidget, self).__init__(parent)
         
         self._items = items
@@ -1128,17 +1128,56 @@ class ComboWidget(QtGui.QWidget):
         self._name = name
         self._child = None
         self._parent = parentLevel
-        if self._parent:
-            self._parent.setChild = self
+        self._parentLayout = parentLayout
+        self._path = path
+        
+        self.model = None
+        
+        #if self._parent:
+        #    self._parent.setChild = self
         
         
         self.layout = QtGui.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignLeft)
         self.label = QtGui.QLabel(label,self)
         self.comboBox = QtGui.QComboBox(self)
+        self.comboBox.setIconSize(QtCore.QSize(24 ,24)  ) 
         self.comboBox.setMinimumHeight(30)
         self.comboBox.setMinimumWidth(60)
 
+
+        self.createModel()      
+        
+        self.comboBox.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+        
+        self.layout.setContentsMargins(0, 0, 0, 0)      
+        self.setLayout(self.layout) 
+        
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.comboBox)
+        
+        
+        self.comboBox.currentIndexChanged.connect(self.update)
+        #self.update()
+
+    def addChild(self, name):
+        level_dict = ["TYPE","ASSET"]
+        dirs = []  
+        dir = os.path.join(self._path, name)
+        
+        [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
+        
+        if len(dirs) > 0:
+     
+            real = os.path.relpath(dir, self._relpath)
+            depth = real.count(os.sep)         
+            widget = ComboWidget(level_dict[depth], name = os.path.split(dir)[1], path = dir, relpath = self._relpath, items = dirs ,parentLevel = self, parentLayout = self._parentLayout)    
+            self._parentLayout.addWidget(widget)
+            self._child = widget
+            print "ADD-> ", widget._name, " from ", name
+
+
+    def createModel(self):
         list = []
         for i in range(len(self._items)):
             n = os.path.split(self._items[i])[1]
@@ -1152,27 +1191,52 @@ class ComboWidget(QtGui.QWidget):
         if RemoveOption:
             list.append(dt.AddNode("Remove..."))
         
-        self.model = dtm.PipelineListModel(list)        
-        self.comboBox.setModel(self.model)
-        self.comboBox.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
-        
-        self.layout.setContentsMargins(0, 0, 0, 0)      
-        self.setLayout(self.layout) 
-        
-        self.layout.addWidget(self.label)
-        self.layout.addWidget(self.comboBox)
-        
-        
-        self.comboBox.currentIndexChanged.connect(self.update)
+        self.model = dtm.PipelineListModel(list) 
+        self.comboBox.setModel(self.model)          
                 
-    def setChild(self, child):
-        self._child = child
+
+    #def setChild(self, child):
+    #    self._child = child
         
     def update(self):
-        print self.comboBox.currentText()
+        self.removeChild()
+        self.addChild(self.comboBox.currentText())
+        print "<<<<<<<<"
+         
         
+    def removeChild(self):
         
-    
-    
-    
+        if self._child:
+            c = self._child
+            print "REM-> ",c._name 
+            print c
+            print c.comboBox.currentText()
+            c.removeChild()
+            print "..."
+            c.comboBox.clear()
+            print c.comboBox.currentText(), "<<<"
+            
+            clearLayout(c.layout)
+            
+            print c._parentLayout
+            #del c.model
+            #c.label.deleteLater()
+            #c.comboBox.deleteLater()
+            #c.layout.removeWidget(c.label)
+            #c.layout.removeWidget(c.comboBox)
+            #x = c._parentLayout.takeAt(0)
+            #c.setParent(None)
+            #c.deleteLater()
+            self._child = None
+            #del c
+            
+            
+        
+def clearLayout(layout):
+    while layout.count():
+        child = layout.takeAt(0)
+        if child.widget() is not None:
+            child.widget().deleteLater()
+        elif child.layout() is not None:
+            clearLayout(child.layout())
     
