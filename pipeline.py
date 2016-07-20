@@ -1666,6 +1666,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         level0 = dtv.ComboWidget(level_dict[depth], name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navScrollLayout)
         
+        self.ui.navScrollLayout.setContentsMargins(5, 5, 5, 5) 
         self.ui.navScrollLayout.addWidget(level0)
         #[self.ui.navScrollLayout.addWidget(levels[l+1]) for l in range(len(levels)-1)]
 

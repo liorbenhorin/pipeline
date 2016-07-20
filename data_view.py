@@ -1174,8 +1174,10 @@ class ComboWidget(QtGui.QWidget):
             widget = ComboWidget(level_dict[depth], name = os.path.split(dir)[1], path = dir, relpath = self._relpath, items = dirs ,parentLevel = self, parentLayout = self._parentLayout)    
             self._parentLayout.addWidget(widget)
             self._child = widget
-            print "ADD-> ", widget._name, " from ", name
-
+            print "adding -----> ", widget._items, " from ", name
+        else:
+            self._child = None
+            print "no childrens"
 
     def createModel(self):
         list = []
@@ -1199,22 +1201,20 @@ class ComboWidget(QtGui.QWidget):
     #    self._child = child
         
     def update(self):
+        print "===> updating"
         self.removeChild()
         self.addChild(self.comboBox.currentText())
-        print "<<<<<<<<"
+        
          
         
     def removeChild(self):
         
         if self._child:
             c = self._child
-            print "REM-> ",c._name 
-            print c
-            print c.comboBox.currentText()
+            print "killing -> ",c._name 
             c.removeChild()
-            print "..."
-            c.comboBox.clear()
-            print c.comboBox.currentText(), "<<<"
+            print "recursively killing"
+            print c.comboBox.currentText(), "<- compbox needs to be empty"
             
             clearLayout(c.layout)
             
@@ -1228,7 +1228,9 @@ class ComboWidget(QtGui.QWidget):
             #c.setParent(None)
             #c.deleteLater()
             self._child = None
-            #del c
+            del c
+        else:
+            print "end recurstion"
             
             
         
