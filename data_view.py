@@ -106,7 +106,7 @@ class OptionsButtonDelegate(QtGui.QItemDelegate):
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
             
-            
+            print "OPTIONS<--"
             button = QtGui.QPushButton(
                     index.data(), 
                     self.parent()
@@ -136,8 +136,7 @@ class PipelineVersionsView(QtGui.QTableView):
         self.setSortingEnabled(True)
 
         # Set the delegate for column 0 of our table
-        self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
-        self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
+
         
 
     def setModel(self,model):
@@ -155,8 +154,10 @@ class PipelineVersionsView(QtGui.QTableView):
               
         self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
         self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)        
-
-
+        
+        # setup the buttons for loading and more options with delegates
+        self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
+        self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
  
          
     @QtCore.Slot()

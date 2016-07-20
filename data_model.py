@@ -593,10 +593,10 @@ class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
 
         if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent): 
             
-            '''
+            
             if self.sourceModel().getNode(id).typeInfo() == _stage_:
                 return False
-            '''          
+                      
             return True
         
         return self.hasAcceptedChildren(sourceRow,sourceParent)
