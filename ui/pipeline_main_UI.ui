@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>461</width>
+    <width>491</width>
     <height>984</height>
    </rect>
   </property>
@@ -373,7 +373,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="save_master_pushButton_2">
+               <widget class="QPushButton" name="playblast_shot_pushButton">
                 <property name="text">
                  <string>Save Playblast</string>
                 </property>
@@ -403,7 +403,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>461</width>
+     <width>491</width>
      <height>22</height>
     </rect>
    </property>

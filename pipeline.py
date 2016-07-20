@@ -1161,48 +1161,30 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def set_icons(self):
         
         for button in [
-                       self.ui.catagory_pushButton, 
-                       self.ui.asset_pushButton,
-                       self.ui.component_pushButton,
                        self.ui.projects_pushButton,
                        self.ui.users_pushButton,
                        self.ui.save_version_pushButton,
                        self.ui.save_master_pushButton,
                        self.ui.import_version_pushButton,
-                       self.ui.asset_scenes_switch_pushButton,
-                       self.ui.sequence_pushButton,
-                       self.ui.shot_pushButton,
-                       self.ui.save_shot_version_pushButton,
-                       self.ui.import_shot_version_pushButton,
-                       self.ui.export_shot_pushButton,
                        self.ui.playblast_shot_pushButton
                        ]:
             
             button.setIconSize(QtCore.QSize(20,20)) 
         
-        self.ui.catagory_pushButton.setIcon(QtGui.QIcon(catagory_icon))            
-        self.ui.asset_pushButton.setIcon(QtGui.QIcon(asset_icon))
-        self.ui.component_pushButton.setIcon(QtGui.QIcon(component_icon))
+     
         self.ui.projects_pushButton.setIcon(QtGui.QIcon(project_icon))
         self.ui.users_pushButton.setIcon(QtGui.QIcon(users_icon))
-        self.ui.asset_scenes_switch_pushButton.setIcon(QtGui.QIcon(anim_icon))
+
         self.ui.save_version_pushButton.setIcon(QtGui.QIcon(save_icon))
         self.ui.save_master_pushButton.setIcon(QtGui.QIcon(save_master_icon))
         self.ui.import_version_pushButton.setIcon(QtGui.QIcon(import_icon))       
-        self.ui.sequence_pushButton.setIcon(QtGui.QIcon(asset_icon))
-        self.ui.shot_pushButton.setIcon(QtGui.QIcon(component_icon))        
-        self.ui.save_shot_version_pushButton.setIcon(QtGui.QIcon(save_icon))
-        self.ui.import_shot_version_pushButton.setIcon(QtGui.QIcon(import_icon))
-        self.ui.export_shot_pushButton.setIcon(QtGui.QIcon(export_icon))
+
         self.ui.playblast_shot_pushButton.setIcon(QtGui.QIcon(camrea_icon))
                 
         self.ui.comp_icon_label.setPixmap(new_icon.scaled(16,16))
         self.ui.comp_user_label.setPixmap(users_icon.scaled(16,16))
         self.ui.comp_note_label.setPixmap(edit_icon.scaled(16,16))        
-        self.ui.shot_icon_label.setPixmap(new_icon.scaled(16,16))
-        self.ui.shot_user_label.setPixmap(users_icon.scaled(16,16))
-        self.ui.shot_note_label.setPixmap(edit_icon.scaled(16,16))      
-        
+    
 
 
         
