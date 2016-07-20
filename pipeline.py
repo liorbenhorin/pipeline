@@ -2908,7 +2908,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.setDockableParameters(width=420)
         self.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred )
         self.setMinimumWidth(420)
-        self.setMaximumWidth(600)
+        self.setMaximumWidth(900)
 
 
 
@@ -3060,7 +3060,8 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.set_project(project_key = project_key)
         
     def set_project(self,project_key = None):
-
+        import pymel.core as pm
+        import maya.mel as mel
         if project_key:
             projects = self.pipeline_window.settings.projects      
             project_path = projects[project_key][0]
