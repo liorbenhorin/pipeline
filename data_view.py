@@ -739,12 +739,7 @@ class pipelineTreeView(QtGui.QTreeView):
                            QTreeView::branch:open:has-children:has-siblings  {
                                 border-image: none;
                                 image: url(''' + branch_open + ''') 0;
-                           }
-                           
-
-                           
-                            ''')
-
+                           }''')
     
     def setModel(self,model):
 
@@ -1124,74 +1119,3 @@ class pipelineTreeView(QtGui.QTreeView):
             self.tableView.populateTable(model)
             
 
-
-class pipelineFileTreeView(QtGui.QTreeView):
-    def __init__(self,parent = None):
-        super(pipelineFileTreeView, self).__init__(parent)
-        
-        # display options
-        self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.setAlternatingRowColors(True)
-        self.setSortingEnabled(True)
-        self.setDragEnabled( True )
-        self.setAcceptDrops( True )
-        self.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
-        self.setDropIndicatorShown(True)
-        self.resizeColumnToContents(True) 
-                
-        #local variables
-
-        self._ignoreExpentions = False
-        self._expended_states = None        
-        self._userSelection = None       
-        self._tableView = None
-        self._proxyModel = None
-        self._sourceModel = None
-        self._tree_as_flat_list = None
-        
-        #stylesheet 
-        self.setStyleSheet('''  
-                           
-                           QTreeView::item:focus {
-                           }
-                           QTreeView::branch:has-siblings:!adjoins-item {
-                                border-image:url(''' + vline + ''') 0;
-                           }
-                           
-                           QTreeView::branch:has-siblings:adjoins-item {
-                                border-image:url(''' + branch_more + ''') 0;
-                           }
-                           
-                           QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                                border-image:url(''' + branch_end + ''') 0;
-                           }
-
-                           QTreeView::branch:has-children:!has-siblings:closed,
-                           QTreeView::branch:closed:has-children:has-siblings {
-                                border-image: none;
-                                image:url(''' + branch_closed + ''') 0;
-                           }
-
-                           QTreeView::branch:open:has-children:!has-siblings,
-                           QTreeView::branch:open:has-children:has-siblings  {
-                                border-image: none;
-                                image: url(''' + branch_open + ''') 0;
-                           }
-                           
-
-                           
-                            ''')
-
-
-class PipelineFileContentsView(QtGui.QListView):
-    def __init__(self,parent = None):
-        super(PipelineFileContentsView, self).__init__(parent)
-        
-        #display options
-       
-        
-        #self.setSortingEnabled(True)
-        self.setDragEnabled( True )
-        self.setAcceptDrops( True )
-        self.setDragDropMode( QtGui.QAbstractItemView.DragDrop )#QtGui.QAbstractItemView.DragDrop )InternalMove
-    
