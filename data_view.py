@@ -1120,9 +1120,15 @@ class pipelineTreeView(QtGui.QTreeView):
             
 
 class ComboWidget(QtGui.QWidget):
-    def __init__(self,label = None, name = None, path = None, relpath = None, items = None, parentLevel = None, parentLayout = None, parent = None):
+    def __init__(self,label = None, level = None, name = None, path = None, relpath = None, items = None, parentLevel = None, parentLayout = None, parent = None):
         super(ComboWidget, self).__init__(parent)
         
+        self.level_dict = ["TYPE","ASSET","STAGE"]
+        try:
+            self._level = self.level_dict[level]
+        except:
+            self._level = "A"
+            
         self._items = items
         self._relpath = relpath
         self._name = name
@@ -1139,40 +1145,45 @@ class ComboWidget(QtGui.QWidget):
         
         self.layout = QtGui.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignLeft)
-        self.label = QtGui.QLabel(label,self)
+        #self.label = QtGui.QLabel(label,self)
         self.comboBox = QtGui.QComboBox(self)
         self.comboBox.setIconSize(QtCore.QSize(24 ,24)  ) 
-        self.comboBox.setMinimumHeight(30)
-        self.comboBox.setMinimumWidth(60)
+        self.setMaximumHeight(30)
+        #self.comboBox.setMinimumWidth(60)
 
 
         self.createModel()      
         
-        self.comboBox.setSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
+        self.comboBox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         
-        self.layout.setContentsMargins(0, 0, 0, 0)      
+              
         self.setLayout(self.layout) 
         
-        self.layout.addWidget(self.label)
+        #self.layout.addWidget(self.label)
         self.layout.addWidget(self.comboBox)
         
         
         self.comboBox.currentIndexChanged.connect(self.update)
-        #self.update()
+        self._parentLayout.addWidget(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self._parentLayout.setContentsMargins(5, 5, 5, 5)
+        self.update()
 
     def addChild(self, name):
-        level_dict = ["TYPE","ASSET"]
+        
         dirs = []  
         dir = os.path.join(self._path, name)
         
-        [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
+        
+        if os.path.exists(dir):
+            [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
         
         if len(dirs) > 0:
      
             real = os.path.relpath(dir, self._relpath)
             depth = real.count(os.sep)         
-            widget = ComboWidget(level_dict[depth], name = os.path.split(dir)[1], path = dir, relpath = self._relpath, items = dirs ,parentLevel = self, parentLayout = self._parentLayout)    
-            self._parentLayout.addWidget(widget)
+            widget = ComboWidget(level = depth, name = os.path.split(dir)[1], path = dir, relpath = self._relpath, items = dirs ,parentLevel = self, parentLayout = self._parentLayout)    
+            #self._parentLayout.addWidget(widget)
             self._child = widget
             print "adding -----> ", widget._items, " from ", name
         else:
@@ -1180,7 +1191,9 @@ class ComboWidget(QtGui.QWidget):
             print "no childrens"
 
     def createModel(self):
-        list = []
+        
+        list = [dt.DummyNode(self._level)]
+        
         for i in range(len(self._items)):
             n = os.path.split(self._items[i])[1]
             list.append(dt.FolderNode(n))
@@ -1221,11 +1234,12 @@ class ComboWidget(QtGui.QWidget):
             print c._parentLayout
             #del c.model
             #c.label.deleteLater()
-            #c.comboBox.deleteLater()
+            
             #c.layout.removeWidget(c.label)
             #c.layout.removeWidget(c.comboBox)
             #x = c._parentLayout.takeAt(0)
-            #c.setParent(None)
+            c.setParent(None)
+            c.deleteLater()
             #c.deleteLater()
             self._child = None
             del c

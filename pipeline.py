@@ -1645,13 +1645,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     
         self.ui.versionsTabLayout.addWidget(self.versionsTable)
         
-        
-        level_dict = ["TYPE","ASSET"]
+
         
         
         levels = [None]
         #[levels.append(dtv.ComboWidget("<LEVEL>_%s"%(str(i)), name = "<LEVEL>_%s"%(str(i)), parentLevel = levels[i]), parent = self.ui.navScrollLayout) for i in range(5)]
-        self.ui.navScrollLayout.setAlignment(QtCore.Qt.AlignLeft)
+        self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
         
         dirs = []  
         dir = os.path.join(self.settings.current_project_path, "assets")
@@ -1664,10 +1663,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         real = os.path.relpath(dir, self.settings.current_project_path)
         depth = real.count(os.sep) 
         
-        level0 = dtv.ComboWidget(level_dict[depth], name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navScrollLayout)
+        level0 = dtv.ComboWidget(level = depth, name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
         
-        self.ui.navScrollLayout.setContentsMargins(5, 5, 5, 5) 
-        self.ui.navScrollLayout.addWidget(level0)
+        #self.ui.navScrollLayout.setContentsMargins(5, 5, 5, 5) 
+        #self.ui.navScrollLayout.addWidget(level0)
         #[self.ui.navScrollLayout.addWidget(levels[l+1]) for l in range(len(levels)-1)]
 
         

@@ -98,9 +98,9 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
      </widget>
     </item>
     <item>
-     <widget class="QScrollArea" name="navScrollArea">
+     <widget class="QWidget" name="navBarWidget" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -108,35 +108,10 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>90</height>
+        <height>20</height>
        </size>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>90</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <property name="widgetResizable">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>465</width>
-         <height>88</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="navScrollLayout"/>
-      </widget>
+      <layout class="QHBoxLayout" name="navBarLayout"/>
      </widget>
     </item>
     <item>
