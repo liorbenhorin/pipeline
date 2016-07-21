@@ -1168,6 +1168,61 @@ class PipelineStagesView(QtGui.QListView):
 
 class ComboWidget(QtGui.QWidget):
     def __init__(self,
+                 parent_layout = None,
+                 parent = None):
+        
+        super(ComboWidget, self).__init__(parent)
+
+        #self._parent = parent_box
+        self._parent_layout = parent_layout  
+
+        # UI
+        self.setMaximumHeight(30)  
+        self.layout = QtGui.QVBoxLayout(self)
+        self.layout.setAlignment(QtCore.Qt.AlignLeft)
+        self.comboBox = QtGui.QComboBox(self)
+        self.comboBox.setIconSize(QtCore.QSize(24 ,24)  ) 
+        self.comboBox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.layout.addWidget(self.comboBox)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.layout) 
+        self._parent_layout.addWidget(self)
+
+
+class ComboStaticWidget(ComboWidget):
+    def __init__(self,
+                 items = None,
+                 parent_layout = None,
+                 parent = None):
+        
+        super(ComboStaticWidget, self).__init__(parent_layout, parent)
+        
+        self._items = items
+        self._model = None
+        self.createModel()
+
+    def createModel(self):
+        
+        list = [dt.DummyNode("stage")]
+        
+        [list.append(dt.DummyNode(i)) for i in self._items]
+        
+        RemoveOption = False
+        
+        if list:
+            RemoveOption = True
+        
+        list.append(dt.AddNode("Add..."))
+        
+        if RemoveOption:
+            list.append(dt.AddNode("Remove..."))
+        
+        self._model = dtm.PipelineListModel(list) 
+        self.comboBox.setModel(self._model)  
+        
+
+class ComboDynamicWidget(ComboWidget):
+    def __init__(self,
                  project = None,
                  path = None,
                  stage = None,
@@ -1175,14 +1230,9 @@ class ComboWidget(QtGui.QWidget):
                  parent_layout = None,
                  parent = None):
         
-        super(ComboWidget, self).__init__(parent)
-        
-        # Locals
-        #self.level_dict = ["TYPE","ASSET","STAGE"]
-        #try:
-        #    self._level = self.level_dict[level]
-        #except:
-        #    self._level = "A"
+        super(ComboDynamicWidget, self).__init__(parent_layout, parent)
+                
+        # Local and init calls
         
         self._project = project
         self._level = None
@@ -1196,50 +1246,16 @@ class ComboWidget(QtGui.QWidget):
             self._stage = stage
             self.listDirectory()
                                   
-        #self._items = items
-        #self._relpath = relpath
-        #self._name = name
-        self._child = None
-        self._parent = parent_box
-        self._parent_layout = parent_layout
-        #self._path = path        
-        
+
+        self._child = None            
         self._model = None
         
-        # UI
-        self.setMaximumHeight(30)  
-        self.layout = QtGui.QVBoxLayout(self)
-        self.layout.setAlignment(QtCore.Qt.AlignLeft)
-        self.comboBox = QtGui.QComboBox(self)
-        self.comboBox.setIconSize(QtCore.QSize(24 ,24)  ) 
-        self.comboBox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.layout.addWidget(self.comboBox)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        #self._parentLayout.setContentsMargins(5, 5, 5, 5)
-        self.setLayout(self.layout) 
-        self._parent_layout.addWidget(self)
         
         # Init calls
         self.createModel()              
                     
         # connections                
         self.comboBox.currentIndexChanged.connect(self.update)
-        #self.update()
-
-        '''
-        project = {}
-        project["project_path"] = self.settings.current_project_path
-
-        levels = {}
-        levels["asset"] = ["type","asset","stage"]
-        levels["animation"] = ["Ep","Seq"]
-        project["levels"] = levels
-        
-        stages = {}
-        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
-        stages["animation"] = ["layout","Shot"]               
-        project["stages"] = stages
-        ''' 
 
     def listDirectory(self):
         dir = self._path
@@ -1286,10 +1302,9 @@ class ComboWidget(QtGui.QWidget):
                 
 
     def addChild(self, name):
-        print "AAAA"
         new_path = os.path.join(self._path, name)
         if files.list_dir_folders(new_path):
-            widget = ComboWidget(
+            widget = ComboDynamicWidget(
                                  project = self._project,
                                  path = new_path,
                                  stage = self._stage,
