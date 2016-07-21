@@ -350,4 +350,28 @@ class AddNode(Node):
         return _dummy_
   
     def resource(self):
-        return add_icon                    
+        return add_icon 
+        
+        
+
+class project(object):
+    def __init__(self, project_path):
+
+        stages = {}
+        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
+        stages["animation"] = ["layout","Shot"]   
+
+        levels = {}
+        levels["asset"] = ["type","asset","stage","ccc"]
+        levels["animation"] = ["Ep","Seq"]
+
+                
+        self.project = {}
+        self.project["project_path"] = project_path
+
+
+        self.project["levels"] = levels          
+        self.project["stages"] = stages   
+        
+        self.project["current_stage"] = None
+                                

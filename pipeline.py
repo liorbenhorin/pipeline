@@ -1659,18 +1659,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         
         
-        project = {}
-        project["project_path"] = self.settings.current_project_path
-
-        levels = {}
-        levels["asset"] = ["type","asset","stage","ccc"]
-        levels["animation"] = ["Ep","Seq"]
-        project["levels"] = levels
-        
-        stages = {}
-        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
-        stages["animation"] = ["layout","Shot"]               
-        project["stages"] = stages
+       
          
         
         if self.settings.current_project_path:
@@ -1690,15 +1679,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             #stage = dtv.ComboWidget(level = 2, name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
             '''
+            
+            self.project_data = dt.project(self.settings.current_project_path)
+            
             dir = os.path.join(self.settings.current_project_path, "assets")
 
             stage = dtv.ComboStaticWidget(
-                                          items = project["stages"]["asset"] + project["stages"]["animation"],
+                                          project = self.project_data,
+                                          items = self.project_data.project["stages"]["asset"] + self.project_data.project["stages"]["animation"],
                                           parent_layout = self.ui.navBarLayout,
                                           parent = None) 
                                     
             level1 = dtv.ComboDynamicWidget(
-                     project = project,
+                     project = self.project_data,
                      path = dir,
                      stage = "model",
                      parent_box = None,

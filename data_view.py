@@ -1191,12 +1191,14 @@ class ComboWidget(QtGui.QWidget):
 
 class ComboStaticWidget(ComboWidget):
     def __init__(self,
+                 project = None,
                  items = None,
                  parent_layout = None,
                  parent = None):
         
         super(ComboStaticWidget, self).__init__(parent_layout, parent)
         
+        self._project = project
         self._items = items
         self._model = None
         self.createModel()
@@ -1220,6 +1222,10 @@ class ComboStaticWidget(ComboWidget):
         self._model = dtm.PipelineListModel(list) 
         self.comboBox.setModel(self._model)  
         
+        self.comboBox.currentIndexChanged.connect(self.update)
+        
+    def update(self):
+        self._project.project["current_stage"] = self.comboBox.currentText()
 
 class ComboDynamicWidget(ComboWidget):
     def __init__(self,
@@ -1266,16 +1272,16 @@ class ComboDynamicWidget(ComboWidget):
             
             self._subdirectories = dirs
             
-            relative_path = os.path.relpath(dir, self._project["project_path"])
+            relative_path = os.path.relpath(dir, self._project.project["project_path"])
             depth = relative_path.count(os.sep)
             
-            if self._stage in self._project["stages"]["asset"]:
+            if self._stage in self._project.project["stages"]["asset"]:
             
-                self._level = self._project["levels"]["asset"][depth]
+                self._level = self._project.project["levels"]["asset"][depth]
             
-            if self._stage in self._project["stages"]["animation"]:
+            if self._stage in self._project.project["stages"]["animation"]:
                 
-                self._level = self._project["levels"]["animation"][depth] 
+                self._level = self._project.project["levels"]["animation"][depth] 
                 
 
     def createModel(self):
@@ -1315,6 +1321,7 @@ class ComboDynamicWidget(ComboWidget):
             
  
     def update(self):
+
         self.removeChild()
         
         self.addChild(self.comboBox.currentText())
@@ -1328,20 +1335,8 @@ class ComboDynamicWidget(ComboWidget):
             
             # recursive to all childs
             c.removeChild()
-            
-            clearLayout(c.layout)
             c.setParent(None)
             c.deleteLater()
             self._child = None
             del c
 
-
-        
-def clearLayout(layout):
-    while layout.count():
-        child = layout.takeAt(0)
-        if child.widget() is not None:
-            child.widget().deleteLater()
-        elif child.layout() is not None:
-            clearLayout(child.layout())
-    
