@@ -1610,14 +1610,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.splitter1.addWidget(self.list)        
         '''
         
-        self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
+        #self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
         #self.navWidget.
-        h_layout.addWidget(self.stagesView)
+        #h_layout.addWidget(self.stagesView)
         #self.ui.project_widget.setHeight(200)
         
-        self.ui.stages_version_splitter.setSizes([150,600])
-        self.ui.stages_version_splitter.setSizes([150,600])
-        
+        #self.ui.stages_version_splitter.setSizes([150,600])
+        #self.ui.stages_version_splitter.setSizes([150,600])
+        '''
         large_lable = QtGui.QLabel()
         large_lable.setMaximumSize(QtCore.QSize(16, 16)) 
         large_lable.setPixmap(large_icon)
@@ -1645,7 +1645,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         slideLayout.addWidget(small_lable)
         slideLayout.addWidget(self.listSlider)
         slideLayout.addWidget(large_lable)
-        h_layout.addWidget(slideWidget)
+        h_layout.addWidget(slideWidget)'''
 
         # add to the designer ui
         self.ui.verticalLayout_18.addWidget(self.navWidget)

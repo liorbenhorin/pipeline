@@ -375,3 +375,27 @@ class project(object):
         
         self.project["current_stage"] = None
                                 
+                                
+                                
+                                
+def xml():
+    doc = QtXml.QDomDocument("MyXML")
+    root = doc.createElement("MyXML")
+    doc.appendChild(root)
+
+    tag = doc.createElement("Greeting")
+    tag.setAttribute("X",2000)
+    root.appendChild(tag)
+
+    t = doc.createTextNode("Hello World")
+    tag.appendChild(t)
+
+
+    file = QtCore.QFile("/Users/liorbenhorin/Documents/maya/projects/QFileSystemModel/assets/Chars/Dog/stage.xml")
+    if not file.open(QtCore.QIODevice.WriteOnly | QtCore.QIODevice.Text):
+        pass
+    else:
+        print doc.toString()
+        stream = QtCore.QTextStream(file)
+        stream << doc.toString()
+        file.close()

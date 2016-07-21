@@ -108,7 +108,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>20</height>
+        <height>30</height>
        </size>
       </property>
       <layout class="QHBoxLayout" name="navBarLayout">
@@ -201,6 +201,12 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
           <number>10</number>
          </property>
          <widget class="QWidget" name="project_widget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
