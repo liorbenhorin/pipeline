@@ -111,7 +111,20 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
         <height>20</height>
        </size>
       </property>
-      <layout class="QHBoxLayout" name="navBarLayout"/>
+      <layout class="QHBoxLayout" name="navBarLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+      </layout>
      </widget>
     </item>
     <item>

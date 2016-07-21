@@ -59,7 +59,7 @@ from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 from maya.app.general.mayaMixin import MayaQDockWidget
 from maya.OpenMayaUI import MQtUtil
 #import operator
-#import warnings
+import warnings
 import time
 from timeit import default_timer as timer
 #import collections
@@ -1531,6 +1531,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         generate some tree nodes for testing
         '''
+        '''
         _root = dt.RootNode("root")
         root = dt.FolderNode("Diving",_root)
         char = dt.FolderNode("Charachters", root)
@@ -1539,17 +1540,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         rig = dt.StageNode("Rig", parent = dog)
         model = dt.StageNode("Model", parent = dog)
         sorted = dt.StageNode("Sorted_component", parent = dog)
-        
+        '''
         '''
         creating the tree model,
         it's the main tree model object, its global so it is deleted every restart of Pipeline
         '''
-        
+        '''
         treeModel = dtm.PipelineProjectModel(_root) 
         
         '''
+        '''
         _proxymodel is the sortFilterProxyModel object that is connected to the tree model
         
+        '''
         '''
         self._proxyModel = dtm.PipelineProjectProxyModel()      
         self._proxyModel.setSourceModel(treeModel)
@@ -1558,10 +1561,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setSortRole(0)
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
-        
+        '''
         '''
         VIEWS
         
+        '''
         '''
         self.list = dtv.PipelineContentsView()        
         self.tree = dtv.pipelineTreeView() 
@@ -1589,7 +1593,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         # select the tree root
         self.tree.selectRoot()
-        
+        '''
         '''
         UI LAYOUTS, SPLITTER, AND ICONS SCALE SLIDER
         '''
@@ -1597,14 +1601,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         h_layout = QtGui.QVBoxLayout()   
         h_layout.setContentsMargins(0, 0, 0, 0)      
         self.navWidget.setLayout(h_layout) 
-               
+        '''       
         self.splitter1 = QtGui.QSplitter()
         self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
         self.splitter1.setHandleWidth(10)
         self.splitter1.setChildrenCollapsible(True)
         self.splitter1.addWidget(self.tree)
         self.splitter1.addWidget(self.list)        
-        h_layout.addWidget(self.splitter1)
+        '''
+        
+        self.stagesView = QtGui.QListView()
+        
+        h_layout.addWidget(self.stagesView)
 
         large_lable = QtGui.QLabel()
         large_lable.setMaximumSize(QtCore.QSize(16, 16)) 
@@ -1628,7 +1636,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.listSlider.setMinimum(32)
         self.listSlider.setMaximum(96)
         self.listSlider.setValue(32)
-        self.listSlider.valueChanged.connect(self.list.icons_size) 
+        #self.listSlider.valueChanged.connect(self.list.icons_size) 
 
         slideLayout.addWidget(small_lable)
         slideLayout.addWidget(self.listSlider)
@@ -1641,30 +1649,33 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.ui.assets_selection_frame.setHidden(True)
         
         self.versionsTable = dtv.PipelineVersionsView()
-        self.list.versionsView = self.versionsTable
+        #self.list.versionsView = self.versionsTable
     
         self.ui.versionsTabLayout.addWidget(self.versionsTable)
         
 
         
-        
-        levels = [None]
-        #[levels.append(dtv.ComboWidget("<LEVEL>_%s"%(str(i)), name = "<LEVEL>_%s"%(str(i)), parentLevel = levels[i]), parent = self.ui.navScrollLayout) for i in range(5)]
-        self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
-        
-        dirs = []  
-        dir = os.path.join(self.settings.current_project_path, "assets")
-        
-        [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
-        
-        
-        
-        
-        real = os.path.relpath(dir, self.settings.current_project_path)
-        depth = real.count(os.sep) 
-        
-        level0 = dtv.ComboWidget(level = depth, name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
-        
+        if self.settings.current_project_path:
+            levels = [None]
+            #[levels.append(dtv.ComboWidget("<LEVEL>_%s"%(str(i)), name = "<LEVEL>_%s"%(str(i)), parentLevel = levels[i]), parent = self.ui.navScrollLayout) for i in range(5)]
+            self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
+            
+            dirs = []  
+            dir = os.path.join(self.settings.current_project_path, "assets")
+            
+            [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
+            
+
+
+
+            
+            
+            
+            real = os.path.relpath(dir, self.settings.current_project_path)
+            depth = real.count(os.sep) 
+            
+            level0 = dtv.ComboWidget(level = depth, name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
+            
         #self.ui.navScrollLayout.setContentsMargins(5, 5, 5, 5) 
         #self.ui.navScrollLayout.addWidget(level0)
         #[self.ui.navScrollLayout.addWidget(levels[l+1]) for l in range(len(levels)-1)]
