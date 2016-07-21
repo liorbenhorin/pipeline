@@ -10,6 +10,9 @@ reload(dt)
 import data_model as dtm
 reload(dtm)
 
+import modules.files as files
+reload(files)
+
 global _node_
 global _root_
 global  _stage_
@@ -1119,134 +1122,205 @@ class pipelineTreeView(QtGui.QTreeView):
             self.tableView.populateTable(model)
             
 
+
+
+class PipelineStagesView(QtGui.QListView):
+    def __init__(self,parent = None):
+        super(PipelineStagesView, self).__init__(parent)
+        
+        #display options
+        
+        self.setViewMode(QtGui.QListView.IconMode)
+        self.setUniformItemSizes(True)
+        self.setResizeMode(QtGui.QListView.Adjust)
+        self.setFlow(QtGui.QListView.LeftToRight)
+        self.setWrapping(True)
+        self.setTextElideMode(QtCore.Qt.ElideRight)
+        
+        w = 48
+        grid_w = w + 5
+        grid_h = w + 30
+        size = QtCore.QSize(w,w)
+        size2 = QtCore.QSize(grid_w, grid_h)
+        self.setIconSize(size)
+        self.setGridSize(size2)
+        
+        list = []
+        [list.append(dt.StageNode("<Stage>")) for i in range(6)]
+        self.setModel(dtm.PipelineListModel(list)) 
+        
+        #self.setSpacing(5)
+        self.setWordWrap(True)
+        '''
+        self.setAlternatingRowColors(True)
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.setWordWrap(True)
+        self.setShowGrid(False)
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
+        self.icons_size(32)       
+        #self.setMinimumWidth(250)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.setSortingEnabled(True)
+        self.horizontalHeader().setOffset(10)
+        self.verticalHeader().hide()'''
+        
+        #self.setSortingEnabled(True)
+
 class ComboWidget(QtGui.QWidget):
-    def __init__(self,label = None, level = None, name = None, path = None, relpath = None, items = None, parentLevel = None, parentLayout = None, parent = None):
+    def __init__(self,
+                 project = None,
+                 path = None,
+                 stage = None,
+                 parent_box = None,
+                 parent_layout = None,
+                 parent = None):
+        
         super(ComboWidget, self).__init__(parent)
         
-        self.level_dict = ["TYPE","ASSET","STAGE"]
-        try:
-            self._level = self.level_dict[level]
-        except:
-            self._level = "A"
+        # Locals
+        #self.level_dict = ["TYPE","ASSET","STAGE"]
+        #try:
+        #    self._level = self.level_dict[level]
+        #except:
+        #    self._level = "A"
+        
+        self._project = project
+        self._level = None
+        self._subdirectories = None
+        self._path = None
+        self._stage = None
+        self._parent_layout = parent_layout
             
-        self._items = items
-        self._relpath = relpath
-        self._name = name
+        if path and stage:
+            self._path = path
+            self._stage = stage
+            self.listDirectory()
+                                  
+        #self._items = items
+        #self._relpath = relpath
+        #self._name = name
         self._child = None
-        self._parent = parentLevel
-        self._parentLayout = parentLayout
-        self._path = path
+        self._parent = parent_box
+        self._parent_layout = parent_layout
+        #self._path = path        
         
-        self.model = None
+        self._model = None
         
-        #if self._parent:
-        #    self._parent.setChild = self
-        
-        
+        # UI
+        self.setMaximumHeight(30)  
         self.layout = QtGui.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignLeft)
-        #self.label = QtGui.QLabel(label,self)
         self.comboBox = QtGui.QComboBox(self)
         self.comboBox.setIconSize(QtCore.QSize(24 ,24)  ) 
-        self.setMaximumHeight(30)
-        #self.comboBox.setMinimumWidth(60)
-
-
-        self.createModel()      
-        
         self.comboBox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        
-              
-        self.setLayout(self.layout) 
-        
-        #self.layout.addWidget(self.label)
         self.layout.addWidget(self.comboBox)
-        
-        
-        self.comboBox.currentIndexChanged.connect(self.update)
-        self._parentLayout.addWidget(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self._parentLayout.setContentsMargins(5, 5, 5, 5)
-        self.update()
+        #self._parentLayout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(self.layout) 
+        self._parent_layout.addWidget(self)
+        
+        # Init calls
+        self.createModel()              
+                    
+        # connections                
+        self.comboBox.currentIndexChanged.connect(self.update)
+        #self.update()
 
-    def addChild(self, name):
+        '''
+        project = {}
+        project["project_path"] = self.settings.current_project_path
+
+        levels = {}
+        levels["asset"] = ["type","asset","stage"]
+        levels["animation"] = ["Ep","Seq"]
+        project["levels"] = levels
         
-        dirs = []  
-        dir = os.path.join(self._path, name)
-        
-        
-        if os.path.exists(dir):
-            [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
-        
-        if len(dirs) > 0:
-     
-            real = os.path.relpath(dir, self._relpath)
-            depth = real.count(os.sep)         
-            widget = ComboWidget(level = depth, name = os.path.split(dir)[1], path = dir, relpath = self._relpath, items = dirs ,parentLevel = self, parentLayout = self._parentLayout)    
-            #self._parentLayout.addWidget(widget)
-            self._child = widget
-            print "adding -----> ", widget._items, " from ", name
-        else:
-            self._child = None
-            print "no childrens"
+        stages = {}
+        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
+        stages["animation"] = ["layout","Shot"]               
+        project["stages"] = stages
+        ''' 
+
+    def listDirectory(self):
+        dir = self._path
+        dirs = files.list_dir_folders(dir)   
+
+              
+        if dirs:
+            
+            self._subdirectories = dirs
+            
+            relative_path = os.path.relpath(dir, self._project["project_path"])
+            depth = relative_path.count(os.sep)
+            
+            if self._stage in self._project["stages"]["asset"]:
+            
+                self._level = self._project["levels"]["asset"][depth]
+            
+            if self._stage in self._project["stages"]["animation"]:
+                
+                self._level = self._project["levels"]["animation"][depth] 
+                
 
     def createModel(self):
         
         list = [dt.DummyNode(self._level)]
         
-        for i in range(len(self._items)):
-            n = os.path.split(self._items[i])[1]
-            list.append(dt.FolderNode(n))
+        if self._subdirectories:
+            for i in range(len(self._subdirectories)):
+                n = os.path.split(self._subdirectories[i])[1]
+                list.append(dt.FolderNode(n))
         
         RemoveOption = False
-        if len(list)>0:
+        
+        if list:
             RemoveOption = True
         
         list.append(dt.AddNode("Add..."))
+        
         if RemoveOption:
             list.append(dt.AddNode("Remove..."))
         
-        self.model = dtm.PipelineListModel(list) 
-        self.comboBox.setModel(self.model)          
+        self._model = dtm.PipelineListModel(list) 
+        self.comboBox.setModel(self._model)    
                 
 
-    #def setChild(self, child):
-    #    self._child = child
-        
+    def addChild(self, name):
+        print "AAAA"
+        new_path = os.path.join(self._path, name)
+        if files.list_dir_folders(new_path):
+            widget = ComboWidget(
+                                 project = self._project,
+                                 path = new_path,
+                                 stage = self._stage,
+                                 parent_box = self,
+                                 parent_layout = self._parent_layout,
+                                 parent = None)    
+            self._child = widget
+            
+ 
     def update(self):
-        print "===> updating"
         self.removeChild()
+        
         self.addChild(self.comboBox.currentText())
         
-         
-        
+       
     def removeChild(self):
         
         if self._child:
+
             c = self._child
-            print "killing -> ",c._name 
+            
+            # recursive to all childs
             c.removeChild()
-            print "recursively killing"
-            print c.comboBox.currentText(), "<- compbox needs to be empty"
             
             clearLayout(c.layout)
-            
-            print c._parentLayout
-            #del c.model
-            #c.label.deleteLater()
-            
-            #c.layout.removeWidget(c.label)
-            #c.layout.removeWidget(c.comboBox)
-            #x = c._parentLayout.takeAt(0)
             c.setParent(None)
             c.deleteLater()
-            #c.deleteLater()
             self._child = None
             del c
-        else:
-            print "end recurstion"
-            
-            
+
+
         
 def clearLayout(layout):
     while layout.count():

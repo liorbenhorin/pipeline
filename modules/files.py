@@ -217,7 +217,8 @@ def list_all_directory(path):
 
  
 def list_dir_folders(path):
-    return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+    if os.path.exists(path):
+        return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
  
 def assure_path_exists(path):

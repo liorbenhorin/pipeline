@@ -193,7 +193,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
         <number>0</number>
        </property>
        <item>
-        <widget class="QSplitter" name="splitter">
+        <widget class="QSplitter" name="stages_version_splitter">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -398,14 +398,14 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
               <item>
                <widget class="QPushButton" name="save_master_pushButton">
                 <property name="text">
-                 <string>Save Master</string>
+                 <string>Publish</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="playblast_shot_pushButton">
                 <property name="text">
-                 <string>Save Playblast</string>
+                 <string>Take</string>
                 </property>
                </widget>
               </item>

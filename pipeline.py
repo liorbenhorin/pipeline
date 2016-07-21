@@ -1610,10 +1610,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.splitter1.addWidget(self.list)        
         '''
         
-        self.stagesView = QtGui.QListView()
-        
+        self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
+        #self.navWidget.
         h_layout.addWidget(self.stagesView)
-
+        #self.ui.project_widget.setHeight(200)
+        
+        self.ui.stages_version_splitter.setSizes([150,600])
+        self.ui.stages_version_splitter.setSizes([150,600])
+        
         large_lable = QtGui.QLabel()
         large_lable.setMaximumSize(QtCore.QSize(16, 16)) 
         large_lable.setPixmap(large_icon)
@@ -1653,28 +1657,51 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     
         self.ui.versionsTabLayout.addWidget(self.versionsTable)
         
+        
+        
+        project = {}
+        project["project_path"] = self.settings.current_project_path
 
+        levels = {}
+        levels["asset"] = ["type","asset","stage","ccc"]
+        levels["animation"] = ["Ep","Seq"]
+        project["levels"] = levels
+        
+        stages = {}
+        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
+        stages["animation"] = ["layout","Shot"]               
+        project["stages"] = stages
+         
         
         if self.settings.current_project_path:
             levels = [None]
             #[levels.append(dtv.ComboWidget("<LEVEL>_%s"%(str(i)), name = "<LEVEL>_%s"%(str(i)), parentLevel = levels[i]), parent = self.ui.navScrollLayout) for i in range(5)]
             self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
-            
+            '''
             dirs = []  
             dir = os.path.join(self.settings.current_project_path, "assets")
             
             [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
             
 
-
-
-            
-            
-            
+          
             real = os.path.relpath(dir, self.settings.current_project_path)
             depth = real.count(os.sep) 
+
+            #stage = dtv.ComboWidget(level = 2, name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
+            '''
+            dir = os.path.join(self.settings.current_project_path, "assets")
             
-            level0 = dtv.ComboWidget(level = depth, name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
+            level1 = dtv.ComboWidget(
+                     project = project,
+                     path = dir,
+                     stage = "model",
+                     parent_box = None,
+                     parent_layout = self.ui.navBarLayout,
+                     parent = None)  
+            
+                        
+            #level0 = dtv.ComboWidget(level = depth, path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
             
         #self.ui.navScrollLayout.setContentsMargins(5, 5, 5, 5) 
         #self.ui.navScrollLayout.addWidget(level0)
@@ -2945,9 +2972,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
               
         self.show(dockable=True, area='right', floating=False)
         self.raise_()
-        self.setDockableParameters(width=420)
+        self.setDockableParameters(width=350)
         self.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred )
-        self.setMinimumWidth(420)
+        self.setMinimumWidth(350)
         self.setMaximumWidth(900)
 
 
