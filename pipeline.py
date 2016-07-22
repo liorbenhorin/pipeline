@@ -1260,6 +1260,24 @@ class pipeline_settings(pipeline_data):
             self.settings_file = self.data_file.read()
 
 
+    @property
+    def stage(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["stage"]
+            except:
+                return True
+        else:
+            return True
+
+    @stage.setter
+    def stage(self,value):
+        if self.data_file:
+            data = {}
+            data["stage"] = value
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
     def log(self):
         log.info("logging settings")
         log.info("settings data file: %s"%self.data_file_path)        
@@ -1507,6 +1525,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.tree()
     
     def tree(self):
+        print self.settings
         print self.settings.current_project_path
         
         self.ui.searchIcon_label.setPixmap(search_icon)
@@ -1664,33 +1683,24 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         if self.settings.current_project_path:
             levels = [None]
-            #[levels.append(dtv.ComboWidget("<LEVEL>_%s"%(str(i)), name = "<LEVEL>_%s"%(str(i)), parentLevel = levels[i]), parent = self.ui.navScrollLayout) for i in range(5)]
             self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
-            '''
-            dirs = []  
-            dir = os.path.join(self.settings.current_project_path, "assets")
-            
-            [dirs.append(os.path.join(dir,o)) for o in os.listdir(dir) if os.path.isdir(os.path.join(dir,o))]
-            
 
-          
-            real = os.path.relpath(dir, self.settings.current_project_path)
-            depth = real.count(os.sep) 
-
-            #stage = dtv.ComboWidget(level = 2, name = os.path.split(dir)[1], path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
-            '''
             
             self.project_data = dt.project(self.settings.current_project_path)
             
             dir = os.path.join(self.settings.current_project_path, "assets")
 
-            stage = dtv.ComboStaticWidget(
+            self.stageCombo = dtv.ComboStaticWidget(
                                           project = self.project_data,
                                           items = self.project_data.project["stages"]["asset"] + self.project_data.project["stages"]["animation"],
                                           parent_layout = self.ui.navBarLayout,
                                           parent = None) 
                                     
+            
+            self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
+            print self.settings
             level1 = dtv.ComboDynamicWidget(
+                     settings = self.settings,                       
                      project = self.project_data,
                      path = dir,
                      stage = "model",
@@ -1698,14 +1708,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                      parent_layout = self.ui.navBarLayout,
                      parent = None)  
             
-                        
-            #level0 = dtv.ComboWidget(level = depth, path = dir, relpath = self.settings.current_project_path, items = dirs ,parentLevel = None, parentLayout = self.ui.navBarLayout)
-            
-        #self.ui.navScrollLayout.setContentsMargins(5, 5, 5, 5) 
-        #self.ui.navScrollLayout.addWidget(level0)
-        #[self.ui.navScrollLayout.addWidget(levels[l+1]) for l in range(len(levels)-1)]
 
-        
+   
+    def stageChanged(self):
+        self.settings.stage = self.stageCombo.comboBox.currentText()
         
         
     def selectInScene(self):
@@ -1756,7 +1762,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             return
 
         self.settings = pipeline_settings().create(path = file)
-
+    
 
     def verify_projects(self):
         self.project = None

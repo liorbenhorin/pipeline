@@ -1229,6 +1229,7 @@ class ComboStaticWidget(ComboWidget):
 
 class ComboDynamicWidget(ComboWidget):
     def __init__(self,
+                 settings = None,
                  project = None,
                  path = None,
                  stage = None,
@@ -1240,6 +1241,9 @@ class ComboDynamicWidget(ComboWidget):
                 
         # Local and init calls
         
+        self._settings = settings
+        print settings
+        print self._settings, "<<"
         self._project = project
         self._level = None
         self._subdirectories = None
@@ -1305,12 +1309,32 @@ class ComboDynamicWidget(ComboWidget):
         
         self._model = dtm.PipelineListModel(list) 
         self.comboBox.setModel(self._model)    
-                
+
+    def stageDir(self,dir):
+        print "<<- stage dir call"
+        if os.path.exists(dir):
+            if os.path.isfile(os.path.join(dir,"stage.json")):
+                '''
+                further verify if the stage.json file is actually related to the path
+                '''
+                return True
+            
+        return False
+        
 
     def addChild(self, name):
         new_path = os.path.join(self._path, name)
+        
+        '''
+        if the folder is a stage folder don't list it and return True
+        '''
+        if self.stageDir(new_path):
+            
+            return True
+        
         if files.list_dir_folders(new_path):
             widget = ComboDynamicWidget(
+                                 settings = self._settings,
                                  project = self._project,
                                  path = new_path,
                                  stage = self._stage,
@@ -1318,14 +1342,20 @@ class ComboDynamicWidget(ComboWidget):
                                  parent_layout = self._parent_layout,
                                  parent = None)    
             self._child = widget
-            
+        
+        return False    
  
     def update(self):
 
         self.removeChild()
         
-        self.addChild(self.comboBox.currentText())
-        
+        if self.addChild(self.comboBox.currentText()):
+            '''
+            This is a stage folder
+            '''
+            print self._settings
+            print self._settings.stage 
+            print self.comboBox.currentText()
        
     def removeChild(self):
         
