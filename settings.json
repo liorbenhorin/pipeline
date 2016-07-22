@@ -1,0 +1,23 @@
+{
+    "current_open_file": null, 
+    "current_project": "DO903W", 
+    "project_premissions": null, 
+    "projects": {
+        "DO903W": [
+            "/Users/liorbenhorin/Documents/maya/projects/json", 
+            "ONLINE", 
+            "json"
+        ]
+    }, 
+    "selection": {
+        "asset": null, 
+        "catagory": null, 
+        "component": null, 
+        "sequence": null, 
+        "shot": null
+    }, 
+    "user": [
+        null, 
+        null
+    ]
+}

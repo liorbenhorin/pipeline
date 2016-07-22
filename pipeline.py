@@ -76,7 +76,7 @@ global end_time
 start_time = timer()
 
 
-import modules.data as data
+import modules.jsonData as data
 reload(data)
 
 import modules.files as files
@@ -419,7 +419,7 @@ class pipeline_data(object):
 
     def set_data_file(self,path): 
         if os.path.isfile(path):          
-            self.data_file = data.pickleDict(path = path) 
+            self.data_file = data.jsonDict(path = path) 
             return True
         else:
             log.debug ("Invalid path to data file")
@@ -438,7 +438,7 @@ class pipeline_project(pipeline_data):
         if self.data_file:
             self.project_file = self.data_file.read()
 
-        self.project_file_name = 'project.pipe'
+        self.project_file_name = 'project.json'
    
         self.settings = None
         for key in kwargs:
@@ -493,7 +493,7 @@ class pipeline_project(pipeline_data):
             files.create_directory(os.path.join(project_path, fl_folders[0], fl_folders[1], fl_folder))              
 
         
-        self.data_file = data.pickleDict().create(project_settings_file, project_data)  
+        self.data_file = data.jsonDict().create(project_settings_file, project_data)  
         self.project_file = self.data_file.read()
         
         return self 
@@ -690,7 +690,7 @@ class pipeline_project(pipeline_data):
                 folders = files.list_dir_folders(path)
                 sequences = []
                 for folder in folders:
-                    if os.path.isfile(os.path.join(path, folder, "sequence.pipe")):
+                    if os.path.isfile(os.path.join(path, folder, "sequence.json")):
                         sequences.append(folder)
                 return sequences
         return None  
@@ -715,7 +715,7 @@ class pipeline_project(pipeline_data):
 
         path = os.path.join(self.scenes_path, sequence_name)    
         if files.create_directory(path):
-            files.create_dummy(path, "sequence.pipe")
+            files.create_dummy(path, "sequence.json")
             return True
 
 
@@ -948,7 +948,7 @@ class pipeline_settings(pipeline_data):
         settings_data["selection"] = selection
                      
         
-        self.data_file = data.pickleDict().create(path, settings_data)  
+        self.data_file = data.jsonDict().create(path, settings_data)  
         self.settings_file = self.data_file.read()
         
         return self 
@@ -1745,10 +1745,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def init_settings(self):
   
         
-        self.settings_file_name = 'settings.pipe'                 
+        self.settings_file_name = 'settings.json'
+                      
         file = os.path.join(os.path.dirname(__file__), self.settings_file_name)
+
         
-        if os.path.isfile(file):                       
+        if os.path.isfile(file): 
+                   
             self.settings = pipeline_settings(path = file)                                         
             return
 
@@ -1761,7 +1764,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         if projects:            
             for p in projects:                                    
-                project_file_path = os.path.join(self.settings.project_path(project_key = p),"project.pipe")  
+                project_file_path = os.path.join(self.settings.project_path(project_key = p),"project.json")  
                                 
                 if os.path.isfile(project_file_path):                    
                     project = pipeline_project(path = project_file_path)                    
@@ -1792,7 +1795,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
             
         if self.settings.current_project:            
-            self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.pipe"), settings = self.settings)
+            self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.json"), settings = self.settings)
             
 
                                        
@@ -3031,7 +3034,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
         
         projects = self.pipeline_window.settings.projects        
-        path = os.path.join(projects[wanted_project_key][0],"project.pipe")        
+        path = os.path.join(projects[wanted_project_key][0],"project.json")        
         self.create_edit_project(project_file = pipeline_project(path = path, settings = self.pipeline_window.settings))       
         
     def create_edit_project(self, **kwargs):
@@ -3055,11 +3058,11 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         index = self.ui.projects_tableWidget.indexAt(widget.pos())
         wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
         
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.pipe file", filter = "pipe files (*.pipe)")
+        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
         if os.path.isfile(path[0]):
             
             project_path = os.path.dirname(str(path[0])) 
-            project_file = data.pickleDict(path=str(path[0]))
+            project_file = data.jsonDict(path=str(path[0]))
             project_name = project_file.read("project_name")["project_name"] 
             project_key = project_file.read("project_key")["project_key"] 
 
@@ -3073,7 +3076,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                     self.updateProjectsTable()
                     self.setColumnWidth_projectsTable()
             else:
-                dlg.massage("critical", "Sorry", "The selected *.pipe file dose not match the selected project" )
+                dlg.massage("critical", "Sorry", "The selected *.json file dose not match the selected project" )
         else:
             dlg.massage("critical", "Sorry", "No file selected" )
         
@@ -3093,10 +3096,10 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             self.setColumnWidth_projectsTable()
 
     def load_project(self):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.pipe file", filter = "pipe files (*.pipe)")
+        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
         if path[0]:
             project_path = os.path.dirname(str(path[0]))        
-            project_file = data.pickleDict(path=str(path[0]))
+            project_file = data.jsonDict(path=str(path[0]))
             project_name = project_file.read("project_name")["project_name"]
             project_key = project_file.read("project_key")["project_key"]
             
@@ -3273,7 +3276,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         
         self.setMaximumHeight(500)
         
-        self.project_file_name = 'project.pipe'
+        self.project_file_name = 'project.json'
         self.project_name = "My_Project"
 
         self.path = None
