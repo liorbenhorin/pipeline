@@ -164,7 +164,7 @@ class PipelineVersionsView(QtGui.QTableView):
                   
             self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
             self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)        
-            print "setting delegates ---->"
+            
             # setup the buttons for loading and more options with delegates
             self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
             self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
@@ -699,6 +699,7 @@ class pipelineTreeView(QtGui.QTreeView):
     def __init__(self,parent = None):
         super(pipelineTreeView, self).__init__(parent)
         
+        
         # display options
         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.setAlternatingRowColors(True)
@@ -710,7 +711,7 @@ class pipelineTreeView(QtGui.QTreeView):
         self.resizeColumnToContents(True) 
                 
         #local variables
-
+        self.pipelineUI = self.parent()
         self._ignoreExpentions = False
         self._expended_states = None        
         self._userSelection = None       
@@ -1098,16 +1099,34 @@ class pipelineTreeView(QtGui.QTreeView):
                 self.updateTable( self.fromProxyIndex(parent))
         
     def create_new_asset(self, parent):
-        node = dt.AssetNode(_asset_)
-        self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
-        self._proxyModel.invalidate()
-        self.updateTable( self.fromProxyIndex(parent))
+        parent_node = self.sourceModel.getNode(parent)
+        
+        folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
+        
+        if ok:
+            path = os.path.join(parent_node.path, folder_name)
+            node = dt.AssetNode(folder_name).create( path = path) 
+            if node is not False: 
+                self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
+                self._proxyModel.invalidate()
+                self.updateTable( self.fromProxyIndex(parent))
         
     def create_new_stage(self, parent):
-        node = dt.StageNode(_stage_)
-        self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
-        self._proxyModel.invalidate()
-        self.updateTable( self.fromProxyIndex(parent))
+        parent_node = self.sourceModel.getNode(parent)
+ 
+        stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
+        stageDlg = dlg.newStage(stages = stages)
+        result = stageDlg.exec_()
+        stage_name  = stageDlg.result()
+        if result == QtGui.QDialog.Accepted:
+
+            path = os.path.join(parent_node.path, stage_name)
+            node = dt.StageNode(stage_name).create( stage = stage_name, path = path) 
+            if node is not False: 
+        
+                self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
+                self._proxyModel.invalidate()
+                self.updateTable( self.fromProxyIndex(parent))
 
     def updateTable(self, index):
         selection = QtGui.QItemSelection(index, index)        

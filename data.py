@@ -52,6 +52,29 @@ def set_icons():
     
 set_icons()
 
+class Metadata_file(object):
+    
+    def __init__(self,**kwargs):
+        self.data_file = None
+        self.data_file_path = None
+        
+        
+        for key in kwargs:
+            if key == "path":
+                self.data_file_path = kwargs[key]
+                
+        if self.data_file_path:        
+            self.set_data_file(self.data_file_path)
+
+
+    def set_data_file(self,path): 
+        
+        if os.path.isfile(path):          
+            self.data_file = data.jsonDict(path = path) 
+            return True
+        else:
+            print "invalid path"
+
 class Node(object):
     
     def __init__(self, name,  parent=None):
@@ -222,7 +245,7 @@ class Node(object):
         return self._id
 
 
-class RootNode(Node):
+class RootNode(Node, Metadata_file):
     
     def __init__(self, name, parent=None, **kwargs):
         super(RootNode, self).__init__(name, parent)
@@ -274,7 +297,7 @@ class RootNode(Node):
                             node = AssetNode(os.path.split(p)[1], path=p, parent = parent) 
                             rec(p, node)
                         elif files.stageDir( p ):
-                            node = StageNode(os.path.split(p)[1], path=p, parent = parent)   
+                            node = StageNode(os.path.split(p)[1], stage = dir, path=p, parent = parent)   
                         else:                         
                             node = FolderNode(os.path.split(p)[1], path=p, parent = parent)                        
                             rec(p, node)
@@ -302,7 +325,19 @@ class AssetNode(RootNode):
     def __init__(self, name,  parent=None, **kwargs):
         super(AssetNode, self).__init__(name, parent, **kwargs)
       
-
+    def create(self, path = None):
+        node = super(AssetNode, self).create(path)
+        if node:
+            dict = {}
+            dict["typeInfo"] = "_asset_"
+            
+            path = os.path.join(path,"%s.%s"%("asset","json"))
+            
+            self.data_file = data.jsonDict().create(path, dict)  
+            self.data_file = self.data_file.read()
+            return node
+        
+        
     def typeInfo(self):
         return _asset_
           
@@ -312,18 +347,34 @@ class AssetNode(RootNode):
         
 class StageNode(RootNode):
     
-    def __init__(self, name, parent=None, **kwargs):
+    def __init__(self, name, stage = None, parent=None, **kwargs):
         super(StageNode, self).__init__(name, parent, **kwargs)
       
+        self._stage = stage
+        
+    def create(self, stage = None, path = None):
+        node = super(StageNode, self).create(path)
+        if node:
+                        
+            dict = {}
+            dict["typeInfo"] = "_stage_"
+            dict["stage"] = stage
+            
+            self._stage = stage
+            
+            path = os.path.join(path,"%s.%s"%("stage","json"))
+            
+            self.data_file = data.jsonDict().create(path, dict)  
+            self.data_file = self.data_file.read()
+            return node
 
-        #self._versions = [] 
-               
-        #[self._versions.append(VersionNode(self.name, author = "autor" ,number = i, date = i, note = "no note")) for i in range(10)]
-     
-    #@property
-    #def versions(self):
-    #    return self._versions
-
+    @property  
+    def stage(self):
+        return self._stage
+    
+    @stage.setter
+    def stage(self, value):
+        self._stage = value
 
     def typeInfo(self):
         return _stage_
@@ -430,31 +481,36 @@ class project(object):
         self.project["current_stage"] = None
                                 
                                 
-class Metadata_file(object):
-    x = 100
-    
+
+
+
+class Asset(Metadata_file):
     def __init__(self,**kwargs):
-        self.data_file = None
-        self.data_file_path = None
-        
-        
+        Metadata_file.__init__(self, **kwargs)
+       
+        self.project = None
         for key in kwargs:
-            if key == "path":
-                self.data_file_path = kwargs[key]
-                
-        if self.data_file_path:        
-            self.set_data_file(self.data_file_path)
-
-
-    def set_data_file(self,path): 
+            if key == "project":
+                self.project = kwargs[key]
         
-        if os.path.isfile(path):          
-            self.data_file = data.jsonDict(path = path) 
-            return True
-        else:
-            print "invalid path"
-            #log.debug ("Invalid path to data file")
-
+        
+        self.settings = None
+        for key in kwargs:
+            if key == "settings":
+                self.settings = kwargs[key]
+                                
+    
+    
+    def create(self, path, name):
+        data = {}
+        data["typeInfo"] = "_asset_"
+        
+        path = os.path.join(path,"%s.%s"%(name,"json"))
+        
+        self.data_file = data.jsonDict().create(path, data)  
+        self.data_file = self.data_file.read()
+       
+        return self
                                 
 class Stage(Metadata_file):
     def __init__(self,**kwargs):
@@ -762,15 +818,15 @@ class Stage(Metadata_file):
         if self.project:
             if self.data_file:
                 versions = files.list_directory(self.versions_path,self.project.project_file_type)
-                
-                versions_dict = files.dict_versions(versions,self.project.project_padding)
-                
-                version_nodes = []                 
-                for key in versions_dict:
+                if versions:
+                    versions_dict = files.dict_versions(versions,self.project.project_padding)
+                    
+                    version_nodes = []                 
+                    for key in versions_dict:
 
-                    version_nodes.append(VersionNode(key, path = versions_dict[key], author = "autor" ,number = key, date = key, note = "no note"))
+                        version_nodes.append(VersionNode(key, path = versions_dict[key], author = "autor" ,number = key, date = key, note = "no note"))
 
-                return version_nodes
+                    return version_nodes
                     
 
     def last_version(self):

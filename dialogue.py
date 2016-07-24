@@ -550,6 +550,52 @@ def _decode_strings():
     strings.append(decode64(data.encoded_strings()[5]))
     strings.append(ast.literal_eval(decode64(data.encoded_strings()[7])))                                                      
     return strings
+
+
+
+
+class newStage(QtGui.QDialog):
+    def __init__(self, parent = None, title = None, stages = []):
+        super(newStage, self).__init__(parent)
+        
+    
+        self.setMaximumWidth(200) 
+        self.setMinimumWidth(200)        
+        self.setMaximumHeight(50) 
+
+
+        layout = QtGui.QVBoxLayout(self)
+        self.stage_name = QtGui.QLabel("Stage type:")
+
+        self.stage_combo = QtGui.QComboBox()
+        self.stage_combo.setEditable(False)
+        if stages:
+            self.stage_combo.addItems(stages)
+        else:
+            self.stage_combo.addItems([stages])
+                  
+     
+        layout.addWidget(self.stage_name)
+        layout.addWidget(self.stage_combo)
+
+                
+        buttons = QtGui.QDialogButtonBox(
+            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
+            QtCore.Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+       
+    def result(self):
+        return self.stage_combo.currentText()   
+
+
+
+
+
+
+
     
 class test(QtGui.QDialog):
     def __init__(self, parent = None, title = None):

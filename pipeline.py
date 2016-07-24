@@ -1615,7 +1615,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         
         #self.list = dtv.PipelineContentsView()        
-        self.tree = dtv.pipelineTreeView() 
+        self.tree = dtv.pipelineTreeView(self) 
         self.tree.setModel( self._proxyModel )
          
         
@@ -1769,11 +1769,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def updateVersionsTable(self):
         if self.versionsView:
             if self.stage:
-                self.versionModel = dtm.PipelineVersionsModel(self.stage.versions)
-                self.versionsView.setModel_(self.versionModel)
-            else:
-                self.versionsView.setModel_(None)
-
+                if self.stage.versions:
+                    self.versionModel = dtm.PipelineVersionsModel(self.stage.versions)
+                    self.versionsView.setModel_(self.versionModel)
+                    return True
+           
+        
+        self.versionsView.setModel_(None)
+        return False
 
         
     def selectInScene(self):
