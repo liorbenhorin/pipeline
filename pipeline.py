@@ -917,7 +917,7 @@ class pipeline_project(pipeline_data):
     @property
     def stages(self):
         stages = {}
-        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
+        stages["asset"] = ["model","rig","clip","shading","lightning"]
         stages["animation"] = ["layout","Shot"]   
         return stages
     
