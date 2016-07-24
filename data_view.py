@@ -1320,12 +1320,21 @@ class ComboDynamicWidget(ComboWidget):
             depth = relative_path.count(os.sep)
             
             if self._stage in self._project.stages["asset"]:
-            
-                self._level = self._project.levels["asset"][depth]
-            
-            if self._stage in self._project.stages["animation"]:
+                options = self._project.levels["asset"]
+
+                if len(options) >  depth:
+                    self._level = options[depth]
                 
-                self._level = self._project.levels["animation"][depth] 
+                    return
+                
+            if self._stage in self._project.stages["animation"]:
+                options = self._project.levels["animation"]
+                if len(options) > depth:
+                    self._level = options[depth]
+                
+                    return
+          
+            self._level = "n/a" 
                 
 
     def createModel(self):
