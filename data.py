@@ -296,13 +296,16 @@ class StageNode(Node):
 
 class VersionNode(Node):
     
-    def __init__(self, name, number = None, author = None, date = None, note = None, parent=None):
+    def __init__(self, name,path = None,  number = None, author = None, date = None, note = None, parent=None):
         super(VersionNode, self).__init__(name, parent)
         
+        self._path = path
         self._number = number
         self._date = date
         self._note = note
         self._author = author
+
+
 
     @property
     def number(self):
@@ -323,6 +326,14 @@ class VersionNode(Node):
     @note.setter
     def note(self, note):
         self._note = note
+
+    @property
+    def path(self):
+        return self._path
+        
+    @path.setter
+    def path(self, path):
+        self._path = path
 
 
     def typeInfo(self):
@@ -712,11 +723,16 @@ class Stage(Metadata_file):
         if self.project:
             if self.data_file:
                 versions = files.list_directory(self.versions_path,self.project.project_file_type)
+                
                 versions_dict = files.dict_versions(versions,self.project.project_padding)
-                sorted_versions = files.sort_version(versions_dict)
                 
-                
-                return sorted_versions
+                version_nodes = []                 
+                for key in versions_dict:
+
+                    version_nodes.append(VersionNode(key, path = versions_dict[key], author = "autor" ,number = key, date = key, note = "no note"))
+
+                return version_nodes
+                    
 
     def last_version(self):
         if self.project:

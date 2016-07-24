@@ -1365,10 +1365,11 @@ class ComboDynamicWidget(ComboWidget):
 
 
     def stageScan(self):
-        
+        print ">>>>"
         path = os.path.join(self._path, self.comboBox.currentText())
 
         if self.assetDir(path):
+
             '''
             if the path is an assets folder
             '''    
@@ -1378,17 +1379,22 @@ class ComboDynamicWidget(ComboWidget):
                 '''    
 
                 if dir == self._settings.stage:
-                    
+                    print dir, "<"
                     '''
                     if its a stage, see if it is a match to the current selected stage, if so, set it as the current stage folder
                     '''
                     
                     self.parent.stage = os.path.join(path, dir,"stage.json")
-            
+                    self.parent.updateVersionsTable()
+                    
                     return True
             
+            self.parent.stage = None
+            self.parent.updateVersionsTable()          
             return True
         
+        self.parent.stage = None
+        self.parent.updateVersionsTable()
         return path
        
     def removeChild(self):

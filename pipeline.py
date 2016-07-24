@@ -85,6 +85,10 @@ reload(dt)
 
 import modules.files as files
 reload(files)
+
+import data_model as dtm
+reload(dtm)
+
 '''
 import modules.maya_warpper as maya
 reload(maya)
@@ -1701,8 +1705,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
 
             
-            #self.project_data = dt.project(self.settings.current_project_path)
-            
             dir = os.path.join(self.settings.current_project_path, "assets")
 
             self.stageCombo = dtv.ComboStaticWidget(
@@ -1712,8 +1714,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                           parent = self) 
                                     
             
-            self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
-            print self.settings
+            
+
+
+
+            
             self.dynamicCombo = dtv.ComboDynamicWidget(
                      settings = self.settings,                       
                      project = self.project,
@@ -1725,11 +1730,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                      parent = self)  
             
 
+            self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
+            index = self.stageCombo.comboBox.findText(self.settings.stage)
+            if index != -1:
+                self.stageCombo.comboBox.setCurrentIndex(index)            
+            
    
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
-
-
+        print "update"
+        self.dynamicCombo._box_list[-1].stageScan()
+        
     @property
     def versionsView(self):
         return self._versionsView
@@ -1744,21 +1755,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         return self._stage
     
     @stage.setter
-    def stage(self, path):
-        self._stage = dt.Stage(path = path, project = self.project, settings = self.settings)             
+    def stage(self, path):   
+        if not path:
+            self._stage = None
+        else:     
+            self._stage = dt.Stage(path = path, project = self.project, settings = self.settings)             
 
 
-    def updateVersionsTable(self, node = None):
-        
+    def updateVersionsTable(self):
         if self.versionsView:
-            if node:
-                versionModel = dtm.PipelineVersionsModel(node._versions)
-                self.versionsView.setModel_(versionModel)
+            if self.stage:
+                self.versionModel = dtm.PipelineVersionsModel(self.stage.versions)
+                self.versionsView.setModel_(self.versionModel)
             else:
-                try:
-                    del versionModel
-                except:
-                    pass
                 self.versionsView.setModel_(None)
 
 
