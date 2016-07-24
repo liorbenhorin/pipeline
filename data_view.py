@@ -1005,8 +1005,9 @@ class pipelineTreeView(QtGui.QTreeView):
     
     def projectRootIndex(self):
         modelRootIndex = self.asModelIndex(self.rootIndex())
+        return modelRootIndex
         # get the first childe of the model's root                                   
-        return self.sourceModel.index(0,0,modelRootIndex)
+        #return self.sourceModel.index(0,0,modelRootIndex)
       
     
     def mouseReleaseEvent(self, event):
@@ -1044,8 +1045,8 @@ class pipelineTreeView(QtGui.QTreeView):
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
         else:
-            actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder,self.projectRootIndex()) ))
-            actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self.projectRootIndex()) ))
+            actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self.projectRootIndex()) ))
+            actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, self.projectRootIndex()) ))
 
         menu.addActions(actions)      
         
@@ -1317,27 +1318,7 @@ class ComboDynamicWidget(ComboWidget):
         self._model = dtm.PipelineListModel(list) 
         self.comboBox.setModel(self._model)    
 
-    def stageDir(self,dir):
-        
-        if os.path.exists(dir):
-            if os.path.isfile(os.path.join(dir,"stage.json")):
-                '''
-                further verify if the stage.json file is actually related to the path
-                '''
-                return True
-            
-        return False
-
-    def assetDir(self,dir):
-        
-        if os.path.exists(dir):
-            if os.path.isfile(os.path.join(dir,"asset.json")):
-                '''
-                further verify if the asset.json file is actually related to the path
-                '''
-                return True
-            
-        return False        
+      
 
     def addChild(self, path):
         
@@ -1370,7 +1351,7 @@ class ComboDynamicWidget(ComboWidget):
         print ">>>>"
         path = os.path.join(self._path, self.comboBox.currentText())
 
-        if self.assetDir(path):
+        if assetDir(path):
 
             '''
             if the path is an assets folder
@@ -1413,6 +1394,31 @@ class ComboDynamicWidget(ComboWidget):
             del c
 
 
+def stageDir(dir):
+    
+    if os.path.exists(dir):
+        if os.path.isfile(os.path.join(dir,"stage.json")):
+            '''
+            further verify if the stage.json file is actually related to the path
+            '''
+            return True
+        
+    return False
 
+def assetDir(dir):
+    
+    if os.path.exists(dir):
+        if os.path.isfile(os.path.join(dir,"asset.json")):
+            '''
+            further verify if the asset.json file is actually related to the path
+            '''
+            return True
         
+    return False  
         
+def model_Tree(path):
+    print os.walk(path)
+    
+    
+    
+            

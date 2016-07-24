@@ -1576,13 +1576,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         
         _root = dt.RootNode("root")
-        root = dt.FolderNode("Diving",_root)
-        char = dt.FolderNode("Charachters", root)
-        dog = dt.AssetNode("Dog", char)
-        Animation = dt.FolderNode("Animation", root)
-        rig = dt.StageNode("Rig", parent = dog)
-        model = dt.StageNode("Model", parent = dog)
-        sorted = dt.StageNode("Sorted_component", parent = dog)
+        #root = dt.FolderNode("Diving",_root)
+        #char = dt.FolderNode("Charachters", root)
+        #dog = dt.AssetNode("Dog", char)
+        #Animation = dt.FolderNode("Animation", root)
+        #rig = dt.StageNode("Rig", parent = dog)
+        #model = dt.StageNode("Model", parent = dog)
+        #sorted = dt.StageNode("Sorted_component", parent = dog)
+        
+        _rootx = dtv.model_Tree(self.settings.current_project_path)
         
         '''
         creating the tree model,
