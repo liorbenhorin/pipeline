@@ -1710,7 +1710,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
 
             
-            dir = os.path.join(self.settings.current_project_path, "assets")
+            
 
             self.stageCombo = dtv.ComboStaticWidget(
                                           settings = self.settings,
@@ -1719,7 +1719,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                           parent = self) 
                                     
 
+            self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
+            self.stageSelect()
 
+            
+            if self.stageCombo.comboBox.currentText() in self.project.stages["asset"]:
+                dir = os.path.join(self.settings.current_project_path, "assets")
+            
+            if self.stageCombo.comboBox.currentText() in self.project.stages["animation"]:
+                dir = os.path.join(self.settings.current_project_path, "scenes") 
             
             self.dynamicCombo = dtv.ComboDynamicWidget(
                                                      settings = self.settings,                       
@@ -1732,8 +1740,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                                      parent = self)  
             
 
-            self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
-            self.stageSelect()
+
             
     def stageSelect(self):
         index = self.stageCombo.comboBox.findText(self.settings.stage)
