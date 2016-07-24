@@ -172,7 +172,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         
         if not index.isValid():
 
-            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled 
+            return QtCore.Qt.ItemIsEnabled #| QtCore.Qt.ItemIsDropEnabled 
 
         if index.isValid():
             node = self.getNode(index)
@@ -180,10 +180,10 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
             if node.typeInfo() == _root_:
                 return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
             
-            if node.typeInfo() == _stage_:
-                return  QtCore.Qt.ItemIsEnabled #| QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+            #if node.typeInfo() == _stage_:
+            #    return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
         
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable    
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable# | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |    
     
     """INPUTS: QModelIndex"""
     """OUTPUT: QModelIndex"""
@@ -594,8 +594,8 @@ class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
         if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent): 
             
             
-            if self.sourceModel().getNode(id).typeInfo() == _stage_:
-                return False
+            #if self.sourceModel().getNode(id).typeInfo() == _stage_:
+            #    return False
                       
             return True
         

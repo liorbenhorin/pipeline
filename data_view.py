@@ -829,7 +829,7 @@ class pipelineTreeView(QtGui.QTreeView):
     def selectRoot(self):
         
         self.setCurrentIndex(self.asProxyIndex(self.rootIndex()))
-        self.tableView.update(self.selectionModel().selection())    
+        #self.tableView.update(self.selectionModel().selection())    
         self.saveSelection()
         
 
@@ -1013,7 +1013,7 @@ class pipelineTreeView(QtGui.QTreeView):
         
         super(pipelineTreeView, self).mouseReleaseEvent(event)
         self.saveSelection()
-        self.tableView.update(self.selectionModel().selection())
+        #self.tableView.update(self.selectionModel().selection())
         event.accept
    
     def contextMenuEvent(self, event):
@@ -1040,6 +1040,9 @@ class pipelineTreeView(QtGui.QTreeView):
                 actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage, src) ))
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
+            elif node.typeInfo() == _stage_:
+                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+
         else:
             actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder,self.projectRootIndex()) ))
             actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self.projectRootIndex()) ))
@@ -1064,14 +1067,13 @@ class pipelineTreeView(QtGui.QTreeView):
     '''
     def delete(self,  index):
         # clear the table view              
-        self.tableView.update(QtGui.QItemSelection())
+        #self.tableView.update(QtGui.QItemSelection())
         
         node = self.asModelNode(index)
         parentIndex = self.sourceModel.parent(index)
         self.sourceModel.removeRows(node.row(),1,parentIndex, kill=True)
         self._proxyModel.invalidate()
-        
-        #self.updateTable( parentIndex)
+
         self.updateTable( self.fromProxyIndex(parentIndex))
         return True
         
@@ -1095,7 +1097,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
     def updateTable(self, index):
         selection = QtGui.QItemSelection(index, index)        
-        self.tableView.update(selection)
+        #self.tableView.update(selection)
 
     @property
     def tree_as_flat_list(self):

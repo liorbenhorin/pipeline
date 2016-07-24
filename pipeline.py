@@ -1574,7 +1574,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         generate some tree nodes for testing
         '''
-        '''
+        
         _root = dt.RootNode("root")
         root = dt.FolderNode("Diving",_root)
         char = dt.FolderNode("Charachters", root)
@@ -1583,20 +1583,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         rig = dt.StageNode("Rig", parent = dog)
         model = dt.StageNode("Model", parent = dog)
         sorted = dt.StageNode("Sorted_component", parent = dog)
-        '''
+        
         '''
         creating the tree model,
         it's the main tree model object, its global so it is deleted every restart of Pipeline
         '''
-        '''
+        
         treeModel = dtm.PipelineProjectModel(_root) 
         
-        '''
+        
         '''
         _proxymodel is the sortFilterProxyModel object that is connected to the tree model
         
         '''
-        '''
+        
         self._proxyModel = dtm.PipelineProjectProxyModel()      
         self._proxyModel.setSourceModel(treeModel)
         self._proxyModel.setDynamicSortFilter(True)
@@ -1604,23 +1604,23 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._proxyModel.setSortRole(0)
         self._proxyModel.setFilterRole(0)
         self._proxyModel.setFilterKeyColumn(0)
-        '''
+        
         '''
         VIEWS
         
         '''
-        '''
-        self.list = dtv.PipelineContentsView()        
+        
+        #self.list = dtv.PipelineContentsView()        
         self.tree = dtv.pipelineTreeView() 
         self.tree.setModel( self._proxyModel )
          
         
         #connect the tree to the table views and vice versa     
-        self.tree.tableView = self.list 
-        self.list.treeView = self.tree      
+        #self.tree.tableView = self.list 
+        #self.list.treeView = self.tree      
         
         self.tree.setModel( self._proxyModel )
-        self.list.init_treeView()        
+        #self.list.init_treeView()        
         self._proxyModel.treeView = self.tree
 
         #connect the tree and the table signals
@@ -1636,7 +1636,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         # select the tree root
         self.tree.selectRoot()
-        '''
+        #verticalLayout_18
         '''
         UI LAYOUTS, SPLITTER, AND ICONS SCALE SLIDER
         '''
@@ -1644,6 +1644,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         h_layout = QtGui.QVBoxLayout()   
         h_layout.setContentsMargins(0, 0, 0, 0)      
         self.navWidget.setLayout(h_layout) 
+        h_layout.addWidget(self.tree)
         '''       
         self.splitter1 = QtGui.QSplitter()
         self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
