@@ -13,6 +13,10 @@ reload(dtm)
 import modules.files as files
 reload(files)
 
+import dialogue as dlg
+reload(dlg)
+
+
 global _node_
 global _root_
 global  _stage_
@@ -455,7 +459,7 @@ class PipelineContentsView(QtGui.QTableView):
             
             treeIndex = self.asTreeIndex(index)
             #print treeIndex, " <--- table clicked"
-            print "UPDATE --->>>>", node.name
+           
             if node.typeInfo() == _stage_:
                 self.updateVersionsTable(node)
             else:
@@ -1077,12 +1081,21 @@ class pipelineTreeView(QtGui.QTreeView):
 
         self.updateTable( self.fromProxyIndex(parentIndex))
         return True
+
+
         
     def create_new_folder(self, parent):
-        node = dt.FolderNode(_folder_)        
-        self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
-        self._proxyModel.invalidate()
-        self.updateTable( self.fromProxyIndex(parent))
+        parent_node = self.sourceModel.getNode(parent)
+        
+        folder_name, ok = QtGui.QInputDialog.getText(self, 'New Folder', 'Enter Folder name:')
+        
+        if ok:
+            path = os.path.join(parent_node.path, folder_name)
+            node = dt.FolderNode(folder_name).create( path = path) 
+            if node is not False:     
+                self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
+                self._proxyModel.invalidate()
+                self.updateTable( self.fromProxyIndex(parent))
         
     def create_new_asset(self, parent):
         node = dt.AssetNode(_asset_)
@@ -1348,10 +1361,10 @@ class ComboDynamicWidget(ComboWidget):
 
 
     def stageScan(self):
-        print ">>>>"
+        
         path = os.path.join(self._path, self.comboBox.currentText())
 
-        if assetDir(path):
+        if files.assetDir(path):
 
             '''
             if the path is an assets folder
@@ -1362,7 +1375,7 @@ class ComboDynamicWidget(ComboWidget):
                 '''    
 
                 if dir == self._settings.stage:
-                    print dir, "<"
+                    
                     '''
                     if its a stage, see if it is a match to the current selected stage, if so, set it as the current stage folder
                     '''
@@ -1394,27 +1407,7 @@ class ComboDynamicWidget(ComboWidget):
             del c
 
 
-def stageDir(dir):
-    
-    if os.path.exists(dir):
-        if os.path.isfile(os.path.join(dir,"stage.json")):
-            '''
-            further verify if the stage.json file is actually related to the path
-            '''
-            return True
-        
-    return False
 
-def assetDir(dir):
-    
-    if os.path.exists(dir):
-        if os.path.isfile(os.path.join(dir,"asset.json")):
-            '''
-            further verify if the asset.json file is actually related to the path
-            '''
-            return True
-        
-    return False  
         
 def model_Tree(path):
     print os.walk(path)

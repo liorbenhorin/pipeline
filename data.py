@@ -54,7 +54,7 @@ set_icons()
 
 class Node(object):
     
-    def __init__(self, name, parent=None):
+    def __init__(self, name,  parent=None):
         
         super(Node, self).__init__()
         
@@ -63,7 +63,7 @@ class Node(object):
         self._parent = parent
         self.expendedState = False
         self._id = data.id_generator()
-        
+
         if parent is not None:
             parent.addChild(self)
 
@@ -224,9 +224,33 @@ class Node(object):
 
 class RootNode(Node):
     
-    def __init__(self, name, parent=None):
+    def __init__(self, name, parent=None, **kwargs):
         super(RootNode, self).__init__(name, parent)
+        
         self.name = name
+    
+        self._path = None
+        for key in kwargs:
+            if key == "path":
+                self._path = kwargs[key]
+        
+        
+            
+    def create(self, path = None):
+        if files.create_directory(path):  
+            self.path = path          
+            return self
+        else:
+            return False
+
+
+    @property
+    def path(self):
+        return self._path
+                
+    @path.setter
+    def path(self, path):
+        self._path = path  
     
     def typeInfo(self):
         return _root_
@@ -234,13 +258,38 @@ class RootNode(Node):
     def resource(self):
         return folder_icon
 
+    def model_tree(self):
+        
+        '''
+        returns a flat list of all descending childs from the given index
+        '''     
+        def rec(path, parent):
+            if path:
+                folders = files.list_dir_folders(path)
+                if folders:
+                    for dir in folders: 
+                        p  = os.path.join(path,dir)
+ 
+                        if files.assetDir( p ):
+                            node = AssetNode(os.path.split(p)[1], path=p, parent = parent) 
+                            rec(p, node)
+                        elif files.stageDir( p ):
+                            node = StageNode(os.path.split(p)[1], path=p, parent = parent)   
+                        else:                         
+                            node = FolderNode(os.path.split(p)[1], path=p, parent = parent)                        
+                            rec(p, node)
+                else:
+                    pass
 
-class FolderNode(Node):
+        rec(self.path, self)
+
+class FolderNode(RootNode):
     
-    def __init__(self, name,  parent=None):
-        super(FolderNode, self).__init__(name, parent)
-      
-
+    def __init__(self, name,  parent=None, **kwargs):
+        super(FolderNode, self).__init__(name, parent, **kwargs)
+   
+       
+        
     def typeInfo(self):
         return _folder_
           
@@ -248,10 +297,10 @@ class FolderNode(Node):
         return folder_icon
 
 
-class AssetNode(Node):
+class AssetNode(RootNode):
     
-    def __init__(self, name,  parent=None):
-        super(AssetNode, self).__init__(name, parent)
+    def __init__(self, name,  parent=None, **kwargs):
+        super(AssetNode, self).__init__(name, parent, **kwargs)
       
 
     def typeInfo(self):
@@ -261,33 +310,23 @@ class AssetNode(Node):
         return cube_icon_full
         
         
-class StageNode(Node):
+class StageNode(RootNode):
     
-    def __init__(self, name, stage = None, parent=None):
-        super(StageNode, self).__init__(name, parent)
+    def __init__(self, name, parent=None, **kwargs):
+        super(StageNode, self).__init__(name, parent, **kwargs)
       
-        self._stage = stage
 
-        self._versions = [] 
+        #self._versions = [] 
                
-        [self._versions.append(VersionNode(self.name, author = "autor" ,number = i, date = i, note = "no note")) for i in range(10)]
+        #[self._versions.append(VersionNode(self.name, author = "autor" ,number = i, date = i, note = "no note")) for i in range(10)]
      
-    @property
-    def versions(self):
-        return self._versions
+    #@property
+    #def versions(self):
+    #    return self._versions
 
 
     def typeInfo(self):
         return _stage_
-
-
-    @property
-    def stage(self):
-        return self._stage
-        
-    @stage.setter
-    def stage(self, value):
-        self._stage = value
 
    
     def resource(self):

@@ -385,3 +385,25 @@ def erase(file):
             with open(file, "w"):
                 pass        
             return True
+            
+def stageDir(dir):
+    
+    if os.path.exists(dir):
+        if os.path.isfile(os.path.join(dir,"stage.json")):
+            '''
+            further verify if the stage.json file is actually related to the path
+            '''
+            return True
+        
+    return False
+
+def assetDir(dir):
+    
+    if os.path.exists(dir):
+        if os.path.isfile(os.path.join(dir,"asset.json")):
+            '''
+            further verify if the asset.json file is actually related to the path
+            '''
+            return True
+        
+    return False              

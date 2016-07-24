@@ -1575,7 +1575,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         generate some tree nodes for testing
         '''
         
-        _root = dt.RootNode("root")
+        _root = dt.RootNode("root", path = self.settings.current_project_path)
+        assets = dt.FolderNode("assets",path = os.path.join(self.settings.current_project_path, 'assets'), parent = _root)
+        assets.model_tree()
+        scenes = dt.FolderNode("scenes",path = os.path.join(self.settings.current_project_path, 'scenes'), parent = _root)
+        scenes.model_tree()
         #root = dt.FolderNode("Diving",_root)
         #char = dt.FolderNode("Charachters", root)
         #dog = dt.AssetNode("Dog", char)
@@ -1583,8 +1587,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #rig = dt.StageNode("Rig", parent = dog)
         #model = dt.StageNode("Model", parent = dog)
         #sorted = dt.StageNode("Sorted_component", parent = dog)
-        
-        _rootx = dtv.model_Tree(self.settings.current_project_path)
         
         '''
         creating the tree model,
@@ -1741,7 +1743,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
    
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
-        print "update"
         self.dynamicCombo._box_list[-1].stageScan()
         
     @property
