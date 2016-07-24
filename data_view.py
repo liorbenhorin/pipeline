@@ -1118,10 +1118,10 @@ class pipelineTreeView(QtGui.QTreeView):
     def filterContents(self):
         
         if self.tree_as_flat_list:
-            self.tableView.clearModel()
+            #self.tableView.clearModel()
             
             model = dtm.PipelineContentsModel(self.tree_as_flat_list)
-            self.tableView.populateTable(model)
+            #self.tableView.populateTable(model)
             
 
 
