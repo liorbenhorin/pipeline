@@ -1172,7 +1172,8 @@ class ComboWidget(QtGui.QWidget):
                  parent = None):
         
         super(ComboWidget, self).__init__(parent)
-
+        #self.parent = parent
+        
         #self._parent = parent_box
         self._parent_layout = parent_layout  
 
@@ -1191,14 +1192,15 @@ class ComboWidget(QtGui.QWidget):
 
 class ComboStaticWidget(ComboWidget):
     def __init__(self,
-                 project = None,
+                 settings = None,
                  items = None,
                  parent_layout = None,
                  parent = None):
         
         super(ComboStaticWidget, self).__init__(parent_layout, parent)
         
-        self._project = project
+        self.parent = parent
+        self._settings = settings
         self._items = items
         self._model = None
         self.createModel()
@@ -1225,7 +1227,8 @@ class ComboStaticWidget(ComboWidget):
         self.comboBox.currentIndexChanged.connect(self.update)
         
     def update(self):
-        self._project.project["current_stage"] = self.comboBox.currentText()
+        self._settings.stage = self.comboBox.currentText()
+        self.parent.dynamicCombo._box_list[-1].stageScan()
 
 class ComboDynamicWidget(ComboWidget):
     def __init__(self,
@@ -1233,14 +1236,15 @@ class ComboDynamicWidget(ComboWidget):
                  project = None,
                  path = None,
                  stage = None,
+                 box_list = None,
                  parent_box = None,
                  parent_layout = None,
                  parent = None):
         
         super(ComboDynamicWidget, self).__init__(parent_layout, parent)
-                
+               
         # Local and init calls
-        
+        self.parent = parent
         self._settings = settings
         self._project = project
         self._level = None
@@ -1248,6 +1252,9 @@ class ComboDynamicWidget(ComboWidget):
         self._path = None
         self._stage = None
         self._parent_layout = parent_layout
+        
+        self._box_list = box_list
+        self._box_list.append(self)
             
         if path and stage:
             self._path = path
@@ -1274,16 +1281,16 @@ class ComboDynamicWidget(ComboWidget):
             
             self._subdirectories = dirs
             
-            relative_path = os.path.relpath(dir, self._project.project["project_path"])
+            relative_path = os.path.relpath(dir, self._settings.current_project_path)
             depth = relative_path.count(os.sep)
             
-            if self._stage in self._project.project["stages"]["asset"]:
+            if self._stage in self._project.stages["asset"]:
             
-                self._level = self._project.project["levels"]["asset"][depth]
+                self._level = self._project.levels["asset"][depth]
             
-            if self._stage in self._project.project["stages"]["animation"]:
+            if self._stage in self._project.stages["animation"]:
                 
-                self._level = self._project.project["levels"]["animation"][depth] 
+                self._level = self._project.levels["animation"][depth] 
                 
 
     def createModel(self):
@@ -1330,45 +1337,59 @@ class ComboDynamicWidget(ComboWidget):
             
         return False        
 
-    def addChild(self, name):
-        new_path = os.path.join(self._path, name)
+    def addChild(self, path):
         
-        '''
-        if the folder is a stage folder don't list it and return True
-        '''
-        if self.assetDir(new_path):
-            print "<<- asset dir call"
-            for dir in files.list_dir_folders(new_path):
-                
-                
-                if dir == self._settings.stage:
-                    print dir, "<-- match to the settings stage, loading the stage"# self.stageDir(dir)
-                #print "<<- stage dir call"
-            
-            return True
-        
-        if files.list_dir_folders(new_path):
+        if files.list_dir_folders(path):
             widget = ComboDynamicWidget(
                                  settings = self._settings,
                                  project = self._project,
-                                 path = new_path,
+                                 path = path,
                                  stage = self._stage,
+                                 box_list = self._box_list,
                                  parent_box = self,
                                  parent_layout = self._parent_layout,
-                                 parent = None)    
-            self._child = widget
-        
-        return False    
+                                 parent = self.parent)    
+            self._child = widget   
  
     def update(self):
 
         self.removeChild()
         
-        if self.addChild(self.comboBox.currentText()):
+        scan = self.stageScan()
+        
+        if scan is not True:
             '''
-            This is a stage folder
+            if the folder is a stage folder don't list it and return True
             '''
+            self.addChild(scan)
 
+
+    def stageScan(self):
+        
+        path = os.path.join(self._path, self.comboBox.currentText())
+
+        if self.assetDir(path):
+            '''
+            if the path is an assets folder
+            '''    
+            for dir in files.list_dir_folders(path):
+                '''
+                scan each folder to see if it is a stage folder
+                '''    
+
+                if dir == self._settings.stage:
+                    
+                    '''
+                    if its a stage, see if it is a match to the current selected stage, if so, set it as the current stage folder
+                    '''
+                    
+                    self.parent.stage = os.path.join(path, dir,"stage.json")
+            
+                    return True
+            
+            return True
+        
+        return path
        
     def removeChild(self):
         
@@ -1383,3 +1404,7 @@ class ComboDynamicWidget(ComboWidget):
             self._child = None
             del c
 
+
+
+        
+        

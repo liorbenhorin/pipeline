@@ -79,6 +79,10 @@ start_time = timer()
 import modules.jsonData as data
 reload(data)
 
+
+import data as dt
+reload(dt)
+
 import modules.files as files
 reload(files)
 '''
@@ -896,7 +900,22 @@ class pipeline_project(pipeline_data):
             return masters        
         else:            
             return None
-                            
+
+    @property
+    def stages(self):
+        stages = {}
+        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
+        stages["animation"] = ["layout","Shot"]   
+        return stages
+    
+    @property
+    def levels(self):
+        levels = {}
+        levels["asset"] = ["type","asset","stage","ccc"]
+        levels["animation"] = ["Ep","Seq"]
+        return levels
+                
+
 
     def log(self):
         
@@ -919,7 +938,6 @@ class pipeline_project(pipeline_data):
 
 class pipeline_settings(pipeline_data):
     def __init__(self,**kwargs):
-        #super(pipeline_settings, self).__init__()
         pipeline_data.__init__(self, **kwargs)
  
         self.settings_file = None
@@ -1522,11 +1540,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         '''
 
+        self._versionsView = None
+        self._stage = None
+        
         self.tree()
     
     def tree(self):
-        print self.settings
-        print self.settings.current_project_path
+
         
         self.ui.searchIcon_label.setPixmap(search_icon)
         
@@ -1670,49 +1690,78 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.verticalLayout_18.addWidget(self.navWidget)
         # ----> temp!!! hide the old selection options
         #self.ui.assets_selection_frame.setHidden(True)
-        
-        self.versionsTable = dtv.PipelineVersionsView()
+        self.versionsView = dtv.PipelineVersionsView()
         #self.list.versionsView = self.versionsTable
     
-        self.ui.versionsTabLayout.addWidget(self.versionsTable)
+        self.ui.versionsTabLayout.addWidget(self.versionsView)
         
-        
-        
-       
-         
-        
+   
         if self.settings.current_project_path:
             levels = [None]
             self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
 
             
-            self.project_data = dt.project(self.settings.current_project_path)
+            #self.project_data = dt.project(self.settings.current_project_path)
             
             dir = os.path.join(self.settings.current_project_path, "assets")
 
             self.stageCombo = dtv.ComboStaticWidget(
-                                          project = self.project_data,
-                                          items = self.project_data.project["stages"]["asset"] + self.project_data.project["stages"]["animation"],
+                                          settings = self.settings,
+                                          items = self.project.stages["asset"] + self.project.stages["animation"],
                                           parent_layout = self.ui.navBarLayout,
-                                          parent = None) 
+                                          parent = self) 
                                     
             
             self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
             print self.settings
-            level1 = dtv.ComboDynamicWidget(
+            self.dynamicCombo = dtv.ComboDynamicWidget(
                      settings = self.settings,                       
-                     project = self.project_data,
+                     project = self.project,
                      path = dir,
                      stage = "model",
+                     box_list = [],
                      parent_box = None,
                      parent_layout = self.ui.navBarLayout,
-                     parent = None)  
+                     parent = self)  
             
 
    
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
+
+
+    @property
+    def versionsView(self):
+        return self._versionsView
+    
+    @versionsView.setter
+    def versionsView(self, view):
+        self._versionsView = view        
+
+       
+    @property
+    def stage(self):
+        return self._stage
+    
+    @stage.setter
+    def stage(self, path):
+        self._stage = dt.Stage(path = path, project = self.project, settings = self.settings)             
+
+
+    def updateVersionsTable(self, node = None):
         
+        if self.versionsView:
+            if node:
+                versionModel = dtm.PipelineVersionsModel(node._versions)
+                self.versionsView.setModel_(versionModel)
+            else:
+                try:
+                    del versionModel
+                except:
+                    pass
+                self.versionsView.setModel_(None)
+
+
         
     def selectInScene(self):
         pass
