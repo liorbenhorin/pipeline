@@ -9,3 +9,5 @@
 *.pyc
 
 *.json
+
+settings.json
