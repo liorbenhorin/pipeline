@@ -1713,27 +1713,27 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                           parent_layout = self.ui.navBarLayout,
                                           parent = self) 
                                     
-            
-            
-
 
 
             
             self.dynamicCombo = dtv.ComboDynamicWidget(
-                     settings = self.settings,                       
-                     project = self.project,
-                     path = dir,
-                     stage = "model",
-                     box_list = [],
-                     parent_box = None,
-                     parent_layout = self.ui.navBarLayout,
-                     parent = self)  
+                                                     settings = self.settings,                       
+                                                     project = self.project,
+                                                     path = dir,
+                                                     stage = "model",
+                                                     box_list = [],
+                                                     parent_box = None,
+                                                     parent_layout = self.ui.navBarLayout,
+                                                     parent = self)  
             
 
             self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
-            index = self.stageCombo.comboBox.findText(self.settings.stage)
-            if index != -1:
-                self.stageCombo.comboBox.setCurrentIndex(index)            
+            self.stageSelect()
+            
+    def stageSelect(self):
+        index = self.stageCombo.comboBox.findText(self.settings.stage)
+        if index != -1:
+            self.stageCombo.comboBox.setCurrentIndex(index)            
             
    
     def stageChanged(self):
