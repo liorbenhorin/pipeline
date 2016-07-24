@@ -89,6 +89,15 @@ reload(files)
 import data_model as dtm
 reload(dtm)
 
+import data as dt
+reload(dt)
+
+import data_model as dtm
+reload(dtm)
+
+import data_view as dtv
+reload(dtv)   
+
 '''
 import modules.maya_warpper as maya
 reload(maya)
@@ -1557,14 +1566,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         import modules
         '''
-        import data as dt
-        reload(dt)
-
-        import data_model as dtm
-        reload(dtm)
- 
-        import data_view as dtv
-        reload(dtv)               
+            
     
     
         '''
@@ -1720,15 +1722,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                     
 
             self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
+            
             self.stageSelect()
-
-            
-            if self.stageCombo.comboBox.currentText() in self.project.stages["asset"]:
-                dir = os.path.join(self.settings.current_project_path, "assets")
-            
-            if self.stageCombo.comboBox.currentText() in self.project.stages["animation"]:
-                dir = os.path.join(self.settings.current_project_path, "scenes") 
-            
+            #dir = os.path.join(self.settings.current_project_path, self.stageType()) 
+            '''
             self.dynamicCombo = dtv.ComboDynamicWidget(
                                                      settings = self.settings,                       
                                                      project = self.project,
@@ -1740,17 +1737,57 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                                      parent = self)  
             
 
-
+            '''
+            #self.stageSelect()
             
     def stageSelect(self):
+        print "SSSS"
         index = self.stageCombo.comboBox.findText(self.settings.stage)
         if index != -1:
             self.stageCombo.comboBox.setCurrentIndex(index)            
+        dir = os.path.join(self.settings.current_project_path, self.stageTypeName()) 
+        print dir , "<<<<"
+        self.dynamicCombo = dtv.ComboDynamicWidget(
+                                                 settings = self.settings,                       
+                                                 project = self.project,
+                                                 path = dir,
+                                                 stage = self.settings.stage,
+                                                 box_list = [],
+                                                 parent_box = None,
+                                                 parent_layout = self.ui.navBarLayout,
+                                                 parent = self)          
+        
             
+    def stageType(self):
+        if self.stageCombo.comboBox.currentText() in self.project.stages["asset"]:
+            return "asset"
+        
+        if self.stageCombo.comboBox.currentText() in self.project.stages["animation"]:
+            return "animation" 
+        
+        return None
+
+    def stageTypeName(self ):
+        if self.stageType() == "asset":
+            return "assets"
+        if self.stageType() == "animation":
+            return "scenes"
+                    
+        return None
    
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
-        self.dynamicCombo._box_list[-1].stageScan()
+        type = self.stageType()
+        current = self.dynamicCombo._box_list[0]._stage
+        
+        if current not in self.project.stages[type]:
+            self.dynamicCombo.kill()
+            self.stageSelect() 
+        else:
+            try:
+                self.dynamicCombo._box_list[-1].stageScan()
+            except:
+                print "..."
         
     @property
     def versionsView(self):

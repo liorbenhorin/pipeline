@@ -1426,7 +1426,12 @@ class ComboDynamicWidget(ComboWidget):
             del c
 
 
-
+    def kill(self):
+        self.removeChild()
+        self.setParent(None)
+        self.deleteLater()
+        self._child = None
+        del self        
         
 def model_Tree(path):
     print os.walk(path)
