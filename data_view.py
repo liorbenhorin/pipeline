@@ -1242,8 +1242,6 @@ class ComboDynamicWidget(ComboWidget):
         # Local and init calls
         
         self._settings = settings
-        print settings
-        print self._settings, "<<"
         self._project = project
         self._level = None
         self._subdirectories = None
@@ -1311,7 +1309,7 @@ class ComboDynamicWidget(ComboWidget):
         self.comboBox.setModel(self._model)    
 
     def stageDir(self,dir):
-        print "<<- stage dir call"
+        
         if os.path.exists(dir):
             if os.path.isfile(os.path.join(dir,"stage.json")):
                 '''
@@ -1320,7 +1318,17 @@ class ComboDynamicWidget(ComboWidget):
                 return True
             
         return False
+
+    def assetDir(self,dir):
         
+        if os.path.exists(dir):
+            if os.path.isfile(os.path.join(dir,"asset.json")):
+                '''
+                further verify if the asset.json file is actually related to the path
+                '''
+                return True
+            
+        return False        
 
     def addChild(self, name):
         new_path = os.path.join(self._path, name)
@@ -1328,7 +1336,14 @@ class ComboDynamicWidget(ComboWidget):
         '''
         if the folder is a stage folder don't list it and return True
         '''
-        if self.stageDir(new_path):
+        if self.assetDir(new_path):
+            print "<<- asset dir call"
+            for dir in files.list_dir_folders(new_path):
+                
+                
+                if dir == self._settings.stage:
+                    print dir, "<-- match to the settings stage, loading the stage"# self.stageDir(dir)
+                #print "<<- stage dir call"
             
             return True
         
@@ -1353,9 +1368,7 @@ class ComboDynamicWidget(ComboWidget):
             '''
             This is a stage folder
             '''
-            print self._settings
-            print self._settings.stage 
-            print self.comboBox.currentText()
+
        
     def removeChild(self):
         
