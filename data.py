@@ -596,8 +596,7 @@ class StageNode(RootNode):
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
 
-        print self.data_file_path, "stage node path"
-        print self.data_file, "stage node data file"
+
 
     def create(self,  path=None):
         node = super(StageNode, self).create(path)
@@ -956,10 +955,10 @@ class StageNode(RootNode):
 
     @property
     def versiosnModel(self):
-        print "listing versions <------"
+
         if self.versions:
             return dtm.PipelineVersionsModel(self.versions)
-            print self.version, "<<<<"
+
         else:
             return dtm.PipelineVersionsModel(self.emptyVersions)
 
@@ -1296,7 +1295,6 @@ def stageDir(dir):
             '''
             j = Metadata_file(path=os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json")))
             info = j.data_file.read()
-            print info
             typeInfo = info["typeInfo"]
             if typeInfo == _stage_:
                 return True
@@ -1312,7 +1310,6 @@ def assetDir(dir):
             '''
             j = Metadata_file(path=os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json")))
             info = j.data_file.read()
-            print info
             typeInfo = info["typeInfo"]
             if typeInfo == _asset_:
 

@@ -1455,20 +1455,20 @@ class ComboDynamicWidget(ComboWidget):
 
 
     def stageScan(self):
-        print "SCAN"
+
         path = os.path.join(self._path, self.comboBox.currentText())
 
         self._node = None
 
         if dt.assetDir(path):
-            print "ASSET/"
+
             '''
             if the path is an assets folder
             '''
 
 
             for dir in files.list_dir_folders(path):
-                print ""
+
                 '''
                 scan each folder to see if it is a stage folder
                 '''
@@ -1480,7 +1480,7 @@ class ComboDynamicWidget(ComboWidget):
                         '''
                         if its a stage, see if it is a match to the current selected stage, if so, set it as the current stage folder
                         '''
-                        print os.path.join(path,dir), "<<<<<<<<<"
+
                         self._node = None
                         self._node = dt.StageNode(dir, parent=self._parent_box._node , path=os.path.join(path,dir), project=self._project,
                                      settings=self._settings, pipelineUI= self.parent)

@@ -1810,16 +1810,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if not parent:
             self._stage = None
         else:
-            #path = os.path.join(parent.path, parent.name)
 
-            print "setting stage --->", #path
-
-            self._stage = parent #dt.StageNode("fdffdhdhd", parent = parent,path = os.path.join(path), project = self.project, settings = self.settings, pipelineUI = self)
+            self._stage = parent
 
 
     def updateVersionsTable(self):
         if self.versionsView and self._stage:
-            print self._stage.name, "<--------"
+
             self.versionsView.setModel_(self._stage.versiosnModel)
             return True
 
