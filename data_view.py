@@ -23,7 +23,11 @@ global  _stage_
 global _asset_
 global _folder_
 global _dummy_
+global _version_
+global _new_
 
+_new_ = "new"
+_version_ = "version"
 _node_ = "node"
 _root_ = "root"
 _stage_ = "stage"
@@ -63,7 +67,40 @@ def set_icons():
 set_icons()
 
 
-        
+class NewButtonDelegate(QtGui.QItemDelegate):
+    """
+    A delegate that places a fully functioning QPushButton in every
+    cell of the column to which it's applied
+    """
+
+    def __init__(self, parent):
+        # The parent is not an optional argument for the delegate as
+        # we need to reference it in the paint method (see below)
+        QtGui.QItemDelegate.__init__(self, parent)
+
+    def paint(self, painter, option, index):
+        # This method will be called every time a particular cell is
+        # in view and that view is changed in some way. We ask the
+        # delegates parent (in this case a table view) if the index
+        # in question (the table cell) already has a widget associated
+        # with it. If not, create one with the text for this index and
+        # connect its clicked signal to a slot in the parent view so
+        # we are notified when its used and can do something.
+        if not self.parent().indexWidget(index):
+
+            if self.parent().model().getNode(index).typeInfo() != _new_:
+                return None
+
+            self.parent().setIndexWidget(
+                index,
+                QtGui.QPushButton(
+                    "New",
+                    index.data(),
+                    self.parent(),
+                    clicked=self.parent().NewButtonClicked
+                )
+            )
+
 class loadButtonDelegate(QtGui.QItemDelegate):
     """
     A delegate that places a fully functioning QPushButton in every
@@ -83,15 +120,19 @@ class loadButtonDelegate(QtGui.QItemDelegate):
         # connect its clicked signal to a slot in the parent view so 
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
+
+            if self.parent().model().getNode(index).typeInfo() == _new_:
+                return None
+
             self.parent().setIndexWidget(
-                index, 
+                index,
                 QtGui.QPushButton(
                     "Open",
-                    index.data(), 
-                    self.parent(), 
+                    index.data(),
+                    self.parent(),
                     clicked=self.parent().loadButtonClicked
                 )
-            )     
+            )
 
 class OptionsButtonDelegate(QtGui.QItemDelegate):
     """
@@ -112,7 +153,9 @@ class OptionsButtonDelegate(QtGui.QItemDelegate):
         # connect its clicked signal to a slot in the parent view so 
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
-            
+
+            if self.parent().model().getNode(index).typeInfo() == _new_:
+                return None
 
             button = QtGui.QPushButton(
                     index.data(), 
@@ -168,6 +211,8 @@ class PipelineVersionsView(QtGui.QTableView):
             # setup the buttons for loading and more options with delegates
             self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
             self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
+            self.setItemDelegateForColumn(0, NewButtonDelegate(self))
+
     
     '''
     def setModel(self,model):
@@ -175,7 +220,16 @@ class PipelineVersionsView(QtGui.QTableView):
         super(PipelineVersionsView,self).setModel(model)
         # size the options button column
     '''
-         
+
+    @QtCore.Slot()
+    def NewButtonClicked(self):
+        # This slot will be called when our button is clicked.
+        # self.sender() returns a refence to the QPushButton created
+        # by the delegate, not the delegate itself.
+        button = self.sender()
+        index = self.indexAt(button.pos())
+        print self.model().getNode(index).name, " New --->"
+
     @QtCore.Slot()
     def loadButtonClicked(self):
         # This slot will be called when our button is clicked. 

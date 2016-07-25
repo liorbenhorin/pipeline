@@ -18,7 +18,9 @@ global  _stage_
 global _asset_
 global _folder_
 global _dummy_
+global _new_
 
+_new_ = "new"
 _node_ = "node"
 _root_ = "root"
 _stage_ = "stage"
@@ -443,21 +445,30 @@ class DummyNode(Node):
         return _dummy_
   
     def resource(self):
-        return dummy_icon               
-                
+        return dummy_icon
+
 class AddNode(Node):
-    
     def __init__(self, name, parent=None):
         super(AddNode, self).__init__(name, parent)
 
+    def typeInfo(self):
+        return _new_
+
+    def resource(self):
+        return add_icon
+
+class NewNode(Node):
+
+    def __init__(self, name, parent=None):
+        super(NewNode, self).__init__(name, parent)
 
     def typeInfo(self):
-        return _dummy_
-  
+        return _new_
+
     def resource(self):
-        return add_icon 
-        
-        
+        return add_icon
+
+
 
 class project(object):
     def __init__(self, project_path):
@@ -827,7 +838,22 @@ class Stage(Metadata_file):
                         version_nodes.append(VersionNode(key, path = versions_dict[key], author = "autor" ,number = key, date = key, note = "no note"))
 
                     return version_nodes
-                    
+
+        return None
+
+    @property
+    def versiosnModel(self):
+        if self.versions:
+            return dtm.PipelineVersionsModel(self.versions)
+        else:
+            print "else"
+            return dtm.PipelineVersionsModel(self.emptyVersions)
+
+    @property
+    def emptyVersions(self):
+
+        return [NewNode("new...")]
+
 
     def last_version(self):
         if self.project:

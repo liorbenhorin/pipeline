@@ -1816,14 +1816,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def updateVersionsTable(self):
-        if self.versionsView:
-            if self.stage:
-                if self.stage.versions:
-                    self.versionModel = dtm.PipelineVersionsModel(self.stage.versions)
-                    self.versionsView.setModel_(self.versionModel)
-                    return True
-           
-        
+        if self.versionsView and self.stage:
+            self.versionsView.setModel_(self.stage.versiosnModel)
+            return True
+
         self.versionsView.setModel_(None)
         return False
 

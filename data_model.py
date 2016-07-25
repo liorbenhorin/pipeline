@@ -13,7 +13,9 @@ global  _stage_
 global _asset_
 global _folder_
 global _dummy_
+global _new_
 
+_new_ = "new"
 _node_ = "node"
 _root_ = "root"
 _stage_ = "stage"
@@ -722,8 +724,11 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                 if section == 2:
                     return "Note"
                                         
-            if orientation == QtCore.Qt.Vertical:                    
-                    return self.__items[section].number    
+            if orientation == QtCore.Qt.Vertical:
+                if self.__items[section].typeInfo() != _new_:
+                    return self.__items[section].number
+                else:
+                    return section
             else:
                 return 
 
@@ -752,19 +757,23 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         
         
         if role == QtCore.Qt.DecorationRole:
-            if index.column() == 0:
-                resource = self.__items[index.row()].resource()
-                return QtGui.QIcon(QtGui.QPixmap(resource))
+            row = index.row()
+            if self.__items[row].typeInfo() != _new_:
+                if index.column() == 0:
+                    resource = self.__items[index.row()].resource()
+                    return QtGui.QIcon(QtGui.QPixmap(resource))
               
         if role == QtCore.Qt.DisplayRole:
-            
             row = index.row()
-            if index.column() == 0:
-                return self.__items[row].author
-            if index.column() == 1:
-                return self.__items[row].date
-            if index.column() == 2:
-                return self.__items[row].note
+            if self.__items[row].typeInfo() != _new_:
+                if index.column() == 0:
+                    return self.__items[row].author
+                if index.column() == 1:
+                    return self.__items[row].date
+                if index.column() == 2:
+                    return self.__items[row].note
+
+
 
 
     def flags(self, index):
