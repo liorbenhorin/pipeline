@@ -229,7 +229,7 @@ class PipelineVersionsView(QtGui.QTableView):
         button = self.sender()
         index = self.indexAt(button.pos())
         print self.model().getNode(index).name, " New --->"
-        self.model().getNode(index).stage.FirstVersion()
+        self.model().getNode(index).parent().FirstVersion()
 
     @QtCore.Slot()
     def loadButtonClicked(self):
@@ -1147,7 +1147,7 @@ class pipelineTreeView(QtGui.QTreeView):
         
         if ok:
             path = os.path.join(parent_node.path, folder_name)
-            node = dt.FolderNode(folder_name).create( path = path) 
+            node = dt.FolderNode(folder_name, parent = parent_node).create( path = path)
             if node is not False:     
                 self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
                 self._proxyModel.invalidate()
@@ -1160,7 +1160,7 @@ class pipelineTreeView(QtGui.QTreeView):
         
         if ok:
             path = os.path.join(parent_node.path, folder_name)
-            node = dt.AssetNode(folder_name).create( path = path) 
+            node = dt.AssetNode(folder_name, parent = parent_node).create( path = path)
             if node is not False: 
                 self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
                 self._proxyModel.invalidate()
@@ -1176,10 +1176,10 @@ class pipelineTreeView(QtGui.QTreeView):
         if result == QtGui.QDialog.Accepted:
 
             path = os.path.join(parent_node.path, stage_name)
-            node = dt.StageNode(stage_name).create( path = path)
-            if node is not False: 
-        
-                self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
+            node = dt.StageNode(stage_name, parent = parent_node).create( path = path)
+            if node is not False:
+
+                self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
                 self._proxyModel.invalidate()
                 self.updateTable( self.fromProxyIndex(parent))
 
@@ -1466,13 +1466,18 @@ class ComboDynamicWidget(ComboWidget):
             if the path is an assets folder
             '''
 
+            self._node = dt.AssetNode(os.path.split(path)[1], parent=self._parent_box._node, path=os.path.join(path),
+                                      project=self._project,
+                                      settings=self._settings, pipelineUI=self.parent)
 
             for dir in files.list_dir_folders(path):
 
                 '''
                 scan each folder to see if it is a stage folder
                 '''
-                self._node = None
+
+
+
 
                 if dt.stageDir(os.path.join(path,dir)):
                     if dir == self._settings.stage:
@@ -1481,28 +1486,24 @@ class ComboDynamicWidget(ComboWidget):
                         if its a stage, see if it is a match to the current selected stage, if so, set it as the current stage folder
                         '''
 
-                        self._node = None
-                        self._node = dt.StageNode(dir, parent=self._parent_box._node , path=os.path.join(path,dir), project=self._project,
+
+                        stage = dt.StageNode(dir, parent=self._node , path=os.path.join(path,dir), project=self._project,
                                      settings=self._settings, pipelineUI= self.parent)
 
-                        self.parent.stage(self._node)
+                        self.parent.stage(stage)
                         self.parent.updateVersionsTable()
                         return True
-
-
-            self._node = dt.AssetNode(dir, parent=self._parent_box._node, path=os.path.join(path, dir),
-                                      project=self._project,
-                                      settings=self._settings, pipelineUI=self.parent)
 
             self.parent.stage(None)
             self.parent.updateVersionsTable()
             return path
 
+
         if self._parent_box:
-            self._node = dt.FolderNode(path, parent=self._parent_box._node, path=path, project=self._project,
+            self._node = dt.FolderNode(os.path.split(path)[1], parent=self._parent_box._node, path=path, project=self._project,
                                    settings=self._settings, pipelineUI=self.parent)
         else:
-            self._node = dt.FolderNode(path, parent=None, path=path, project=self._project,
+            self._node = dt.FolderNode(os.path.split(path)[1], parent=None, path=path, project=self._project,
                                        settings=self._settings, pipelineUI=self.parent)
 
         self.parent.stage(None)

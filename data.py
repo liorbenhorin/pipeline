@@ -1,6 +1,7 @@
 
 from PySide import QtXml, QtGui
 import os
+import time
 
 import data_model as dtm
 reload(dtm)
@@ -355,17 +356,17 @@ class AssetNode(RootNode):
         super(AssetNode, self).__init__(name, parent, **kwargs)
       
     def create(self, path = None):
-        node = super(AssetNode, self).create(path)
-        if node:
-            dict = {}
-            dict["typeInfo"] = _asset_
-            dict[_asset_] = self.name
+        super(AssetNode, self).create(path)
+        #if node:
+        dict = {}
+        dict["typeInfo"] = _asset_
+        dict[_asset_] = self.name
 
-            path = os.path.join(path,"%s.%s"%(self.name,"json"))
-            
-            self.data_file = data.jsonDict().create(path, dict)  
-            self.data_file = self.data_file.read()
-            return node
+        path = os.path.join(path,"%s.%s"%(self.name,"json"))
+
+        self.data_file = data.jsonDict().create(path, dict)
+        self.data_file = self.data_file.read()
+        return self
         
         
     def typeInfo(self):
@@ -490,14 +491,8 @@ class AddNode(Node):
 
 class NewNode(Node):
 
-    def __init__(self, name, stage = None, parent=None):
+    def __init__(self, name,  parent=None):
         super(NewNode, self).__init__(name, parent)
-
-        self._stage = stage
-
-    @property
-    def stage(self):
-        return self._stage
 
     def typeInfo(self):
         return _new_
@@ -555,30 +550,9 @@ class Asset(Metadata_file):
         return self
 
 
-
-# class Stage(Metadata_file):
-#     def __init__(self,**kwargs):
-#         Metadata_file.__init__(self, **kwargs)
-#
-#         self.project = None
-#         for key in kwargs:
-#             if key == "project":
-#                 self.project = kwargs[key]
-#
-#
-#         self.settings = None
-#         for key in kwargs:
-#             if key == "settings":
-#                 self.settings = kwargs[key]
-#
-#         self.pipelineUI = None
-#         for key in kwargs:
-#             if key == "pipelineUI":
-#                 self.pipelineUI = kwargs[key]
-
 class StageNode(RootNode):
 
-    def __init__(self, name, stage=None, parent=None, **kwargs):
+    def __init__(self, name, parent=None, **kwargs):
 
         RootNode.__init__(self, name, parent, **kwargs)
 
@@ -600,19 +574,19 @@ class StageNode(RootNode):
 
 
     def create(self,  path=None):
-        node = super(StageNode, self).create(path)
-        if node:
-            dict = {}
-            dict["typeInfo"] = _stage_
-            dict[_stage_] = self.name
-            dict[_asset_] = self.parent().name
+        super(StageNode, self).create(path)
+        #if node:
+        dict = {}
+        dict["typeInfo"] = _stage_
+        dict[_stage_] = self.name
+        dict[_asset_] = self.parent().name
 
-            path = os.path.join(path, "%s.%s" % (self.name, "json"))
+        path = os.path.join(path, "%s.%s" % (self.name, "json"))
 
-            self.data_file = data.jsonDict().create(path, dict)
-            self.data_file = self.data_file.read()
+        self.data_file = data.jsonDict().create(path, dict)
+        self.data_file = self.data_file.read()
 
-            return node
+        return self
 
     @property
     def stage(self):
@@ -639,18 +613,22 @@ class StageNode(RootNode):
 
         version_number = files.set_padding(1, self.project.project_padding)
 
-        file_name = "%s_%s.%s" % ("fsfafsa", version_number, "ma")
+        file_name = "%s_%s_%s.%s" % (self.parent().name, self.name, version_number, "ma")
 
         scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 
-        #first_version = {}
-        #first_version["path"] = scene_path
-        #first_version["date_created"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
-        #first_version["author"] = self.settings.user[0]
-        #first_version["note"] = "No notes"
+        first_version = {}
+        first_version["date_created"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+        first_version["author"] = "no user"# self.settings.user[0]
+        first_version["note"] = "No notes"
 
-        #versions = {}
-        #versions[version_number] = first_version
+        versions = {}
+        versions[version_number] = first_version
+
+        data = {}
+        data["versions"] = versions
+        self.data_file.edit(data)
+        self.data_file = self.data_file.read()
 
         self.pipelineUI.updateVersionsTable()
         return
@@ -966,7 +944,7 @@ class StageNode(RootNode):
     @property
     def emptyVersions(self):
 
-        return [NewNode("new...", stage = self)]
+        return [NewNode("new...", parent = self)]
 
 
     def last_version(self):
@@ -1296,9 +1274,10 @@ def stageDir(dir):
             '''
             j = Metadata_file(path=os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json")))
             info = j.data_file.read()
-            typeInfo = info["typeInfo"]
-            if typeInfo == _stage_:
-                return True
+            if info:
+                typeInfo = info["typeInfo"]
+                if typeInfo == _stage_:
+                    return True
 
     return False
 
@@ -1311,9 +1290,10 @@ def assetDir(dir):
             '''
             j = Metadata_file(path=os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json")))
             info = j.data_file.read()
-            typeInfo = info["typeInfo"]
-            if typeInfo == _asset_:
+            if info:
+                typeInfo = info["typeInfo"]
+                if typeInfo == _asset_:
 
-                return True
+                    return True
 
     return False
