@@ -1793,15 +1793,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self._stage = self.stageCombo.comboBox.currentText()
         current = self.dynamicCombo._box_list[0]._stage
 
-        if current not in self.project.stages[type]:
-            self.dynamicCombo.kill()
-            self.stageSelect()
-        else:
-            #print self.dynamicCombo._box_list[-1]
-            #try:
-            self.dynamicCombo._box_list[-1].stageScan()
-            #except:
-             #   print "..."
+        if type:
+            if current not in self.project.stages[type]:
+                self.dynamicCombo.kill()
+                self.stageSelect()
+                return
+
+            return
+
+        self.dynamicCombo.kill()
+        self.stageSelect()
+
 
 
         

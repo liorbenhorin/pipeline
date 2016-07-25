@@ -1404,11 +1404,12 @@ class ComboDynamicWidget(ComboWidget):
     def createModel(self):
         
         list = [dt.DummyNode(self._level)]
-        
-        if self._subdirectories:
-            for i in range(len(self._subdirectories)):
-                n = os.path.split(self._subdirectories[i])[1]
-                list.append(dt.FolderNode(n))
+
+        if self._level != "n/a":
+            if self._subdirectories:
+                for i in range(len(self._subdirectories)):
+                    n = os.path.split(self._subdirectories[i])[1]
+                    list.append(dt.FolderNode(n))
         
         RemoveOption = False
         
