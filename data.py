@@ -60,8 +60,6 @@ class Metadata_file():
     
     def __init__(self,**kwargs):
 
-        print kwargs, "********* MetaFile ********"
-
         self.data_file = None
         self.data_file_path = None
 
@@ -83,7 +81,6 @@ class Metadata_file():
 class Node(object):
     
     def __init__(self, name,  parent=None, **kwargs):
-        print  "********* Node ********"
         super(Node, self).__init__()
         
         self._name = name
@@ -254,11 +251,8 @@ class RootNode(Node, Metadata_file):
     
     def __init__(self, name, parent=None, **kwargs):
 
-        print kwargs, "************ RootNode"
         Metadata_file.__init__(self, **kwargs)
         Node.__init__(self, name, parent, **kwargs)
-        #super(RootNode, self).__init__(name, parent, **kwargs)
-
 
 
         self.name = name
@@ -268,7 +262,6 @@ class RootNode(Node, Metadata_file):
             if key == "path":
                 self._path = kwargs[key]
 
-        #print self.data_file, "<< root node"
             
     def create(self, path = None):
         if files.create_directory(path):  
@@ -276,7 +269,6 @@ class RootNode(Node, Metadata_file):
             return self
         else:
             return False
-
 
     @property
     def path(self):
@@ -396,10 +388,10 @@ class AssetNode(RootNode):
 
 
 class VersionNode(Node):
-    
+
     def __init__(self, name,path = None,  number = None, author = None, date = None, note = None, stage = None, parent=None):
         super(VersionNode, self).__init__(name, parent)
-        
+
         self._path = path
         self._number = number
         self._date = date
@@ -427,7 +419,7 @@ class VersionNode(Node):
     @property
     def note(self):
         return self._note
-        
+
     @note.setter
     def note(self, note):
         self._note = note
@@ -435,7 +427,7 @@ class VersionNode(Node):
     @property
     def path(self):
         return self._path
-        
+
     @path.setter
     def path(self, path):
         self._path = path
@@ -443,20 +435,19 @@ class VersionNode(Node):
 
     def typeInfo(self):
         return _version_
-  
-    def resource(self):
-        return None  
 
+    def resource(self):
+        return None
 
 class DummyNode(Node):
-    
+
     def __init__(self, name, parent=None):
         super(DummyNode, self).__init__(name, parent)
 
 
     def typeInfo(self):
         return _dummy_
-  
+
     def resource(self):
         return dummy_icon
 
@@ -487,62 +478,54 @@ class NewNode(Node):
     def resource(self):
         return add_icon
 
-
-
 class project(object):
     def __init__(self, project_path):
 
         stages = {}
         stages["asset"] = ["model","rig","clip","shandeing","lightning"]
-        stages["animation"] = ["layout","Shot"]   
+        stages["animation"] = ["layout","Shot"]
 
         levels = {}
         levels["asset"] = ["type","asset","stage","ccc"]
         levels["animation"] = ["Ep","Seq"]
 
-                
+
         self.project = {}
         self.project["project_path"] = project_path
 
 
-        self.project["levels"] = levels          
-        self.project["stages"] = stages   
-        
+        self.project["levels"] = levels
+        self.project["stages"] = stages
+
         self.project["current_stage"] = None
-                                
-                                
-
-
 
 class Asset(Metadata_file):
     def __init__(self,**kwargs):
         Metadata_file.__init__(self, **kwargs)
-       
+
         self.project = None
         for key in kwargs:
             if key == "project":
                 self.project = kwargs[key]
-        
-        
+
+
         self.settings = None
         for key in kwargs:
             if key == "settings":
                 self.settings = kwargs[key]
-                                
-    
-    
+
+
+
     def create(self, path, name):
         data = {}
         data["typeInfo"] = "_asset_"
-        
+
         path = os.path.join(path,"%s.%s"%(name,"json"))
-        
-        self.data_file = data.jsonDict().create(path, data)  
+
+        self.data_file = data.jsonDict().create(path, data)
         self.data_file = self.data_file.read()
-       
+
         return self
-
-
 
 
 
@@ -569,14 +552,8 @@ class Asset(Metadata_file):
 class StageNode(RootNode):
 
     def __init__(self, name, stage=None, parent=None, **kwargs):
-        print ">>>>>>>>>    init stage ", name, "********"
-        #Metadata_file.__init__(self, **kwargs)
+
         RootNode.__init__(self, name, parent, **kwargs)
-        #print kwargs," ********** StageNode ******"
-        #super(StageNode, self).__init__(name, parent, **kwargs)
-
-        print self.data_file_path, "******** final *****"
-
 
         self.project = None
         for key in kwargs:
@@ -593,10 +570,7 @@ class StageNode(RootNode):
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
 
-
         self._stage = stage
-
-
 
     def create(self, stage=None, path=None):
         node = super(StageNode, self).create(path)
@@ -628,7 +602,6 @@ class StageNode(RootNode):
         return large_image_icon
 
     def FirstVersion(self):
-
 
         files.assure_folder_exists(self.versions_path)
 
@@ -939,8 +912,7 @@ class StageNode(RootNode):
     
     @property
     def versions(self):
-        print self.project
-        print self.data_file
+
         if self.project:
             if self.data_file:
                 versions = files.list_directory(self.versions_path,self.project.project_file_type)
@@ -1285,4 +1257,4 @@ class StageNode(RootNode):
         
         log.info(self.data_file.print_nice())
 
-        log.info("end logging component ")    
+        log.info("end logging component ")

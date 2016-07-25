@@ -229,7 +229,7 @@ class PipelineVersionsView(QtGui.QTableView):
         button = self.sender()
         index = self.indexAt(button.pos())
         print self.model().getNode(index).name, " New --->"
-        self.model().getNode(index).stage.create()
+        self.model().getNode(index).stage.FirstVersion()
 
     @QtCore.Slot()
     def loadButtonClicked(self):
