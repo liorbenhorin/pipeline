@@ -1263,7 +1263,11 @@ class ComboStaticWidget(ComboWidget):
         
     def update(self):
         self._settings.stage = self.comboBox.currentText()
-        self.parent.dynamicCombo._box_list[-1].stageScan()
+
+        try:
+            self.parent.dynamicCombo._box_list[-1].stageScan()
+        except:
+            pass
 
 class ComboDynamicWidget(ComboWidget):
     def __init__(self,
@@ -1380,7 +1384,7 @@ class ComboDynamicWidget(ComboWidget):
         self.removeChild()
         
         scan = self.stageScan()
-        
+
         if scan is not True:
             '''
             if the folder is a stage folder don't list it and return True

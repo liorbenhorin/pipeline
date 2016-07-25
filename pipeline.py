@@ -1718,12 +1718,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                           settings = self.settings,
                                           items = self.project.stages["asset"] + self.project.stages["animation"],
                                           parent_layout = self.ui.navBarLayout,
-                                          parent = self) 
-                                    
+                                          parent = self)
 
+            self.stageSelect()
             self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
             
-            self.stageSelect()
+
             #dir = os.path.join(self.settings.current_project_path, self.stageType()) 
             '''
             self.dynamicCombo = dtv.ComboDynamicWidget(
@@ -1741,12 +1741,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             #self.stageSelect()
             
     def stageSelect(self):
-        print "SSSS"
+
         index = self.stageCombo.comboBox.findText(self.settings.stage)
         if index != -1:
             self.stageCombo.comboBox.setCurrentIndex(index)            
         dir = os.path.join(self.settings.current_project_path, self.stageTypeName()) 
-        print dir , "<<<<"
+
         self.dynamicCombo = dtv.ComboDynamicWidget(
                                                  settings = self.settings,                       
                                                  project = self.project,
@@ -1755,7 +1755,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                                  box_list = [],
                                                  parent_box = None,
                                                  parent_layout = self.ui.navBarLayout,
-                                                 parent = self)          
+                                                 parent = self)
+
+
         
             
     def stageType(self):
@@ -1778,16 +1780,19 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
         type = self.stageType()
+
         current = self.dynamicCombo._box_list[0]._stage
-        
+
         if current not in self.project.stages[type]:
             self.dynamicCombo.kill()
-            self.stageSelect() 
+            self.stageSelect()
         else:
             try:
                 self.dynamicCombo._box_list[-1].stageScan()
             except:
                 print "..."
+
+
         
     @property
     def versionsView(self):
