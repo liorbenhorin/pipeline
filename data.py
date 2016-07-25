@@ -358,9 +358,10 @@ class AssetNode(RootNode):
         node = super(AssetNode, self).create(path)
         if node:
             dict = {}
-            dict["typeInfo"] = "_asset_"
-            
-            path = os.path.join(path,"%s.%s"%("asset","json"))
+            dict["typeInfo"] = _asset_
+            dict[_asset_] = self.name
+
+            path = os.path.join(path,"%s.%s"%(self.name,"json"))
             
             self.data_file = data.jsonDict().create(path, dict)  
             self.data_file = self.data_file.read()
@@ -602,11 +603,11 @@ class StageNode(RootNode):
         node = super(StageNode, self).create(path)
         if node:
             dict = {}
-            dict["typeInfo"] = "_stage_"
-            dict["stage"] = self.name
-            dict["asset"] = self.parent().name
+            dict["typeInfo"] = _stage_
+            dict[_stage_] = self.name
+            dict[_asset_] = self.parent().name
 
-            path = os.path.join(path, "%s.%s" % ("stage", "json"))
+            path = os.path.join(path, "%s.%s" % (self.name, "json"))
 
             self.data_file = data.jsonDict().create(path, dict)
             self.data_file = self.data_file.read()
