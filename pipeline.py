@@ -1746,11 +1746,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         index = self.stageCombo.comboBox.findText(self.settings.stage)
         if index != -1:
-            self.stageCombo.comboBox.setCurrentIndex(index)            
-        dir = os.path.join(self.settings.current_project_path, self.stageTypeName()) 
+            self.stageCombo.comboBox.setCurrentIndex(index)
+
+        dir = os.path.join(self.settings.current_project_path, "assets")
 
         self.dynamicCombo = dtv.ComboDynamicWidget(
-                                                 settings = self.settings,                       
+                                                 settings = self.settings,
                                                  project = self.project,
                                                  path = dir,
                                                  stage = self.settings.stage,
@@ -1763,6 +1764,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
             
     def stageType(self):
+
         if self.stageCombo.comboBox.currentText() in self.project.stages["asset"]:
             return "asset"
         
@@ -1772,6 +1774,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         return None
 
     def stageTypeName(self ):
+
         if self.stageType() == "asset":
             return "assets"
         if self.stageType() == "animation":
@@ -1789,10 +1792,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.dynamicCombo.kill()
             self.stageSelect()
         else:
-            try:
-                self.dynamicCombo._box_list[-1].stageScan()
-            except:
-                print "..."
+            #print self.dynamicCombo._box_list[-1]
+            #try:
+            self.dynamicCombo._box_list[-1].stageScan()
+            #except:
+             #   print "..."
 
 
         

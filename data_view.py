@@ -1149,7 +1149,7 @@ class pipelineTreeView(QtGui.QTreeView):
             path = os.path.join(parent_node.path, folder_name)
             node = dt.FolderNode(folder_name, parent = parent_node).create( path = path)
             if node is not False:     
-                self.sourceModel.insertRows( 0, 1, parent = parent , node = node)
+                self.sourceModel.insertRows( 0, 0, parent = parent , node = node)
                 self._proxyModel.invalidate()
                 self.updateTable( self.fromProxyIndex(parent))
         
@@ -1162,7 +1162,7 @@ class pipelineTreeView(QtGui.QTreeView):
             path = os.path.join(parent_node.path, folder_name)
             node = dt.AssetNode(folder_name, parent = parent_node).create( path = path)
             if node is not False: 
-                self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
+                self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
                 self._proxyModel.invalidate()
                 self.updateTable( self.fromProxyIndex(parent))
         
@@ -1476,9 +1476,6 @@ class ComboDynamicWidget(ComboWidget):
                 scan each folder to see if it is a stage folder
                 '''
 
-
-
-
                 if dt.stageDir(os.path.join(path,dir)):
                     if dir == self._settings.stage:
 
@@ -1493,6 +1490,10 @@ class ComboDynamicWidget(ComboWidget):
                         self.parent.stage(stage)
                         self.parent.updateVersionsTable()
                         return True
+
+                    self.parent.stage(None)
+                    self.parent.updateVersionsTable()
+                    return True
 
             self.parent.stage(None)
             self.parent.updateVersionsTable()
