@@ -56,13 +56,15 @@ def set_icons():
     
 set_icons()
 
-class Metadata_file(object):
+class Metadata_file():
     
     def __init__(self,**kwargs):
+
+        print kwargs, "********* MetaFile ********"
+
         self.data_file = None
         self.data_file_path = None
-        
-        
+
         for key in kwargs:
             if key == "path":
                 self.data_file_path = kwargs[key]
@@ -70,19 +72,18 @@ class Metadata_file(object):
         if self.data_file_path:        
             self.set_data_file(self.data_file_path)
 
-
-    def set_data_file(self,path): 
-        
-        if os.path.isfile(path):          
-            self.data_file = data.jsonDict(path = path) 
+    def set_data_file(self,path):
+        if os.path.isfile(path):
+            self.data_file = data.jsonDict(path = path)
+            #print self.data_file, "<<<<<< function"
             return True
         else:
             print "invalid path"
 
 class Node(object):
     
-    def __init__(self, name,  parent=None):
-        
+    def __init__(self, name,  parent=None, **kwargs):
+        print  "********* Node ********"
         super(Node, self).__init__()
         
         self._name = name
@@ -252,16 +253,22 @@ class Node(object):
 class RootNode(Node, Metadata_file):
     
     def __init__(self, name, parent=None, **kwargs):
-        super(RootNode, self).__init__(name, parent)
-        
+
+        print kwargs, "************ RootNode"
+        Metadata_file.__init__(self, **kwargs)
+        Node.__init__(self, name, parent, **kwargs)
+        #super(RootNode, self).__init__(name, parent, **kwargs)
+
+
+
         self.name = name
-    
+
         self._path = None
         for key in kwargs:
             if key == "path":
                 self._path = kwargs[key]
-        
-        
+
+        #print self.data_file, "<< root node"
             
     def create(self, path = None):
         if files.create_directory(path):  
@@ -298,10 +305,10 @@ class RootNode(Node, Metadata_file):
                         p  = os.path.join(path,dir)
  
                         if files.assetDir( p ):
-                            node = AssetNode(os.path.split(p)[1], path=p, parent = parent) 
+                            node = AssetNode(os.path.split(p)[1], path=os.path.join(p,"asset.json"), parent = parent)
                             rec(p, node)
                         elif files.stageDir( p ):
-                            node = StageNode(os.path.split(p)[1], stage = dir, path=p, parent = parent)   
+                            node = StageNode(os.path.split(p)[1], stage = dir, path=os.path.join(p,"stage.json"), parent = parent)
                         else:                         
                             node = FolderNode(os.path.split(p)[1], path=p, parent = parent)                        
                             rec(p, node)
@@ -348,45 +355,45 @@ class AssetNode(RootNode):
     def resource(self):
         return cube_icon_full
         
-        
-class StageNode(RootNode):
-    
-    def __init__(self, name, stage = None, parent=None, **kwargs):
-        super(StageNode, self).__init__(name, parent, **kwargs)
-      
-        self._stage = stage
-        
-    def create(self, stage = None, path = None):
-        node = super(StageNode, self).create(path)
-        if node:
-                        
-            dict = {}
-            dict["typeInfo"] = "_stage_"
-            dict["stage"] = stage
-            
-            self._stage = stage
-            
-            path = os.path.join(path,"%s.%s"%("stage","json"))
-            
-            self.data_file = data.jsonDict().create(path, dict)  
-            self.data_file = self.data_file.read()
-            return node
 
-    @property  
-    def stage(self):
-        return self._stage
-    
-    @stage.setter
-    def stage(self, value):
-        self._stage = value
+# class StageNode(RootNode):
+#
+#     def __init__(self, name, stage = None, parent=None, **kwargs):
+#         super(StageNode, self).__init__(name, parent, **kwargs)
+#
+#         self._stage = stage
+#
+#     def create(self, stage = None, path = None):
+#         node = super(StageNode, self).create(path)
+#         if node:
+#
+#             dict = {}
+#             dict["typeInfo"] = "_stage_"
+#             dict["stage"] = stage
+#
+#             self._stage = stage
+#
+#             path = os.path.join(path,"%s.%s"%("stage","json"))
+#
+#             self.data_file = data.jsonDict().create(path, dict)
+#             self.data_file = self.data_file.read()
+#             return node
+#
+#     @property
+#     def stage(self):
+#         return self._stage
+#
+#     @stage.setter
+#     def stage(self, value):
+#         self._stage = value
+#
+#     def typeInfo(self):
+#         return _stage_
+#
+#
+#     def resource(self):
+#         return large_image_icon
 
-    def typeInfo(self):
-        return _stage_
-
-   
-    def resource(self):
-        return large_image_icon
-                           
 
 class VersionNode(Node):
     
@@ -534,17 +541,48 @@ class Asset(Metadata_file):
         self.data_file = self.data_file.read()
        
         return self
-                                
-class Stage(Metadata_file):
-    def __init__(self,**kwargs):
-        Metadata_file.__init__(self, **kwargs)
-       
+
+
+
+
+
+# class Stage(Metadata_file):
+#     def __init__(self,**kwargs):
+#         Metadata_file.__init__(self, **kwargs)
+#
+#         self.project = None
+#         for key in kwargs:
+#             if key == "project":
+#                 self.project = kwargs[key]
+#
+#
+#         self.settings = None
+#         for key in kwargs:
+#             if key == "settings":
+#                 self.settings = kwargs[key]
+#
+#         self.pipelineUI = None
+#         for key in kwargs:
+#             if key == "pipelineUI":
+#                 self.pipelineUI = kwargs[key]
+
+class StageNode(RootNode):
+
+    def __init__(self, name, stage=None, parent=None, **kwargs):
+        print ">>>>>>>>>    init stage ", name, "********"
+        #Metadata_file.__init__(self, **kwargs)
+        RootNode.__init__(self, name, parent, **kwargs)
+        #print kwargs," ********** StageNode ******"
+        #super(StageNode, self).__init__(name, parent, **kwargs)
+
+        print self.data_file_path, "******** final *****"
+
+
         self.project = None
         for key in kwargs:
             if key == "project":
                 self.project = kwargs[key]
-        
-        
+
         self.settings = None
         for key in kwargs:
             if key == "settings":
@@ -555,9 +593,41 @@ class Stage(Metadata_file):
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
 
-    
 
-    def create(self):
+        self._stage = stage
+
+
+
+    def create(self, stage=None, path=None):
+        node = super(StageNode, self).create(path)
+        if node:
+            dict = {}
+            dict["typeInfo"] = "_stage_"
+            dict["stage"] = stage
+
+            self._stage = stage
+
+            path = os.path.join(path, "%s.%s" % ("stage", "json"))
+
+            self.data_file = data.jsonDict().create(path, dict)
+            self.data_file = self.data_file.read()
+            return node
+
+    @property
+    def stage(self):
+        return self._stage
+
+    @stage.setter
+    def stage(self, value):
+        self._stage = value
+
+    def typeInfo(self):
+        return _stage_
+
+    def resource(self):
+        return large_image_icon
+
+    def FirstVersion(self):
 
 
         files.assure_folder_exists(self.versions_path)
@@ -869,6 +939,8 @@ class Stage(Metadata_file):
     
     @property
     def versions(self):
+        print self.project
+        print self.data_file
         if self.project:
             if self.data_file:
                 versions = files.list_directory(self.versions_path,self.project.project_file_type)
@@ -889,7 +961,6 @@ class Stage(Metadata_file):
         if self.versions:
             return dtm.PipelineVersionsModel(self.versions)
         else:
-            print "else"
             return dtm.PipelineVersionsModel(self.emptyVersions)
 
     @property

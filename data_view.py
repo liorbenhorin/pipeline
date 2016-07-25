@@ -1235,9 +1235,9 @@ class PipelineStagesView(QtGui.QListView):
         self.setIconSize(size)
         self.setGridSize(size2)
         
-        list = []
-        [list.append(dt.StageNode("<Stage>")) for i in range(6)]
-        self.setModel(dtm.PipelineListModel(list)) 
+        #list = []
+        #[list.append(dt.StageNode("<Stage>")) for i in range(6)]
+        #self.setModel(dtm.PipelineListModel(list))
         
         #self.setSpacing(5)
         self.setWordWrap(True)
@@ -1501,9 +1501,7 @@ class ComboDynamicWidget(ComboWidget):
         self._child = None
         del self        
         
-def model_Tree(path):
-    print os.walk(path)
-    
+
     
     
             

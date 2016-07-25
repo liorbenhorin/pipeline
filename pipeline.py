@@ -1813,8 +1813,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def stage(self, path):   
         if not path:
             self._stage = None
-        else:     
-            self._stage = dt.Stage(path = path, project = self.project, settings = self.settings, pipelineUI = self)
+        else:
+            print "setting stage --->", path
+            self._stage = dt.StageNode(os.path.split(path)[1], path = path, project = self.project, settings = self.settings, pipelineUI = self)
 
 
     def updateVersionsTable(self):
