@@ -65,7 +65,7 @@ class Metadata_file():
 
         for key in kwargs:
             if key == "path":
-                self.data_file_path = kwargs[key]
+                self.data_file_path = os.path.join(kwargs[key])
                 
         if self.data_file_path:        
             self.set_data_file(self.data_file_path)
@@ -73,10 +73,11 @@ class Metadata_file():
     def set_data_file(self,path):
         if os.path.isfile(path):
             self.data_file = data.jsonDict(path = path)
-            #print self.data_file, "<<<<<< function"
+
             return True
         else:
-            print "invalid path"
+            pass
+
 
 class Node(object):
     
@@ -247,20 +248,40 @@ class Node(object):
         return self._id
 
 
-class RootNode(Node, Metadata_file):
+class RootNode(Node):#, Metadata_file):
     
     def __init__(self, name, parent=None, **kwargs):
 
-        Metadata_file.__init__(self, **kwargs)
+
         Node.__init__(self, name, parent, **kwargs)
 
 
         self.name = name
 
-        self._path = None
+
+        #Metadata_file.__init__(self, **kwargs)
+
+
+        self.data_file = None
+        self.data_file_path = None
+
         for key in kwargs:
             if key == "path":
                 self._path = kwargs[key]
+                self.data_file_path = os.path.join(kwargs[key],"%s.%s"%(self.name,"json"))
+
+        if self.data_file_path:
+            self.set_data_file(self.data_file_path)
+
+
+
+    def set_data_file(self, path):
+        if os.path.isfile(path):
+            self.data_file = data.jsonDict(path=path)
+
+            return True
+        else:
+            pass
 
             
     def create(self, path = None):
@@ -269,6 +290,11 @@ class RootNode(Node, Metadata_file):
             return self
         else:
             return False
+
+    @property
+    def sTypeInfo(self):
+        if self.data_file:
+            return self.data_file["typeInfo"]
 
     @property
     def path(self):
@@ -296,11 +322,11 @@ class RootNode(Node, Metadata_file):
                     for dir in folders: 
                         p  = os.path.join(path,dir)
  
-                        if files.assetDir( p ):
-                            node = AssetNode(os.path.split(p)[1], path=os.path.join(p,"asset.json"), parent = parent)
+                        if assetDir( p ):
+                            node = AssetNode(os.path.split(p)[1], path=p, parent = parent)
                             rec(p, node)
-                        elif files.stageDir( p ):
-                            node = StageNode(os.path.split(p)[1], stage = dir, path=os.path.join(p,"stage.json"), parent = parent)
+                        elif stageDir( p ):
+                            node = StageNode(os.path.split(p)[1],  path=p, parent = parent)
                         else:                         
                             node = FolderNode(os.path.split(p)[1], path=p, parent = parent)                        
                             rec(p, node)
@@ -570,21 +596,22 @@ class StageNode(RootNode):
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
 
-        self._stage = stage
+        print self.data_file_path, "stage node path"
+        print self.data_file, "stage node data file"
 
-    def create(self, stage=None, path=None):
+    def create(self,  path=None):
         node = super(StageNode, self).create(path)
         if node:
             dict = {}
             dict["typeInfo"] = "_stage_"
-            dict["stage"] = stage
-
-            self._stage = stage
+            dict["stage"] = self.name
+            dict["asset"] = self.parent().name
 
             path = os.path.join(path, "%s.%s" % ("stage", "json"))
 
             self.data_file = data.jsonDict().create(path, dict)
             self.data_file = self.data_file.read()
+
             return node
 
     @property
@@ -912,7 +939,6 @@ class StageNode(RootNode):
     
     @property
     def versions(self):
-
         if self.project:
             if self.data_file:
                 versions = files.list_directory(self.versions_path,self.project.project_file_type)
@@ -930,8 +956,10 @@ class StageNode(RootNode):
 
     @property
     def versiosnModel(self):
+        print "listing versions <------"
         if self.versions:
             return dtm.PipelineVersionsModel(self.versions)
+            print self.version, "<<<<"
         else:
             return dtm.PipelineVersionsModel(self.emptyVersions)
 
@@ -1258,3 +1286,36 @@ class StageNode(RootNode):
         log.info(self.data_file.print_nice())
 
         log.info("end logging component ")
+
+def stageDir(dir):
+
+    if os.path.exists(dir):
+        if os.path.isfile(os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json"))):
+            '''
+            further verify if the stage.json file is actually related to the path
+            '''
+            j = Metadata_file(path=os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json")))
+            info = j.data_file.read()
+            print info
+            typeInfo = info["typeInfo"]
+            if typeInfo == _stage_:
+                return True
+
+    return False
+
+def assetDir(dir):
+
+    if os.path.exists(dir):
+        if os.path.isfile(os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json"))):
+            '''
+            further verify if the asset.json file is actually related to the path
+            '''
+            j = Metadata_file(path=os.path.join(dir, "%s.%s" % (os.path.split(dir)[1], "json")))
+            info = j.data_file.read()
+            print info
+            typeInfo = info["typeInfo"]
+            if typeInfo == _asset_:
+
+                return True
+
+    return False

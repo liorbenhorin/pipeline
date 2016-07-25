@@ -56,6 +56,25 @@ import glob
 import logging
 import re
 
+
+
+global _node_
+global _root_
+global  _stage_
+global _asset_
+global _folder_
+global _dummy_
+global _new_
+
+_new_ = "new"
+_node_ = "node"
+_root_ = "root"
+_stage_ = "stage"
+_asset_ = "asset"
+_folder_ = "folder"
+_dummy_ = "dummy"
+_version_ = "version"
+
 def set_padding(int, padding):
     return str(int).zfill(padding)
 
@@ -387,25 +406,8 @@ def erase(file):
             with open(file, "w"):
                 pass        
             return True
-            
-def stageDir(dir):
-    
-    if os.path.exists(dir):
-        if os.path.isfile(os.path.join(dir,"stage.json")):
-            '''
-            further verify if the stage.json file is actually related to the path
-            '''
-            return True
-        
-    return False
 
-def assetDir(dir):
-    
-    if os.path.exists(dir):
-        if os.path.isfile(os.path.join(dir,"asset.json")):
-            '''
-            further verify if the asset.json file is actually related to the path
-            '''
-            return True
-        
-    return False              
+
+
+
+

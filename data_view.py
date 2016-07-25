@@ -1176,7 +1176,7 @@ class pipelineTreeView(QtGui.QTreeView):
         if result == QtGui.QDialog.Accepted:
 
             path = os.path.join(parent_node.path, stage_name)
-            node = dt.StageNode(stage_name).create( stage = stage_name, path = path) 
+            node = dt.StageNode(stage_name).create( path = path)
             if node is not False: 
         
                 self._sourceModel.insertRows( 0, 1, parent = parent , node = node)
@@ -1345,16 +1345,21 @@ class ComboDynamicWidget(ComboWidget):
         self._subdirectories = None
         self._path = None
         self._stage = None
+        self._parent_box = parent_box
         self._parent_layout = parent_layout
         
         self._box_list = box_list
         self._box_list.append(self)
-            
+
+        self._node = None
+
         if path and stage:
             self._path = path
             self._stage = stage
             self.listDirectory()
-                                  
+
+
+
 
         self._child = None            
         self._model = None
@@ -1436,6 +1441,8 @@ class ComboDynamicWidget(ComboWidget):
  
     def update(self):
 
+
+
         self.removeChild()
         
         scan = self.stageScan()
@@ -1448,37 +1455,61 @@ class ComboDynamicWidget(ComboWidget):
 
 
     def stageScan(self):
-        
+        print "SCAN"
         path = os.path.join(self._path, self.comboBox.currentText())
 
-        if files.assetDir(path):
+        self._node = None
 
+        if dt.assetDir(path):
+            print "ASSET/"
             '''
             if the path is an assets folder
-            '''    
+            '''
+
+
             for dir in files.list_dir_folders(path):
+                print ""
                 '''
                 scan each folder to see if it is a stage folder
-                '''    
+                '''
+                self._node = None
 
-                if dir == self._settings.stage:
-                    
-                    '''
-                    if its a stage, see if it is a match to the current selected stage, if so, set it as the current stage folder
-                    '''
-                    
-                    self.parent.stage = os.path.join(path, dir,"stage.json")
-                    self.parent.updateVersionsTable()
-                    
-                    return True
-            
-            self.parent.stage = None
-            self.parent.updateVersionsTable()          
-            return True
-        
-        self.parent.stage = None
+                if dt.stageDir(os.path.join(path,dir)):
+                    if dir == self._settings.stage:
+
+                        '''
+                        if its a stage, see if it is a match to the current selected stage, if so, set it as the current stage folder
+                        '''
+                        print os.path.join(path,dir), "<<<<<<<<<"
+                        self._node = None
+                        self._node = dt.StageNode(dir, parent=self._parent_box._node , path=os.path.join(path,dir), project=self._project,
+                                     settings=self._settings, pipelineUI= self.parent)
+
+                        self.parent.stage(self._node)
+                        self.parent.updateVersionsTable()
+                        return True
+
+
+            self._node = dt.AssetNode(dir, parent=self._parent_box._node, path=os.path.join(path, dir),
+                                      project=self._project,
+                                      settings=self._settings, pipelineUI=self.parent)
+
+            self.parent.stage(None)
+            self.parent.updateVersionsTable()
+            return path
+
+        if self._parent_box:
+            self._node = dt.FolderNode(path, parent=self._parent_box._node, path=path, project=self._project,
+                                   settings=self._settings, pipelineUI=self.parent)
+        else:
+            self._node = dt.FolderNode(path, parent=None, path=path, project=self._project,
+                                       settings=self._settings, pipelineUI=self.parent)
+
+        self.parent.stage(None)
         self.parent.updateVersionsTable()
         return path
+
+
        
     def removeChild(self):
         

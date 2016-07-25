@@ -1580,9 +1580,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         
         _root = dt.RootNode("root", path = self.settings.current_project_path)
-        assets = dt.FolderNode("assets",path = os.path.join(self.settings.current_project_path, 'assets'), parent = _root)
+        assets = dt.FolderNode("assets", path = os.path.join(self.settings.current_project_path, 'assets'), parent = _root)
         assets.model_tree()
-        scenes = dt.FolderNode("scenes",path = os.path.join(self.settings.current_project_path, 'scenes'), parent = _root)
+        scenes = dt.FolderNode("scenes", path = os.path.join(self.settings.current_project_path, 'scenes'), parent = _root)
         scenes.model_tree()
         #root = dt.FolderNode("Diving",_root)
         #char = dt.FolderNode("Charachters", root)
@@ -1804,23 +1804,23 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def versionsView(self, view):
         self._versionsView = view        
 
-       
-    @property
-    def stage(self):
-        return self._stage
-    
-    @stage.setter
-    def stage(self, path):   
-        if not path:
+
+    def stage(self, parent):
+
+        if not parent:
             self._stage = None
         else:
-            print "setting stage --->", path
-            self._stage = dt.StageNode(os.path.split(path)[1], path = path, project = self.project, settings = self.settings, pipelineUI = self)
+            #path = os.path.join(parent.path, parent.name)
+
+            print "setting stage --->", #path
+
+            self._stage = parent #dt.StageNode("fdffdhdhd", parent = parent,path = os.path.join(path), project = self.project, settings = self.settings, pipelineUI = self)
 
 
     def updateVersionsTable(self):
-        if self.versionsView and self.stage:
-            self.versionsView.setModel_(self.stage.versiosnModel)
+        if self.versionsView and self._stage:
+            print self._stage.name, "<--------"
+            self.versionsView.setModel_(self._stage.versiosnModel)
             return True
 
         self.versionsView.setModel_(None)
