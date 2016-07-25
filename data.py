@@ -11,6 +11,8 @@ import modules.files as files
 reload(files)
 import modules.jsonData as data
 reload(data)
+import modules.maya_warpper as maya
+reload(maya)
 
 global _node_
 global _root_
@@ -388,7 +390,7 @@ class StageNode(RootNode):
 
 class VersionNode(Node):
     
-    def __init__(self, name,path = None,  number = None, author = None, date = None, note = None, parent=None):
+    def __init__(self, name,path = None,  number = None, author = None, date = None, note = None, stage = None, parent=None):
         super(VersionNode, self).__init__(name, parent)
         
         self._path = path
@@ -396,8 +398,12 @@ class VersionNode(Node):
         self._date = date
         self._note = note
         self._author = author
+        self._stage = stage
 
 
+    @property
+    def stage(self):
+        return self._stage
 
     @property
     def number(self):
@@ -459,8 +465,14 @@ class AddNode(Node):
 
 class NewNode(Node):
 
-    def __init__(self, name, parent=None):
+    def __init__(self, name, stage = None, parent=None):
         super(NewNode, self).__init__(name, parent)
+
+        self._stage = stage
+
+    @property
+    def stage(self):
+        return self._stage
 
     def typeInfo(self):
         return _new_
@@ -537,11 +549,42 @@ class Stage(Metadata_file):
         for key in kwargs:
             if key == "settings":
                 self.settings = kwargs[key]
-                                
+
+        self.pipelineUI = None
+        for key in kwargs:
+            if key == "pipelineUI":
+                self.pipelineUI = kwargs[key]
+
     
-    '''
-    def create(self, path, asset_name, stage_name, project, settings, create_from):
-        
+
+    def create(self):
+
+
+        files.assure_folder_exists(self.versions_path)
+
+
+        maya.new_scene()
+        maya.set_fps(self.project.project_fps)
+        maya.rewind()
+
+        version_number = files.set_padding(1, self.project.project_padding)
+
+        file_name = "%s_%s.%s" % ("fsfafsa", version_number, "ma")
+
+        scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
+
+        #first_version = {}
+        #first_version["path"] = scene_path
+        #first_version["date_created"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+        #first_version["author"] = self.settings.user[0]
+        #first_version["note"] = "No notes"
+
+        #versions = {}
+        #versions[version_number] = first_version
+
+        self.pipelineUI.updateVersionsTable()
+        return
+        '''
         self.project = project
         self.settings = settings
         
@@ -588,8 +631,8 @@ class Stage(Metadata_file):
         self.data_file = data.pickleDict().create(path, component_data)  
         self.data_file = self.data_file.read()
        
-        return self '''
-
+        return self
+        '''
     @property
     def stage_path(self):
         if self.data_file:
@@ -835,7 +878,7 @@ class Stage(Metadata_file):
                     version_nodes = []                 
                     for key in versions_dict:
 
-                        version_nodes.append(VersionNode(key, path = versions_dict[key], author = "autor" ,number = key, date = key, note = "no note"))
+                        version_nodes.append(VersionNode(key, path = versions_dict[key], author = "autor" ,number = key, date = key, note = "no note", stage = self))
 
                     return version_nodes
 
@@ -852,7 +895,7 @@ class Stage(Metadata_file):
     @property
     def emptyVersions(self):
 
-        return [NewNode("new...")]
+        return [NewNode("new...", stage = self)]
 
 
     def last_version(self):
@@ -866,7 +909,10 @@ class Stage(Metadata_file):
                         
 
                 
-    def new_version(self): 
+    def new_version(self):
+
+
+
         if self.project:
             if self.data_file:
                 

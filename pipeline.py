@@ -75,6 +75,8 @@ global start_time
 global end_time
 start_time = timer()
 
+import modules.maya_warpper as maya
+reload(maya)
 
 import modules.jsonData as data
 reload(data)
@@ -1812,7 +1814,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if not path:
             self._stage = None
         else:     
-            self._stage = dt.Stage(path = path, project = self.project, settings = self.settings)             
+            self._stage = dt.Stage(path = path, project = self.project, settings = self.settings, pipelineUI = self)
 
 
     def updateVersionsTable(self):

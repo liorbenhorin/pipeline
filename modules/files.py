@@ -56,6 +56,8 @@ import glob
 import logging
 import re
 
+def set_padding(int, padding):
+    return str(int).zfill(padding)
 
 def dir_rename(dir_fullpath, new_name):
     
