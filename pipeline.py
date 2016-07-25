@@ -1711,6 +1711,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
    
         if self.settings.current_project_path:
             levels = [None]
+            self._stageNode = None
             self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
 
             
@@ -1740,6 +1741,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
 
             '''
+            #self.updateVersionsTable()
             #self.stageSelect()
             
     def stageSelect(self):
@@ -1749,7 +1751,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.stageCombo.comboBox.setCurrentIndex(index)
 
         dir = os.path.join(self.settings.current_project_path, "assets")
-
+        print self.settings.stage, "***"
+        self._stage = self.settings.stage
         self.dynamicCombo = dtv.ComboDynamicWidget(
                                                  settings = self.settings,
                                                  project = self.project,
@@ -1785,7 +1788,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
         type = self.stageType()
-
+        print self.stageCombo.comboBox.currentText(), "<<<<<"
+        print self.settings.stage , "<<"
+        #self._stage = self.stageCombo.comboBox.currentText()
         current = self.dynamicCombo._box_list[0]._stage
 
         if current not in self.project.stages[type]:
@@ -1809,22 +1814,23 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._versionsView = view        
 
 
-    def stage(self, parent):
+    def stageNode(self, node):
 
-        if not parent:
-            self._stage = None
+        if node:
+            self._stageNode = node
         else:
-
-            self._stage = parent
+            self._stageNode = None
 
 
     def updateVersionsTable(self):
-        if self.versionsView and self._stage:
+        print self.stageNode, "<<<<<<<<<<<<<<<<<<***"
+        if self.versionsView and self._stageNode:
 
-            self.versionsView.setModel_(self._stage.versiosnModel)
+            self.versionsView.setModel_(self._stageNode.versiosnModel)
             return True
 
         self.versionsView.setModel_(None)
+        #self.ui.stage_widget.setEnabled(False)
         return False
 
         

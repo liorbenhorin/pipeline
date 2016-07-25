@@ -1462,6 +1462,7 @@ class ComboDynamicWidget(ComboWidget):
 
         if dt.assetDir(path):
 
+
             '''
             if the path is an assets folder
             '''
@@ -1487,15 +1488,15 @@ class ComboDynamicWidget(ComboWidget):
                         stage = dt.StageNode(dir, parent=self._node , path=os.path.join(path,dir), project=self._project,
                                      settings=self._settings, pipelineUI= self.parent)
 
-                        self.parent.stage(stage)
+                        self.parent.stageNode(stage)
                         self.parent.updateVersionsTable()
                         return True
 
-                    self.parent.stage(None)
-                    self.parent.updateVersionsTable()
-                    return True
+                    #self.parent.stageNode(None)
+                    #self.parent.updateVersionsTable()
+                    #return True
 
-            self.parent.stage(None)
+            self.parent.stageNode(None)
             self.parent.updateVersionsTable()
             return path
 
@@ -1507,7 +1508,7 @@ class ComboDynamicWidget(ComboWidget):
             self._node = dt.FolderNode(os.path.split(path)[1], parent=None, path=path, project=self._project,
                                        settings=self._settings, pipelineUI=self.parent)
 
-        self.parent.stage(None)
+        self.parent.stageNode(None)
         self.parent.updateVersionsTable()
         return path
 
