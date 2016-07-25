@@ -1498,7 +1498,7 @@ class ComboDynamicWidget(ComboWidget):
 
             self.parent.stageNode(None)
             self.parent.updateVersionsTable()
-            return path
+            return True
 
 
         if self._parent_box:
