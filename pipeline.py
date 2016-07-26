@@ -1355,7 +1355,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
         #self.ui.asset_component_files_tabWidget.currentChanged.connect(self.update_component_files_tab)
-        self.ui.component_note_label.mousePressEvent = self.version_note        
+        self.ui.stage_note_label.mousePressEvent = self.version_note
         #self.ui.shot_notes_label.mousePressEvent = self.shot_note   
         self.ui.save_version_pushButton.clicked.connect(self.version_save)
         self.ui.save_master_pushButton.clicked.connect(self.master_save)
@@ -1703,10 +1703,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.verticalLayout_18.addWidget(self.navWidget)
         # ----> temp!!! hide the old selection options
         #self.ui.assets_selection_frame.setHidden(True)
-        self.versionsView = dtv.PipelineVersionsView(parent = self)
+
+        self.versionsView = dtv.PipelineVersionsView(parentWidget = self.ui.versionsTab,  parent = self)
         #self.list.versionsView = self.versionsTable
 
         self.ui.versionsTabLayout.addWidget(self.versionsView)
+        self.versionsView.addSlider()
 
         self._dataMapper = QtGui.QDataWidgetMapper()
         # self._dataMapper.setModel(treeModel)
@@ -1839,14 +1841,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._dataMapper.setCurrentModelIndex(index)
 
     def updateVersionsTable(self):
-        print "updateVersionsTable"
+
         if self.versionsView and self._stageNode:
             Model = self._stageNode.versiosnModel
             self.versionsView.setModel_(Model)
 
 
             self._dataMapper.setModel(Model)
-            self._dataMapper.addMapping(self.ui.component_name_label, 3, QtCore.QByteArray("text"))
+            self._dataMapper.addMapping(self.ui.stage_path_label, 3, QtCore.QByteArray("text"))
+            self._dataMapper.addMapping(self.ui.stage_author_label, 0, QtCore.QByteArray("text"))
+            self._dataMapper.addMapping(self.ui.stage_note_label, 4, QtCore.QByteArray("text"))
             self._dataMapper.toFirst()
             QtCore.QObject.connect(self.versionsView.selectionModel(), QtCore.SIGNAL("currentRowChanged(QModelIndex, QModelIndex)"), self.setVersionSelection)# self._dataMapper,  QtCore.SLOT("setCurrentModelIndex(QModelIndex)"))
 
@@ -1857,7 +1861,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         self.versionsView.setModel_(None)
         self._dataMapper.setModel(None)
-        self.ui.component_name_label.setText("Stage path")
+        self.ui.stage_path_label.setText("Stage path")
+        self.ui.stage_author_label.setText("Stage author")
+        self.ui.stage_note_label.setText("Stage note")
         self.ui.stage_widget.setEnabled(False)
         return False
 

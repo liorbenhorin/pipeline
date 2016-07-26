@@ -473,7 +473,7 @@ class VersionNode(Node):
         return _version_
 
     def resource(self):
-        return None
+        return large_image_icon
 
     def load(self):
         maya.open_scene(self.path)

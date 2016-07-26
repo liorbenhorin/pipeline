@@ -701,7 +701,18 @@ class PipelineContentsProxyModel(QtGui.QSortFilterProxyModel):
             else:
                 self.treeView._ignoreExpentions = True
                 self.treeView.restoreState()          
-                self.treeView._ignoreExpentions = False '''        
+                self.treeView._ignoreExpentions = False '''
+
+class PipelineVersionsProxyModel(QtGui.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(PipelineVersionsProxyModel, self).__init__(parent)
+
+        self.setDynamicSortFilter(True)
+        self.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.setSortRole(0)
+        self.setFilterRole(0)
+        self.setFilterKeyColumn(0)
+
 
 class PipelineVersionsModel(QtCore.QAbstractTableModel):
     
@@ -720,12 +731,10 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             
             if orientation == QtCore.Qt.Horizontal:
-                if section == 0:
-                    return "Author"
                 if section == 1:
-                    return "Date Saved"
+                    return "Author"
                 if section == 2:
-                    return "Note"
+                    return "Date Saved"
                                         
             if orientation == QtCore.Qt.Vertical:
                 if self.__items[section].typeInfo() != _new_:
@@ -734,16 +743,16 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                     return section
             else:
                 return 
-
-        if role == QtCore.Qt.DecorationRole:
-
-            if orientation == QtCore.Qt.Horizontal:
-                if section == 0:
-                    return QtGui.QIcon(QtGui.QPixmap(cube_icon))
-                if section == 1:
-                    return QtGui.QIcon(QtGui.QPixmap(cube_icon))
-            else:
-                return 
+        #
+        # if role == QtCore.Qt.DecorationRole:
+        #
+        #     if orientation == QtCore.Qt.Horizontal:
+        #         if section == 0:
+        #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+        #         if section == 1:
+        #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+        #     else:
+        #         return
 
 
     def rowCount(self, parent):
@@ -759,6 +768,10 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
             row = index.row()
             if index.column() == 3:
                 return self.__items[row].fullName
+            if index.column() == 0:
+                return self.__items[row].author
+            if index.column() == 4:
+                return self.__items[row].note
 
             return self.__items[index.row()].name
         
@@ -773,11 +786,11 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         if role == QtCore.Qt.DisplayRole:
             row = index.row()
             if self.__items[row].typeInfo() != _new_:
-                if index.column() == 0:
-                    return self.__items[row].author
                 if index.column() == 1:
-                    return self.__items[row].date
+                    return self.__items[row].author
                 if index.column() == 2:
+                    return self.__items[row].date
+                if index.column() == 3:
                     return self.__items[row].note
                 if index.column() == 6:
                     return self.__items[row].fullName

@@ -36,6 +36,114 @@ _folder_ = "folder"
 _dummy_ = "dummy"
 
 
+# def set_icons():
+#     global localIconPath
+#
+#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
+#     if not os.path.exists(localIconPath):
+#         log.info("icons folder not found: %s"%localIconPath)
+#         return
+#
+#
+#     global offline_icon
+#     global catagory_icon
+#     global asset_icon
+#     global component_icon
+#     global new_icon
+#     global delete_icon
+#     global load_icon
+#     global unload_icon
+#     global project_icon
+#     global users_icon
+#     global settings_icon
+#     global set_icon
+#     global yes_icon
+#     global no_icon
+#     global search_icon
+#     global edit_icon
+#     global delete_folder_icon
+#     global new_folder_icon
+#     global open_icon
+#     global save_icon
+#     global save_master_icon
+#     global add_icon
+#     global down_arrow_icon
+#     global import_icon
+#     global export_icon
+#     global help_icon
+#     global anim_icon
+#     global asset_mode_icon
+#     global reload_icon
+#     global shutter_icon
+#     global camrea_icon
+#     global play_icon
+#     global comment_icon
+#     global large_icon
+#     global small_icon
+#
+#     global large_image_icon
+#     global large_image_icon_dark
+#     global large_image_icon_click
+#     global large_image_icon_click_dark
+#     global wide_image_icon
+#     global wide_image_icon_click
+#     global wide_image_icon_dark
+#     global wide_image_icon_click_dark
+#
+#
+#     offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
+#     catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
+#     asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
+#     component_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"component"))
+#     new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
+#     delete_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete"))
+#     load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"load"))
+#     unload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"unload"))
+#     project_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"project"))
+#     users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
+#     settings_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"settings"))
+#     set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"set"))
+#     yes_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"yes"))
+#     no_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"no"))
+#     search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
+#     edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
+#     delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
+#     new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
+#     open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
+#     save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
+#     save_master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
+#     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
+#     down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
+#     import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
+#     export_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"export"))
+#     help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
+#     anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
+#     asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
+#     reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
+#     shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
+#     camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
+#     play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
+#     comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
+#
+#     large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
+#     small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
+#
+#
+#     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+#     large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark"))
+#     large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click"))
+#     large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark"))
+#
+#     wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image"))
+#     wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click"))
+#     wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark"))
+#     wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark"))
+#
+#
+# # declare all the global icons  variables
+# set_icons()
+
+
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
     if not os.path.exists(localIconPath):
@@ -61,8 +169,24 @@ def set_icons():
     cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
     cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
-                    
+    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+
+
+    localIconPath = os.path.join(os.path.dirname(__file__), 'icons/')
+    if not os.path.exists(localIconPath):
+        return
+
+    global large_icon
+    global small_icon
+    global reload_icon
+    global load_icon
+    global open_icon
+
+    reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "reload"))
+    load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "load"))
+    large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
+    small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
+    open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "open"))
     
 set_icons()
 
@@ -89,66 +213,37 @@ class loadButtonDelegate(QtGui.QItemDelegate):
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
 
-            if self.parent().model().items[0].typeInfo() == _new_:
-                label = "New..."
+            if self.parent().model().sourceModel().items[0].typeInfo() == _new_:
+                label = ""
             else:
-                label = "Load"
-
-            self.parent().setIndexWidget(
-                index,
-                QtGui.QPushButton(
-                    label,
-                    index.data(),
-                    self.parent(),
-                    clicked=self.parent().MultiButtonClicked
-                )
-            )
-
-class OptionsButtonDelegate(QtGui.QItemDelegate):
-    """
-    A delegate that places a fully functioning QPushButton in every
-    cell of the column to which it's applied
-    """
-    def __init__(self, parent):
-        # The parent is not an optional argument for the delegate as
-        # we need to reference it in the paint method (see below)
-        QtGui.QItemDelegate.__init__(self, parent)
- 
-    def paint(self, painter, option, index):
-        # This method will be called every time a particular cell is
-        # in view and that view is changed in some way. We ask the 
-        # delegates parent (in this case a table view) if the index
-        # in question (the table cell) already has a widget associated 
-        # with it. If not, create one with the text for this index and
-        # connect its clicked signal to a slot in the parent view so 
-        # we are notified when its used and can do something. 
-        if not self.parent().indexWidget(index):
-
-            if self.parent().model().getNode(index).typeInfo() == _new_:
-                return None
+                label = ""
 
             button = QtGui.QPushButton(
-                    index.data(), 
-                    self.parent()
-                )
-            
-            self.parent().setIndexWidget(index, button)  
+                label,
+                index.data(),
+                self.parent(),
+                clicked=self.parent().MultiButtonClicked
+            )
 
-            menu = QtGui.QMenu(button)
-            deleteAction = QtGui.QAction("Delete",button, triggered = self.parent().deletActionClicked) 
-            menu.addAction( deleteAction )          
-            button.setMenu(menu)
+            button.setIconSize(QtCore.QSize(20, 20))
+
+            button.setIcon(QtGui.QIcon(open_icon))
+
+            self.parent().setIndexWidget(index, button)
+
+
     
 class PipelineVersionsView(QtGui.QTableView):
-    def __init__(self, parent = None):
+    def __init__(self, parentWidget = None, parent = None):
         super(PipelineVersionsView, self).__init__(parent)
 
         self.parent = parent
+        self.parentWidget = parentWidget
 
         self.setAlternatingRowColors(True)
-        #self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setWordWrap(True)
-        #self.setShowGrid(False)
+        #elf.setShowGrid(False)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
         #self.icons_size(32)       
         #self.setMinimumWidth(250)
@@ -159,33 +254,64 @@ class PipelineVersionsView(QtGui.QTableView):
         self.setSortingEnabled(True)
 
         # Set the delegate for column 0 of our table
+        self._proxyModel = None
 
-        
+    def addSlider(self):
+
+        self._slider = IconScaleSlider(self)
+        self.parentWidget.layout().addWidget(self._slider)
+        self._slider.listSlider.sliderMoved.connect(self.icons_size)
+        self.icons_size(32)
+
+
+    def icons_size(self, int):
+        self.setIconSize(QtCore.QSize(int, int))
+        #self.horizontalHeader().setDefaultSectionSize(int)
+        self.verticalHeader().setDefaultSectionSize(int)
+        self.horizontalHeader().resizeSection(0, int)
+        self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
+        self.update()
+
     def clearModel(self):
         self.setModel(None)
-    
+        if self._proxyModel:
+            self._proxyModel.setSourceModel(None)
+            self._proxyModel = None
+
+
     def setModel_(self, model = None):
         self.clearModel()
         if model:
-            self.setModel(model) 
-                   
-            self.horizontalHeader().resizeSection(4,25)
+
+
+            self._proxyModel = dtm.PipelineVersionsProxyModel()
+            self._proxyModel.setSourceModel(model)
+            self.setModel(self._proxyModel)
+
+            self.horizontalHeader().resizeSection(4,40)
             self.horizontalHeader().setResizeMode(4,QtGui.QHeaderView.Fixed)   
             # size the load button column
-            self.horizontalHeader().resizeSection(3,60)
+            self.horizontalHeader().resizeSection(3,32)
             self.horizontalHeader().setResizeMode(3,QtGui.QHeaderView.Fixed)   
             # size the note button column
-            self.horizontalHeader().resizeSection(2,25)
-            self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
-                  
-            self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
-            self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)        
+            #self.horizontalHeader().resizeSection(2,25)
+            #self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
+
+            self.horizontalHeader().resizeSection(0, 32)
+            self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
+
+            #self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
+            self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
+            self.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Stretch)
             
             # setup the buttons for loading and more options with delegates
-            self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
-            self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
+            self.setItemDelegateForColumn(4,  loadButtonDelegate(self))
+            #self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
 
-            self.setCurrentIndex(self.model().index(0,0, None))
+            self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
+
+
+            #self.setCurrentIndex(self.model().index(0,0, None))
 
     
     '''
@@ -195,28 +321,72 @@ class PipelineVersionsView(QtGui.QTableView):
         # size the options button column
     '''
 
-    @QtCore.Slot()
+    #@QtCore.Slot()
     def MultiButtonClicked(self):
         # This slot will be called when our button is clicked. 
         # self.sender() returns a refence to the QPushButton created
         # by the delegate, not the delegate itself.
         button = self.sender()
         index = self.indexAt(button.pos())
-        if self.model().items[0].typeInfo() == _new_:
-            self.model().items[0].parent().initialVersion()
+        index = self.model().mapToSource(index)
+        if self.model().sourceModel().items[0].typeInfo() == _new_:
+            self.model().sourceModel().items[0].parent().initialVersion()
         else:
-            self.model().getNode(index).load()
+            self.model().sourceModel().getNode(index).load()
             self.setCurrentIndex(index)
 
 
-    @QtCore.Slot()
+    #@QtCore.Slot()
     def deletActionClicked(self):
         # This slot will be called when our button is clicked. 
         # self.sender() returns a refence to the QPushButton created
         # by the delegate, not the delegate itself.
         button = self.sender().parent()
         index = self.indexAt(button.pos())
-        self.model().getNode(index).delete_me()
+        index = self.model().mapToSource(index)
+        self.model().sourceModel().getNode(index).delete_me()
+
+
+
+class IconScaleSlider(QtGui.QWidget):
+    def __init__(self, parent):
+        super(IconScaleSlider, self).__init__(parent)
+
+
+        self.large_lable = QtGui.QLabel()
+        self.large_lable.setMaximumSize(QtCore.QSize(16, 16))
+        self.large_lable.setPixmap(large_icon)
+        self.small_lable = QtGui.QLabel()
+        self.small_lable.setMaximumSize(QtCore.QSize(16, 16))
+        self.small_lable.setPixmap(small_icon)
+        self.slideWidget = QtGui.QWidget()
+        self.slideWidget.setMaximumHeight(20)
+        self.slideLayout = QtGui.QHBoxLayout()
+        self.slideLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.slideLayout.setAlignment(QtCore.Qt.AlignRight)
+
+        self.listSlider = QtGui.QSlider()
+        self.listSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.listSlider.setMaximumWidth(80)
+        self.listSlider.setMinimumWidth(80)
+        self.listSlider.setMaximumHeight(25)
+        self.listSlider.setMinimum(32)
+        self.listSlider.setMaximum(96)
+        self.listSlider.setValue(32)
+        #self.listSlider.valueChanged.connect(self.list.icons_size)
+
+        self.slideLayout.addWidget(self.small_lable)
+        self.slideLayout.addWidget(self.listSlider)
+        self.slideLayout.addWidget(self.large_lable)
+
+        self.setMinimumHeight(25)
+        self.setLayout(self.slideLayout)
+        print self, "MMM"
+
+        #h_layout.addWidget(slideWidget)
+
+
 
 
 class PipelineContentsView(QtGui.QTableView):
@@ -251,6 +421,8 @@ class PipelineContentsView(QtGui.QTableView):
         self._treeParentIndex = None
 
         self._versionsView = None
+
+
 
 
     def dropEvent(self, event):
