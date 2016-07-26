@@ -235,6 +235,11 @@ class Node(object):
             child.delete()
 
     def delete_me(self):
+
+        if hasattr(self, '_path'):
+            if self._path:
+                files.delete(self._path)
+
         print "***DELETE ALL IN" + self._name + "\n"
     
     @property
@@ -460,12 +465,16 @@ class VersionNode(Node):
     def path(self, path):
         self._path = path
 
-
     def typeInfo(self):
         return _version_
 
     def resource(self):
         return None
+
+    def load(self):
+        maya.open_scene(self.path)
+
+
 
 class DummyNode(Node):
 

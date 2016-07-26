@@ -67,39 +67,7 @@ def set_icons():
 set_icons()
 
 
-class NewButtonDelegate(QtGui.QItemDelegate):
-    """
-    A delegate that places a fully functioning QPushButton in every
-    cell of the column to which it's applied
-    """
 
-    def __init__(self, parent):
-        # The parent is not an optional argument for the delegate as
-        # we need to reference it in the paint method (see below)
-        QtGui.QItemDelegate.__init__(self, parent)
-
-    def paint(self, painter, option, index):
-        # This method will be called every time a particular cell is
-        # in view and that view is changed in some way. We ask the
-        # delegates parent (in this case a table view) if the index
-        # in question (the table cell) already has a widget associated
-        # with it. If not, create one with the text for this index and
-        # connect its clicked signal to a slot in the parent view so
-        # we are notified when its used and can do something.
-        if not self.parent().indexWidget(index):
-
-            if self.parent().model().getNode(index).typeInfo() != _new_:
-                return None
-
-            self.parent().setIndexWidget(
-                index,
-                QtGui.QPushButton(
-                    "New",
-                    index.data(),
-                    self.parent(),
-                    clicked=self.parent().NewButtonClicked
-                )
-            )
 
 class loadButtonDelegate(QtGui.QItemDelegate):
     """
@@ -213,7 +181,6 @@ class PipelineVersionsView(QtGui.QTableView):
             # setup the buttons for loading and more options with delegates
             self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
             self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
-            #self.setItemDelegateForColumn(0, NewButtonDelegate(self))
 
     
     '''
@@ -222,16 +189,6 @@ class PipelineVersionsView(QtGui.QTableView):
         super(PipelineVersionsView,self).setModel(model)
         # size the options button column
     '''
-
-    @QtCore.Slot()
-    def NewButtonClicked(self):
-        # This slot will be called when our button is clicked.
-        # self.sender() returns a refence to the QPushButton created
-        # by the delegate, not the delegate itself.
-        button = self.sender()
-        index = self.indexAt(button.pos())
-        print self.model().getNode(index).name, " New --->"
-        self.model().getNode(index).parent().FirstVersion()
 
     @QtCore.Slot()
     def MultiButtonClicked(self):
@@ -243,7 +200,9 @@ class PipelineVersionsView(QtGui.QTableView):
         if self.model().items[0].typeInfo() == _new_:
             self.model().items[0].parent().FirstVersion()
         else:
-            print self.model().getNode(index).name, " load --->" , self.model().getNode(index).number
+            self.model().getNode(index).load()
+
+            print  " load --->" , self.model().getNode(index).number
 
     @QtCore.Slot()
     def deletActionClicked(self):
