@@ -638,7 +638,7 @@ class StageNode(RootNode):
         return "_".join(reversed(levels))
 
     def padding(self, int):
-        return files.set_padding(1, self.project.project_padding)
+        return files.set_padding(int, self.project.project_padding)
 
     def initialVersion(self):
 
@@ -722,7 +722,7 @@ class StageNode(RootNode):
         '''
 
     def new_version(self):
-
+        print "new v!"
         if self.project:
             if self.data_file:
 
@@ -749,6 +749,8 @@ class StageNode(RootNode):
                 versions = self.versions_
                 versions[version_number] = new_version
                 self.versions_ = versions
+
+                self.edited.emit()
 
     def removeVersionData(self, padded_number):
         if padded_number in self.stage_file["versions"]:

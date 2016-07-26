@@ -2360,10 +2360,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                 self.ui.asset_component_files_tabWidget.setCurrentIndex(1)
 
     def version_save(self):
-        if self.set_component_selection():
-            if self.component:
-                self.component.new_version()
-                self.update_versions()
+        if self.versionsView and self._stageNode:
+            self._stageNode.new_version()
+        # if self.set_component_selection():
+        #     if self.component:
+        #         self.component.new_version()
+        #         self.update_versions()
         
     def version_open(self):  
           
