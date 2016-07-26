@@ -465,6 +465,10 @@ class VersionNode(Node):
     def path(self, path):
         self._path = path
 
+    @property
+    def fullName(self):
+        return "%s > %s"%(self.stage.parent().name, self.stage.name)
+
     def typeInfo(self):
         return _version_
 

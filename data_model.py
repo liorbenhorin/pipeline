@@ -756,6 +756,10 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         
         
         if role == QtCore.Qt.EditRole:
+            row = index.row()
+            if index.column() == 3:
+                return self.__items[row].fullName
+
             return self.__items[index.row()].name
         
         
@@ -775,6 +779,8 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                     return self.__items[row].date
                 if index.column() == 2:
                     return self.__items[row].note
+                if index.column() == 6:
+                    return self.__items[row].fullName
 
 
 

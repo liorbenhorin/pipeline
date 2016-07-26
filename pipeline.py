@@ -1705,9 +1705,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.ui.assets_selection_frame.setHidden(True)
         self.versionsView = dtv.PipelineVersionsView()
         #self.list.versionsView = self.versionsTable
-    
+
         self.ui.versionsTabLayout.addWidget(self.versionsView)
 
+        self._dataMapper = QtGui.QDataWidgetMapper()
+        # self._dataMapper.setModel(treeModel)
+        # self._dataMapper.addMapping(self.mapLabel, 0, QtCore.QByteArray("text"))
+        # self._dataMapper.setRootIndex(QtCore.QModelIndex())
+        # self._dataMapper.toFirst()
    
         if self.settings.current_project_path:
             levels = [None]
@@ -1719,7 +1724,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             #def setModel(self, proxyModel):
             #self._proxyModel = proxyModel
 
-            self._dataMapper = QtGui.QDataWidgetMapper()
+
             #self._dataMapper.addMapping(self.uiX, 2)
 
             
@@ -1831,29 +1836,26 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self._stageNode = None
 
     def setVersionSelection(self, index, oldIndex):
-        print index, oldIndex
-        print "sel changed"
-        #if hasattr(self, "_dataMapper"):
-        #    self._dataMapper.setCurrentModelIndex(index)
-
+        self._dataMapper.setCurrentModelIndex(index)
 
     def updateVersionsTable(self):
 
         if self.versionsView and self._stageNode:
             Model = self._stageNode.versiosnModel
             self.versionsView.setModel_(Model)
-            print self.versionsView.selectionModel(), "<<<<--- connecting"
-            QtCore.QObject.connect(self.versionsView.selectionModel(), QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.setVersionSelection)
-            #self.versionsView.selectionModel().selectionChanged.connect(self.setVersionSelection)
-            #self._dataMapper.setModel(Model)
-            #self._dataMapper.addMapping(self.ui.component_name_label, 0)
+            self._dataMapper.setModel(Model)
+            self._dataMapper.addMapping(self.ui.component_name_label, 3, QtCore.QByteArray("text"))
+            self._dataMapper.toFirst()
+            QtCore.QObject.connect(self.versionsView.selectionModel(), QtCore.SIGNAL("currentRowChanged(QModelIndex, QModelIndex)"), self.setVersionSelection)# self._dataMapper,  QtCore.SLOT("setCurrentModelIndex(QModelIndex)"))
 
 
             self.ui.stage_widget.setEnabled(True)
             return True
 
+
         self.versionsView.setModel_(None)
-        #self._dataMapper.setModel(None)
+        self._dataMapper.setModel(None)
+        self.ui.component_name_label.setText("Stage path")
         self.ui.stage_widget.setEnabled(False)
         return False
 
