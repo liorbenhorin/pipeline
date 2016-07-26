@@ -1707,12 +1707,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.list.versionsView = self.versionsTable
     
         self.ui.versionsTabLayout.addWidget(self.versionsView)
-        
+
    
         if self.settings.current_project_path:
             levels = [None]
             self._stageNode = None
             self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
+
+
+
+            #def setModel(self, proxyModel):
+            #self._proxyModel = proxyModel
+
+            self._dataMapper = QtGui.QDataWidgetMapper()
+            #self._dataMapper.addMapping(self.uiX, 2)
 
             
             
@@ -1741,7 +1749,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
 
             '''
-            #self.updateVersionsTable()
+            self.updateVersionsTable()
             #self.stageSelect()
             
     def stageSelect(self):
@@ -1822,16 +1830,31 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self._stageNode = None
 
+    def setVersionSelection(self, index, oldIndex):
+        print index, oldIndex
+        print "sel changed"
+        #if hasattr(self, "_dataMapper"):
+        #    self._dataMapper.setCurrentModelIndex(index)
+
 
     def updateVersionsTable(self):
 
         if self.versionsView and self._stageNode:
+            Model = self._stageNode.versiosnModel
+            self.versionsView.setModel_(Model)
+            print self.versionsView.selectionModel(), "<<<<--- connecting"
+            QtCore.QObject.connect(self.versionsView.selectionModel(), QtCore.SIGNAL("currentChanged(QModelIndex, QModelIndex)"), self.setVersionSelection)
+            #self.versionsView.selectionModel().selectionChanged.connect(self.setVersionSelection)
+            #self._dataMapper.setModel(Model)
+            #self._dataMapper.addMapping(self.ui.component_name_label, 0)
 
-            self.versionsView.setModel_(self._stageNode.versiosnModel)
+
+            self.ui.stage_widget.setEnabled(True)
             return True
 
         self.versionsView.setModel_(None)
-        #self.ui.stage_widget.setEnabled(False)
+        #self._dataMapper.setModel(None)
+        self.ui.stage_widget.setEnabled(False)
         return False
 
         
