@@ -198,11 +198,10 @@ class PipelineVersionsView(QtGui.QTableView):
         button = self.sender()
         index = self.indexAt(button.pos())
         if self.model().items[0].typeInfo() == _new_:
-            self.model().items[0].parent().FirstVersion()
+            self.model().items[0].parent().initialVersion()
         else:
             self.model().getNode(index).load()
 
-            print  " load --->" , self.model().getNode(index).number
 
     @QtCore.Slot()
     def deletActionClicked(self):
@@ -211,7 +210,7 @@ class PipelineVersionsView(QtGui.QTableView):
         # by the delegate, not the delegate itself.
         button = self.sender().parent()
         index = self.indexAt(button.pos())
-        print self.model().getNode(index).name, " delete action on --->" , self.model().getNode(index).number
+        self.model().getNode(index).delete_me()
 
 
 class PipelineContentsView(QtGui.QTableView):

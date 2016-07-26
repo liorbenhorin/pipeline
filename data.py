@@ -1,5 +1,5 @@
 
-from PySide import QtXml, QtGui
+from PySide import QtXml, QtGui, QtCore
 import os
 import time
 
@@ -80,7 +80,7 @@ class Metadata_file():
             pass
 
 
-class Node(object):
+class Node(QtCore.QObject, object):
     
     def __init__(self, name,  parent=None, **kwargs):
         super(Node, self).__init__()
@@ -474,6 +474,10 @@ class VersionNode(Node):
     def load(self):
         maya.open_scene(self.path)
 
+    def delete_me(self):
+        print "deteing", self.stage, self.name, self.path
+        files.delete(self.path)
+        self.stage.removeVersionData(self.number)
 
 
 class DummyNode(Node):
@@ -509,61 +513,66 @@ class NewNode(Node):
     def resource(self):
         return add_icon
 
-class project(object):
-    def __init__(self, project_path):
+# class project(object):
+#     def __init__(self, project_path):
+#
+#         stages = {}
+#         stages["asset"] = ["model","rig","clip","shandeing","lightning"]
+#         stages["animation"] = ["layout","Shot"]
+#
+#         levels = {}
+#         levels["asset"] = ["type","asset","stage","ccc"]
+#         levels["animation"] = ["Ep","Seq"]
+#
+#
+#         self.project = {}
+#         self.project["project_path"] = project_path
+#
+#
+#         self.project["levels"] = levels
+#         self.project["stages"] = stages
+#
+#         self.project["current_stage"] = None
 
-        stages = {}
-        stages["asset"] = ["model","rig","clip","shandeing","lightning"]
-        stages["animation"] = ["layout","Shot"]
-
-        levels = {}
-        levels["asset"] = ["type","asset","stage","ccc"]
-        levels["animation"] = ["Ep","Seq"]
-
-
-        self.project = {}
-        self.project["project_path"] = project_path
-
-
-        self.project["levels"] = levels
-        self.project["stages"] = stages
-
-        self.project["current_stage"] = None
-
-class Asset(Metadata_file):
-    def __init__(self,**kwargs):
-        Metadata_file.__init__(self, **kwargs)
-
-        self.project = None
-        for key in kwargs:
-            if key == "project":
-                self.project = kwargs[key]
-
-
-        self.settings = None
-        for key in kwargs:
-            if key == "settings":
-                self.settings = kwargs[key]
-
-
-
-    def create(self, path, name):
-        data = {}
-        data["typeInfo"] = "_asset_"
-
-        path = os.path.join(path,"%s.%s"%(name,"json"))
-
-        self.data_file = data.jsonDict().create(path, data)
-        self.data_file = self.data_file.read()
-
-        return self
+#
+# class Asset(Metadata_file):
+#     def __init__(self,**kwargs):
+#         Metadata_file.__init__(self, **kwargs)
+#
+#         self.project = None
+#         for key in kwargs:
+#             if key == "project":
+#                 self.project = kwargs[key]
+#
+#
+#         self.settings = None
+#         for key in kwargs:
+#             if key == "settings":
+#                 self.settings = kwargs[key]
+#
+#
+#
+#     def create(self, path, name):
+#         data = {}
+#         data["typeInfo"] = "_asset_"
+#
+#         path = os.path.join(path,"%s.%s"%(name,"json"))
+#
+#         self.data_file = data.jsonDict().create(path, data)
+#         self.data_file = self.data_file.read()
+#
+#         return self
 
 
 class StageNode(RootNode):
 
+    edited = QtCore.Signal()
+
     def __init__(self, name, parent=None, **kwargs):
 
         RootNode.__init__(self, name, parent, **kwargs)
+
+        changed = QtCore.Signal()
 
         self.project = None
         for key in kwargs:
@@ -579,9 +588,13 @@ class StageNode(RootNode):
         for key in kwargs:
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
+                self.edited.connect(self.pipelineUI.updateVersionsTable)
 
         if self.data_file:
             self.stage_file = self.data_file.read()
+
+
+
 
 
     def create(self,  path=None):
@@ -627,7 +640,7 @@ class StageNode(RootNode):
     def padding(self, int):
         return files.set_padding(1, self.project.project_padding)
 
-    def FirstVersion(self):
+    def initialVersion(self):
 
         files.assure_folder_exists(self.versions_path)
 
@@ -655,7 +668,8 @@ class StageNode(RootNode):
         self.data_file.edit(data)
         self.stage_file = self.data_file.read()
 
-        self.pipelineUI.updateVersionsTable()
+        self.edited.emit()
+        #self.pipelineUI.updateVersionsTable()
         return
         '''
         self.project = project
@@ -736,14 +750,21 @@ class StageNode(RootNode):
                 versions[version_number] = new_version
                 self.versions_ = versions
 
+    def removeVersionData(self, padded_number):
+        if padded_number in self.stage_file["versions"]:
+            edit = self.stage_file["versions"]
+            del edit[padded_number]
+            self.data_file.edit(edit)
+            self.stage_file = self.data_file.read()
+
+        self.edited.emit()
+
     @property
     def stage_path(self):
         if self.data_file:
             
             return os.path.dirname(self.data_file_path)
-            #
-            #if self.settings:            
-            #    return os.path.join(self.settings.current_project_path, self.project.assets_dir,self.catagory_name,self.asset_name,self.component_name)  
+
         else:
             return None  
 
