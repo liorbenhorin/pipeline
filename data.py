@@ -479,7 +479,6 @@ class VersionNode(Node):
         maya.open_scene(self.path)
 
     def delete_me(self):
-        print "deteing", self.stage, self.name, self.path
         files.delete(self.path)
         self.stage.removeVersionData(self.number)
 

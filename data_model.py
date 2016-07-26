@@ -783,7 +783,11 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                     return self.__items[row].fullName
 
 
+    def index(self, row, column, parent):
+        if not self.hasIndex(row, column):
+            return QtCore.QModelIndex()
 
+        return self.createIndex(row, column)
 
     def flags(self, index):
         

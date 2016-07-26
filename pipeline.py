@@ -1703,7 +1703,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.verticalLayout_18.addWidget(self.navWidget)
         # ----> temp!!! hide the old selection options
         #self.ui.assets_selection_frame.setHidden(True)
-        self.versionsView = dtv.PipelineVersionsView()
+        self.versionsView = dtv.PipelineVersionsView(parent = self)
         #self.list.versionsView = self.versionsTable
 
         self.ui.versionsTabLayout.addWidget(self.versionsView)
@@ -1839,10 +1839,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._dataMapper.setCurrentModelIndex(index)
 
     def updateVersionsTable(self):
-
+        print "updateVersionsTable"
         if self.versionsView and self._stageNode:
             Model = self._stageNode.versiosnModel
             self.versionsView.setModel_(Model)
+
+
             self._dataMapper.setModel(Model)
             self._dataMapper.addMapping(self.ui.component_name_label, 3, QtCore.QByteArray("text"))
             self._dataMapper.toFirst()

@@ -140,8 +140,11 @@ class OptionsButtonDelegate(QtGui.QItemDelegate):
             button.setMenu(menu)
     
 class PipelineVersionsView(QtGui.QTableView):
-    def __init__(self,parent = None):
+    def __init__(self, parent = None):
         super(PipelineVersionsView, self).__init__(parent)
+
+        self.parent = parent
+
         self.setAlternatingRowColors(True)
         #self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
         self.setWordWrap(True)
@@ -182,6 +185,8 @@ class PipelineVersionsView(QtGui.QTableView):
             self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
             self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
 
+            self.setCurrentIndex(self.model().index(0,0, None))
+
     
     '''
     def setModel(self,model):
@@ -201,6 +206,7 @@ class PipelineVersionsView(QtGui.QTableView):
             self.model().items[0].parent().initialVersion()
         else:
             self.model().getNode(index).load()
+            self.setCurrentIndex(index)
 
 
     @QtCore.Slot()
