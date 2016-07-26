@@ -571,6 +571,8 @@ class StageNode(RootNode):
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
 
+        if self.data_file:
+            self.stage_file = self.data_file.read()
 
 
     def create(self,  path=None):
@@ -584,7 +586,7 @@ class StageNode(RootNode):
         path = os.path.join(path, "%s.%s" % (self.name, "json"))
 
         self.data_file = data.jsonDict().create(path, dict)
-        self.data_file = self.data_file.read()
+        self.stage_file = self.data_file.read()
 
         return self
 
@@ -602,6 +604,20 @@ class StageNode(RootNode):
     def resource(self):
         return large_image_icon
 
+    def formatFileName(self):
+
+        depth = 2
+        levels = []
+        current = self
+        for i in range(depth):
+            levels.append(current.name)
+            current = current.parent()
+
+        return "_".join(reversed(levels))
+
+    def padding(self, int):
+        return files.set_padding(1, self.project.project_padding)
+
     def FirstVersion(self):
 
         files.assure_folder_exists(self.versions_path)
@@ -611,14 +627,14 @@ class StageNode(RootNode):
         maya.set_fps(self.project.project_fps)
         maya.rewind()
 
-        version_number = files.set_padding(1, self.project.project_padding)
+        version_number = self.padding(1)
 
-        file_name = "%s_%s_%s.%s" % (self.parent().name, self.name, version_number, "ma")
+        file_name = "%s_%s.%s" % (self.formatFileName(), version_number, "ma")
 
         scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 
         first_version = {}
-        first_version["date_created"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+        first_version["date"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
         first_version["author"] = "no user"# self.settings.user[0]
         first_version["note"] = "No notes"
 
@@ -628,7 +644,7 @@ class StageNode(RootNode):
         data = {}
         data["versions"] = versions
         self.data_file.edit(data)
-        self.data_file = self.data_file.read()
+        self.stage_file = self.data_file.read()
 
         self.pipelineUI.updateVersionsTable()
         return
@@ -681,6 +697,36 @@ class StageNode(RootNode):
        
         return self
         '''
+
+    def new_version(self):
+
+        if self.project:
+            if self.data_file:
+
+                #versions = self.versions
+                #versions = self.versions
+                #if versions:
+                #    last = versions[-1]
+                #else:
+                #    last = 0
+
+                last_version = self.versions[-1]
+
+                version_number = set_padding(last_version.name+1, self.project.project_padding)
+
+                file_name = "%s_%s.%s" % (self.formatFileName(), version_number, "ma")
+
+                scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
+
+                new_version = {}
+                new_version["date"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+                new_version["author"] = "no user"  # self.settings.user[0]
+                new_version["note"] = "No notes"
+
+                versions = self.versions_
+                versions[version_number] = new_version
+                self.versions_ = versions
+
     @property
     def stage_path(self):
         if self.data_file:
@@ -719,8 +765,11 @@ class StageNode(RootNode):
 
     @property  
     def versions_(self):
-        if self.data_file:
-            return self.data_file["versions"]
+        if self.stage_file:
+            if "versions" in self.stage_file:
+                return self.stage_file["versions"]
+            else:
+                return None
     
     @versions_.setter
     def versions_(self,versions):
@@ -729,7 +778,7 @@ class StageNode(RootNode):
             data = {}
             data["versions"] = versions
             self.data_file.edit(data)
-            self.data_file = self.data_file.read()
+            self.stage_file = self.data_file.read()
 
 
 
@@ -925,8 +974,20 @@ class StageNode(RootNode):
                     
                     version_nodes = []                 
                     for key in versions_dict:
+                        padded_number = self.padding(key)
+                        author = "n/a"
+                        note = "n/a"
+                        date = "n/a"
+                        versions_data = self.versions_
+                        if versions_data:
 
-                        version_nodes.append(VersionNode(key, path = versions_dict[key], author = "autor" ,number = key, date = key, note = "no note", stage = self))
+                            if padded_number in versions_data:
+                                thisVersion = versions_data[padded_number]
+                                author = thisVersion["author"]
+                                note = thisVersion["note"]
+                                date = thisVersion["date"]
+
+                        version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
 
                     return version_nodes
 
@@ -958,35 +1019,7 @@ class StageNode(RootNode):
                         
 
                 
-    def new_version(self):
 
-
-
-        if self.project:
-            if self.data_file:
-                
-                versions = self.versions
-                versions = self.versions
-                if versions:
-                    last = versions[-1]
-                else:
-                    last = 0
-
-                
-                version_number = set_padding(last+1,self.project.project_padding)                
-      
-                file_name = "%s_%s_%s.%s"%(self.asset_name,self.component_name,version_number,"ma")                   
-                scene_path = maya.save_scene_as(path = self.versions_path, file_name = file_name ) 
-                                
-                new_version = {}
-                new_version["path"] = scene_path
-                new_version["date_created"] = "%s %s"%(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
-                new_version["author"] = self.settings.user[0]#"USER"
-                new_version["note"] = "No notes"   
-                                
-                versions = self.versions_  
-                versions[version_number] = new_version
-                self.versions_ = versions          
     
     
     def delete_version(self, type, version):
@@ -1297,3 +1330,7 @@ def assetDir(dir):
                     return True
 
     return False
+
+
+def set_padding(int, padding):
+    return str(int).zfill(padding)
