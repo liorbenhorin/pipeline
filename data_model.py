@@ -766,12 +766,14 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         
         if role == QtCore.Qt.EditRole:
             row = index.row()
-            if index.column() == 3:
-                return self.__items[row].fullName
-            if index.column() == 0:
-                return self.__items[row].author
-            if index.column() == 4:
-                return self.__items[row].note
+            if self.__items[row].typeInfo() != _new_:
+                row = index.row()
+                if index.column() == 3:
+                    return self.__items[row].fullName
+                if index.column() == 0:
+                    return self.__items[row].author
+                if index.column() == 4:
+                    return self.__items[row].note
 
             return self.__items[index.row()].name
         

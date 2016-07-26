@@ -181,12 +181,14 @@ def set_icons():
     global reload_icon
     global load_icon
     global open_icon
+    global new_icon
 
     reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "reload"))
     load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "load"))
     large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
     small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
     open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "open"))
+    new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
     
 set_icons()
 
@@ -215,8 +217,10 @@ class loadButtonDelegate(QtGui.QItemDelegate):
 
             if self.parent().model().sourceModel().items[0].typeInfo() == _new_:
                 label = ""
+                icon = new_icon
             else:
                 label = ""
+                icon = open_icon
 
             button = QtGui.QPushButton(
                 label,
@@ -227,7 +231,7 @@ class loadButtonDelegate(QtGui.QItemDelegate):
 
             button.setIconSize(QtCore.QSize(20, 20))
 
-            button.setIcon(QtGui.QIcon(open_icon))
+            button.setIcon(QtGui.QIcon(icon))
 
             self.parent().setIndexWidget(index, button)
 
