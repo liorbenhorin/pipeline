@@ -711,6 +711,9 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self.__items = items
 
+    @property
+    def items(self):
+        return self.__items
 
     def headerData(self, section, orientation, role):
 

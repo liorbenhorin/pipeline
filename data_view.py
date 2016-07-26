@@ -121,16 +121,18 @@ class loadButtonDelegate(QtGui.QItemDelegate):
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
 
-            if self.parent().model().getNode(index).typeInfo() == _new_:
-                return None
+            if self.parent().model().items[0].typeInfo() == _new_:
+                label = "New..."
+            else:
+                label = "Load"
 
             self.parent().setIndexWidget(
                 index,
                 QtGui.QPushButton(
-                    "Open",
+                    label,
                     index.data(),
                     self.parent(),
-                    clicked=self.parent().loadButtonClicked
+                    clicked=self.parent().MultiButtonClicked
                 )
             )
 
@@ -211,7 +213,7 @@ class PipelineVersionsView(QtGui.QTableView):
             # setup the buttons for loading and more options with delegates
             self.setItemDelegateForColumn(3,  loadButtonDelegate(self))
             self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
-            self.setItemDelegateForColumn(0, NewButtonDelegate(self))
+            #self.setItemDelegateForColumn(0, NewButtonDelegate(self))
 
     
     '''
@@ -232,13 +234,16 @@ class PipelineVersionsView(QtGui.QTableView):
         self.model().getNode(index).parent().FirstVersion()
 
     @QtCore.Slot()
-    def loadButtonClicked(self):
+    def MultiButtonClicked(self):
         # This slot will be called when our button is clicked. 
         # self.sender() returns a refence to the QPushButton created
         # by the delegate, not the delegate itself.
         button = self.sender()
         index = self.indexAt(button.pos())
-        print self.model().getNode(index).name, " load --->" , self.model().getNode(index).number
+        if self.model().items[0].typeInfo() == _new_:
+            self.model().items[0].parent().FirstVersion()
+        else:
+            print self.model().getNode(index).name, " load --->" , self.model().getNode(index).number
 
     @QtCore.Slot()
     def deletActionClicked(self):

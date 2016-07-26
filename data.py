@@ -983,9 +983,12 @@ class StageNode(RootNode):
 
                             if padded_number in versions_data:
                                 thisVersion = versions_data[padded_number]
-                                author = thisVersion["author"]
-                                note = thisVersion["note"]
-                                date = thisVersion["date"]
+                                if "author" in thisVersion:
+                                    author = thisVersion["author"]
+                                if "note" in thisVersion:
+                                    note = thisVersion["note"]
+                                if "date" in thisVersion:
+                                    date = thisVersion["date"]
 
                         version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
 
