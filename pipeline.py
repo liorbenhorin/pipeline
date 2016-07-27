@@ -1616,6 +1616,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         '''
 
+
+        self._dataMapper = None
+        self.dynamicCombo = None
+        self.stageCombo = None
+
         self._versionsView = None
 
         self._client = None
@@ -1627,8 +1632,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._stageNode = None
         self.populate_clients()
         self.populate_projects()
-        self.populate_navbar()
+        self.stage_ui()
         self.populate_project_tree()
+        self.populate_navbar()
+
 
     def init_settings(self):
         self.settings_file_name = 'settings.json'
@@ -1713,7 +1720,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def populate_project_tree(self):
         if self.project:
 
-            _root = dt.RootNode("root", path = self.project.path)
+            _root = dt.RootNode("root", path = self.project.path, parent = self.project)
             assets = dt.FolderNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root)
             assets.model_tree()
             scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root)
@@ -1787,7 +1794,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             # add to the designer ui
             self.ui.verticalLayout_18.addWidget(self.navWidget)
-
+            self.tree.update.connect(self.refresh_navbar)
 
             # self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
             # self.navWidget.
@@ -1797,16 +1804,33 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             # self.ui.stages_version_splitter.setSizes([150,600])
 
 
+    def reset_navbar(self):
+        self._dataMapper = None
+        try:
+            self.dynamicCombo.setParent(None)
+            self.dynamicCombo.deleteLater()
+            self.dynamicCombo = None
+        except:
+            pass
+        try:
+            self.stageCombo.setParent(None)
+            self.stageCombo.deleteLater()
+            self.stageCombo = None
+        except:
+            pass
 
-
-    def populate_navbar(self):
+    def stage_ui(self):
 
         self.ui.stages_version_splitter.setSizes([0, 600])
-        self.versionsView = dtv.PipelineVersionsView(parentWidget = self.ui.versionsTab,  parent = self)
+
+        self.versionsView = dtv.PipelineVersionsView(parentWidget=self.ui.versionsTab, parent=self)
         self.ui.versionsTabLayout.addWidget(self.versionsView)
         self.versionsView.addSlider()
 
         self._dataMapper = QtGui.QDataWidgetMapper()
+
+    def populate_navbar(self):
+
 
         self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
 
@@ -1859,7 +1883,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             return "scenes"
                     
         return None
-   
+
+    def refresh_navbar(self):
+        self.dynamicCombo.kill()
+        self.stageSelect()
+
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
         type = self.stageType()

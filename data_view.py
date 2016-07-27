@@ -1056,6 +1056,9 @@ class PipelineContentsView(QtGui.QTableView):
                 self.versionsView.setModel_(None)
                    
 class pipelineTreeView(QtGui.QTreeView):
+
+    update = QtCore.Signal()
+
     def __init__(self,parent = None):
         super(pipelineTreeView, self).__init__(parent)
         
@@ -1457,6 +1460,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 self.sourceModel.insertRows( 0, 0, parent = parent , node = node)
                 self._proxyModel.invalidate()
                 self.updateTable( self.fromProxyIndex(parent))
+                self.update.emit()
         
     def create_new_asset(self, parent):
         parent_node = self.sourceModel.getNode(parent)
@@ -1470,6 +1474,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
                 self._proxyModel.invalidate()
                 self.updateTable( self.fromProxyIndex(parent))
+                self.update.emit()
         
     def create_new_stage(self, parent):
         parent_node = self.sourceModel.getNode(parent)
@@ -1487,6 +1492,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
                 self._proxyModel.invalidate()
                 self.updateTable( self.fromProxyIndex(parent))
+                self.update.emit()
 
     def updateTable(self, index):
         selection = QtGui.QItemSelection(index, index)        
