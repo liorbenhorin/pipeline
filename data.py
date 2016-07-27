@@ -512,8 +512,13 @@ class DummyNode(Node):
 
 class ClientNode(Node):
 
-    def __init__(self, name, parent=None):
+    def __init__(self, name, path = None, parent=None):
         super(ClientNode, self).__init__(name, parent)
+        self._path = path
+
+    @property
+    def path(self):
+        return self._path
 
     def typeInfo(self):
         return _dummy_
@@ -1391,23 +1396,21 @@ class ProjectNode(RootNode):
 
     def create(self,
                path = None,
-               name = "My_Project",
                padding = 3,
                file_type = "ma",
                fps = 25,
-               users = {"Admin":(1234,"admin")},
-               playblast_outside = False):
+               users = {"Admin":(1234,"admin")}):
 
 
         project_key = data.id_generator()
         project_data = {}
-        project_data["project_name"] = name
+        project_data["project_name"] = self.name
         project_data["project_key"] = project_key
         project_data["padding"] = padding
         project_data["fps"] = fps
         project_data["defult_file_type"] = file_type
         project_data["users"] = users
-        project_data["playblast_outside"] = playblast_outside
+        #project_data["playblast_outside"] = playblast_outside
 
         folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
                    "sound", "clips", "renderData", "cache"]

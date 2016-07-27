@@ -1026,26 +1026,7 @@ class pipeline_settings(pipeline_data):
             return self.projects[project_key][0]
             
 
-    @property
-    def current_project(self):
-        
-        if self.settings_file:
-            current_project_key = self.settings_file["current_project"]
-            if current_project_key:
-                return current_project_key
-            else:
-                return None
-        else:
-            return None  
 
-    @current_project.setter
-    def current_project(self,project_key):
- 
-        if self.data_file:
-            data = {}
-            data["current_project"] = project_key
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
 
     
     @property
@@ -1369,6 +1350,28 @@ class pipeline_settings(pipeline_data):
             self.data_file.edit(data)
             self.settings_file = self.data_file.read()
 
+
+    @property
+    def project(self):
+        if self.settings_file:
+            if self.settings_file:
+                try:
+                    return self.settings_file["project"]
+                except:
+                    return None
+            else:
+                return None
+
+
+    @project.setter
+    def project(self, project_key):
+        if self.data_file:
+            data = {}
+            data["project"] = project_key
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+
     def log(self):
         log.info("logging settings")
         log.info("settings data file: %s"%self.data_file_path)        
@@ -1578,9 +1581,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             #self.unload_project()
             #maya.viewMassage("No user is logged in")
   
-        
-        if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'       
-            self.set_project() # if the user logged in matchs with the settings active project, create a project object
+        #
+        #if self.verify_projects(): # make sure projects are where the settings file say they are, if not marks them 'offline'
+        #    self.set_project() # if the user logged in matchs with the settings active project, create a project object
         
         
         
@@ -1589,7 +1592,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             containg all data relevent to the project:
                 users, assets, shots, etc
         '''
-        self.init_current_project()   #init the ui tabels with the project's data    
+        #self.init_current_project()   #init the ui tabels with the project's data
     
         '''
         
@@ -1614,10 +1617,91 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
 
         self._versionsView = None
+
+
+        self._clients = None
+        self._projects = None
+        self._project = None
+
         self._stage = None
-        
-        self.tree()
-    
+        self._stageNode = None
+        self.populate_clients()
+        if self.populate_projects():
+            self.tree()
+
+
+    def init_settings(self):
+        self.settings_file_name = 'settings.json'
+
+        file = os.path.join(os.path.dirname(__file__), self.settings_file_name)
+
+        if os.path.isfile(file):
+            self.settings = pipeline_settings(path=file)
+            return
+
+        self.settings = pipeline_settings().create(path=file)
+
+
+    def populate_clients(self):
+        path = self.settings.rootDir
+
+        if path:
+
+            dirs = files.list_dir_folders(path)
+
+            list = [dt.CatagoryNode("clients")]
+
+            [list.append(dt.ClientNode(i, path=os.path.join(path, i))) for i in dirs]
+
+            RemoveOption = False
+
+            if list:
+                RemoveOption = True
+
+            list.append(dt.AddNode("Add..."))
+
+            if RemoveOption:
+                list.append(dt.AddNode("Remove..."))
+
+            self.clients = dtm.PipelineListModel(list)
+
+            return True
+
+
+    @property
+    def clients(self):
+        return self._clients
+
+    @clients.setter
+    def clients(self, model):
+        self._clients = model
+
+
+    def populate_projects(self):
+        if self.settings.rootDir and self.settings.client:
+            projects_path = os.path.join(self.settings.rootDir,
+                                         self.settings.client)
+            dirs = files.list_dir_folders(projects_path)
+            list = []
+            current = None
+            for i in dirs:
+                node = dt.ProjectNode(i, pipelineUI=self, path=os.path.join(projects_path, i))
+                if node.name == self.settings.project:
+                    current = node
+                list.append(node)
+
+            if list:
+                self.projects = dtm.PipelineProjectsModel(list)
+                self.project = current
+                if current:
+                    return True
+
+                return False
+
+            self.projects = None
+            return False
+
+
     def tree(self):
 
         
@@ -1637,10 +1721,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         generate some tree nodes for testing
         '''
         
-        _root = dt.RootNode("root", path = self.settings.current_project_path)
-        assets = dt.FolderNode("assets", path = os.path.join(self.settings.current_project_path, 'assets'), parent = _root)
+        _root = dt.RootNode("root", path = self.project.path)
+        assets = dt.FolderNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root)
         assets.model_tree()
-        scenes = dt.FolderNode("scenes", path = os.path.join(self.settings.current_project_path, 'scenes'), parent = _root)
+        scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root)
         scenes.model_tree()
         #root = dt.FolderNode("Diving",_root)
         #char = dt.FolderNode("Charachters", root)
@@ -1773,49 +1857,49 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         # self._dataMapper.addMapping(self.mapLabel, 0, QtCore.QByteArray("text"))
         # self._dataMapper.setRootIndex(QtCore.QModelIndex())
         # self._dataMapper.toFirst()
-   
-        if self.settings.current_project_path:
-            levels = [None]
-            self._stageNode = None
-            self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
+        self._projects = None
+
+        levels = [None]
+
+        self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
 
 
 
-            #def setModel(self, proxyModel):
-            #self._proxyModel = proxyModel
+        #def setModel(self, proxyModel):
+        #self._proxyModel = proxyModel
 
 
-            #self._dataMapper.addMapping(self.uiX, 2)
+        #self._dataMapper.addMapping(self.uiX, 2)
 
-            
-            
 
-            self.stageCombo = dtv.ComboStaticWidget(
-                                          settings = self.settings,
-                                          items = self.project.stages["asset"] + self.project.stages["animation"],
-                                          parent_layout = self.ui.navBarLayout,
-                                          parent = self)
 
-            self.stageSelect()
-            self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
-            
 
-            #dir = os.path.join(self.settings.current_project_path, self.stageType()) 
-            '''
-            self.dynamicCombo = dtv.ComboDynamicWidget(
-                                                     settings = self.settings,                       
-                                                     project = self.project,
-                                                     path = dir,
-                                                     stage = "model",
-                                                     box_list = [],
-                                                     parent_box = None,
-                                                     parent_layout = self.ui.navBarLayout,
-                                                     parent = self)  
-            
+        self.stageCombo = dtv.ComboStaticWidget(
+                                      settings = self.settings,
+                                      items = self.project.stages["asset"] + self.project.stages["animation"],
+                                      parent_layout = self.ui.navBarLayout,
+                                      parent = self)
 
-            '''
-            self.updateVersionsTable()
-            #self.stageSelect()
+        self.stageSelect()
+        self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
+
+
+        #dir = os.path.join(self.settings.current_project_path, self.stageType())
+        '''
+        self.dynamicCombo = dtv.ComboDynamicWidget(
+                                                 settings = self.settings,
+                                                 project = self.project,
+                                                 path = dir,
+                                                 stage = "model",
+                                                 box_list = [],
+                                                 parent_box = None,
+                                                 parent_layout = self.ui.navBarLayout,
+                                                 parent = self)
+
+
+        '''
+        self.updateVersionsTable()
+        #self.stageSelect()
             
     def stageSelect(self):
 
@@ -1823,7 +1907,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if index != -1:
             self.stageCombo.comboBox.setCurrentIndex(index)
 
-        dir = os.path.join(self.settings.current_project_path, "assets")
+        dir = os.path.join(self.project.path, "assets")
 
         self._stage = self.settings.stage
         self.dynamicCombo = dtv.ComboDynamicWidget(
@@ -1885,8 +1969,36 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     
     @versionsView.setter
     def versionsView(self, view):
-        self._versionsView = view        
+        self._versionsView = view
 
+    @property
+    def client(self):
+        return self._client
+
+    @client.setter
+    def client(self, client):
+        self._client = client
+
+
+    @property
+    def project(self):
+        return self._project
+
+
+    @project.setter
+    def project(self, project):
+        self._project = project
+        if project:
+            project.set()
+
+    @property
+    def projects(self):
+        return self._projects
+
+
+    @projects.setter
+    def projects(self, model):
+        self._projects = model
 
     def stageNode(self, node):
 
@@ -1928,6 +2040,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def updateCurrentProject(self):
         print self.sender(), "*****"
+        self.settings.project = self.sender().name
         
     def selectInScene(self):
         pass
@@ -1963,20 +2076,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         
 
-    def init_settings(self):
-  
-        
-        self.settings_file_name = 'settings.json'
-                      
-        file = os.path.join(os.path.dirname(__file__), self.settings_file_name)
 
-        
-        if os.path.isfile(file): 
-                   
-            self.settings = pipeline_settings(path = file)                                         
-            return
-
-        self.settings = pipeline_settings().create(path = file)
     
 
     def verify_projects(self):
@@ -3129,8 +3229,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
 
     def projects_window(self):
-        if self.verify_projects():
-            self.set_project()
+        #if self.verify_projects():
+        #    self.set_project()
         
         global projectsWindow
         try:
@@ -3236,10 +3336,12 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.set_icons()
         self.boldFont=QtGui.QFont()
         self.boldFont.setBold(True)               
-               
-        self.init_projectssTable()
-        self.updateProjectsTable()
-        self.setColumnWidth_projectsTable()
+
+
+        self.ui.projects_tableWidget.setHidden(True)
+        #self.init_projectssTable()
+        #self.updateProjectsTable()
+        #self.setColumnWidth_projectsTable()
 
         self.projectsTableView = dtv.PipelineProjectsView(parent = self, parentWidget = self.ui.projectsWidget)
 
@@ -3254,6 +3356,13 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
 
     def populate_clients(self):
+
+        if self.pipeline_window.clients:
+            self.ui.clients_comboBox.setModel(self.pipeline_window.clients)
+            self.ui.clients_comboBox.currentIndexChanged.connect(self.setClient)
+            return True
+
+
         path = self.pipeline_window.settings.rootDir
 
         if path:
@@ -3262,7 +3371,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
             list = [dt.CatagoryNode("clients")]
 
-            [list.append(dt.ClientNode(i)) for i in dirs]
+            [list.append(dt.ClientNode(i, path = os.path.join(path, i))) for i in dirs]
 
             RemoveOption = False
 
@@ -3281,6 +3390,11 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
 
     def populate_projects(self):
+        self.pipeline_window.populate_projects()
+        self.projectsTableView.setModel_(self.pipeline_window.projects)
+
+        return True
+
         if self.pipeline_window.settings.rootDir and self.pipeline_window.settings.client:
             projects_path = os.path.join(self.pipeline_window.settings.rootDir, self.pipeline_window.settings.client)
             dirs = files.list_dir_folders(projects_path)
@@ -3288,7 +3402,8 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             [list.append(dt.ProjectNode(i, pipelineUI = self.pipeline_window, path = os.path.join(projects_path, i))) for i in dirs]
 
             if list:
-                self.projectsTableView.setModel_(dtm.PipelineProjectsModel(list))
+                self.pipeline_window.projects = dtm.PipelineProjectsModel(list)
+                self.projectsTableView.setModel_(self.pipeline_window.projects)
                 return True
 
         self.projectsTableView.setModel(None)
@@ -3301,14 +3416,17 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
     def setClient(self):
 
         index = self.ui.clients_comboBox.currentIndex()
-        x =  self.ui.clients_comboBox.model().items[index].typeInfo()
 
         if self.ui.clients_comboBox.model().items[index].typeInfo() != _new_ and self.ui.clients_comboBox.model().items[
             index].typeInfo() != _catagory_:
             self.pipeline_window.settings.client = self.ui.clients_comboBox.currentText()
+            self.pipeline_window.client = self.ui.clients_comboBox.model().items[index]
+            self.ui.create_project_pushButton.setEnabled(True)
 
         else:
             self.pipeline_window.settings.client = None
+            self.pipeline_window.client = None
+            self.ui.create_project_pushButton.setEnabled(False)
 
         self.populate_projects()
 
@@ -3332,7 +3450,14 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.ui.close_pushButton.setIconSize(QtCore.QSize(20,20))    
 
     def create_project(self):
-        self.create_edit_project()
+        global create_edit_projectsWindow
+        try:
+            create_edit_projectsWindow.close()
+        except:
+            pass
+
+        create_edit_projectsWindow = pipeLine_create_edit_project_UI(parent = self, pipelineUI=self.pipeline_window)
+        create_edit_projectsWindow.show()
     
     def edit_project(self):
         widget = self.sender()
@@ -3347,16 +3472,16 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         project_file = None
         for key in kwargs:
             if key == "project_file":
-                project_file = kwargs[key]        
-        
-        
+                project_file = kwargs[key]
+
+
         global create_edit_projectsWindow
         try:
             create_edit_projectsWindow.close()
         except:
             pass
 
-        create_edit_projectsWindow=pipeLine_create_edit_project_UI(parent=self,projects_window = self,project_file = project_file)
+        create_edit_projectsWindow=pipeLine_create_edit_project_UI(parent=self,pipelineUI = None, projects_window = self)#,project_file = project_file)
         create_edit_projectsWindow.show()
         
     def relink_project(self):
@@ -3568,7 +3693,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.close()
 
 class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
-    def __init__(self, parent=None, projects_window = None, **kwargs):
+    def __init__(self, parent=None, pipelineUI = None, **kwargs):
          
         super(pipeLine_create_edit_project_UI, self).__init__(parent)      
         self.setWindowFlags(QtCore.Qt.Tool)                
@@ -3577,13 +3702,18 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.ui = form_class()
         self.ui.setupUi(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.setWindowTitle("Create Project")        
-        self.projects_window = projects_window
+        self.setWindowTitle("Create Project")
+        self.pipelineUI = pipelineUI
         
         self.setMaximumHeight(500)
-        
-        self.project_file_name = 'project.json'
-        self.project_name = "My_Project"
+
+        self.ui.label_4.setHidden(True)
+        self.ui.widget.setHidden(True)
+        self.ui.widget_7.setHidden(True)
+        self.ui.widget_8.setHidden(True)
+
+        #self.project_file_name = 'project.json'
+        self.project_name = "Pipeline_Project"
 
         self.path = None
         self.project_file = None
@@ -3630,6 +3760,8 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
             
     def playblast_help_button(self):
+
+
         
         self.playblast_help_label = QtGui.QLabel()
         sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
@@ -3711,6 +3843,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
     
     def set_project_path(self):
+
         path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.ui.project_path_lineEdit.setText(os.path.join(path,str(self.ui.project_name_lineEdit.text())))
 
@@ -3842,14 +3975,14 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             
 
     def create_project(self):
-        if self.ui.users_checkBox.isChecked() == True:
-            self.set_users_dict()
-            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]] 
-            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin")) 
-        else:
-            self.users = None
-   
-        project_path = str(self.ui.project_path_lineEdit.text())        
+        # if self.ui.users_checkBox.isChecked() == True:
+        #     self.set_users_dict()
+        #     self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
+        #     self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
+        # else:
+        #     self.users = None
+
+        project_path = os.path.join( self.pipelineUI.client.path , str(self.ui.project_name_lineEdit.text()))
         project_name = str(self.ui.project_name_lineEdit.text())
 
 
@@ -3871,11 +4004,20 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         if self.ui.playblast_sister_dir_checkBox.isChecked():
             playblast_outside = True    
             
-        self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users, playblast_outside = playblast_outside)        
-        self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)        
+        project = dt.ProjectNode(project_name, self.pipelineUI.client ).create(path = project_path,
+                                                                                padding=padding,
+                                                                                file_type=file_type,
+                                                                                fps = fps,
+                                                                                users = self.users)
+
+
+        #self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users, playblast_outside = playblast_outside)
+        #self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)
         
-            
-        self.projects_window.set_project(project_key = self.project_file.project_key)
+        self.pipelineUI.projects.insertRows(0, 1, node = project)
+        project.set()
+
+        #self.projects_window.set_project(project_key = self.project_file.project_key)
         self.close()
 
 

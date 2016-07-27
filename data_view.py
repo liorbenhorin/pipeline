@@ -325,7 +325,10 @@ class PipelineProjectsView(QtGui.QTableView):
 
             self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
 
+            return True
 
+        self.setModel(None)
+        return None
             #self.setCurrentIndex(self.model().index(0,0, None))
 
 

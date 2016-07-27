@@ -949,9 +949,10 @@ class PipelineProjectsModel(QtCore.QAbstractTableModel):
     #=====================================================#
     #INSERTING & REMOVING
     #=====================================================#
-    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex(), node = None):
         self.beginInsertRows(parent, position, position + rows - 1)
-
+        if node:
+            self.__items.insert(position, node)
         self.endInsertRows()
 
         return True
