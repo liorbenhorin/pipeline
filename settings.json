@@ -1,4 +1,5 @@
 {
+    "client": "Client_b", 
     "current_open_file": null, 
     "current_project": "DO903W", 
     "project_premissions": null, 
@@ -9,6 +10,7 @@
             "json"
         ]
     }, 
+    "rootDir": "/Users/liorbenhorin/Documents/maya/VirtualRoot", 
     "selection": {
         "asset": null, 
         "catagory": null, 

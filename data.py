@@ -22,7 +22,9 @@ global _asset_
 global _folder_
 global _dummy_
 global _new_
+global _catagory_
 
+_catagory_ = "catagory"
 _new_ = "new"
 _node_ = "node"
 _root_ = "root"
@@ -46,6 +48,9 @@ def set_icons():
     global cube_icon_full
     global add_icon
     global large_image_icon
+    global client_icon
+
+    client_icon = os.path.join(localIconPath, "%s.svg" % "client")
     folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
     cube_icon = os.path.join(localIconPath, "%s.svg"%"cube") 
     add_cube_icon = os.path.join(localIconPath, "%s.svg"%"add_cube")     
@@ -483,17 +488,40 @@ class VersionNode(Node):
         self.stage.removeVersionData(self.number)
 
 
+class CatagoryNode(Node):
+
+    def __init__(self, name, parent=None):
+        super(CatagoryNode, self).__init__(name, parent)
+
+    def typeInfo(self):
+        return _catagory_
+
+    def resource(self):
+        return dummy_icon
+
 class DummyNode(Node):
 
     def __init__(self, name, parent=None):
         super(DummyNode, self).__init__(name, parent)
-
 
     def typeInfo(self):
         return _dummy_
 
     def resource(self):
         return dummy_icon
+
+class ClientNode(Node):
+
+    def __init__(self, name, parent=None):
+        super(ClientNode, self).__init__(name, parent)
+
+    def typeInfo(self):
+        return _dummy_
+
+    def resource(self):
+        return client_icon
+
+
 
 class AddNode(Node):
     def __init__(self, name, parent=None):

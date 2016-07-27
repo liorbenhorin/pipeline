@@ -98,7 +98,26 @@ import data_model as dtm
 reload(dtm)
 
 import data_view as dtv
-reload(dtv)   
+reload(dtv)
+
+global _node_
+global _root_
+global _stage_
+global _asset_
+global _folder_
+global _dummy_
+global _new_
+global _catagory_
+
+_catagory_ = "catagory"
+_new_ = "new"
+_node_ = "node"
+_root_ = "root"
+_stage_ = "stage"
+_asset_ = "asset"
+_folder_ = "folder"
+_dummy_ = "dummy"
+
 
 '''
 import modules.maya_warpper as maya
@@ -1308,6 +1327,45 @@ class pipeline_settings(pipeline_data):
         if self.data_file:
             data = {}
             data["stage"] = value
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+
+    @property
+    def rootDir(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["rootDir"]
+            except:
+                return None
+        else:
+            return None
+
+    @rootDir.setter
+    def rootDir(self, value):
+        if self.data_file:
+            data = {}
+            data["rootDir"] = value
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+
+    @property
+    def client(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["client"]
+            except:
+                return None
+        else:
+            return None
+
+
+    @client.setter
+    def client(self, value):
+        if self.data_file:
+            data = {}
+            data["client"] = value
             self.data_file.edit(data)
             self.settings_file = self.data_file.read()
 
@@ -3168,7 +3226,10 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.ui.unload_project_pushButton.clicked.connect(self.unload_project)
         self.ui.load_project_pushButton.clicked.connect(self.load_project)
         self.ui.close_pushButton.clicked.connect(self.close_window)
-        
+
+        self.ui.unload_project_pushButton.setHidden(True)
+        self.ui.load_project_pushButton.setHidden(True)
+
         self.set_icons()
         self.boldFont=QtGui.QFont()
         self.boldFont.setBold(True)               
@@ -3176,7 +3237,59 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.init_projectssTable()
         self.updateProjectsTable()
         self.setColumnWidth_projectsTable()
-    
+
+        self.ui.rootDirSet_pushButton.clicked.connect(self.set_root_path)
+        self.ui.rootDir_lineEdit.setText(self.pipeline_window.settings.rootDir)
+        self.ui.clients_comboBox.setIconSize(QtCore.QSize(24 ,24)  )
+        self.populate_clients()
+        dtv.setComboValue(self.ui.clients_comboBox, self.pipeline_window.settings.client)
+
+
+    def populate_clients(self):
+        path = self.pipeline_window.settings.rootDir
+
+        if path:
+
+            dirs = files.list_dir_folders(path)
+
+            list = [dt.CatagoryNode("clients")]
+
+            [list.append(dt.ClientNode(i)) for i in dirs]
+
+            RemoveOption = False
+
+            if list:
+                RemoveOption = True
+
+            list.append(dt.AddNode("Add..."))
+
+            if RemoveOption:
+                list.append(dt.AddNode("Remove..."))
+
+            self._model = dtm.PipelineListModel(list)
+            self.ui.clients_comboBox.setModel(self._model)
+
+            self.ui.clients_comboBox.currentIndexChanged.connect(self.setClient)
+
+
+    def setClient(self):
+
+        index = self.ui.clients_comboBox.currentIndex()
+        x =  self.ui.clients_comboBox.model().items[index].typeInfo()
+
+        if self.ui.clients_comboBox.model().items[index].typeInfo() != _new_ and self.ui.clients_comboBox.model().items[
+            index].typeInfo() != _catagory_:
+            self.pipeline_window.settings.client = self.ui.clients_comboBox.currentText()
+
+
+
+
+    def set_root_path(self):
+        path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        if os.path.isdir(path):
+            self.ui.rootDir_lineEdit.setText(path)
+            self.pipeline_window.settings.rootDir = path
+
     def set_icons(self):
         self.ui.create_project_pushButton.setIcon(QtGui.QIcon(new_icon))
         self.ui.create_project_pushButton.setIconSize(QtCore.QSize(20,20))

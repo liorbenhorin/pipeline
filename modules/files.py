@@ -240,6 +240,8 @@ def list_all_directory(path):
 def list_dir_folders(path):
     if os.path.exists(path):
         return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+    else:
+        return []
 
  
 def assure_path_exists(path):

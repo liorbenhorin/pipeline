@@ -14,7 +14,9 @@ global _asset_
 global _folder_
 global _dummy_
 global _new_
+global _catagory_
 
+_catagory_ = "catagory"
 _new_ = "new"
 _node_ = "node"
 _root_ = "root"
@@ -864,6 +866,9 @@ class PipelineListModel(QtCore.QAbstractListModel):
         QtCore.QAbstractListModel.__init__(self, parent)
         self.__items = items
 
+    @property
+    def items(self):
+        return self.__items
 
     def rowCount(self, parent):
         return len(self.__items)

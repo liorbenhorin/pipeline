@@ -25,7 +25,9 @@ global _folder_
 global _dummy_
 global _version_
 global _new_
+global _catagory_
 
+_catagory_ = "catagory"
 _new_ = "new"
 _version_ = "version"
 _node_ = "node"
@@ -193,6 +195,10 @@ def set_icons():
 set_icons()
 
 
+def setComboValue(QComboBox, String):
+    index = QComboBox.findText(String, QtCore.Qt.MatchFixedString)
+    if index >= 0:
+        QComboBox.setCurrentIndex(index)
 
 
 class loadButtonDelegate(QtGui.QItemDelegate):
@@ -1442,7 +1448,7 @@ class ComboStaticWidget(ComboWidget):
 
     def createModel(self):
         
-        list = [dt.DummyNode("stage")]
+        list = [dt.CatagoryNode("stage")]
         
         [list.append(dt.DummyNode(i)) for i in self._items]
         
@@ -1548,7 +1554,7 @@ class ComboDynamicWidget(ComboWidget):
 
     def createModel(self):
         
-        list = [dt.DummyNode(self._level)]
+        list = [dt.CatagoryNode(self._level)]
 
         if self._level != "n/a":
             if self._subdirectories:
