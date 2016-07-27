@@ -289,7 +289,7 @@ projects_form_class, projects_base_class = loadUiType(projects_uiFile)
 create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_create_edit_project_UI.ui')
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
 
-version = '1.0.10-NFR'
+version = 'Snowball | 0.0.0'
 
 
 def set_icons():

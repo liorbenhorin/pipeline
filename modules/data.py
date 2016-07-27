@@ -233,10 +233,14 @@ def encoded_strings():
             'c2V0VGV4dA==',
             'c2V0SGlkZGVu',
             'Tm9uIGNvbW1lcmNpYWwgdmVyc2lvbiBvZiBwaXBlbGluZQ==',
-            'TkZSIHZlcnNpb24gb2YgUGlwZWxpbmU=',
+            'UGlwZWxpbmUgfCBTbm93YmFsbCBidWlsZA==',
             'VHJ1ZQ==',
             'RmFsc2U='] 
-            
+
+            #6th element
+            #snowball = UGlwZWxpbmUgfCBTbm93YmFsbCBidWlsZA==
+            #nf pipeline = 'TkZSIHZlcnNpb24gb2YgUGlwZWxpbmU='
+
 def edit_key(dict = None ,key = None ,value = None):
     
     if key in dict:                                                                
