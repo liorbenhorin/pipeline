@@ -1571,13 +1571,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         
         '''
-        self.init_settings()  
-        self._decode_users()
-        
-        if self.settings.user[0] is not None:
-            self.ui.users_pushButton.setText(self.settings.user[0])
-        else:
-            self.ui.users_pushButton.setText("Not logged In") 
+        # self.init_settings()
+        # self._decode_users()
+        #
+        # if self.settings.user[0] is not None:
+        #     self.ui.users_pushButton.setText(self.settings.user[0])
+        # else:
+        #     self.ui.users_pushButton.setText("Not logged In")
             #self.unload_project()
             #maya.viewMassage("No user is logged in")
   
@@ -1616,20 +1616,25 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         '''
 
+        self.init_settings()
+        self._decode_users()
+
+        if self.settings.user[0] is not None:
+            self.ui.users_pushButton.setText(self.settings.user[0])
+        else:
+            self.ui.users_pushButton.setText("Not logged In")
 
         self._dataMapper = None
         self.dynamicCombo = None
         self.stageCombo = None
-
         self._versionsView = None
-
         self._client = None
         self._clients = None
         self._projects = None
         self._project = None
         self._stage = None
-
         self._stageNode = None
+
         self.populate_clients()
         self.populate_projects()
         self.stage_ui()
@@ -1725,13 +1730,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             assets.model_tree()
             scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root)
             scenes.model_tree()
-            #root = dt.FolderNode("Diving",_root)
-            #char = dt.FolderNode("Charachters", root)
-            #dog = dt.AssetNode("Dog", char)
-            #Animation = dt.FolderNode("Animation", root)
-            #rig = dt.StageNode("Rig", parent = dog)
-            #model = dt.StageNode("Model", parent = dog)
-            #sorted = dt.StageNode("Sorted_component", parent = dog)
 
             '''
             creating the tree model,
