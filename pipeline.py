@@ -3238,11 +3238,16 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.updateProjectsTable()
         self.setColumnWidth_projectsTable()
 
+        self.projectsTableView = dtv.PipelineProjectsView(parent = self, parentWidget = self.ui.projectsWidget)
+
+        self.ui.projectsWidget.layout().addWidget(self.projectsTableView)
+
         self.ui.rootDirSet_pushButton.clicked.connect(self.set_root_path)
         self.ui.rootDir_lineEdit.setText(self.pipeline_window.settings.rootDir)
         self.ui.clients_comboBox.setIconSize(QtCore.QSize(24 ,24)  )
         self.populate_clients()
         dtv.setComboValue(self.ui.clients_comboBox, self.pipeline_window.settings.client)
+        self.populate_projects()
 
 
     def populate_clients(self):
@@ -3272,6 +3277,24 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             self.ui.clients_comboBox.currentIndexChanged.connect(self.setClient)
 
 
+    def populate_projects(self):
+        if self.pipeline_window.settings.rootDir and self.pipeline_window.settings.client:
+            projects_path = os.path.join(self.pipeline_window.settings.rootDir, self.pipeline_window.settings.client)
+            dirs = files.list_dir_folders(projects_path)
+            list = []
+            [list.append(dt.ProjectNode(i, path = os.path.join(projects_path, i))) for i in dirs]
+
+            if list:
+                self.projectsTableView.setModel_(dtm.PipelineProjectsModel(list))
+                return True
+
+        self.projectsTableView.setModel(None)
+
+
+
+
+
+
     def setClient(self):
 
         index = self.ui.clients_comboBox.currentIndex()
@@ -3280,6 +3303,11 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         if self.ui.clients_comboBox.model().items[index].typeInfo() != _new_ and self.ui.clients_comboBox.model().items[
             index].typeInfo() != _catagory_:
             self.pipeline_window.settings.client = self.ui.clients_comboBox.currentText()
+
+        else:
+            self.pipeline_window.settings.client = None
+
+        self.populate_projects()
 
 
 

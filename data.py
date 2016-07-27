@@ -1364,6 +1364,268 @@ class StageNode(RootNode):
 
         log.info("end logging component ")
 
+class ProjectNode(RootNode):
+    def __init__(self,name, parent=None, **kwargs):
+
+        RootNode.__init__(self, name, parent, **kwargs)
+
+
+        self.project_file = None
+        if self.data_file:
+            self.project_file = self.data_file.read()
+
+        self.settings = None
+        for key in kwargs:
+            if key == "settings":
+                self.settings = kwargs[key]
+
+    def create(self,
+               path = None,
+               name = "My_Project",
+               padding = 3,
+               file_type = "ma",
+               fps = 25,
+               users = {"Admin":(1234,"admin")},
+               playblast_outside = False):
+
+
+        project_key = data.id_generator()
+        project_data = {}
+        project_data["project_name"] = name
+        project_data["project_key"] = project_key
+        project_data["padding"] = padding
+        project_data["fps"] = fps
+        project_data["defult_file_type"] = file_type
+        project_data["users"] = users
+        project_data["playblast_outside"] = playblast_outside
+
+        folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
+                   "sound", "clips", "renderData", "cache"]
+
+        for folder in folders:
+            project_data[folder] = folder
+            files.create_directory(os.path.join(project_path, folder))
+
+        #render folders:
+        r_folders = ["renderData", "depth", "iprimages", "shaders"]
+        for r_folder in r_folders[1:]:
+            files.create_directory(os.path.join(project_path, r_folders[0], r_folder))
+
+        fur_folders = ["renderData", "fur", "furFiles", "furImages", "furEqualMap", "furAttrMap", "furShadowMap" ]
+        for f_folder in fur_folders[2:]:
+            files.create_directory(os.path.join(project_path, fur_folders[0], fur_folders[1], f_folder))
+
+        #cache folders:
+        c_folders = ["cache", "particles", "nCache", "bifrost"]
+        for c_folder in c_folders[1:]:
+            files.create_directory(os.path.join(project_path, c_folders[0], c_folder))
+
+        fl_folders = ["cache", "nCache", "fluid"]
+        for fl_folder in fl_folders[2:]:
+            files.create_directory(os.path.join(project_path, fl_folders[0], fl_folders[1], fl_folder))
+
+
+        stages = {}
+        stages["asset"] = ["model", "rig", "clip", "shading", "lightning"]
+        stages["animation"] = ["layout", "Shot"]
+
+        project_data["stages"] = stages
+
+        levels = {}
+        levels["asset"] = ["type", "asset", "stage", "ccc"]
+        levels["animation"] = ["Ep", "Seq"]
+
+        project_data["levels"] = levels
+
+        path = os.path.join(path, "%s.%s" % (self.name, "json"))
+
+        self.data_file = data.jsonDict().create(path, project_data)
+        self.project_file = self.data_file.read()
+
+
+        return self
+
+
+
+    def project_file_key(self, key = None):
+        if self.project_file:
+            return self.project_file[key]
+        else:
+            return None
+
+    @property
+    def project_name(self):
+        if self.project_file:
+            return self.project_file["project_name"]
+        else:
+            return None
+
+    @property
+    def project_fps(self):
+        if self.project_file:
+            if "fps" in self.project_file.keys():
+                return self.project_file["fps"]
+            else:
+                return None
+        else:
+            return None
+
+
+    @project_fps.setter
+    def project_fps(self,fps):
+
+        if self.data_file:
+            data = {}
+            data["fps"] = fps
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+
+    @property
+    def project_key(self):
+        if self.project_file:
+            return self.project_file["project_key"]
+        else:
+            return None
+
+    @property
+    def project_padding(self):
+        if self.project_file:
+            return self.project_file["padding"]
+        else:
+            return None
+
+    @property
+    def project_file_type(self):
+        if self.project_file:
+            return self.project_file["defult_file_type"]
+        else:
+            return None
+
+
+    @project_file_type.setter
+    def project_file_type(self,type):
+
+        if self.data_file:
+            data = {}
+            data["defult_file_type"] = type
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+    @property
+    def movie_file_type(self):
+        if self.project_file:
+            return "mov"
+        else:
+            return None
+
+    @property
+    def project_users(self):
+        if self.project_file:
+            if "users" in self.project_file.keys():
+                return self.project_file["users"]
+            else:
+                return None
+        else:
+            return None
+
+    @project_users.setter
+    def project_users(self,users):
+
+        if self.data_file:
+            data = {}
+            data["users"] = users
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+
+    @property
+    def playblast_outside(self):
+        if self.project_file:
+            if "playblast_outside" in self.project_file.keys():
+                return self.project_file["playblast_outside"]
+            else:
+                return False
+        else:
+            return None
+
+    @playblast_outside.setter
+    def playblast_outside(self,playblast_outside):
+
+
+        old_path = self.playblasts_path
+
+        if self.data_file:
+            data = {}
+            data["playblast_outside"] = playblast_outside
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+            files.dir_move(old_path, self.playblasts_path)
+
+
+    @property
+    def playblasts_path(self):
+        if self.settings:
+            if self.playblast_outside:
+                path = os.path.join(os.path.dirname(self.settings.current_project_path),"%s_playblasts"%(self.project_name))
+
+            else:
+                path = os.path.join(self.settings.current_project_path,"playblasts")
+
+
+            return path
+        return None
+
+
+    # @property
+    # def stages(self):
+    #     stages = {}
+    #     stages["asset"] = ["model","rig","clip","shading","lightning"]
+    #     stages["animation"] = ["layout","Shot"]
+    #     return stages
+    #
+    # @property
+    # def levels(self):
+    #     levels = {}
+    #     levels["asset"] = ["type","asset","stage","ccc"]
+    #     levels["animation"] = ["Ep","Seq"]
+    #     return levels
+
+
+    @property
+    def stages(self):
+        if self.project_file:
+            return self.project_file["stages"]
+        else:
+            return None
+
+    @stages.setter
+    def stages(self, dict):
+        if self.data_file:
+            data = {}
+            data["stages"] = dict
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+
+    @property
+    def levels(self):
+        if self.project_file:
+            return self.project_file["levels"]
+        else:
+            return None
+
+
+    @levels.setter
+    def levels(self, dict):
+        if self.data_file:
+            data = {}
+            data["levels"] = dict
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
+
+
 def stageDir(dir):
 
     if os.path.exists(dir):

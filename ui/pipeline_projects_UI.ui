@@ -139,7 +139,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableView" name="projects_tableView"/>
+        <widget class="QWidget" name="projectsWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout"/>
+        </widget>
        </item>
        <item>
         <widget class="QTableWidget" name="projects_tableWidget"/>

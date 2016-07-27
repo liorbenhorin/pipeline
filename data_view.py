@@ -199,6 +199,118 @@ def setComboValue(QComboBox, String):
     index = QComboBox.findText(String, QtCore.Qt.MatchFixedString)
     if index >= 0:
         QComboBox.setCurrentIndex(index)
+        return True
+    return False
+
+
+class SetProjectButtonDelegate(QtGui.QItemDelegate):
+
+    def __init__(self, parent):
+        QtGui.QItemDelegate.__init__(self, parent)
+
+    def paint(self, painter, option, index):
+
+        if not self.parent().indexWidget(index):
+
+
+            label = "Set"
+            icon = new_icon
+
+
+            button = QtGui.QPushButton(
+                label,
+                index.data(),
+                self.parent(),
+                clicked=self.parent().setProject
+            )
+
+            button.setIconSize(QtCore.QSize(20, 20))
+            button.setIcon(QtGui.QIcon(icon))
+            self.parent().setIndexWidget(index, button)
+
+class PipelineProjectsView(QtGui.QTableView):
+    def __init__(self, parentWidget = None, parent = None):
+        super(PipelineProjectsView, self).__init__(parent)
+
+        self.parent = parent
+        self.parentWidget = parentWidget
+
+        self.setAlternatingRowColors(True)
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.setWordWrap(True)
+        #elf.setShowGrid(False)
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+        #self.icons_size(32)
+        #self.setMinimumWidth(250)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        #self.setSortingEnabled(True)
+        #self.horizontalHeader().setOffset(10)
+        self.horizontalHeader().hide()
+        self.verticalHeader().hide()
+        self.setSortingEnabled(True)
+
+        # Set the delegate for column 0 of our table
+        self._proxyModel = None
+
+    def addSlider(self):
+
+        self._slider = IconScaleSlider(self)
+        self.parentWidget.layout().addWidget(self._slider)
+        self._slider.listSlider.sliderMoved.connect(self.icons_size)
+        self.icons_size(32)
+
+    def icons_size(self, int):
+        self.setIconSize(QtCore.QSize(int, int))
+        #self.horizontalHeader().setDefaultSectionSize(int)
+        #self.verticalHeader().setDefaultSectionSize(int)
+        #self.horizontalHeader().resizeSection(0, int)
+        #self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
+        self.update()
+
+    def clearModel(self):
+        self.setModel(None)
+        if self._proxyModel:
+            self._proxyModel.setSourceModel(None)
+            self._proxyModel = None
+
+
+    def setModel_(self, model = None):
+        self.clearModel()
+        if model:
+
+
+            self._proxyModel = dtm.PipelineVersionsProxyModel()
+            self._proxyModel.setSourceModel(model)
+            self.setModel(self._proxyModel)
+            # size the load button column
+            self.horizontalHeader().resizeSection(2,50)
+            self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
+            self.horizontalHeader().resizeSection(1, 50)
+            self.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed)
+            self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
+
+
+            # setup the buttons for loading and more options with delegates
+
+            #self.setItemDelegateForColumn(4,  loadButtonDelegate(self))
+
+
+            self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
+
+
+            #self.setCurrentIndex(self.model().index(0,0, None))
+
+
+    def setProject(self):
+
+        button = self.sender()
+        index = self.indexAt(button.pos())
+        index = self.model().mapToSource(index)
+        if self.model().sourceModel().items[0].typeInfo() == _new_:
+            self.model().sourceModel().items[0].parent().initialVersion()
+        else:
+            self.model().sourceModel().getNode(index).set()
+            self.setCurrentIndex(index)
 
 
 class loadButtonDelegate(QtGui.QItemDelegate):
