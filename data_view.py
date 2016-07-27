@@ -184,7 +184,11 @@ def set_icons():
     global load_icon
     global open_icon
     global new_icon
+    global set_icon
+    global edit_icon
 
+    edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "edit"))
+    set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "set"))
     reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "reload"))
     load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "load"))
     large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
@@ -202,6 +206,30 @@ def setComboValue(QComboBox, String):
         return True
     return False
 
+class EditProjectButtonDelegate(QtGui.QItemDelegate):
+
+    def __init__(self, parent):
+        QtGui.QItemDelegate.__init__(self, parent)
+
+    def paint(self, painter, option, index):
+
+        if not self.parent().indexWidget(index):
+
+
+            label = "Edit"
+            icon = edit_icon
+
+
+            button = QtGui.QPushButton(
+                label,
+                index.data(),
+                self.parent(),
+                clicked=self.parent().editProject
+            )
+
+            button.setIconSize(QtCore.QSize(20, 20))
+            button.setIcon(QtGui.QIcon(icon))
+            self.parent().setIndexWidget(index, button)
 
 class SetProjectButtonDelegate(QtGui.QItemDelegate):
 
@@ -213,8 +241,8 @@ class SetProjectButtonDelegate(QtGui.QItemDelegate):
         if not self.parent().indexWidget(index):
 
 
-            label = "Set"
-            icon = new_icon
+            label = "Set project"
+            icon = set_icon
 
 
             button = QtGui.QPushButton(
@@ -283,16 +311,16 @@ class PipelineProjectsView(QtGui.QTableView):
             self._proxyModel.setSourceModel(model)
             self.setModel(self._proxyModel)
             # size the load button column
-            self.horizontalHeader().resizeSection(2,50)
+            self.horizontalHeader().resizeSection(2,100)
             self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
-            self.horizontalHeader().resizeSection(1, 50)
+            self.horizontalHeader().resizeSection(1, 100)
             self.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed)
             self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
 
 
             # setup the buttons for loading and more options with delegates
-
-            #self.setItemDelegateForColumn(4,  loadButtonDelegate(self))
+            self.setItemDelegateForColumn(1, EditProjectButtonDelegate(self))
+            self.setItemDelegateForColumn(2,  SetProjectButtonDelegate(self))
 
 
             self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
@@ -300,6 +328,16 @@ class PipelineProjectsView(QtGui.QTableView):
 
             #self.setCurrentIndex(self.model().index(0,0, None))
 
+
+    def editProject(self):
+        button = self.sender()
+        index = self.indexAt(button.pos())
+        index = self.model().mapToSource(index)
+        if self.model().sourceModel().items[0].typeInfo() == _new_:
+            self.model().sourceModel().items[0].parent().initialVersion()
+        else:
+            self.model().sourceModel().getNode(index).edit()
+            self.setCurrentIndex(index)
 
     def setProject(self):
 

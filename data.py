@@ -1365,6 +1365,9 @@ class StageNode(RootNode):
         log.info("end logging component ")
 
 class ProjectNode(RootNode):
+
+    loaded = QtCore.Signal()
+
     def __init__(self,name, parent=None, **kwargs):
 
         RootNode.__init__(self, name, parent, **kwargs)
@@ -1378,6 +1381,13 @@ class ProjectNode(RootNode):
         for key in kwargs:
             if key == "settings":
                 self.settings = kwargs[key]
+
+
+        self.pipelineUI = None
+        for key in kwargs:
+            if key == "pipelineUI":
+                self.pipelineUI = kwargs[key]
+                self.loaded.connect(self.pipelineUI.updateCurrentProject)
 
     def create(self,
                path = None,
@@ -1404,25 +1414,25 @@ class ProjectNode(RootNode):
 
         for folder in folders:
             project_data[folder] = folder
-            files.create_directory(os.path.join(project_path, folder))
+            files.create_directory(os.path.join(path, folder))
 
         #render folders:
         r_folders = ["renderData", "depth", "iprimages", "shaders"]
         for r_folder in r_folders[1:]:
-            files.create_directory(os.path.join(project_path, r_folders[0], r_folder))
+            files.create_directory(os.path.join(path, r_folders[0], r_folder))
 
         fur_folders = ["renderData", "fur", "furFiles", "furImages", "furEqualMap", "furAttrMap", "furShadowMap" ]
         for f_folder in fur_folders[2:]:
-            files.create_directory(os.path.join(project_path, fur_folders[0], fur_folders[1], f_folder))
+            files.create_directory(os.path.join(path, fur_folders[0], fur_folders[1], f_folder))
 
         #cache folders:
         c_folders = ["cache", "particles", "nCache", "bifrost"]
         for c_folder in c_folders[1:]:
-            files.create_directory(os.path.join(project_path, c_folders[0], c_folder))
+            files.create_directory(os.path.join(path, c_folders[0], c_folder))
 
         fl_folders = ["cache", "nCache", "fluid"]
         for fl_folder in fl_folders[2:]:
-            files.create_directory(os.path.join(project_path, fl_folders[0], fl_folders[1], fl_folder))
+            files.create_directory(os.path.join(path, fl_folders[0], fl_folders[1], fl_folder))
 
 
         stages = {}
@@ -1445,6 +1455,35 @@ class ProjectNode(RootNode):
 
         return self
 
+    def edit(self):
+        print "eding the project"
+
+    def set(self):
+        self.loaded.emit()
+        return
+
+
+        import pymel.core as pm
+        import maya.mel as mel
+
+        if 1==1: # do some test to see if we can set this projet
+
+            pm.workspace.open(self.path)
+            pm.workspace.chdir(self.path)
+
+            raw_project_path = self.path.replace("\\", "\\\\")
+            melCmd = "setProject \"" + raw_project_path + "\";"
+            try:
+                mel.eval(melCmd)
+            except:
+                pass
+
+            print "project changed to: %s" % self.name
+
+            self.loaded.emit()
+
+        else:
+            print "Cannot set project"
 
 
     def project_file_key(self, key = None):

@@ -1925,6 +1925,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.stage_widget.setEnabled(False)
         return False
 
+
+    def updateCurrentProject(self):
+        print self.sender(), "*****"
         
     def selectInScene(self):
         pass
@@ -3282,7 +3285,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             projects_path = os.path.join(self.pipeline_window.settings.rootDir, self.pipeline_window.settings.client)
             dirs = files.list_dir_folders(projects_path)
             list = []
-            [list.append(dt.ProjectNode(i, path = os.path.join(projects_path, i))) for i in dirs]
+            [list.append(dt.ProjectNode(i, pipelineUI = self.pipeline_window, path = os.path.join(projects_path, i))) for i in dirs]
 
             if list:
                 self.projectsTableView.setModel_(dtm.PipelineProjectsModel(list))
