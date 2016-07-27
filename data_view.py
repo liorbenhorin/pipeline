@@ -473,6 +473,7 @@ class PipelineVersionsView(QtGui.QTableView):
 
             self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
 
+            self.update()
 
             #self.setCurrentIndex(self.model().index(0,0, None))
 
@@ -1684,7 +1685,7 @@ class ComboDynamicWidget(ComboWidget):
             
             self._subdirectories = dirs
             
-            relative_path = os.path.relpath(dir, self._settings.current_project_path)
+            relative_path = os.path.relpath(dir, self.parent.project.path)
             depth = relative_path.count(os.sep)
             
             if self._stage in self._project.stages["asset"]:
@@ -1702,7 +1703,7 @@ class ComboDynamicWidget(ComboWidget):
                 
                     return
           
-            self._level = "n/a" 
+        self._level = "n/a"
                 
 
     def createModel(self):
@@ -1772,7 +1773,9 @@ class ComboDynamicWidget(ComboWidget):
             if the path is an assets folder
             '''
 
-            self._node = dt.AssetNode(os.path.split(path)[1], parent=self._parent_box._node, path=os.path.join(path),
+            p = self._parent_box._node if self._parent_box else self._node
+
+            self._node = dt.AssetNode(os.path.split(path)[1], parent=p, path=os.path.join(path),
                                       project=self._project,
                                       settings=self._settings, pipelineUI=self.parent)
 

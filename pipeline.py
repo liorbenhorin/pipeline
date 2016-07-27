@@ -1618,17 +1618,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         self._versionsView = None
 
-
+        self._client = None
         self._clients = None
         self._projects = None
         self._project = None
-
         self._stage = None
+
         self._stageNode = None
         self.populate_clients()
-        if self.populate_projects():
-            self.tree()
-
+        self.populate_projects()
+        self.populate_navbar()
+        self.populate_project_tree()
 
     def init_settings(self):
         self.settings_file_name = 'settings.json'
@@ -1650,8 +1650,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             dirs = files.list_dir_folders(path)
 
             list = [dt.CatagoryNode("clients")]
-
-            [list.append(dt.ClientNode(i, path=os.path.join(path, i))) for i in dirs]
+            current = None
+            for i in dirs:
+                node = dt.ClientNode(i, path=os.path.join(path, i))
+                list.append(node)
+                if node.name == self.settings.client:
+                    current = node
 
             RemoveOption = False
 
@@ -1664,6 +1668,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 list.append(dt.AddNode("Remove..."))
 
             self.clients = dtm.PipelineListModel(list)
+            if current:
+                self.client = current
 
             return True
 
@@ -1685,7 +1691,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             list = []
             current = None
             for i in dirs:
-                node = dt.ProjectNode(i, pipelineUI=self, path=os.path.join(projects_path, i))
+                node = dt.ProjectNode(i, parent = self.client, pipelineUI=self, path=os.path.join(projects_path, i))
                 if node.name == self.settings.project:
                     current = node
                 list.append(node)
@@ -1696,183 +1702,113 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 if current:
                     return True
 
+                self.ui.projects_pushButton.setText("No Project")
                 return False
 
             self.projects = None
             return False
 
 
-    def tree(self):
 
-        
-        self.ui.searchIcon_label.setPixmap(search_icon)
-        
-        '''
-        import modules
-        '''
-            
-    
-    
-        '''
-        MODELS
-        '''
-        
-        '''
-        generate some tree nodes for testing
-        '''
-        
-        _root = dt.RootNode("root", path = self.project.path)
-        assets = dt.FolderNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root)
-        assets.model_tree()
-        scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root)
-        scenes.model_tree()
-        #root = dt.FolderNode("Diving",_root)
-        #char = dt.FolderNode("Charachters", root)
-        #dog = dt.AssetNode("Dog", char)
-        #Animation = dt.FolderNode("Animation", root)
-        #rig = dt.StageNode("Rig", parent = dog)
-        #model = dt.StageNode("Model", parent = dog)
-        #sorted = dt.StageNode("Sorted_component", parent = dog)
-        
-        '''
-        creating the tree model,
-        it's the main tree model object, its global so it is deleted every restart of Pipeline
-        '''
-        
-        treeModel = dtm.PipelineProjectModel(_root) 
-        
-        
-        '''
-        _proxymodel is the sortFilterProxyModel object that is connected to the tree model
-        
-        '''
-        
-        self._proxyModel = dtm.PipelineProjectProxyModel()      
-        self._proxyModel.setSourceModel(treeModel)
-        self._proxyModel.setDynamicSortFilter(True)
-        self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        self._proxyModel.setSortRole(0)
-        self._proxyModel.setFilterRole(0)
-        self._proxyModel.setFilterKeyColumn(0)
-        
-        '''
-        VIEWS
-        
-        '''
-        
-        #self.list = dtv.PipelineContentsView()        
-        self.tree = dtv.pipelineTreeView(self) 
-        self.tree.setModel( self._proxyModel )
+    def populate_project_tree(self):
+        if self.project:
+
+            _root = dt.RootNode("root", path = self.project.path)
+            assets = dt.FolderNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root)
+            assets.model_tree()
+            scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root)
+            scenes.model_tree()
+            #root = dt.FolderNode("Diving",_root)
+            #char = dt.FolderNode("Charachters", root)
+            #dog = dt.AssetNode("Dog", char)
+            #Animation = dt.FolderNode("Animation", root)
+            #rig = dt.StageNode("Rig", parent = dog)
+            #model = dt.StageNode("Model", parent = dog)
+            #sorted = dt.StageNode("Sorted_component", parent = dog)
+
+            '''
+            creating the tree model,
+            it's the main tree model object, its global so it is deleted every restart of Pipeline
+            '''
+
+            treeModel = dtm.PipelineProjectModel(_root)
+
+
+            '''
+            _proxymodel is the sortFilterProxyModel object that is connected to the tree model
+
+            '''
+
+            self._proxyModel = dtm.PipelineProjectProxyModel()
+            self._proxyModel.setSourceModel(treeModel)
+            self._proxyModel.setDynamicSortFilter(True)
+            self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+            self._proxyModel.setSortRole(0)
+            self._proxyModel.setFilterRole(0)
+            self._proxyModel.setFilterKeyColumn(0)
+
+            '''
+            VIEWS
+
+            '''
+
+            #self.list = dtv.PipelineContentsView()
+            self.tree = dtv.pipelineTreeView(self)
+            self.tree.setModel( self._proxyModel )
          
         
-        #connect the tree to the table views and vice versa     
-        #self.tree.tableView = self.list 
-        #self.list.treeView = self.tree      
+            #connect the tree to the table views and vice versa
+            #self.tree.tableView = self.list
+            #self.list.treeView = self.tree
         
-        self.tree.setModel( self._proxyModel )
-        #self.list.init_treeView()        
-        self._proxyModel.treeView = self.tree
+            self.tree.setModel( self._proxyModel )
+            #self.list.init_treeView()
+            self._proxyModel.treeView = self.tree
 
-        #connect the tree and the table signals
-        #QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.click)
-        QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
-        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
-        QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)        
-        #QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.click)
+            #connect the tree and the table signals
+            #QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.click)
+            QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
+            QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
+            QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)
+            #QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.click)
 
-        self.selModel = self.tree.selectionModel()
-        self.tree.clicked.connect( self.tree.saveSelection ) 
-        #self.selModel.selectionChanged.connect( self.list.update )        
-        
-        # select the tree root
-        self.tree.selectRoot()
-        #verticalLayout_18
-        '''
-        UI LAYOUTS, SPLITTER, AND ICONS SCALE SLIDER
-        '''
-        self.navWidget = QtGui.QWidget()        
-        h_layout = QtGui.QVBoxLayout()   
-        h_layout.setContentsMargins(0, 0, 0, 0)      
-        self.navWidget.setLayout(h_layout) 
-        h_layout.addWidget(self.tree)
-        '''       
-        self.splitter1 = QtGui.QSplitter()
-        self.splitter1.setOrientation(QtCore.Qt.Horizontal)         
-        self.splitter1.setHandleWidth(10)
-        self.splitter1.setChildrenCollapsible(True)
-        self.splitter1.addWidget(self.tree)
-        self.splitter1.addWidget(self.list)        
-        '''
-        
-        #self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
-        #self.navWidget.
-        #h_layout.addWidget(self.stagesView)
-        #self.ui.project_widget.setHeight(200)
-        
-        #self.ui.stages_version_splitter.setSizes([150,600])
-        #self.ui.stages_version_splitter.setSizes([150,600])
-        '''
-        large_lable = QtGui.QLabel()
-        large_lable.setMaximumSize(QtCore.QSize(16, 16)) 
-        large_lable.setPixmap(large_icon)
-        small_lable = QtGui.QLabel()
-        small_lable.setMaximumSize(QtCore.QSize(16, 16)) 
-        small_lable.setPixmap(small_icon)
-            
-        slideWidget = QtGui.QWidget() 
-        slideWidget.setMaximumHeight(20)
-        slideLayout = QtGui.QHBoxLayout()
-        slideLayout.setContentsMargins(0, 0, 0, 0)        
-        slideWidget.setLayout(slideLayout)
-        slideLayout.setAlignment(QtCore.Qt.AlignRight)
-                
-        self.listSlider = QtGui.QSlider()
-        self.listSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.listSlider.setMaximumWidth(80)
-        self.listSlider.setMinimumWidth(80)
-        self.listSlider.setMaximumHeight(10)
-        self.listSlider.setMinimum(32)
-        self.listSlider.setMaximum(96)
-        self.listSlider.setValue(32)
-        #self.listSlider.valueChanged.connect(self.list.icons_size) 
+            self.selModel = self.tree.selectionModel()
+            self.tree.clicked.connect( self.tree.saveSelection )
+            #self.selModel.selectionChanged.connect( self.list.update )
 
-        slideLayout.addWidget(small_lable)
-        slideLayout.addWidget(self.listSlider)
-        slideLayout.addWidget(large_lable)
-        h_layout.addWidget(slideWidget)'''
+            # select the tree root
+            self.tree.selectRoot()
 
-        # add to the designer ui
-        self.ui.verticalLayout_18.addWidget(self.navWidget)
-        # ----> temp!!! hide the old selection options
-        #self.ui.assets_selection_frame.setHidden(True)
+            self.navWidget = QtGui.QWidget()
+            h_layout = QtGui.QVBoxLayout()
+            h_layout.setContentsMargins(0, 0, 0, 0)
+            self.navWidget.setLayout(h_layout)
+            h_layout.addWidget(self.tree)
 
+            # add to the designer ui
+            self.ui.verticalLayout_18.addWidget(self.navWidget)
+
+
+            # self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
+            # self.navWidget.
+            # h_layout.addWidget(self.stagesView)
+            # self.ui.project_widget.setHeight(200)
+
+            # self.ui.stages_version_splitter.setSizes([150,600])
+
+
+
+
+    def populate_navbar(self):
+
+        self.ui.stages_version_splitter.setSizes([0, 600])
         self.versionsView = dtv.PipelineVersionsView(parentWidget = self.ui.versionsTab,  parent = self)
-        #self.list.versionsView = self.versionsTable
-
         self.ui.versionsTabLayout.addWidget(self.versionsView)
         self.versionsView.addSlider()
 
         self._dataMapper = QtGui.QDataWidgetMapper()
-        # self._dataMapper.setModel(treeModel)
-        # self._dataMapper.addMapping(self.mapLabel, 0, QtCore.QByteArray("text"))
-        # self._dataMapper.setRootIndex(QtCore.QModelIndex())
-        # self._dataMapper.toFirst()
-        self._projects = None
-
-        levels = [None]
 
         self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
-
-
-
-        #def setModel(self, proxyModel):
-        #self._proxyModel = proxyModel
-
-
-        #self._dataMapper.addMapping(self.uiX, 2)
-
-
-
 
         self.stageCombo = dtv.ComboStaticWidget(
                                       settings = self.settings,
@@ -1882,24 +1818,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         self.stageSelect()
         self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
-
-
-        #dir = os.path.join(self.settings.current_project_path, self.stageType())
-        '''
-        self.dynamicCombo = dtv.ComboDynamicWidget(
-                                                 settings = self.settings,
-                                                 project = self.project,
-                                                 path = dir,
-                                                 stage = "model",
-                                                 box_list = [],
-                                                 parent_box = None,
-                                                 parent_layout = self.ui.navBarLayout,
-                                                 parent = self)
-
-
-        '''
         self.updateVersionsTable()
-        #self.stageSelect()
+
             
     def stageSelect(self):
 
@@ -1909,7 +1829,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         dir = os.path.join(self.project.path, "assets")
 
-        self._stage = self.settings.stage
+
         self.dynamicCombo = dtv.ComboDynamicWidget(
                                                  settings = self.settings,
                                                  project = self.project,
@@ -1920,8 +1840,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                                  parent_layout = self.ui.navBarLayout,
                                                  parent = self)
 
-
-        
             
     def stageType(self):
 
@@ -2017,7 +1935,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.versionsView.setModel_(Model)
 
 
+
             self._dataMapper.setModel(Model)
+
             self._dataMapper.addMapping(self.ui.stage_path_label, 3, QtCore.QByteArray("text"))
             self._dataMapper.addMapping(self.ui.stage_author_label, 0, QtCore.QByteArray("text"))
             self._dataMapper.addMapping(self.ui.stage_note_label, 4, QtCore.QByteArray("text"))
@@ -2041,6 +1961,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def updateCurrentProject(self):
         print self.sender(), "*****"
         self.settings.project = self.sender().name
+        self.ui.projects_pushButton.setText("%s > %s"%(self.sender().parent().name, self.sender().name))
         
     def selectInScene(self):
         pass
@@ -2070,9 +1991,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 
         self.ui.comp_icon_label.setPixmap(new_icon.scaled(16,16))
         self.ui.comp_user_label.setPixmap(users_icon.scaled(16,16))
-        self.ui.comp_note_label.setPixmap(edit_icon.scaled(16,16))        
-    
+        self.ui.comp_note_label.setPixmap(edit_icon.scaled(16,16))
 
+        self.ui.searchIcon_label.setPixmap(search_icon)
 
         
 
@@ -3405,6 +3326,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                 self.pipeline_window.projects = dtm.PipelineProjectsModel(list)
                 self.projectsTableView.setModel_(self.pipeline_window.projects)
                 return True
+
 
         self.projectsTableView.setModel(None)
 

@@ -1462,9 +1462,6 @@ class ProjectNode(RootNode):
         print "eding the project"
 
     def set(self):
-        self.loaded.emit()
-        return
-
 
         import pymel.core as pm
         import maya.mel as mel

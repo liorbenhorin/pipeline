@@ -716,142 +716,142 @@ class PipelineVersionsProxyModel(QtGui.QSortFilterProxyModel):
         self.setFilterKeyColumn(0)
 
 
-        class PipelineVersionsModel(QtCore.QAbstractTableModel):
+class PipelineVersionsModel(QtCore.QAbstractTableModel):
 
-            MIMEDATA = 'application/x-qabstractitemmodeldatalist'
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
 
-            def __init__(self, items=[], parent=None):
-                QtCore.QAbstractTableModel.__init__(self, parent)
-                self.__items = items
+    def __init__(self, items=[], parent=None):
+        QtCore.QAbstractTableModel.__init__(self, parent)
+        self.__items = items
 
-            @property
-            def items(self):
-                return self.__items
+    @property
+    def items(self):
+        return self.__items
 
-            def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role):
 
-                if role == QtCore.Qt.DisplayRole:
+        if role == QtCore.Qt.DisplayRole:
 
-                    if orientation == QtCore.Qt.Horizontal:
-                        if section == 1:
-                            return "Author"
-                        if section == 2:
-                            return "Date Saved"
+            if orientation == QtCore.Qt.Horizontal:
+                if section == 1:
+                    return "Author"
+                if section == 2:
+                    return "Date Saved"
 
-                    if orientation == QtCore.Qt.Vertical:
-                        if self.__items[section].typeInfo() != _new_:
-                            return self.__items[section].number
-                        else:
-                            return section
-                    else:
-                        return
-                        #
-                        # if role == QtCore.Qt.DecorationRole:
-                        #
-                        #     if orientation == QtCore.Qt.Horizontal:
-                        #         if section == 0:
-                        #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
-                        #         if section == 1:
-                        #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
-                        #     else:
-                        #         return
+            if orientation == QtCore.Qt.Vertical:
+                if self.__items[section].typeInfo() != _new_:
+                    return self.__items[section].number
+                else:
+                    return section
+            else:
+                return
+                #
+                # if role == QtCore.Qt.DecorationRole:
+                #
+                #     if orientation == QtCore.Qt.Horizontal:
+                #         if section == 0:
+                #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+                #         if section == 1:
+                #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+                #     else:
+                #         return
 
-            def rowCount(self, parent):
-                return len(self.__items)
+    def rowCount(self, parent):
+        return len(self.__items)
 
-            def columnCount(self, parent):
-                return 5
+    def columnCount(self, parent):
+        return 5
 
-            def data(self, index, role):
+    def data(self, index, role):
 
-                if role == QtCore.Qt.EditRole:
-                    row = index.row()
-                    if self.__items[row].typeInfo() != _new_:
-                        row = index.row()
-                        if index.column() == 3:
-                            return self.__items[row].fullName
-                        if index.column() == 0:
-                            return self.__items[row].author
-                        if index.column() == 4:
-                            return self.__items[row].note
+        if role == QtCore.Qt.EditRole:
+            row = index.row()
+            if self.__items[row].typeInfo() != _new_:
+                row = index.row()
+                if index.column() == 3:
+                    return self.__items[row].fullName
+                if index.column() == 0:
+                    return self.__items[row].author
+                if index.column() == 4:
+                    return self.__items[row].note
 
-                    return self.__items[index.row()].name
+            return self.__items[index.row()].name
 
-                if role == QtCore.Qt.DecorationRole:
-                    row = index.row()
-                    if self.__items[row].typeInfo() != _new_:
-                        if index.column() == 0:
-                            resource = self.__items[index.row()].resource()
-                            return QtGui.QIcon(QtGui.QPixmap(resource))
+        if role == QtCore.Qt.DecorationRole:
+            row = index.row()
+            if self.__items[row].typeInfo() != _new_:
+                if index.column() == 0:
+                    resource = self.__items[index.row()].resource()
+                    return QtGui.QIcon(QtGui.QPixmap(resource))
 
-                if role == QtCore.Qt.DisplayRole:
-                    row = index.row()
-                    if self.__items[row].typeInfo() != _new_:
-                        if index.column() == 1:
-                            return self.__items[row].author
-                        if index.column() == 2:
-                            return self.__items[row].date
-                        if index.column() == 3:
-                            return self.__items[row].note
-                        if index.column() == 6:
-                            return self.__items[row].fullName
+        if role == QtCore.Qt.DisplayRole:
+            row = index.row()
+            if self.__items[row].typeInfo() != _new_:
+                if index.column() == 1:
+                    return self.__items[row].author
+                if index.column() == 2:
+                    return self.__items[row].date
+                if index.column() == 3:
+                    return self.__items[row].note
+                if index.column() == 6:
+                    return self.__items[row].fullName
 
-            def index(self, row, column, parent):
-                if not self.hasIndex(row, column):
-                    return QtCore.QModelIndex()
+    def index(self, row, column, parent):
+        if not self.hasIndex(row, column):
+            return QtCore.QModelIndex()
 
-                return self.createIndex(row, column)
+        return self.createIndex(row, column)
 
-            def flags(self, index):
+    def flags(self, index):
 
-                if index.isValid():
+        if index.isValid():
 
-                    if self.getNode(index).typeInfo() == _dummy_:
-                        return QtCore.Qt.NoItemFlags
+            if self.getNode(index).typeInfo() == _dummy_:
+                return QtCore.Qt.NoItemFlags
 
-                return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled
 
-            """CUSTOM"""
-            """INPUTS: QModelIndex"""
+    """CUSTOM"""
+    """INPUTS: QModelIndex"""
 
-            def getNode(self, index):
-                if index.isValid():
-                    return self.__items[index.row()]
+    def getNode(self, index):
+        if index.isValid():
+            return self.__items[index.row()]
 
-                return None
+        return None
 
-            def setData(self, index, value, role=QtCore.Qt.EditRole):
-                if role == QtCore.Qt.EditRole:
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
 
-                    row = index.row()
+            row = index.row()
 
-                    if role == QtCore.Qt.EditRole:
-                        self.__items[row].name = value
-                        self.dataChanged.emit(index, index)
-
-                        return True
-
-                return False
-
-            # =====================================================#
-            # INSERTING & REMOVING
-            # =====================================================#
-            def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
-                self.beginInsertRows(parent, position, position + rows - 1)
-
-                self.endInsertRows()
+            if role == QtCore.Qt.EditRole:
+                self.__items[row].name = value
+                self.dataChanged.emit(index, index)
 
                 return True
 
-            def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
-                self.beginRemoveRows(parent, position, position + rows - 1)
+        return False
 
-                for i in range(rows):
-                    value = self.__items[position]
-                    self.__items.remove(value)
+    # =====================================================#
+    # INSERTING & REMOVING
+    # =====================================================#
+    def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
+        self.beginInsertRows(parent, position, position + rows - 1)
 
-                self.endRemoveRows()
-                return True
+        self.endInsertRows()
+
+        return True
+
+    def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, position, position + rows - 1)
+
+        for i in range(rows):
+            value = self.__items[position]
+            self.__items.remove(value)
+
+        self.endRemoveRows()
+        return True
 
 
 class PipelineProjectsModel(QtCore.QAbstractTableModel):
