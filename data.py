@@ -1477,7 +1477,7 @@ class ProjectNode(RootNode):
 
         stages = {}
         stages["asset"] = ["model", "rig", "clip", "shading", "lightning"]
-        stages["animation"] = ["layout", "Shot"]
+        stages["animation"] = ["layout", "Animation"]
 
         project_data["stages"] = stages
 

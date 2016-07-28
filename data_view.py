@@ -449,6 +449,14 @@ class PipelineVersionsView(QtGui.QTableView):
 
             self._proxyModel = dtm.PipelineVersionsProxyModel()
             self._proxyModel.setSourceModel(model)
+
+            self._proxyModel.setDynamicSortFilter(True)
+            #self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+            self._proxyModel.setSortRole(2)
+            #self._proxyModel.setFilterRole(0)
+            #self._proxyModel.setFilterKeyColumn(2)
+
+            #self._proxyModel.invalidateFilter()
             self.setModel(self._proxyModel)
 
             self.horizontalHeader().resizeSection(4,40)
@@ -472,6 +480,9 @@ class PipelineVersionsView(QtGui.QTableView):
             #self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
 
             self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
+
+            self.sortByColumn(2, QtCore.Qt.DescendingOrder)
+            #self.model().sort(0,QtCore.Qt.DescendingOrder)
 
             self.update()
 
@@ -515,6 +526,55 @@ class PipelineVersionsView(QtGui.QTableView):
         self.model().sourceModel().getNode(index).delete_me()
 
 
+    # def delete(self):
+    #     # This slot will be called when our button is clicked.
+    #     # self.sender() returns a refence to the QPushButton created
+    #     # by the delegate, not the delegate itself.
+    #     button = self.sender().parent()
+    #     index = self.indexAt(button.pos())
+    #     index = self.model().mapToSource(index)
+    #     self.model().sourceModel().getNode(index).delete_me()
+    #
+    #     node = self.asModelNode(index)
+    #     parentIndex = self.sourceModel.parent(index)
+    #     self.sourceModel.removeRows(node.row(), 1, parentIndex, kill=True)
+    #     self._proxyModel.invalidate()
+    #
+    # def contextMenuEvent(self, event):
+    #
+    #     handled = True
+    #     node = None
+    #     index = self.indexAt(event.pos())
+    #     menu = QtGui.QMenu()
+    #     actions = []
+    #     append_defult_options = True
+    #
+    #     if index.isValid():
+    #
+    #         tableModelNode = self.model().getNode(index)
+    #         src = self.model().mapToSource(index)
+    #         node = self.model().sourceModel().getNode(src)
+    #
+    #     if node:
+    #
+    #
+    #         actions.append(QtGui.QAction("Explore", menu, triggered=functools.partial(self.explore, src)))
+    #         actions.append(QtGui.QAction("Delete", menu, triggered=functools.partial(self.delete, src)))
+    #
+    #
+    #
+    #     menu.addActions(actions)
+    #
+    #     # if handled:
+    #
+    #     menu.exec_(event.globalPos())
+    #     # TELL QT IVE HANDLED THIS THING
+    #
+    #     # else:
+    #     # event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
+    #
+    #     event.accept()
+    #     return
 
 class IconScaleSlider(QtGui.QWidget):
     def __init__(self, parent):

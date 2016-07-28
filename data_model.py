@@ -810,6 +810,14 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                 #    return self.__items[row].note
                 if index.column() == 6:
                     return self.__items[row].fullName
+                if index.column() == 1:
+                    return self.__items[row].number
+
+            if role == 100: #SortRole
+                row = index.row()
+                if self.__items[row].typeInfo() != _new_:
+                    if index.column() == 0:
+                        return self.__items[row].number
 
     def indexFromNode(self, node):
         if node in self.__items:

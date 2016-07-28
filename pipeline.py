@@ -1623,6 +1623,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.init_settings()
         self._decode_users()
 
+        self.tree = dtv.pipelineTreeView(self)
+        self.navWidget = QtGui.QWidget()
+        h_layout = QtGui.QVBoxLayout()
+        h_layout.setContentsMargins(0, 0, 0, 0)
+        self.navWidget.setLayout(h_layout)
+        h_layout.addWidget(self.tree)
+
+        # add to the designer ui
+        self.ui.verticalLayout_18.addWidget(self.navWidget)
+        self.tree.update.connect(self.populate_navbar)
+
+
         if self.settings.user[0] is not None:
             self.ui.users_pushButton.setText(self.settings.user[0])
         else:
@@ -1790,7 +1802,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             '''
 
             #self.list = dtv.PipelineContentsView()
-            self.tree = dtv.pipelineTreeView(self)
+
             self.tree.setModel( self._proxyModel )
          
         
@@ -1816,15 +1828,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             # select the tree root
             self.tree.selectRoot()
 
-            self.navWidget = QtGui.QWidget()
-            h_layout = QtGui.QVBoxLayout()
-            h_layout.setContentsMargins(0, 0, 0, 0)
-            self.navWidget.setLayout(h_layout)
-            h_layout.addWidget(self.tree)
 
-            # add to the designer ui
-            self.ui.verticalLayout_18.addWidget(self.navWidget)
-            self.tree.update.connect(self.refresh_navbar)
 
             # self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
             # self.navWidget.
@@ -1832,7 +1836,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             # self.ui.project_widget.setHeight(200)
 
             # self.ui.stages_version_splitter.setSizes([150,600])
-
+        else:
+            self.tree.setModel(None)
 
     def stage_ui(self):
 
@@ -1927,11 +1932,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
         return None
 
-    def refresh_navbar(self):
-        self.populate_navbar()
-        return
-        self.dynamicCombo.kill()
-        self.stageSelect()
+
 
     def stageChanged(self):
         self.settings.stage = self.stageCombo.comboBox.currentText()
@@ -2048,11 +2049,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.ui.projects_pushButton.setText("%s > %s" % (project.parent().name, project.name))
             self.project = project
             self.populate_navbar()
+
         else:
             self.ui.projects_pushButton.setText("No Project")
             self.project = None
             self.settings.project = None
             self.populate_navbar()
+
+        self.populate_project_tree()
 
 
     def set_thumbnail(self,Qpixmap):
