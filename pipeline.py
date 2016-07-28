@@ -1299,9 +1299,9 @@ class pipeline_settings(pipeline_data):
             try:
                 return self.settings_file["stage"]
             except:
-                return True
+                return None
         else:
-            return True
+            return None
 
     @stage.setter
     def stage(self,value):
@@ -1356,7 +1356,7 @@ class pipeline_settings(pipeline_data):
         if self.settings_file:
             if self.settings_file:
                 try:
-                    return self.settings_file["project"]
+                    return self.settings_file["_project"]
                 except:
                     return None
             else:
@@ -1367,7 +1367,7 @@ class pipeline_settings(pipeline_data):
     def project(self, project_key):
         if self.data_file:
             data = {}
-            data["project"] = project_key
+            data["_project"] = project_key
             self.data_file.edit(data)
             self.settings_file = self.data_file.read()
 
@@ -1721,19 +1721,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             if list:
                 self.projects = dtm.PipelineProjectsModel(list)
-                self.project = current
+                self.setProject(current)
                 if current:
-                    self.populate_navbar()
+                    self.setProject(current)
+                    #self.populate_navbar()
                     return True
 
                 self.ui.projects_pushButton.setText("No Project")
-                self.populate_navbar()
+                #self.populate_navbar()
+                self.setProject(None)
                 return False
 
         self.projects = None
-        self.project = None
+        self.setProject(None)
+        #self.project = None
 
-        self.populate_navbar()
+        #self.populate_navbar()
         return False
 
 
@@ -1926,18 +1929,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             if type:
                 if current not in self.project.stages[type]:
-                    self.dynamicCombo.kill()
+                    self.dynamicCombo.remove()
                     self.stageSelect()
                     return
 
                 return
 
-            self.dynamicCombo.kill()
+            self.dynamicCombo.remove()
             self.stageSelect()
 
 
-
-        
     @property
     def versionsView(self):
         return self._versionsView
@@ -1963,8 +1964,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     @project.setter
     def project(self, project):
         self._project = project
-        if project:
-            project.set()
+        #if project:
+        #    project.set()
 
     @property
     def projects(self):
@@ -2017,10 +2018,25 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def updateCurrentProject(self):
-        print self.sender(), "*****"
-        self.settings.project = self.sender().name
-        self.ui.projects_pushButton.setText("%s > %s"%(self.sender().parent().name, self.sender().name))
-        
+
+        project = self.sender()
+        self.setProject(project)
+
+
+    def setProject(self, project):
+        if isinstance(project, dt.ProjectNode):
+            self.settings.project = project.name
+            self.ui.projects_pushButton.setText("%s > %s" % (project.parent().name, project.name))
+            self.project = project
+            self.populate_navbar()
+        else:
+            self.ui.projects_pushButton.setText("No Project")
+            self.project = None
+            self.settings.project = None
+            self.populate_navbar()
+
+
+
     def selectInScene(self):
         pass
         

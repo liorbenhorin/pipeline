@@ -1,16 +1,10 @@
 {
+    "_project": "Pipeline_Project", 
     "client": "Client_a", 
     "current_open_file": null, 
-    "current_project": "DO903W", 
-    "project": "Pipeline_Project", 
+    "current_project": null, 
     "project_premissions": null, 
-    "projects": {
-        "DO903W": [
-            "/Users/liorbenhorin/Documents/maya/projects/json", 
-            "ONLINE", 
-            "json"
-        ]
-    }, 
+    "projects": {}, 
     "rootDir": "/Users/liorbenhorin/Documents/maya/VirtualRoot", 
     "selection": {
         "asset": null, 
