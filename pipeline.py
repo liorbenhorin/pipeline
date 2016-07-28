@@ -1915,6 +1915,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         return None
 
     def refresh_navbar(self):
+        self.populate_navbar()
         return
         self.dynamicCombo.kill()
         self.stageSelect()

@@ -1444,6 +1444,7 @@ class pipelineTreeView(QtGui.QTreeView):
         self._proxyModel.invalidate()
 
         self.updateTable( self.fromProxyIndex(parentIndex))
+        self.update.emit()
         return True
 
 
