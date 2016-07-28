@@ -479,7 +479,7 @@ class PipelineVersionsView(QtGui.QTableView):
             self.setItemDelegateForColumn(4,  loadButtonDelegate(self))
             #self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
 
-            self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
+            #self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
 
             self.sortByColumn(2, QtCore.Qt.DescendingOrder)
             #self.model().sort(0,QtCore.Qt.DescendingOrder)
@@ -512,7 +512,7 @@ class PipelineVersionsView(QtGui.QTableView):
             self.model().sourceModel().getNode(index).load()
             self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)
             self.parent.version = self.model().sourceModel().getNode(index)
-            self.setCurrentIndex(index)
+            self.setCurrentIndex(self.model().mapFromSource(index))
 
 
     #@QtCore.Slot()
@@ -1736,6 +1736,7 @@ class ComboDynamicWidget(ComboWidget):
         self._box_list.append(self)
 
         self._node = None
+        self._level = "n/a"
 
         if path and stage:
             self._path = path

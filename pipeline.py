@@ -1886,9 +1886,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             index = self.stageCombo.comboBox.findText(self.settings.stage)
             if index != -1:
                 self.stageCombo.comboBox.setCurrentIndex(index)
+            else:
+                self.stageCombo.comboBox.setCurrentIndex(QtCore.QModelIndex())
 
-
-            dir = os.path.join(self.project.path, self.stageTypeName())
+            dir = os.path.join(self.project.path, self.stageTypeName()) if self.stageTypeName() else None
 
 
             if isinstance(self.dynamicCombo, dtv.ComboDynamicWidget):
@@ -1951,6 +1952,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 return
 
             self.dynamicCombo.remove()
+            self.dynamicCombo = None
             self.stageSelect()
 
 
