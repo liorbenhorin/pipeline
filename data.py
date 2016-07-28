@@ -50,7 +50,13 @@ def set_icons():
     global large_image_icon
     global client_icon
     global large_image_icon_dark
+    global comment_icon
+    global comment_full_icon
+    global new_icon
 
+    new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
+    comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
+    comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
     client_icon = os.path.join(localIconPath, "%s.svg" % "client")
     folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
     cube_icon = os.path.join(localIconPath, "%s.svg"%"cube") 
@@ -59,9 +65,10 @@ def set_icons():
     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
     large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "large_image_dark"))
-    dummy_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"braces")) 
-    
-    
+    dummy_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"braces"))
+
+
+
 set_icons()
 
 class Metadata_file():
@@ -512,6 +519,14 @@ class VersionNode(Node):
         files.delete(self.path)
         self.stage.removeVersionData(self.number)
 
+    @property
+    def note_decoration(self):
+        if self.note:
+            return comment_full_icon
+        else:
+            return comment_icon
+
+
 
 class CatagoryNode(Node):
 
@@ -655,7 +670,7 @@ class StageNode(RootNode):
         if self.data_file:
             self.stage_file = self.data_file.read()
 
-
+        self.resource = new_icon
 
     def create(self,  path=None):
         super(StageNode, self).create(path)
@@ -714,9 +729,9 @@ class StageNode(RootNode):
         scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 
         first_version = {}
-        first_version["date"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+        first_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
         first_version["author"] = "no user"# self.settings.user[0]
-        first_version["note"] = "No notes"
+        first_version["note"] = None
 
         versions = {}
         versions[version_number] = first_version
@@ -800,9 +815,9 @@ class StageNode(RootNode):
                 scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 
                 new_version = {}
-                new_version["date"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+                new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
                 new_version["author"] = "no user"  # self.settings.user[0]
-                new_version["note"] = "No notes"
+                new_version["note"] = None
 
                 versions = self.versions_
                 versions[version_number] = new_version

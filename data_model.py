@@ -47,6 +47,13 @@ def set_icons():
     global cube_icon_full
     global add_icon
     global large_image_icon
+
+    global comment_icon
+    global comment_full_icon
+
+    comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "comment"))
+    comment_full_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "comment_full"))
+
     folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
     cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
     cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
@@ -787,6 +794,11 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                     resource = self.__items[index.row()].resource
                     return QtGui.QIcon(QtGui.QPixmap(resource))
 
+                if index.column() == 3:
+                    resource = self.__items[index.row()].note_decoration
+                    return QtGui.QIcon(QtGui.QPixmap(resource))
+
+
         if role == QtCore.Qt.DisplayRole:
             row = index.row()
             if self.__items[row].typeInfo() != _new_:
@@ -794,8 +806,8 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                     return self.__items[row].author
                 if index.column() == 2:
                     return self.__items[row].date
-                if index.column() == 3:
-                    return self.__items[row].note
+                #if index.column() == 3:
+                #    return self.__items[row].note
                 if index.column() == 6:
                     return self.__items[row].fullName
 

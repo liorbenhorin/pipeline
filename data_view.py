@@ -193,7 +193,7 @@ def set_icons():
     load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "load"))
     large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
     small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
-    open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "open"))
+    open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "openFolder"))
     new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
     
 set_icons()
@@ -406,14 +406,14 @@ class PipelineVersionsView(QtGui.QTableView):
         self.setAlternatingRowColors(True)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setWordWrap(True)
-        #elf.setShowGrid(False)
+        self.setShowGrid(False)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
         #self.icons_size(32)       
         #self.setMinimumWidth(250)
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         #self.setSortingEnabled(True)
         #self.horizontalHeader().setOffset(10)
-        #self.verticalHeader().hide()        
+        self.horizontalHeader().hide()
         self.setSortingEnabled(True)
 
         # Set the delegate for column 0 of our table
@@ -550,7 +550,7 @@ class IconScaleSlider(QtGui.QWidget):
 
         self.setMinimumHeight(25)
         self.setLayout(self.slideLayout)
-        print self, "MMM"
+
 
         #h_layout.addWidget(slideWidget)
 

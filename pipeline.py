@@ -345,7 +345,11 @@ def set_icons():
     global wide_image_icon_click  
     global wide_image_icon_dark
     global wide_image_icon_click_dark
+    global comment_icon
+    global comment_full_icon
 
+    comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
+    comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
         
     offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
     catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
@@ -2125,9 +2129,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         self.ui.playblast_shot_pushButton.setIcon(QtGui.QIcon(camrea_icon))
                 
-        self.ui.comp_icon_label.setPixmap(new_icon.scaled(16,16))
-        self.ui.comp_user_label.setPixmap(users_icon.scaled(16,16))
-        self.ui.comp_note_label.setPixmap(edit_icon.scaled(16,16))
+        self.ui.comp_icon_label.setPixmap(new_icon)#.scaled(16,16))
+        self.ui.comp_user_label.setPixmap(users_icon)#.scaled(16,16))
+        self.ui.comp_note_label.setPixmap(comment_icon)#.scaled(16,16))
 
         self.ui.searchIcon_label.setPixmap(search_icon)
 
