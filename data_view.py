@@ -460,7 +460,7 @@ class PipelineVersionsView(QtGui.QTableView):
             #self.horizontalHeader().resizeSection(2,25)
             #self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
 
-            self.horizontalHeader().resizeSection(0, 32)
+            self.horizontalHeader().resizeSection(0, self._slider.listSlider.value())
             self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
 
             #self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
@@ -474,6 +474,8 @@ class PipelineVersionsView(QtGui.QTableView):
             self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
 
             self.update()
+
+
 
             #self.setCurrentIndex(self.model().index(0,0, None))
 
