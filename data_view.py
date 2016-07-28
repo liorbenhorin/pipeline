@@ -1591,6 +1591,14 @@ class ComboWidget(QtGui.QWidget):
         self._parent_layout.addWidget(self)
 
 
+    def remove(self):
+        self.setParent(None)
+        self.deleteLater()
+        self._child = None
+        del self
+
+
+
 class ComboStaticWidget(ComboWidget):
     def __init__(self,
                  settings = None,
@@ -1842,7 +1850,7 @@ class ComboDynamicWidget(ComboWidget):
             del c
 
 
-    def kill(self):
+    def remove(self):
         self.removeChild()
         self.setParent(None)
         self.deleteLater()
