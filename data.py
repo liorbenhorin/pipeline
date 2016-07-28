@@ -1462,29 +1462,30 @@ class ProjectNode(RootNode):
         print "eding the project"
 
     def set(self):
+        if self.data_file:
+            import pymel.core as pm
+            import maya.mel as mel
 
-        import pymel.core as pm
-        import maya.mel as mel
+            if 1==1: # do some test to see if we can set this projet
 
-        if 1==1: # do some test to see if we can set this projet
+                pm.workspace.open(self.path)
+                pm.workspace.chdir(self.path)
 
-            pm.workspace.open(self.path)
-            pm.workspace.chdir(self.path)
+                raw_project_path = self.path.replace("\\", "\\\\")
+                melCmd = "setProject \"" + raw_project_path + "\";"
+                try:
+                    mel.eval(melCmd)
+                except:
+                    pass
 
-            raw_project_path = self.path.replace("\\", "\\\\")
-            melCmd = "setProject \"" + raw_project_path + "\";"
-            try:
-                mel.eval(melCmd)
-            except:
-                pass
+                print "project changed to: %s" % self.name
 
-            print "project changed to: %s" % self.name
-
-            self.loaded.emit()
+                self.loaded.emit()
+                return True
 
         else:
             print "Cannot set project"
-
+            return None
 
     def project_file_key(self, key = None):
         if self.project_file:

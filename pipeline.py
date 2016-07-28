@@ -1717,8 +1717,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 self.ui.projects_pushButton.setText("No Project")
                 return False
 
-            self.projects = None
-            return False
+        self.projects = None
+        return False
 
 
 
@@ -1800,22 +1800,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             # self.ui.project_widget.setHeight(200)
 
             # self.ui.stages_version_splitter.setSizes([150,600])
-
-
-    def reset_navbar(self):
-        self._dataMapper = None
-        try:
-            self.dynamicCombo.setParent(None)
-            self.dynamicCombo.deleteLater()
-            self.dynamicCombo = None
-        except:
-            pass
-        try:
-            self.stageCombo.setParent(None)
-            self.stageCombo.deleteLater()
-            self.stageCombo = None
-        except:
-            pass
+    #
+    #
+    # def reset_navbar(self):
+    #     self._dataMapper = None
+    #     try:
+    #         self.dynamicCombo.setParent(None)
+    #         self.dynamicCombo.deleteLater()
+    #         self.dynamicCombo = None
+    #     except:
+    #         pass
+    #     try:
+    #         self.stageCombo.setParent(None)
+    #         self.stageCombo.deleteLater()
+    #         self.stageCombo = None
+    #     except:
+    #         pass
 
     def stage_ui(self):
 
@@ -1831,10 +1831,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
         self.ui.navBarLayout.setAlignment(QtCore.Qt.AlignLeft)
-
+        items = ""
+        if self.project:
+            items = self.project.stages["asset"] + self.project.stages["animation"]
         self.stageCombo = dtv.ComboStaticWidget(
                                       settings = self.settings,
-                                      items = self.project.stages["asset"] + self.project.stages["animation"],
+                                      items = items,
                                       parent_layout = self.ui.navBarLayout,
                                       parent = self)
 
@@ -1849,27 +1851,28 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if index != -1:
             self.stageCombo.comboBox.setCurrentIndex(index)
 
-        dir = os.path.join(self.project.path, "assets")
+        if self.project:
+            dir = os.path.join(self.project.path, "assets")
 
-
-        self.dynamicCombo = dtv.ComboDynamicWidget(
-                                                 settings = self.settings,
-                                                 project = self.project,
-                                                 path = dir,
-                                                 stage = self.settings.stage,
-                                                 box_list = [],
-                                                 parent_box = None,
-                                                 parent_layout = self.ui.navBarLayout,
-                                                 parent = self)
+            self.dynamicCombo = dtv.ComboDynamicWidget(
+                                                     settings = self.settings,
+                                                     project = self.project,
+                                                     path = dir,
+                                                     stage = self.settings.stage,
+                                                     box_list = [],
+                                                     parent_box = None,
+                                                     parent_layout = self.ui.navBarLayout,
+                                                     parent = self)
 
             
     def stageType(self):
+        if self.project:
 
-        if self.stageCombo.comboBox.currentText() in self.project.stages["asset"]:
-            return "asset"
-        
-        if self.stageCombo.comboBox.currentText() in self.project.stages["animation"]:
-            return "animation" 
+            if self.stageCombo.comboBox.currentText() in self.project.stages["asset"]:
+                return "asset"
+
+            if self.stageCombo.comboBox.currentText() in self.project.stages["animation"]:
+                return "animation"
         
         return None
 
@@ -1890,19 +1893,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.settings.stage = self.stageCombo.comboBox.currentText()
         type = self.stageType()
 
-        #self._stage = self.stageCombo.comboBox.currentText()
-        current = self.dynamicCombo._box_list[0]._stage
+        if self.dynamicCombo:
 
-        if type:
-            if current not in self.project.stages[type]:
-                self.dynamicCombo.kill()
-                self.stageSelect()
+            current = self.dynamicCombo._box_list[0]._stage
+
+            if type:
+                if current not in self.project.stages[type]:
+                    self.dynamicCombo.kill()
+                    self.stageSelect()
+                    return
+
                 return
 
-            return
-
-        self.dynamicCombo.kill()
-        self.stageSelect()
+            self.dynamicCombo.kill()
+            self.stageSelect()
 
 
 
