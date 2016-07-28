@@ -49,6 +49,7 @@ def set_icons():
     global add_icon
     global large_image_icon
     global client_icon
+    global large_image_icon_dark
 
     client_icon = os.path.join(localIconPath, "%s.svg" % "client")
     folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
@@ -56,7 +57,8 @@ def set_icons():
     add_cube_icon = os.path.join(localIconPath, "%s.svg"%"add_cube")     
     cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
+    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+    large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "large_image_dark"))
     dummy_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"braces")) 
     
     
@@ -94,6 +96,7 @@ class Node(QtCore.QObject, object):
         self._children = []
         self._parent = parent
         self.expendedState = False
+        self._resource = folder_icon
         self._id = data.id_generator()
 
         if parent is not None:
@@ -227,10 +230,16 @@ class Node(QtCore.QObject, object):
         #print value
         if   column is 0: self.name = value
         elif column is 1: pass
-    
+
+    @property
     def resource(self):
-        return folder_icon
-        
+        return self._resource
+
+
+    @resource.setter
+    def resource(self, icon):
+        self._resource = icon
+
     def delete(self):
 
         self.delete_me()
@@ -268,7 +277,7 @@ class RootNode(Node):#, Metadata_file):
 
 
         self.name = name
-
+        self.resource = folder_icon
 
         #Metadata_file.__init__(self, **kwargs)
 
@@ -317,9 +326,9 @@ class RootNode(Node):#, Metadata_file):
     
     def typeInfo(self):
         return _root_
-  
-    def resource(self):
-        return folder_icon
+
+
+
 
     def model_tree(self):
         
@@ -350,21 +359,22 @@ class FolderNode(RootNode):
     
     def __init__(self, name,  parent=None, **kwargs):
         super(FolderNode, self).__init__(name, parent, **kwargs)
-   
-       
+
+        self.resource = folder_icon
         
     def typeInfo(self):
         return _folder_
-          
-    def resource(self):
-        return folder_icon
+
+
 
 
 class AssetNode(RootNode):
     
     def __init__(self, name,  parent=None, **kwargs):
         super(AssetNode, self).__init__(name, parent, **kwargs)
-      
+
+        self.resource = cube_icon_full
+
     def create(self, path = None):
         super(AssetNode, self).create(path)
         #if node:
@@ -381,9 +391,8 @@ class AssetNode(RootNode):
         
     def typeInfo(self):
         return _asset_
-          
-    def resource(self):
-        return cube_icon_full
+
+
         
 
 # class StageNode(RootNode):
@@ -437,6 +446,23 @@ class VersionNode(Node):
         self._author = author
         self._stage = stage
 
+        self.resource = large_image_icon_dark
+
+        if os.path.isfile(self.thumbnail_file):
+            self.resource = self.thumbnail_file
+
+    @property
+    def thumbnail_file(self):
+        filename = files.file_name(self._path)
+        filename = files.file_name_no_extension(filename)
+        path = os.path.join(self._stage.tumbnails_path, "%s.%s" % (filename, "png"))
+        return path
+
+    def snapshot(self):
+        files.assure_path_exists(self.thumbnail_file)
+        snapshot = maya.snapshot(path=self.thumbnail_file, width=96, height=96)
+        self.resource = snapshot
+        return snapshot
 
     @property
     def stage(self):
@@ -477,8 +503,7 @@ class VersionNode(Node):
     def typeInfo(self):
         return _version_
 
-    def resource(self):
-        return large_image_icon
+
 
     def load(self):
         maya.open_scene(self.path)
@@ -496,25 +521,27 @@ class CatagoryNode(Node):
     def typeInfo(self):
         return _catagory_
 
-    def resource(self):
-        return dummy_icon
+
 
 class DummyNode(Node):
 
     def __init__(self, name, parent=None):
         super(DummyNode, self).__init__(name, parent)
 
+        self.resource = dummy_icon
+
     def typeInfo(self):
         return _dummy_
 
-    def resource(self):
-        return dummy_icon
+
 
 class ClientNode(Node):
 
     def __init__(self, name, path = None, parent=None):
         super(ClientNode, self).__init__(name, parent)
         self._path = path
+
+        self.resource = client_icon
 
     @property
     def path(self):
@@ -523,8 +550,6 @@ class ClientNode(Node):
     def typeInfo(self):
         return _dummy_
 
-    def resource(self):
-        return client_icon
 
 
 
@@ -532,22 +557,21 @@ class AddNode(Node):
     def __init__(self, name, parent=None):
         super(AddNode, self).__init__(name, parent)
 
+        self.resource = add_icon
+
     def typeInfo(self):
         return _new_
 
-    def resource(self):
-        return add_icon
 
 class NewNode(Node):
 
     def __init__(self, name,  parent=None):
         super(NewNode, self).__init__(name, parent)
+        self.resource = add_icon
 
     def typeInfo(self):
         return _new_
 
-    def resource(self):
-        return add_icon
 
 # class project(object):
 #     def __init__(self, project_path):
@@ -631,8 +655,6 @@ class StageNode(RootNode):
 
 
 
-
-
     def create(self,  path=None):
         super(StageNode, self).create(path)
         #if node:
@@ -659,8 +681,6 @@ class StageNode(RootNode):
     def typeInfo(self):
         return _stage_
 
-    def resource(self):
-        return large_image_icon
 
     def formatFileName(self):
 

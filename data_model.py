@@ -112,7 +112,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
  
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
-                resource = node.resource()
+                resource = node.resource
                 return QtGui.QIcon(QtGui.QPixmap(resource))
             
         if role == PipelineProjectModel.sortRole:
@@ -449,7 +449,7 @@ class PipelineContentsModel(QtCore.QAbstractTableModel):
         
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
-                resource = self.__items[index.row()].resource()
+                resource = self.__items[index.row()].resource
                 return QtGui.QIcon(QtGui.QPixmap(resource))
               
         if role == QtCore.Qt.DisplayRole:
@@ -773,7 +773,10 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                 if index.column() == 0:
                     return self.__items[row].author
                 if index.column() == 4:
-                    return self.__items[row].note
+                    return self.__items[row].number
+                if index.column() == 6:
+                    resource = self.__items[row].resource
+                    return QtGui.QPixmap(resource)
 
             return self.__items[index.row()].name
 
@@ -781,7 +784,7 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
             row = index.row()
             if self.__items[row].typeInfo() != _new_:
                 if index.column() == 0:
-                    resource = self.__items[index.row()].resource()
+                    resource = self.__items[index.row()].resource
                     return QtGui.QIcon(QtGui.QPixmap(resource))
 
         if role == QtCore.Qt.DisplayRole:
@@ -826,7 +829,11 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
             row = index.row()
 
             if role == QtCore.Qt.EditRole:
-                self.__items[row].name = value
+
+                if index.column() == 0:
+                    self.__items[row].resource = value
+                else:
+                    self.__items[row].name = value
                 self.dataChanged.emit(index, index)
 
                 return True
@@ -899,7 +906,7 @@ class PipelineProjectsModel(QtCore.QAbstractTableModel):
             row = index.row()
             if self.__items[row].typeInfo() != _new_:
                 if index.column() == 0:
-                    resource = self.__items[index.row()].resource()
+                    resource = self.__items[index.row()].resource
                     return QtGui.QIcon(QtGui.QPixmap(resource))
 
         if role == QtCore.Qt.DisplayRole:
@@ -993,7 +1000,7 @@ class PipelineListModel(QtCore.QAbstractListModel):
         
         
         if role == QtCore.Qt.DecorationRole:
-            resource = self.__items[index.row()].resource()
+            resource = self.__items[index.row()].resource
             return QtGui.QIcon(QtGui.QPixmap(resource))
               
         if role == QtCore.Qt.DisplayRole:

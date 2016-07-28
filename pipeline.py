@@ -1985,7 +1985,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self._stageNode = None
 
     def setVersionSelection(self, index, oldIndex):
-        self._dataMapper.setCurrentModelIndex(index)
+        i = self.versionsView.model().mapToSource(index)
+        self._dataMapper.setCurrentModelIndex(i)
+        self.set_thumbnail(self.versionsView.model().sourceModel().getNode(index).resource)
+
 
     def updateVersionsTable(self):
 
@@ -2001,6 +2004,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self._dataMapper.addMapping(self.ui.stage_author_label, 0, QtCore.QByteArray("text"))
             self._dataMapper.addMapping(self.ui.stage_note_label, 4, QtCore.QByteArray("text"))
             self._dataMapper.toFirst()
+
+            index = self.versionsView.model().sourceModel().index(self._dataMapper.currentIndex(), 0, QtCore.QModelIndex())
+            self.set_thumbnail(self.versionsView.model().sourceModel().getNode(index).resource)
             QtCore.QObject.connect(self.versionsView.selectionModel(), QtCore.SIGNAL("currentRowChanged(QModelIndex, QModelIndex)"), self.setVersionSelection)# self._dataMapper,  QtCore.SLOT("setCurrentModelIndex(QModelIndex)"))
 
 
@@ -2014,6 +2020,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.stage_path_label.setText("Stage path")
         self.ui.stage_author_label.setText("Stage author")
         self.ui.stage_note_label.setText("Stage note")
+        self.set_thumbnail(large_image_icon_dark)
         self.ui.stage_widget.setEnabled(False)
         return False
 
@@ -2037,7 +2044,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.populate_navbar()
 
 
-    def set_component_thumbnail(self,Qpixmap):
+    def set_thumbnail(self,Qpixmap):
         self.versionTumb_label.setPixmap(Qpixmap)
 
     def thumbnail_button(self):
@@ -2060,7 +2067,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.versionTumb_label.setFrameShape(QtGui.QFrame.StyledPanel)
         self.ui.component_data_horizontalLayout.addWidget(self.versionTumb_label)
         self.ui.component_data_horizontalLayout.setContentsMargins(0, 6, 0, 0)
-        self.set_component_thumbnail(large_image_icon_dark)
+        self.set_thumbnail(large_image_icon_dark)
 
         layout = QtGui.QHBoxLayout(self.versionTumb_label)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -2078,11 +2085,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def capture_thumbnail(self):
-        path = os.path.join(self.component.tumbnails_path, "%s.%s" % (self.component.component_name, "png"))
-        snapshot = maya.snapshot(path=path, width=96, height=96)
-        self.set_component_thumbnail(QtGui.QPixmap(snapshot))
-        #self.update_published_masters()
 
+        if self.versionsView and self._stageNode:
+            index = self.versionsView.model().sourceModel().index(self._dataMapper.currentIndex(),0,QtCore.QModelIndex())
+            self.versionsView.model().sourceModel().getNode(index).snapshot()
+            self.versionsView.model().sourceModel().dataChanged.emit(index, index)
+            self.set_thumbnail(self.versionsView.model().sourceModel().getNode(index).resource)
 
     def selectInScene(self):
         pass
