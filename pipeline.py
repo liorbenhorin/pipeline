@@ -1615,7 +1615,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         log.info( "loaded in: %s"%(round((end_time - start_time),2)) )                 
         track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         '''
-
+        self.thumbnail_button()
         self.init_settings()
         self._decode_users()
 
@@ -2036,6 +2036,52 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.settings.project = None
             self.populate_navbar()
 
+
+    def set_component_thumbnail(self,Qpixmap):
+        self.versionTumb_label.setPixmap(Qpixmap)
+
+    def thumbnail_button(self):
+        '''
+        create a custom label button for the thumbnail
+
+        first create a normal label
+        then sets up a layout the the label
+        on the new layout create a custom label-button with alpha
+
+        '''
+
+        # version thumbnail (square 1:1 96x96)
+
+        self.versionTumb_label = QtGui.QLabel()
+        sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizepolicy.setHeightForWidth(self.versionTumb_label.sizePolicy().hasHeightForWidth())
+        self.versionTumb_label.setSizePolicy(sizepolicy)
+        self.versionTumb_label.setMinimumSize(QtCore.QSize(96, 96))
+        self.versionTumb_label.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.ui.component_data_horizontalLayout.addWidget(self.versionTumb_label)
+        self.ui.component_data_horizontalLayout.setContentsMargins(0, 6, 0, 0)
+        self.set_component_thumbnail(large_image_icon_dark)
+
+        layout = QtGui.QHBoxLayout(self.versionTumb_label)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.grab_thumnail_Button = alpha_button(self, large_image_icon_click)
+        self.grab_thumnail_Button.set_pixmap(large_image_icon_click_dark)
+        sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizepolicy2.setHeightForWidth(self.grab_thumnail_Button.sizePolicy().hasHeightForWidth())
+        self.grab_thumnail_Button.setSizePolicy(sizepolicy2)
+        self.grab_thumnail_Button.setMinimumSize(QtCore.QSize(96, 96))
+        self.grab_thumnail_Button.button.setAlignment(QtCore.Qt.AlignCenter)
+        layout.addWidget(self.grab_thumnail_Button)
+        self.connect(self.grab_thumnail_Button, QtCore.SIGNAL('clicked()'), self.capture_thumbnail)
+
+
+
+    def capture_thumbnail(self):
+        path = os.path.join(self.component.tumbnails_path, "%s.%s" % (self.component.component_name, "png"))
+        snapshot = maya.snapshot(path=path, width=96, height=96)
+        self.set_component_thumbnail(QtGui.QPixmap(snapshot))
+        #self.update_published_masters()
 
 
     def selectInScene(self):

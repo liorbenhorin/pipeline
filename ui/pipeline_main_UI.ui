@@ -229,6 +229,9 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
               <property name="spacing">
                <number>6</number>
               </property>
+              <property name="topMargin">
+               <number>12</number>
+              </property>
               <item>
                <widget class="QWidget" name="widget" native="true">
                 <property name="minimumSize">
@@ -244,6 +247,9 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                  </size>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_3">
+                 <property name="spacing">
+                  <number>-1</number>
+                 </property>
                  <item row="0" column="1">
                   <widget class="QLabel" name="stage_path_label">
                    <property name="text">
