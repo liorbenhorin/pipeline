@@ -1634,6 +1634,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._project = None
         self._stage = None
         self._stageNode = None
+        self._version = None
 
         self.populate_clients()
         self.populate_projects()
@@ -1685,6 +1686,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             return True
 
+
+    @property
+    def version(self):
+        return self._version
+
+    @version.setter
+    def version(self, version):
+        self._version = version
 
     @property
     def clients(self):
@@ -1985,10 +1994,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self._stageNode = None
 
     def setVersionSelection(self, index, oldIndex):
-        i = self.versionsView.model().mapToSource(index)
-        self._dataMapper.setCurrentModelIndex(i)
-        self.set_thumbnail(self.versionsView.model().sourceModel().getNode(index).resource)
-
+        index = self.versionsView.model().mapToSource(index)
+        self._dataMapper.setCurrentModelIndex(index)
 
     def updateVersionsTable(self):
 
@@ -2004,9 +2011,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self._dataMapper.addMapping(self.ui.stage_author_label, 0, QtCore.QByteArray("text"))
             self._dataMapper.addMapping(self.ui.stage_note_label, 4, QtCore.QByteArray("text"))
             self._dataMapper.toFirst()
-
-            index = self.versionsView.model().sourceModel().index(self._dataMapper.currentIndex(), 0, QtCore.QModelIndex())
-            self.set_thumbnail(self.versionsView.model().sourceModel().getNode(index).resource)
             QtCore.QObject.connect(self.versionsView.selectionModel(), QtCore.SIGNAL("currentRowChanged(QModelIndex, QModelIndex)"), self.setVersionSelection)# self._dataMapper,  QtCore.SLOT("setCurrentModelIndex(QModelIndex)"))
 
 
@@ -2017,11 +2021,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.versionsView:
             self.versionsView.setModel_(None)
             self._dataMapper.setModel(None)
+
         self.ui.stage_path_label.setText("Stage path")
         self.ui.stage_author_label.setText("Stage author")
         self.ui.stage_note_label.setText("Stage note")
         self.set_thumbnail(large_image_icon_dark)
+
         self.ui.stage_widget.setEnabled(False)
+
         return False
 
 
@@ -2086,11 +2093,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def capture_thumbnail(self):
 
-        if self.versionsView and self._stageNode:
-            index = self.versionsView.model().sourceModel().index(self._dataMapper.currentIndex(),0,QtCore.QModelIndex())
-            self.versionsView.model().sourceModel().getNode(index).snapshot()
+        if self.versionsView and self._stageNode and self.version:
+            self.version.snapshot()
+            index = self.versionsView.model().sourceModel().indexFromNode(self.version)
             self.versionsView.model().sourceModel().dataChanged.emit(index, index)
-            self.set_thumbnail(self.versionsView.model().sourceModel().getNode(index).resource)
+            self.set_thumbnail(self.version.resource)
 
     def selectInScene(self):
         pass

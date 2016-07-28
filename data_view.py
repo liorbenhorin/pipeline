@@ -497,6 +497,8 @@ class PipelineVersionsView(QtGui.QTableView):
             self.model().sourceModel().items[0].parent().initialVersion()
         else:
             self.model().sourceModel().getNode(index).load()
+            self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)
+            self.parent.version = self.model().sourceModel().getNode(index)
             self.setCurrentIndex(index)
 
 

@@ -799,6 +799,11 @@ class PipelineVersionsModel(QtCore.QAbstractTableModel):
                 if index.column() == 6:
                     return self.__items[row].fullName
 
+    def indexFromNode(self, node):
+        if node in self.__items:
+            row = self.__items.index(node)
+            return self.index(row, 0, QtCore.QModelIndex())
+
     def index(self, row, column, parent):
         if not self.hasIndex(row, column):
             return QtCore.QModelIndex()
