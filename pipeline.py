@@ -1879,7 +1879,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 self.stageCombo.comboBox.setCurrentIndex(index)
 
 
-            dir = os.path.join(self.project.path, "assets")
+            dir = os.path.join(self.project.path, self.stageTypeName())
 
 
             if isinstance(self.dynamicCombo, dtv.ComboDynamicWidget):
@@ -3407,6 +3407,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.ui.rootDirSet_pushButton.clicked.connect(self.set_root_path)
         self.ui.rootDir_lineEdit.setText(self.pipeline_window.settings.rootDir)
         self.ui.clients_comboBox.setIconSize(QtCore.QSize(24 ,24)  )
+
         self.populate_clients()
         dtv.setComboValue(self.ui.clients_comboBox, self.pipeline_window.settings.client)
         self.populate_projects()
@@ -3496,6 +3497,9 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         if os.path.isdir(path):
             self.ui.rootDir_lineEdit.setText(path)
             self.pipeline_window.settings.rootDir = path
+            self.populate_clients()
+            dtv.setComboValue(self.ui.clients_comboBox, self.pipeline_window.settings.client)
+            self.populate_projects()
 
     def set_icons(self):
         self.ui.create_project_pushButton.setIcon(QtGui.QIcon(new_icon))

@@ -518,6 +518,8 @@ class CatagoryNode(Node):
     def __init__(self, name, parent=None):
         super(CatagoryNode, self).__init__(name, parent)
 
+        self.resource = dummy_icon
+
     def typeInfo(self):
         return _catagory_
 
