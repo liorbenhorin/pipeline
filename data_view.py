@@ -206,6 +206,45 @@ def setComboValue(QComboBox, String):
         return True
     return False
 
+
+# class ColorDelegate: public QItemDelegate
+# {
+# public:
+# 	ColorDelegate(QObject *parent = 0) : QItemDelegate(parent) {}
+#
+# public:
+# 	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+# 	{
+# 		drawBackground(painter, option, index);
+# 		QItemDelegate::paint(painter, option, index);
+# 	}
+#
+# protected:
+# 	virtual void drawBackground(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+# 	{
+# 		Q_UNUSED(index);
+# 		painter->fillRect(option.rect, QColor(qrand()%255, qrand()%255, qrand()%255));
+# 	}
+# };
+
+# class rowBackgroundColorDelegate(QtGui.QItemDelegate):
+#
+#     def __init__(self, parent):
+#         QtGui.QItemDelegate.__init__(self, parent)
+#
+#     def paint(self, painter, option, index):
+#         rubberBand = QtGui.QRubberBand(QtGui.QRubberBand.Rectangle, self.parent())
+#         rubberBand.setGeometry(QtCore.QRect(self.parent().rowViewportPosition(index.row())), QtCore.QSize())
+#         rubberBand.show()
+#         #self.drawBackground(painter, option, index)
+#         #QItemDelegate::paint(painter, option, index)
+#
+#     def drawBackground(self, painter, option, index):
+#
+#
+#         painter.fillRect(option.rect, QtGui.QColor(10,10,10))
+
+
 class EditProjectButtonDelegate(QtGui.QItemDelegate):
 
     def __init__(self, parent):
@@ -395,7 +434,18 @@ class loadButtonDelegate(QtGui.QItemDelegate):
             self.parent().setIndexWidget(index, button)
 
 
-    
+class HeaderViewFilter2(QtCore.QObject):
+    def __init__(self, parent = None,  *args):
+        super(HeaderViewFilter2, self).__init__(parent, *args)
+
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.MouseMove:
+            print "*"
+            logicalIndex = object.indexAt(event.pos())
+            #print logicalIndex, "*"
+            return True
+
+
 class PipelineVersionsView(QtGui.QTableView):
     def __init__(self, parentWidget = None, parent = None):
         super(PipelineVersionsView, self).__init__(parent)
@@ -416,8 +466,28 @@ class PipelineVersionsView(QtGui.QTableView):
         self.horizontalHeader().hide()
         self.setSortingEnabled(True)
 
+        self.setMouseTracking(True)
+        #self.filter = HeaderViewFilter2(self)
+        #self.installEventFilter(self.filter)
+
         # Set the delegate for column 0 of our table
         self._proxyModel = None
+
+    # def mouseMoveEvent(self, event):
+    #     print event, "<<<"
+    #     print self.indexAt(event.pos()), "<<<"
+
+    # def mouseMoveEvent(self, e):
+    #     print e, "<<"
+    #     i = self.indexAt(e.pos())
+    #
+    #
+    #     origin = e.pos()
+    #     rubberBand = QtGui.QRubberBand(QtGui.QRubberBand.Rectangle, self)
+    #     rubberBand.setGeometry(QtCore.QRect(origin, QtCore.QSize()))
+    #     rubberBand.show()
+
+        #self.setItemDelegateForRow(i.row(), rowBackgroundColorDelegate(self))
 
     def addSlider(self):
 
