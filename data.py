@@ -1080,39 +1080,13 @@ class StageNode(RootNode):
                     version_nodes = []                 
 
 
-                    if self._children:
-                        for c in self.children:
-
-                            for key in versions_dict:
-
+                    for key in versions_dict:
+                        skip = False
+                        if self._children:
+                            for c in self._children:
                                 if c.path == versions_dict[key]:
-                                    pass
-                                else:
-                                    padded_number = self.padding(key)
-                                    author = "n/a"
-                                    note = "n/a"
-                                    date = "n/a"
-                                    versions_data = self.versions_
-                                    if versions_data:
-
-                                        if padded_number in versions_data:
-                                            thisVersion = versions_data[padded_number]
-                                            if "author" in thisVersion:
-                                                author = thisVersion["author"]
-                                            if "note" in thisVersion:
-                                                note = thisVersion["note"]
-                                            if "date" in thisVersion:
-                                                date = thisVersion["date"]
-
-                                    #version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
-
-
-                                    VersionNode(key, parent=self, path=versions_dict[key], author=author, number=padded_number, date=date, note=note, stage=self)
-
-                        return True#version_nodes
-                    else:
-                        for key in versions_dict:
-
+                                    skip = True
+                        if not skip:
                             padded_number = self.padding(key)
                             author = "n/a"
                             note = "n/a"
@@ -1129,25 +1103,23 @@ class StageNode(RootNode):
                                     if "date" in thisVersion:
                                         date = thisVersion["date"]
 
-                            # version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
+                        # version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
 
 
                             VersionNode(key, parent=self, path=versions_dict[key], author=author,
-                                        number=padded_number, date=date, note=note, stage=self)
+                                    number=padded_number, date=date, note=note, stage=self)
 
-                        return True
+                    return True
 
+        self._newNode = NewNode("new...", parent = self)
         return None
 
     @property
     def versiosnModel(self):
 
-        if self.versions:
-            return dtm.PipelineVersionsModel2(self)
+        self.versions
+        return dtm.PipelineVersionsModel2(self)
 
-        else:
-            self.emptyVersions()
-            return dtm.PipelineVersionsModel2(self)#.emptyVersions)
 
     @property
     def emptyVersions(self):
