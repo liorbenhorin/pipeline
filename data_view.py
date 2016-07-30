@@ -470,7 +470,7 @@ class HeaderViewFilter2(QtCore.QObject):
             return True
 
 
-class PipelineVersionsView(QtGui.QTableView):
+class PipelineVersionsView(QtGui.QTreeView):
     def __init__(self, parentWidget = None, parent = None):
         super(PipelineVersionsView, self).__init__(parent)
 
@@ -480,14 +480,21 @@ class PipelineVersionsView(QtGui.QTableView):
         self.setAlternatingRowColors(True)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setWordWrap(True)
-        self.setShowGrid(False)
-        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
+
+        #self.setShowGrid(False)
+
+
+        #>>>self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
         #self.icons_size(32)       
         #self.setMinimumWidth(250)
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
+
+        #self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
+
         #self.setSortingEnabled(True)
         #self.horizontalHeader().setOffset(10)
-        self.horizontalHeader().hide()
+        #>>>self.horizontalHeader().hide()
         self.setSortingEnabled(True)
 
         self.setMouseTracking(True)
@@ -519,9 +526,9 @@ class PipelineVersionsView(QtGui.QTableView):
     def icons_size(self, int):
         self.setIconSize(QtCore.QSize(int, int))
         #self.horizontalHeader().setDefaultSectionSize(int)
-        self.verticalHeader().setDefaultSectionSize(int)
-        self.horizontalHeader().resizeSection(0, int)
-        self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
+        #>>>self.verticalHeader().setDefaultSectionSize(int)
+        #>>>self.horizontalHeader().resizeSection(0, int)
+        #>>>self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
         self.update()
 
     def clearModel(self):
@@ -548,21 +555,22 @@ class PipelineVersionsView(QtGui.QTableView):
             #self._proxyModel.invalidateFilter()
             self.setModel(self._proxyModel)
 
-            self.horizontalHeader().resizeSection(4,40)
-            self.horizontalHeader().setResizeMode(4,QtGui.QHeaderView.Fixed)   
+            self.setIndentation(0)
+            #>>>self.horizontalHeader().resizeSection(4,40)
+            #>>>self.horizontalHeader().setResizeMode(4,QtGui.QHeaderView.Fixed)
             # size the load button column
-            self.horizontalHeader().resizeSection(3,32)
-            self.horizontalHeader().setResizeMode(3,QtGui.QHeaderView.Fixed)   
+            #>>>self.horizontalHeader().resizeSection(3,32)
+            #>>>self.horizontalHeader().setResizeMode(3,QtGui.QHeaderView.Fixed)
             # size the note button column
             #self.horizontalHeader().resizeSection(2,25)
             #self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
 
-            self.horizontalHeader().resizeSection(0, self._slider.listSlider.value())
-            self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
+            #>>>self.horizontalHeader().resizeSection(0, self._slider.listSlider.value())
+            #>>>self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
 
             #self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
-            self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
-            self.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Stretch)
+            #>>>self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
+            #>>>self.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Stretch)
             
             # setup the buttons for loading and more options with delegates
             self.setItemDelegateForColumn(4,  loadButtonDelegate(self))
