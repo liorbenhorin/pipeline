@@ -226,16 +226,40 @@ def setComboValue(QComboBox, String):
 # 		painter->fillRect(option.rect, QColor(qrand()%255, qrand()%255, qrand()%255));
 # 	}
 # };
-
+#
 # class rowBackgroundColorDelegate(QtGui.QItemDelegate):
 #
 #     def __init__(self, parent):
 #         QtGui.QItemDelegate.__init__(self, parent)
 #
 #     def paint(self, painter, option, index):
-#         rubberBand = QtGui.QRubberBand(QtGui.QRubberBand.Rectangle, self.parent())
-#         rubberBand.setGeometry(QtCore.QRect(self.parent().rowViewportPosition(index.row())), QtCore.QSize())
-#         rubberBand.show()
+#         hoverd = False
+#         if option.state == QtGui.QStyle.State_MouseOver:
+#             hoverd = True
+#             print "Y"
+#         else:
+#             print "A"
+#             if self.parent():
+#                 print "Z"
+#                 t = self.parent()
+#                 hover = t.indexAt(t.viewport().mapToGlobal(QtGui.QCursor.pos()))
+#
+#                 if hover.row() == index.row():
+#                     print "x"
+#                     hoverd = True
+#                     t.update(hover)
+#
+#         #if hoverd:
+#         print "YY"
+#         bg = QtGui.QBrush(option.palette.highlight())
+#         bgColor = QtGui.QColor(option.palette.highlight().color())
+#         bgColor.setAlpha(100)
+#         bg.setColor(bgColor)
+#
+#         painter.fillRect(option.rect, bg)
+#         painter.setPen(option.palette.text().color())
+#
+#
 #         #self.drawBackground(painter, option, index)
 #         #QItemDelegate::paint(painter, option, index)
 #
@@ -478,16 +502,11 @@ class PipelineVersionsView(QtGui.QTableView):
     #     print self.indexAt(event.pos()), "<<<"
 
     # def mouseMoveEvent(self, e):
-    #     print e, "<<"
+    #
     #     i = self.indexAt(e.pos())
     #
     #
-    #     origin = e.pos()
-    #     rubberBand = QtGui.QRubberBand(QtGui.QRubberBand.Rectangle, self)
-    #     rubberBand.setGeometry(QtCore.QRect(origin, QtCore.QSize()))
-    #     rubberBand.show()
-
-        #self.setItemDelegateForRow(i.row(), rowBackgroundColorDelegate(self))
+    #     self.setItemDelegateForRow(i.row(), rowBackgroundColorDelegate(self))
 
     def addSlider(self):
 
