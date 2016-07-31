@@ -1316,6 +1316,15 @@ class pipelineTreeView(QtGui.QTreeView):
                                 image: url(''' + branch_open + ''') 0;
                            }''')
     
+
+        self.changed = False
+        self.update.connect(self.model_changed)
+
+    def model_changed(self):
+        if not self.changed:
+            self.changed = True
+
+
     def setModel(self,model):
 
         super(pipelineTreeView,self).setModel(model)
@@ -1651,21 +1660,33 @@ class pipelineTreeView(QtGui.QTreeView):
         self.update.emit()
         return True
 
-
-        
     def create_new_folder(self, parent):
         parent_node = self.sourceModel.getNode(parent)
-        
+
         folder_name, ok = QtGui.QInputDialog.getText(self, 'New Folder', 'Enter Folder name:')
-        
+
         if ok:
             path = os.path.join(parent_node.path, folder_name)
-            node = dt.FolderNode(folder_name, parent = parent_node).create( path = path)
-            if node is not False:     
-                self.sourceModel.insertRows( 0, 0, parent = parent , node = node)
-                self._proxyModel.invalidate()
-                self.updateTable( self.fromProxyIndex(parent))
-                self.update.emit()
+            node = dt.FolderNode(folder_name, path=path, parent=parent_node)
+            #if node is not False:
+            self.sourceModel.insertRows(0, 0, parent=parent, node=node)
+            self._proxyModel.invalidate()
+            self.updateTable(self.fromProxyIndex(parent))
+            self.update.emit()
+        
+    # def create_new_folder(self, parent):
+    #     parent_node = self.sourceModel.getNode(parent)
+    #
+    #     folder_name, ok = QtGui.QInputDialog.getText(self, 'New Folder', 'Enter Folder name:')
+    #
+    #     if ok:
+    #         path = os.path.join(parent_node.path, folder_name)
+    #         node = dt.FolderNode(folder_name, parent = parent_node).create( path = path)
+    #         if node is not False:
+    #             self.sourceModel.insertRows( 0, 0, parent = parent , node = node)
+    #             self._proxyModel.invalidate()
+    #             self.updateTable( self.fromProxyIndex(parent))
+    #             self.update.emit()
         
     def create_new_asset(self, parent):
         parent_node = self.sourceModel.getNode(parent)

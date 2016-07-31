@@ -1632,7 +1632,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         # add to the designer ui
         self.ui.verticalLayout_18.addWidget(self.navWidget)
+
         self.tree.update.connect(self.populate_navbar)
+        self.tree.update.connect(self.tree_change_options)
 
 
         if self.settings.user[0] is not None:
@@ -1658,6 +1660,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.populate_project_tree()
         self.populate_navbar()
 
+    def tree_change_options(self):
+        if self.tree.changed:
+            self.ui.tree_changed_opts_widget.setHidden(False)
+        else:
+            self.ui.tree_changed_opts_widget.setHidden(True)
 
     def init_settings(self):
         self.settings_file_name = 'settings.json'
@@ -1801,41 +1808,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             '''
 
-            #self.list = dtv.PipelineContentsView()
-
             self.tree.setModel( self._proxyModel )
-         
-        
-            #connect the tree to the table views and vice versa
-            #self.tree.tableView = self.list
-            #self.list.treeView = self.tree
-        
-            self.tree.setModel( self._proxyModel )
-            #self.list.init_treeView()
             self._proxyModel.treeView = self.tree
 
             #connect the tree and the table signals
-            #QtCore.QObject.connect(self.list, QtCore.SIGNAL("clicked(QModelIndex)"), self.list.click)
             QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged(QString)"), self._proxyModel.setFilterRegExp)
             QtCore.QObject.connect(self.tree, QtCore.SIGNAL("expanded(QModelIndex)"), self.tree.saveState)
             QtCore.QObject.connect(self.tree, QtCore.SIGNAL("collapsed(QModelIndex)"), self.tree.saveState)
-            #QtCore.QObject.connect(self.ui.assetsFilter_lineEdit, QtCore.SIGNAL("textChanged()"), self.list.click)
 
             self.selModel = self.tree.selectionModel()
             self.tree.clicked.connect( self.tree.saveSelection )
-            #self.selModel.selectionChanged.connect( self.list.update )
-
             # select the tree root
             self.tree.selectRoot()
+            self.tree_change_options()
 
-
-
-            # self.stagesView = dtv.PipelineStagesView()#QtGui.QListView()
-            # self.navWidget.
-            # h_layout.addWidget(self.stagesView)
-            # self.ui.project_widget.setHeight(200)
-
-            # self.ui.stages_version_splitter.setSizes([150,600])
         else:
             self.tree.setModel(None)
 
