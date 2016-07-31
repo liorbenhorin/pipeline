@@ -436,8 +436,8 @@ class loadButtonDelegate(QtGui.QItemDelegate):
         # connect its clicked signal to a slot in the parent view so 
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
-
-            if self.parent().model().sourceModel().items[0].typeInfo() == _new_:
+            index = self.parent().model().mapToSource(index)
+            if self.parent().model().sourceModel().getNode(index).typeInfo() == _new_:
                 label = ""
                 icon = new_icon
             else:

@@ -442,7 +442,7 @@ class PipelineVersionsModel2(QtCore.QAbstractItemModel):
     """INPUTS: QModelIndex"""
     """OUTPUT: int"""
     def columnCount(self, parent):
-        return 1
+        return 5
 
 
 
