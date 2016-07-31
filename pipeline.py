@@ -1775,9 +1775,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def commit_tree(self):
         self.tree.commit()
         self.populate_project_tree()
+        self.tree_change_options()
 
     def discard_tree(self):
+
         self.populate_project_tree()
+        self.tree_change_options()
 
 
     def populate_project_tree(self):
@@ -2113,7 +2116,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                        self.ui.save_version_pushButton,
                        self.ui.save_master_pushButton,
                        self.ui.import_version_pushButton,
-                       self.ui.playblast_shot_pushButton
+                       self.ui.playblast_shot_pushButton,
+                       self.ui.commitTree_pushButton,
+                       self.ui.discardTree_pushButton
                        ]:
             
             button.setIconSize(QtCore.QSize(20,20)) 
@@ -2121,6 +2126,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
      
         self.ui.projects_pushButton.setIcon(QtGui.QIcon(project_icon))
         self.ui.users_pushButton.setIcon(QtGui.QIcon(users_icon))
+        self.ui.commitTree_pushButton.setIcon(QtGui.QIcon(yes_icon))
+        self.ui.discardTree_pushButton.setIcon(QtGui.QIcon(no_icon))
 
         self.ui.save_version_pushButton.setIcon(QtGui.QIcon(save_icon))
         self.ui.save_master_pushButton.setIcon(QtGui.QIcon(save_master_icon))

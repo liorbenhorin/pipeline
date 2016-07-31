@@ -1321,14 +1321,16 @@ class pipelineTreeView(QtGui.QTreeView):
         self.update.connect(self.model_changed)
 
     def model_changed(self):
-        if not self.changed:
+        if self.changed == False:
             self.changed = True
 
 
     def setModel(self,model):
 
         super(pipelineTreeView,self).setModel(model)
-        
+
+        self.changed = False
+
         self.proxyModel = self.model()
         self.sourceModel = self.proxyModel.sourceModel()        
         
@@ -1354,6 +1356,7 @@ class pipelineTreeView(QtGui.QTreeView):
         save the expended state of the tree
         '''
         self.saveState()
+
 
 
     @property
@@ -1785,6 +1788,7 @@ class pipelineTreeView(QtGui.QTreeView):
     def commit(self):
         print "commit tree:"
         self.sourceModel.rootNode.commit()
+        self.changed = False
 
 class PipelineStagesView(QtGui.QListView):
     def __init__(self,parent = None):
