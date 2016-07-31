@@ -508,6 +508,9 @@ class PipelineVersionsView(QtGui.QTreeView):
             QTreeView::item:hover {
                 background: #101010;
             }
+            QTreeView {
+                outline: 0;
+            }
             ''')
 
     # def mouseMoveEvent(self, event):
@@ -643,8 +646,8 @@ class PipelineVersionsView(QtGui.QTreeView):
         button = self.sender()
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
-        if self.model().sourceModel().items[0].typeInfo() == _new_:
-            self.model().sourceModel().items[0].parent().initialVersion()
+        if self.model().sourceModel().getNode(index).typeInfo() == _new_:
+            self.model().sourceModel().getNode(index).parent().initialVersion()
         else:
             self.model().sourceModel().getNode(index).load()
             self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)

@@ -807,7 +807,7 @@ class StageNode(RootNode):
                 #else:
                 #    last = 0
 
-                last_version = self.versions[-1]
+                last_version = self._children[-1]
 
                 version_number = set_padding(last_version.name+1, self.project.project_padding)
 
@@ -823,6 +823,8 @@ class StageNode(RootNode):
                 versions = self.versions_
                 versions[version_number] = new_version
                 self.versions_ = versions
+
+
 
                 self.edited.emit()
 

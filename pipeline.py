@@ -2105,7 +2105,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         if self.versionsView and self._stageNode and self.version:
             self.version.snapshot()
-            index = self.versionsView.model().sourceModel().indexFromNode(self.version)
+            index = self.versionsView.model().sourceModel().indexFromNode(self.version, QtCore.QModelIndex())
             self.versionsView.model().sourceModel().dataChanged.emit(index, index)
             self.set_thumbnail(self.version.resource)
 
