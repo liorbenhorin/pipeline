@@ -1841,7 +1841,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def stage_ui(self):
 
-        self.ui.stages_version_splitter.setSizes([0, 600])
+        #self.ui.stages_version_splitter.setSizes([0, 600])
 
         self.versionsView = dtv.PipelineVersionsView(parentWidget=self.ui.versionsTab, parent=self)
         self.ui.versionsTabLayout.addWidget(self.versionsView)
