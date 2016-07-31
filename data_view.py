@@ -1667,7 +1667,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
         if ok:
             path = os.path.join(parent_node.path, folder_name)
-            node = dt.FolderNode(folder_name, path=path, parent=parent_node)
+            node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True)
             #if node is not False:
             self.sourceModel.insertRows(0, 0, parent=parent, node=node)
             self._proxyModel.invalidate()
@@ -1749,7 +1749,9 @@ class pipelineTreeView(QtGui.QTreeView):
             #self.tableView.populateTable(model)
             
 
-
+    def commit(self):
+        print "commit tree:"
+        self.sourceModel.rootNode.commit()
 
 class PipelineStagesView(QtGui.QListView):
     def __init__(self,parent = None):

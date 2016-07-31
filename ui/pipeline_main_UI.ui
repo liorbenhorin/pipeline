@@ -479,7 +479,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="commitTree_pushButton">
              <property name="text">
               <string>Commit changes</string>
              </property>

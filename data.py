@@ -262,7 +262,24 @@ class Node(QtCore.QObject, object):
                 files.delete(self._path)
 
         print "***DELETE ALL IN" + self._name + "\n"
-    
+
+    def commit(self):
+        self.commit_me()
+
+        for child in self._children:
+            child.commit()
+
+    def commit_me(self):
+        if self.__class__.__name__ == "FolderNode":
+            create_mathod = getattr(self, "create", None)
+            print "calling create method:"
+            if callable(create_mathod):
+                self.create(path=self._path)
+            return
+
+        print "not a folder"
+
+
     @property
     def expendedState(self):
         return self._expendedState
@@ -285,6 +302,7 @@ class RootNode(Node):#, Metadata_file):
 
         self.name = name
         self.resource = folder_icon
+        self._virtual = False
 
         #Metadata_file.__init__(self, **kwargs)
 
@@ -296,6 +314,8 @@ class RootNode(Node):#, Metadata_file):
             if key == "path":
                 self._path = kwargs[key]
                 self.data_file_path = os.path.join(kwargs[key],"%s.%s"%(self.name,"json"))
+            if key == "virtual":
+                self._virtual = kwargs[key]
 
         if self.data_file_path:
             self.set_data_file(self.data_file_path)
@@ -361,6 +381,9 @@ class RootNode(Node):#, Metadata_file):
                     pass
 
         rec(self.path, self)
+
+
+
 
 class FolderNode(RootNode):
     

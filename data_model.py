@@ -408,6 +408,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         return data
 
 
+
 class PipelineVersionsModel2(QtCore.QAbstractItemModel):
 
     MIMEDATA = 'application/x-qabstractitemmodeldatalist'
