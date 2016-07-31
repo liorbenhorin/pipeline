@@ -1673,7 +1673,40 @@ class pipelineTreeView(QtGui.QTreeView):
             self._proxyModel.invalidate()
             self.updateTable(self.fromProxyIndex(parent))
             self.update.emit()
-        
+
+
+    def create_new_asset(self, parent):
+        parent_node = self.sourceModel.getNode(parent)
+
+        folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
+
+        if ok:
+            path = os.path.join(parent_node.path, folder_name)
+            node = dt.AssetNode(folder_name, parent = parent_node, path = path, virtual = True)#.create( path = path)
+            #if node is not False:
+            self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
+            self._proxyModel.invalidate()
+            self.updateTable( self.fromProxyIndex(parent))
+            self.update.emit()
+
+
+    def create_new_stage(self, parent):
+        parent_node = self.sourceModel.getNode(parent)
+
+        stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
+        stageDlg = dlg.newStage(stages=stages)
+        result = stageDlg.exec_()
+        stage_name = stageDlg.result()
+        if result == QtGui.QDialog.Accepted:
+
+            path = os.path.join(parent_node.path, stage_name)
+            node = dt.StageNode(stage_name, parent=parent_node, path=path, virtual = True)
+            #if node is not False:
+            self._sourceModel.insertRows(0, 0, parent=parent, node=node)
+            self._proxyModel.invalidate()
+            self.updateTable(self.fromProxyIndex(parent))
+            self.update.emit()
+
     # def create_new_folder(self, parent):
     #     parent_node = self.sourceModel.getNode(parent)
     #
@@ -1688,37 +1721,37 @@ class pipelineTreeView(QtGui.QTreeView):
     #             self.updateTable( self.fromProxyIndex(parent))
     #             self.update.emit()
         
-    def create_new_asset(self, parent):
-        parent_node = self.sourceModel.getNode(parent)
+    # def create_new_asset(self, parent):
+    #     parent_node = self.sourceModel.getNode(parent)
+    #
+    #     folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
+    #
+    #     if ok:
+    #         path = os.path.join(parent_node.path, folder_name)
+    #         node = dt.AssetNode(folder_name, parent = parent_node).create( path = path)
+    #         if node is not False:
+    #             self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
+    #             self._proxyModel.invalidate()
+    #             self.updateTable( self.fromProxyIndex(parent))
+    #             self.update.emit()
         
-        folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
-        
-        if ok:
-            path = os.path.join(parent_node.path, folder_name)
-            node = dt.AssetNode(folder_name, parent = parent_node).create( path = path)
-            if node is not False: 
-                self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
-                self._proxyModel.invalidate()
-                self.updateTable( self.fromProxyIndex(parent))
-                self.update.emit()
-        
-    def create_new_stage(self, parent):
-        parent_node = self.sourceModel.getNode(parent)
- 
-        stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
-        stageDlg = dlg.newStage(stages = stages)
-        result = stageDlg.exec_()
-        stage_name  = stageDlg.result()
-        if result == QtGui.QDialog.Accepted:
-
-            path = os.path.join(parent_node.path, stage_name)
-            node = dt.StageNode(stage_name, parent = parent_node).create( path = path)
-            if node is not False:
-
-                self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
-                self._proxyModel.invalidate()
-                self.updateTable( self.fromProxyIndex(parent))
-                self.update.emit()
+    # def create_new_stage(self, parent):
+    #     parent_node = self.sourceModel.getNode(parent)
+    #
+    #     stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
+    #     stageDlg = dlg.newStage(stages = stages)
+    #     result = stageDlg.exec_()
+    #     stage_name  = stageDlg.result()
+    #     if result == QtGui.QDialog.Accepted:
+    #
+    #         path = os.path.join(parent_node.path, stage_name)
+    #         node = dt.StageNode(stage_name, parent = parent_node).create( path = path)
+    #         if node is not False:
+    #
+    #             self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
+    #             self._proxyModel.invalidate()
+    #             self.updateTable( self.fromProxyIndex(parent))
+    #             self.update.emit()
 
     def updateTable(self, index):
         selection = QtGui.QItemSelection(index, index)        

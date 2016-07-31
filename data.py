@@ -53,7 +53,9 @@ def set_icons():
     global comment_icon
     global comment_full_icon
     global new_icon
+    global creation_icon
 
+    creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
     new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
     comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
     comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
@@ -105,6 +107,7 @@ class Node(QtCore.QObject, object):
         self.expendedState = False
         self._resource = folder_icon
         self._id = data.id_generator()
+        self._virtual = False
 
         if parent is not None:
             parent.addChild(self)
@@ -270,12 +273,24 @@ class Node(QtCore.QObject, object):
             child.commit()
 
     def commit_me(self):
+        create = False
         if self.__class__.__name__ == "FolderNode":
+            create = True
+        elif self.__class__.__name__ == "AssetNode":
+             create = True
+        elif self.__class__.__name__ == "StageNode":
+            create = True
+
+        if create:
             create_mathod = getattr(self, "create", None)
             print "calling create method:"
             if callable(create_mathod):
-                self.create(path=self._path)
-            return
+                if self._virtual:
+                    self.create(path=self._path)
+                    print "creating! --> ", self._path, "<--"
+                else:
+                    print "already real --> ", self._path, "<--"
+                return
 
         print "not a folder"
 
@@ -302,7 +317,7 @@ class RootNode(Node):#, Metadata_file):
 
         self.name = name
         self.resource = folder_icon
-        self._virtual = False
+
 
         #Metadata_file.__init__(self, **kwargs)
 
@@ -390,7 +405,7 @@ class FolderNode(RootNode):
     def __init__(self, name,  parent=None, **kwargs):
         super(FolderNode, self).__init__(name, parent, **kwargs)
 
-        self.resource = folder_icon
+        self.resource = folder_icon if not self._virtual else  creation_icon
         
     def typeInfo(self):
         return _folder_
@@ -403,7 +418,7 @@ class AssetNode(RootNode):
     def __init__(self, name,  parent=None, **kwargs):
         super(AssetNode, self).__init__(name, parent, **kwargs)
 
-        self.resource = cube_icon_full
+        self.resource = cube_icon_full if not self._virtual else  creation_icon
 
     def create(self, path = None):
         super(AssetNode, self).create(path)
@@ -694,7 +709,7 @@ class StageNode(RootNode):
         if self.data_file:
             self.stage_file = self.data_file.read()
 
-        self.resource = new_icon
+        self.resource = new_icon if not self._virtual else  creation_icon
 
     def create(self,  path=None):
         super(StageNode, self).create(path)

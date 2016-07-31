@@ -472,7 +472,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="discardTree_pushButton">
              <property name="text">
               <string>Discard changes</string>
              </property>

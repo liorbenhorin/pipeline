@@ -1635,7 +1635,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         self.tree.update.connect(self.populate_navbar)
         self.tree.update.connect(self.tree_change_options)
-        self.ui.commitTree_pushButton.clicked.connect(self.tree.commit)
+        self.ui.commitTree_pushButton.clicked.connect(self.commit_tree)
+        self.ui.discardTree_pushButton.clicked.connect(self.discard_tree)
 
         if self.settings.user[0] is not None:
             self.ui.users_pushButton.setText(self.settings.user[0])
@@ -1771,6 +1772,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.populate_navbar()
         return False
 
+    def commit_tree(self):
+        self.tree.commit()
+        self.populate_project_tree()
+
+    def discard_tree(self):
+        self.populate_project_tree()
 
 
     def populate_project_tree(self):
