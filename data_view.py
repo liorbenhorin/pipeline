@@ -1664,18 +1664,28 @@ class pipelineTreeView(QtGui.QTreeView):
         return True
 
     def create_new_folder(self, parent):
+        #newTreeFolderDialog
+
         parent_node = self.sourceModel.getNode(parent)
 
-        folder_name, ok = QtGui.QInputDialog.getText(self, 'New Folder', 'Enter Folder name:')
 
-        if ok:
-            path = os.path.join(parent_node.path, folder_name)
-            node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True)
-            #if node is not False:
-            self.sourceModel.insertRows(0, 0, parent=parent, node=node)
-            self._proxyModel.invalidate()
-            self.updateTable(self.fromProxyIndex(parent))
-            self.update.emit()
+        #folder_name, ok = QtGui.QInputDialog.getText(self, 'New Folder', 'Enter Folder name:')
+
+        folderDlg = dlg.newFolderDialog()
+        result = folderDlg.exec_()
+        res = folderDlg.result()
+        if result == QtGui.QDialog.Accepted:
+            base_folder_name = res["name"]
+            for i in range(0,res["quantity"]):
+                number = files.set_padding(i, self.pipelineUI.project.project_padding)
+                folder_name = "%s_%s"%(base_folder_name, number)
+                path = os.path.join(parent_node.path, folder_name)
+                node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True)
+                #if node is not False:
+                self.sourceModel.insertRows(0, 0, parent=parent, node=node)
+                self._proxyModel.invalidate()
+                self.updateTable(self.fromProxyIndex(parent))
+                self.update.emit()
 
 
     def create_new_asset(self, parent):

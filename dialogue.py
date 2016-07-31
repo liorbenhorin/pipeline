@@ -588,195 +588,121 @@ class newStage(QtGui.QDialog):
 
        
     def result(self):
-        return self.stage_combo.currentText()   
+        return self.stage_combo.currentText()
+
+
+# class newTreeNodeDialog(QtGui.QDialog):
+#     def __init__(self, parent=None):
+#         super(newTreeNodeDialog, self).__init__(parent)
+#
+#
+#         self.setMaximumWidth(200)
+#         self.setMinimumWidth(200)
+#         self.setMaximumHeight(50)
+#
+#         self.layout = QtGui.QVBoxLayout(self)
+#         buttons = QtGui.QDialogButtonBox(
+#             QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
+#             QtCore.Qt.Horizontal, self)
+#         buttons.accepted.connect(self.accept)
+#         buttons.rejected.connect(self.reject)
+#         self.layout.addWidget(buttons)
+#
+#
+# class newTreeNodeWidget(QtGui.QWidget):
+#     def __init__(self, parent=None, name_label_string=""):
+#         super(newTreeNodeWidget, self).__init__(parent)
+#
+#
+#         self.name_label_string = name_label_string
+#
+#         self.input_layout = QtGui.QVBoxLayout(self)
+#
+#         self.name_label = QtGui.QLabel(self.name_label_string)
+#         self.name_input = QtGui.QLineEdit()
+#
+#         self.input_layout.addWidget(self.name_label)
+#         self.input_layout.addWidget(self.name_input)
+#
+#
+# class newTreeFolderDialog(newTreeNodeDialog):
+#     def __init__(self, parent =  None, name_label_sting = "Folder name"):
+#         super(newTreeFolderDialog, self).__init__(parent)
+#
+#         self.input_widget = newTreeNodeWidget(self, name_label_sting)
+#         self.layout.addWidget(self.input_widget)
+#
+#         self.quantity_label = QtGui.QLabel("Quantity")
+#
+#         self.quantity_slider = QtGui.QSpinBox()
+#         self.quantity_slider.setMinimum(1)
+#         self.quantity_slider.setMaximum(100)
+#         self.quantity_slider.setValue(1)
+#
+#         self.input_widget.layout().addWidget(self.quantity_label)
+#         self.input_widget.layout().addWidget(self.quantity_slider)
+#
+#
+#
+#     def result(self):
+#         res = {}
+#         res["name"] = self.input_widget.name_input.text()
+#         res["quantity"] = self.quantity_slider.value()
+#         return res
+
+class newNodeDialog(QtGui.QDialog):
+    def __init__(self, parent=None, name_label_string = ""):
+        super(newNodeDialog, self).__init__(parent)
+
+
+        self.setMaximumWidth(200)
+        self.setMinimumWidth(200)
+        self.setMaximumHeight(50)
+
+        self.layout = QtGui.QVBoxLayout(self)
+
+        self.input_widget = QtGui.QWidget(self)
+        self.input_layout = QtGui.QVBoxLayout(self.input_widget)
+
+        self.name_label_string = name_label_string
+
+
+        self.name_label = QtGui.QLabel(self.name_label_string)
+        self.name_input = QtGui.QLineEdit()
+
+        self.input_layout.addWidget(self.name_label)
+        self.input_layout.addWidget(self.name_input)
+
+        self.layout.addWidget(self.input_widget)
+        self.input_layout.setContentsMargins(5, 5, 5, 5)
+        self.layout.setContentsMargins(6, 12, 6, 12)
+
+        buttons = QtGui.QDialogButtonBox(
+            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
+            QtCore.Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        self.layout.addWidget(buttons)
 
 
 
+class newFolderDialog(newNodeDialog):
+    def __init__(self, parent =  None, name_label_sting = "Folder name"):
+        super(newFolderDialog, self).__init__(parent, name_label_sting)
+
+        self.quantity_label = QtGui.QLabel("Quantity")
+
+        self.quantity_slider = QtGui.QSpinBox()
+        self.quantity_slider.setMinimum(1)
+        self.quantity_slider.setMaximum(100)
+        self.quantity_slider.setValue(1)
+
+        self.input_layout.addWidget(self.quantity_label)
+        self.input_layout.addWidget(self.quantity_slider)
 
 
-
-
-    
-class test(QtGui.QDialog):
-    def __init__(self, parent = None, title = None):
-        super(test, self).__init__(parent)                    
-
-        layout =  QtGui.QVBoxLayout(self)
-        scrollArea = QtGui.QScrollArea()
-
-        scrollArea.setWidgetResizable(True)
-        scrollAreaWidgetContents = QtGui.QWidget()
-        scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 488, 208)) 
- 
-        horizontalLayout = QtGui.QHBoxLayout(scrollAreaWidgetContents)
-
-        self.splitter = QtGui.QSplitter(scrollAreaWidgetContents)
-        self.splitter.setOrientation(QtCore.Qt.Horizontal)         
-        self.splitter.setHandleWidth(10)
-        self.splitter.setChildrenCollapsible(False)
-        
-        self._columns = []
-        
-        self.add_column_at_end(self.splitter)
-        
-        horizontalLayout.addWidget(self.splitter)        
-        scrollArea.setWidget(scrollAreaWidgetContents)
-
-        layout.addWidget(scrollArea)
-  
-  
-        widget = QtGui.QWidget()
-        horizontalLayout_2 = QtGui.QHBoxLayout(widget)
-
-        pushButton_2 = QtGui.QPushButton(widget)
-        pushButton_2.setText("+")
-
-        pushButton = QtGui.QPushButton(widget)
-        pushButton.setText("-")
- 
-        pushButton_3 = QtGui.QPushButton(widget)
-        pushButton_3.setText("reset") 
-        
-        horizontalLayout_2.addWidget(pushButton_3)
-        horizontalLayout_2.addWidget(pushButton_2)
-        horizontalLayout_2.addWidget(pushButton)      
-        
-        layout.addWidget(widget)
-
-        pushButton_2.clicked.connect(self.add)
-        pushButton.clicked.connect(self.remove)
-        pushButton_3.clicked.connect(self.del_all_columns)
-
-        import json
-        print json.dumps(virtual_tree(),indent=2)
-        
-    def add(self):
-        self.add_column_at_end(self.splitter)
-
-    def remove(self):
-        self.del_column_from_end()
-        
-    def add_column_at_end(self,splitter):
-        self._columns.append(self.table_column(splitter))
-
-    def del_column_from_end(self):
-        if len(self._columns)>1:
-            self._columns[-1].setParent(None)
-            self._columns[-1].deleteLater()
-            del self._columns[-1]
-            return True
-        return False
-        
-    def del_all_columns(self):
-        while self.del_column_from_end():
-            continue
-                   
-    def table_column(self,splitter):
-        tableWidget = QtGui.QTableWidget(splitter)
-        tableWidget.setMinimumSize(QtCore.QSize(100, 100))
-        splitter.addWidget(tableWidget) 
-        return tableWidget       
-        
-        
-def virtual_tree():
-    tree = {}
-    tree["root"] = {
-                    "level_1":{
-                               "level_1_2": None
-                               }
-                    ,"level_2":{"level_2_2":{
-                                             "level_3_1":None
-                                             }
-                                }
-                    }
-    return tree
-    
-
-
-class test2(QtGui.QDialog):
-    def __init__(self, parent = None, title = None):
-        super(test2, self).__init__(parent)                    
-
-        layout =  QtGui.QVBoxLayout(self)
-
-        self.treeWidget = QtGui.QTreeWidget(self);
-        self.treeWidget.setAutoScrollMargin(16)
-        self.treeWidget.setIndentation(30)
-        self.treeWidget.setAnimated(False)
-        self.treeWidget.setUniformRowHeights(True)
-
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        self.treeWidget.setFont(font)
-        
-        layout.addWidget(self.treeWidget)
-        
-        self.fill_widget(self.treeWidget, virtual_data())
-    
-    def fill_item(self,item, value):
-        item.setExpanded(True)
-        if type(value) is dict:
-            for key, val in sorted(value.iteritems()):
-                child = QtGui.QTreeWidgetItem()
-                child.setText(0, unicode(key))
-                item.addChild(child)
-                self.fill_item(child, val)
-        
-        elif type(value) is list:
-            for val in value:
-                child = QtGui.QTreeWidgetItem()
-                item.addChild(child)
-                if type(val) is dict:      
-                    child.setText(0, '[dict]')
-                    self.fill_item(child, val)
-                elif type(val) is list:
-                    child.setText(0, '[list]')
-                    self.fill_item(child, val)
-                else:
-                    child.setText(0, unicode(val))              
-                    child.setExpanded(True)
-        else:
-            child = QtGui.QTreeWidgetItem()
-            child.setText(0, unicode(value))
-            item.addChild(child)
-
-    def fill_widget(self,widget, value):
-      widget.clear()
-      self.fill_item(widget.invisibleRootItem(), value)            
-      
-def virtual_data():
-    d = { 'key1': 'value1', 
-         'key2': 'value2',
-         'key3': [1,2,3, { 1: 3, 7 : 9}],
-         'key5': { 'another key1' : 'another value1','another key2' : 'another value2'} }
-    
-    return d
-    
-      
-class treeview(QtGui.QDialog):
-    def __init__(self, parent = None, model = None):
-        super(treeview, self).__init__(parent)                    
-
-        layout =  QtGui.QVBoxLayout(self)
-
-        self.treeView = QtGui.QTreeView(self);
-        #self.treeView.setAutoScrollMargin(16)
-        #self.treeView.setIndentation(30)
-        #self.treeView.setAnimated(False)
-        #self.treeView.setUniformRowHeights(True)
-        self.treeView.setSortingEnabled(True)
-        #font = QtGui.QFont()
-        #font.setPointSize(14)
-        #self.treeView.setFont(font) 
-        self.model = model
-        self.treeView.setModel(self.model)
-        
-        line = QtGui.QLineEdit()
-        layout.addWidget(line)
-               
-        layout.addWidget(self.treeView)
-        
-        QtCore.QObject.connect(line, QtCore.SIGNAL("textChanged(QString)"), self.model.setFilterRegExp)
-        
-        
-           
+    def result(self):
+        res = {}
+        res["name"] = self.name_input.text()
+        res["quantity"] = self.quantity_slider.value()
+        return res
