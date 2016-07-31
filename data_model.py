@@ -482,11 +482,11 @@ class PipelineVersionsModel2(QtCore.QAbstractItemModel):
                 resource = node.note_decoration
                 return QtGui.QIcon(QtGui.QPixmap(resource))
 
-        if role == PipelineProjectModel.sortRole:
-            return node.typeInfo()
+        if role == PipelineVersionsModel2.sortRole:
+            return node.number
 
-        if role == PipelineProjectModel.filterRole:
-            return node.typeInfo()
+        if role == PipelineVersionsModel2.filterRole:
+            return node.number
 
         if role == QtCore.Qt.SizeHintRole:
             return QtCore.QSize(0,19)

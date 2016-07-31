@@ -560,7 +560,7 @@ class PipelineVersionsView(QtGui.QTreeView):
 
             self._proxyModel.setDynamicSortFilter(True)
             #self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-            self._proxyModel.setSortRole(2)
+            self._proxyModel.setSortRole(dtm.PipelineVersionsModel2.sortRole)
             #self._proxyModel.setFilterRole(0)
             #self._proxyModel.setFilterKeyColumn(2)
 
@@ -618,7 +618,7 @@ class PipelineVersionsView(QtGui.QTreeView):
 
             #self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
 
-            self.sortByColumn(2, QtCore.Qt.DescendingOrder)
+            self.sortByColumn(1, QtCore.Qt.DescendingOrder)
             #self.model().sort(0,QtCore.Qt.DescendingOrder)
 
             self.update()

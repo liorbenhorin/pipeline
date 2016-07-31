@@ -524,7 +524,8 @@ class VersionNode(Node):
         if self.note:
             return comment_full_icon
         else:
-            return comment_icon
+            return None
+            #return comment_icon
 
 
 
