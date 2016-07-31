@@ -436,8 +436,8 @@ class loadButtonDelegate(QtGui.QItemDelegate):
         # connect its clicked signal to a slot in the parent view so 
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
-            index = self.parent().model().mapToSource(index)
-            if self.parent().model().sourceModel().getNode(index).typeInfo() == _new_:
+            soure_index = self.parent().model().mapToSource(index)
+            if self.parent().model().sourceModel().getNode(soure_index).typeInfo() == _new_:
                 label = ""
                 icon = new_icon
             else:
@@ -446,7 +446,6 @@ class loadButtonDelegate(QtGui.QItemDelegate):
 
             button = QtGui.QPushButton(
                 label,
-                index.data(),
                 self.parent(),
                 clicked=self.parent().MultiButtonClicked
             )
@@ -489,7 +488,7 @@ class PipelineVersionsView(QtGui.QTreeView):
         #self.setMinimumWidth(250)
 
 
-        #self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
 
         #self.setSortingEnabled(True)
@@ -503,6 +502,13 @@ class PipelineVersionsView(QtGui.QTreeView):
 
         # Set the delegate for column 0 of our table
         self._proxyModel = None
+        self.header().setHidden(True)
+        self.setStyleSheet('''
+
+            QTreeView::item:hover {
+                background: #101010;
+            }
+            ''')
 
     # def mouseMoveEvent(self, event):
     #     print event, "<<<"
@@ -529,6 +535,12 @@ class PipelineVersionsView(QtGui.QTreeView):
         #>>>self.verticalHeader().setDefaultSectionSize(int)
         #>>>self.horizontalHeader().resizeSection(0, int)
         #>>>self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
+        self.header().resizeSection(0, int)
+        self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
+        try:
+            self.model().sourceModel()._rowHeight = int
+        except:
+            print "no model"
         self.update()
 
     def clearModel(self):
@@ -556,6 +568,34 @@ class PipelineVersionsView(QtGui.QTreeView):
             self.setModel(self._proxyModel)
 
             self.setIndentation(0)
+
+
+
+            #self.header().setResizeMode(QtGui.QHeaderView.Stretch)
+
+
+
+
+
+
+            self.header().resizeSection(0, 32)
+            self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
+
+
+            self.header().resizeSection(1, 32)
+            self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
+
+
+
+            self.header().setStretchLastSection(False)
+
+            self.header().setResizeMode(2, QtGui.QHeaderView.Stretch)
+            self.header().setResizeMode(3, QtGui.QHeaderView.Stretch)
+
+            self.header().resizeSection(4, 32)
+            self.header().setResizeMode(4, QtGui.QHeaderView.Fixed)
+            self.header().resizeSection(5, 32)
+            self.header().setResizeMode(5, QtGui.QHeaderView.Fixed)
             #>>>self.horizontalHeader().resizeSection(4,40)
             #>>>self.horizontalHeader().setResizeMode(4,QtGui.QHeaderView.Fixed)
             # size the load button column
@@ -573,7 +613,7 @@ class PipelineVersionsView(QtGui.QTreeView):
             #>>>self.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Stretch)
             
             # setup the buttons for loading and more options with delegates
-            self.setItemDelegateForColumn(4,  loadButtonDelegate(self))
+            self.setItemDelegateForColumn(5,  loadButtonDelegate(self))
             #self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
 
             #self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))

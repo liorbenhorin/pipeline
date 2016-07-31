@@ -420,6 +420,7 @@ class PipelineVersionsModel2(QtCore.QAbstractItemModel):
         super(PipelineVersionsModel2, self).__init__(parent)
         self._rootNode = root
         self._tempIndex = None
+        self._rowHeight = 32
 
     def staticIndex(self, index):
         return QtCore.QPersistentModelIndex(index)
@@ -442,7 +443,7 @@ class PipelineVersionsModel2(QtCore.QAbstractItemModel):
     """INPUTS: QModelIndex"""
     """OUTPUT: int"""
     def columnCount(self, parent):
-        return 5
+        return 6
 
 
 
@@ -455,14 +456,30 @@ class PipelineVersionsModel2(QtCore.QAbstractItemModel):
 
         node = index.internalPointer()
 
+        if role == QtCore.Qt.SizeHintRole:
+            return QtCore.QSize(40,self._rowHeight)
 
-        if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
+        if role == QtCore.Qt.EditRole:
 
             return node.data(index.column())
+
+        if role == QtCore.Qt.DisplayRole:
+
+            if index.column() == 1:
+                return node.number
+
+            if index.column() == 2:
+                return node.author
+
+            if index.column() == 3:
+                return node.date
 
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
                 resource = node.resource
+                return QtGui.QIcon(QtGui.QPixmap(resource))
+            if index.column() == 4:
+                resource = node.note_decoration
                 return QtGui.QIcon(QtGui.QPixmap(resource))
 
         if role == PipelineProjectModel.sortRole:
