@@ -460,6 +460,12 @@ class PipelineVersionsModel2(QtCore.QAbstractItemModel):
             return QtCore.QSize(40,self._rowHeight)
 
         if role == QtCore.Qt.EditRole:
+            if index.column() == 0:
+                return node.fullName
+            if index.column() == 1:
+                return node.author
+            if index.column() == 2:
+                return node.note
 
             return node.data(index.column())
 

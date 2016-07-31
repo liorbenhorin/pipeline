@@ -2014,9 +2014,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             self._dataMapper.setModel(Model)
 
-            self._dataMapper.addMapping(self.ui.stage_path_label, 3, QtCore.QByteArray("text"))
-            self._dataMapper.addMapping(self.ui.stage_author_label, 0, QtCore.QByteArray("text"))
-            self._dataMapper.addMapping(self.ui.stage_note_label, 4, QtCore.QByteArray("text"))
+            self._dataMapper.addMapping(self.ui.stage_path_label, 0, QtCore.QByteArray("text"))
+            self._dataMapper.addMapping(self.ui.stage_author_label, 1, QtCore.QByteArray("text"))
+            self._dataMapper.addMapping(self.ui.stage_note_label, 2, QtCore.QByteArray("text"))
             self._dataMapper.toFirst()
             QtCore.QObject.connect(self.versionsView.selectionModel(), QtCore.SIGNAL("currentRowChanged(QModelIndex, QModelIndex)"), self.setVersionSelection)# self._dataMapper,  QtCore.SLOT("setCurrentModelIndex(QModelIndex)"))
 
@@ -2029,9 +2029,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.versionsView.setModel_(None)
             self._dataMapper.setModel(None)
 
-        self.ui.stage_path_label.setText("Stage path")
-        self.ui.stage_author_label.setText("Stage author")
-        self.ui.stage_note_label.setText("Stage note")
+        self.ui.stage_path_label.setText("n/a")
+        self.ui.stage_author_label.setText("n/a")
+        self.ui.stage_note_label.setText("n/a")
         self.set_thumbnail(large_image_icon_dark)
 
         self.ui.stage_widget.setEnabled(False)

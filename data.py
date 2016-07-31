@@ -477,19 +477,19 @@ class VersionNode(Node):
 
     @property
     def number(self):
-        return self._number
+        return self._number if self._number else "n/a"
 
     @property
     def date(self):
-        return self._date
+        return self._date if self._date else "n/a"
 
     @property
     def author(self):
-        return self._author
+        return self._author if self._author else "n/a"
 
     @property
     def note(self):
-        return self._note
+        return self._note if self._note else "n/a"
 
     @note.setter
     def note(self, note):
@@ -505,7 +505,7 @@ class VersionNode(Node):
 
     @property
     def fullName(self):
-        return "%s > %s"%(self.stage.parent().name, self.stage.name)
+        return "%s > %s : %s %s"%(self.stage.parent().name, self.stage.name, "Version",self.number)
 
     def typeInfo(self):
         return _version_
@@ -521,7 +521,7 @@ class VersionNode(Node):
 
     @property
     def note_decoration(self):
-        if self.note:
+        if self._note:
             return comment_full_icon
         else:
             return None
@@ -827,6 +827,7 @@ class StageNode(RootNode):
 
 
                 self.edited.emit()
+
 
     def removeVersionData(self, padded_number):
         if padded_number in self.stage_file["versions"]:
