@@ -76,6 +76,16 @@ def set_icons():
     logo = QtGui.QPixmap(os.path.join(localIconPath, "%s.png"%"pipeline_logo"))
     edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
     comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
+
+
+    global buffer_icon
+    global counter_icon
+    global text_icon
+
+    buffer_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "buffer"))
+    counter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "counter"))
+    text_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "cursor-text"))
+
         
 def warning(icon, title, message ):
     
@@ -655,8 +665,9 @@ class newNodeDialog(QtGui.QDialog):
         super(newNodeDialog, self).__init__(parent)
 
 
-        self.setMaximumWidth(200)
-        self.setMinimumWidth(200)
+
+        self.setMaximumWidth(400)
+        self.setMinimumWidth(400)
         self.setMaximumHeight(50)
 
         self.layout = QtGui.QVBoxLayout(self)
@@ -664,18 +675,17 @@ class newNodeDialog(QtGui.QDialog):
         self.input_widget = QtGui.QWidget(self)
         self.input_layout = QtGui.QVBoxLayout(self.input_widget)
 
-        self.name_label_string = name_label_string
+        self.name_widget = groupInput(self, label=name_label_string, inputWidget=QtGui.QLineEdit(self),  ic=text_icon)
+
+        self.name_input = self.name_widget.input
 
 
-        self.name_label = QtGui.QLabel(self.name_label_string)
-        self.name_input = QtGui.QLineEdit()
-
-        self.input_layout.addWidget(self.name_label)
-        self.input_layout.addWidget(self.name_input)
+        self.input_layout.addWidget(self.name_widget)
 
         self.layout.addWidget(self.input_widget)
-        self.input_layout.setContentsMargins(5, 5, 5, 5)
-        self.layout.setContentsMargins(6, 12, 6, 12)
+
+        self.input_layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setContentsMargins(5, 5, 5, 10)
 
         buttons = QtGui.QDialogButtonBox(
             QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
@@ -690,19 +700,58 @@ class newFolderDialog(newNodeDialog):
     def __init__(self, parent =  None, name_label_sting = "Folder name"):
         super(newFolderDialog, self).__init__(parent, name_label_sting)
 
-        self.quantity_label = QtGui.QLabel("Quantity")
 
-        self.quantity_slider = QtGui.QSpinBox()
+        self.input_quantity_widget = groupInput(self, label = "Quantity", inputWidget=QtGui.QSpinBox(self), ic= buffer_icon)
+
+        self.quantity_slider = self.input_quantity_widget.input
         self.quantity_slider.setMinimum(1)
         self.quantity_slider.setMaximum(100)
         self.quantity_slider.setValue(1)
 
-        self.input_layout.addWidget(self.quantity_label)
-        self.input_layout.addWidget(self.quantity_slider)
+
+        self.input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
+
+        self.padding_slider = self.input_padding_widget.input
+        self.padding_slider.setMinimum(0)
+        self.padding_slider.setMaximum(6)
+        self.padding_slider.setValue(3)
+
+        self.input_layout.addWidget(self.input_quantity_widget)
+        self.input_layout.addWidget(self.input_padding_widget)
 
 
     def result(self):
         res = {}
         res["name"] = self.name_input.text()
         res["quantity"] = self.quantity_slider.value()
+        res["padding"] = self.padding_slider.value()
         return res
+
+
+class groupInput(QtGui.QWidget):
+    def __init__(self, parent, label = "Input", inputWidget = None, ic = None):
+        super(groupInput, self).__init__(parent)
+
+        self.layout = QtGui.QHBoxLayout(self)
+        self.layout.setContentsMargins(5, 5, 5, 5)
+        self.layout.setAlignment(QtCore.Qt.AlignLeft)
+
+
+        if ic:
+            self.icon = QtGui.QLabel()
+            self.icon.setPixmap(ic)
+            self.icon.setMinimumSize(QtCore.QSize(24, 24))
+            self.layout.addWidget(self.icon)
+
+
+
+        self.label = QtGui.QLabel(label)
+        self.label.setMinimumSize(QtCore.QSize(100, 30))
+        self.input = inputWidget
+        self.input.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
+        self.input.setMinimumSize(QtCore.QSize(0, 30))
+
+
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.input)
+

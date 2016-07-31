@@ -1677,7 +1677,7 @@ class pipelineTreeView(QtGui.QTreeView):
         if result == QtGui.QDialog.Accepted:
             base_folder_name = res["name"]
             for i in range(0,res["quantity"]):
-                number = files.set_padding(i, self.pipelineUI.project.project_padding)
+                number = files.set_padding(i, res["padding"])
                 folder_name = "%s_%s"%(base_folder_name, number)
                 path = os.path.join(parent_node.path, folder_name)
                 node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True)
