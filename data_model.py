@@ -42,6 +42,8 @@ def set_icons():
     branch_end = os.path.join(localIconPath,"branch-end.svg")
     vline = os.path.join(localIconPath,"vline.svg")
 
+    localIconPath = os.path.join(os.path.dirname(__file__), 'icons/')
+
     global folder_icon
     global cube_icon
     global cube_icon_full
@@ -58,7 +60,8 @@ def set_icons():
     cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
     cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
+    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+
                     
     
 set_icons()
@@ -99,7 +102,7 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
     """INPUTS: QModelIndex"""
     """OUTPUT: int"""
     def columnCount(self, parent):
-        return 1
+        return 2
     
 
     
@@ -113,10 +116,27 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         node = index.internalPointer()
 
 
+        if role == QtCore.Qt.SizeHintRole:
+            return QtCore.QSize(40, 22)
+
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
            
             return node.data(index.column())
- 
+
+        if role == QtCore.Qt.FontRole:
+            font = QtGui.QFont()
+
+            if index.column() == 0:
+                if node._virtual:
+                    font.setItalic(True)
+                    font.setBold(True)
+
+
+            if index.column() == 1:
+                font.setItalic(True)
+
+            return font
+
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
                 resource = node.resource
@@ -128,8 +148,8 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         if role == PipelineProjectModel.filterRole:
             return node.typeInfo()
 
-        if role == QtCore.Qt.SizeHintRole:
-            return QtCore.QSize(0,19)
+        # if role == QtCore.Qt.SizeHintRole:
+        #     return QtCore.QSize(0,19)
         
         # this is for expending state - the result must be uniqe!!!
         if role == 165:
@@ -166,11 +186,23 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
     """INPUTS: int, Qt::Orientation, int"""
     """OUTPUT: QVariant, strings are cast to QString which is a QVariant"""
     def headerData(self, section, orientation, role):
+
+        # if role == QtCore.Qt.DecorationRole:
+        #
+        #     if section == 0:
+        #         icon = QtGui.QIcon(cube_icon_full)
+        #
+        #         return icon
+
+
+        if role == QtCore.Qt.SizeHintRole:
+            return QtCore.QSize(40, 24)
+
         if role == QtCore.Qt.DisplayRole:
             if section == 0:
-                return "Project"
-            else:
-                return "Type"
+                return "Structure"
+            elif section == 1:
+                return "Level"
 
     """INPUTS: QModelIndex"""
     """OUTPUT: int (flag)"""

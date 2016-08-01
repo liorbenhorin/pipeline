@@ -234,11 +234,11 @@ class Node(QtCore.QObject, object):
     def data(self, column):
         
         if   column is 0: return self.name
-        elif column is 1: return None
+        elif column is 1: return self.typeInfo()#len(self._children)
     
     def setData(self, column, value):
         #print value
-        if   column is 0: self.name = value
+        if   column is 0: pass#self.name = value
         elif column is 1: pass
 
     @property

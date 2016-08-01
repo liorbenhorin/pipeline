@@ -1292,6 +1292,12 @@ class pipelineTreeView(QtGui.QTreeView):
                            
                            QTreeView::item:focus {
                            }
+                           QTreeView::item:hover {
+                                background: #101010;
+                           }
+                           QTreeView {
+                                outline: 0;
+                           }
                            QTreeView::branch:has-siblings:!adjoins-item {
                                 border-image:url(''' + vline + ''') 0;
                            }
@@ -1347,6 +1353,16 @@ class pipelineTreeView(QtGui.QTreeView):
         save the expended state of the tree
         '''
         self.saveState()
+
+
+        self.header().setStretchLastSection(False)
+
+        self.header().setResizeMode(0, QtGui.QHeaderView.Stretch)
+
+        self.header().resizeSection(1, 100)
+        self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
+
+
 
     def initialExpension(self):
         if self.model():
@@ -1626,8 +1642,10 @@ class pipelineTreeView(QtGui.QTreeView):
                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
         else:
-            actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self.projectRootIndex()) ))
-            actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, self.projectRootIndex()) ))
+            event.accept()
+            return
+            #actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self.projectRootIndex()) ))
+            #actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, self.projectRootIndex()) ))
 
         menu.addActions(actions)      
         
