@@ -348,9 +348,14 @@ def set_icons():
     global comment_icon
     global comment_full_icon
 
+    global collapse_icon
+    global expend_icon
+
     comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
     comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
-        
+    collapse_icon = os.path.join(localIconPath, "%s.svg" % "unfold-less")
+    expend_icon = os.path.join(localIconPath, "%s.svg" % "unfold-more")
+
     offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
     catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
     asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
@@ -2118,12 +2123,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                        self.ui.import_version_pushButton,
                        self.ui.playblast_shot_pushButton,
                        self.ui.commitTree_pushButton,
-                       self.ui.discardTree_pushButton
+                       self.ui.discardTree_pushButton,
+                       self.ui.collapseTree_pushButton,
+                       self.ui.expendTree_pushButton
                        ]:
             
-            button.setIconSize(QtCore.QSize(20,20)) 
-        
-     
+            button.setIconSize(QtCore.QSize(20,20))
+
+        self.ui.collapseTree_pushButton.setIcon(QtGui.QIcon(collapse_icon))
+        self.ui.expendTree_pushButton.setIcon(QtGui.QIcon(expend_icon))
+
         self.ui.projects_pushButton.setIcon(QtGui.QIcon(project_icon))
         self.ui.users_pushButton.setIcon(QtGui.QIcon(users_icon))
         self.ui.commitTree_pushButton.setIcon(QtGui.QIcon(yes_icon))

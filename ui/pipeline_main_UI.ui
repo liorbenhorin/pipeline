@@ -398,7 +398,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
          <widget class="QWidget" name="widget_5" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <property name="spacing">
-            <number>0</number>
+            <number>5</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -413,6 +413,32 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
             <number>0</number>
            </property>
            <item>
+            <widget class="QPushButton" name="expendTree_pushButton">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="collapseTree_pushButton">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLabel" name="searchIcon_label">
              <property name="minimumSize">
               <size>
@@ -422,6 +448,9 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
              </property>
              <property name="text">
               <string/>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
