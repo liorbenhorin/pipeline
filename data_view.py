@@ -1691,16 +1691,32 @@ class pipelineTreeView(QtGui.QTreeView):
     def create_new_asset(self, parent):
         parent_node = self.sourceModel.getNode(parent)
 
-        folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
+        # folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
+        #
+        # if ok:
+        #     path = os.path.join(parent_node.path, folder_name)
+        #     node = dt.AssetNode(folder_name, parent = parent_node, path = path, virtual = True)#.create( path = path)
+        #     #if node is not False:
+        #     self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
+        #     self._proxyModel.invalidate()
+        #     self.updateTable( self.fromProxyIndex(parent))
+        #     self.update.emit()
 
-        if ok:
-            path = os.path.join(parent_node.path, folder_name)
-            node = dt.AssetNode(folder_name, parent = parent_node, path = path, virtual = True)#.create( path = path)
-            #if node is not False:
-            self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
-            self._proxyModel.invalidate()
-            self.updateTable( self.fromProxyIndex(parent))
-            self.update.emit()
+        assetDlg = dlg.newAssetDialog()
+        result = assetDlg.exec_()
+        res = assetDlg.result()
+        if result == QtGui.QDialog.Accepted:
+            base_folder_name = res["name"]
+            for i in range(0, res["quantity"]):
+                number = files.set_padding(i, res["padding"])
+                folder_name = "%s_%s" % (base_folder_name, number)
+                path = os.path.join(parent_node.path, folder_name)
+                node = dt.AssetNode(folder_name, path=path, parent=parent_node, virtual=True)
+                # if node is not False:
+                self.sourceModel.insertRows(0, 0, parent=parent, node=node)
+                self._proxyModel.invalidate()
+                self.updateTable(self.fromProxyIndex(parent))
+                self.update.emit()
 
 
     def create_new_stage(self, parent):

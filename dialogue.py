@@ -601,67 +601,9 @@ class newStage(QtGui.QDialog):
         return self.stage_combo.currentText()
 
 
-# class newTreeNodeDialog(QtGui.QDialog):
-#     def __init__(self, parent=None):
-#         super(newTreeNodeDialog, self).__init__(parent)
-#
-#
-#         self.setMaximumWidth(200)
-#         self.setMinimumWidth(200)
-#         self.setMaximumHeight(50)
-#
-#         self.layout = QtGui.QVBoxLayout(self)
-#         buttons = QtGui.QDialogButtonBox(
-#             QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
-#             QtCore.Qt.Horizontal, self)
-#         buttons.accepted.connect(self.accept)
-#         buttons.rejected.connect(self.reject)
-#         self.layout.addWidget(buttons)
-#
-#
-# class newTreeNodeWidget(QtGui.QWidget):
-#     def __init__(self, parent=None, name_label_string=""):
-#         super(newTreeNodeWidget, self).__init__(parent)
-#
-#
-#         self.name_label_string = name_label_string
-#
-#         self.input_layout = QtGui.QVBoxLayout(self)
-#
-#         self.name_label = QtGui.QLabel(self.name_label_string)
-#         self.name_input = QtGui.QLineEdit()
-#
-#         self.input_layout.addWidget(self.name_label)
-#         self.input_layout.addWidget(self.name_input)
-#
-#
-# class newTreeFolderDialog(newTreeNodeDialog):
-#     def __init__(self, parent =  None, name_label_sting = "Folder name"):
-#         super(newTreeFolderDialog, self).__init__(parent)
-#
-#         self.input_widget = newTreeNodeWidget(self, name_label_sting)
-#         self.layout.addWidget(self.input_widget)
-#
-#         self.quantity_label = QtGui.QLabel("Quantity")
-#
-#         self.quantity_slider = QtGui.QSpinBox()
-#         self.quantity_slider.setMinimum(1)
-#         self.quantity_slider.setMaximum(100)
-#         self.quantity_slider.setValue(1)
-#
-#         self.input_widget.layout().addWidget(self.quantity_label)
-#         self.input_widget.layout().addWidget(self.quantity_slider)
-#
-#
-#
-#     def result(self):
-#         res = {}
-#         res["name"] = self.input_widget.name_input.text()
-#         res["quantity"] = self.quantity_slider.value()
-#         return res
 
 class newNodeDialog(QtGui.QDialog):
-    def __init__(self, parent=None, name_label_string = ""):
+    def __init__(self, parent=None, name_label_string = "", title = ""):
         super(newNodeDialog, self).__init__(parent)
 
 
@@ -672,6 +614,9 @@ class newNodeDialog(QtGui.QDialog):
 
         self.layout = QtGui.QVBoxLayout(self)
 
+
+
+
         self.input_widget = QtGui.QWidget(self)
         self.input_layout = QtGui.QVBoxLayout(self.input_widget)
 
@@ -679,6 +624,9 @@ class newNodeDialog(QtGui.QDialog):
 
         self.name_input = self.name_widget.input
 
+
+        self.create_title = Title(self, label=title)
+        self.input_layout.addWidget(self.create_title)
 
         self.input_layout.addWidget(self.name_widget)
 
@@ -697,8 +645,8 @@ class newNodeDialog(QtGui.QDialog):
 
 
 class newFolderDialog(newNodeDialog):
-    def __init__(self, parent =  None, name_label_sting = "Folder name"):
-        super(newFolderDialog, self).__init__(parent, name_label_sting)
+    def __init__(self, parent =  None, name_label_sting = "Folder name", title = "Create new folder"):
+        super(newFolderDialog, self).__init__(parent, name_label_sting, title)
 
 
         self.input_quantity_widget = groupInput(self, label = "Quantity", inputWidget=QtGui.QSpinBox(self), ic= buffer_icon)
@@ -726,6 +674,33 @@ class newFolderDialog(newNodeDialog):
         res["quantity"] = self.quantity_slider.value()
         res["padding"] = self.padding_slider.value()
         return res
+
+
+class newAssetDialog(newFolderDialog):
+    def __init__(self, parent =  None, name_label_sting = "Asset name", title = "Create new asset"):
+        super(newAssetDialog, self).__init__(parent, name_label_sting, title)
+
+        self.create_stages_title = Title(self, label = "Add stages:")
+        self.input_layout.addWidget(self.create_stages_title)
+
+
+class Title(QtGui.QWidget):
+    def __init__(self, parent, label="Input"):
+        super(Title, self).__init__(parent)
+
+        self.layout = QtGui.QVBoxLayout(self)
+        self.layout.setContentsMargins(5, 5, 5, 5)
+        self.layout.setAlignment(QtCore.Qt.AlignLeft)
+
+        self.label = QtGui.QLabel(label)
+        self.label.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.label.setMinimumSize(QtCore.QSize(100, 20))
+
+        self.layout.addWidget(self.label)
+
+        self.layout.addWidget(HLine())
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
 
 
 class groupInput(QtGui.QWidget):
