@@ -1702,7 +1702,7 @@ class pipelineTreeView(QtGui.QTreeView):
         #     self.updateTable( self.fromProxyIndex(parent))
         #     self.update.emit()
 
-        assetDlg = dlg.newAssetDialog()
+        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"])
         result = assetDlg.exec_()
         res = assetDlg.result()
         if result == QtGui.QDialog.Accepted:

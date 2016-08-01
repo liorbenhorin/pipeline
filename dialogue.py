@@ -645,7 +645,7 @@ class newNodeDialog(QtGui.QDialog):
 
 
 class newFolderDialog(newNodeDialog):
-    def __init__(self, parent =  None, name_label_sting = "Folder name", title = "Create new folder"):
+    def __init__(self, parent =  None, name_label_sting = "Name", title = "Create new folder"):
         super(newFolderDialog, self).__init__(parent, name_label_sting, title)
 
 
@@ -677,11 +677,59 @@ class newFolderDialog(newNodeDialog):
 
 
 class newAssetDialog(newFolderDialog):
-    def __init__(self, parent =  None, name_label_sting = "Asset name", title = "Create new asset"):
+    def __init__(self, parent =  None, name_label_sting = "Name", title = "Create new asset", stages = []):
         super(newAssetDialog, self).__init__(parent, name_label_sting, title)
 
         self.create_stages_title = Title(self, label = "Add stages:")
         self.input_layout.addWidget(self.create_stages_title)
+
+        self.stages_options = {}
+        for stage in stages:
+            widget = QtGui.QWidget(self)
+            layout = QtGui.QVBoxLayout(widget)
+            layout.setContentsMargins(5, 2, 5, 2)
+            layout.setAlignment(QtCore.Qt.AlignLeft)
+            checkbox = QtGui.QCheckBox(stage)
+            self.stages_options[stage] = [checkbox, checkbox.isChecked()]
+            layout.addWidget(checkbox)
+            self.input_layout.addWidget(widget)
+
+        self.file_name_title = Title(self, label = "File name format:")
+        self.input_layout.addWidget(self.file_name_title)
+
+
+        self.input_format_widget = groupInput(self, label="Format Depth", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
+
+        self.depth_slider = self.input_format_widget.input
+        self.depth_slider.setMinimum(0)
+        self.depth_slider.setMaximum(6)
+        self.depth_slider.setValue(2)
+        #self.depth_slider.setMaximumSize(QtCore.QSize(40, 30))
+
+        widget = QtGui.QWidget(self)
+        layout = QtGui.QVBoxLayout(widget)
+        layout.setContentsMargins(5, 2, 5, 2)
+        layout.setAlignment(QtCore.Qt.AlignLeft)
+
+        self.format_preview = QtGui.QLineEdit()
+        self.format_preview.setMinimumSize(QtCore.QSize(100, 30))
+        self.format_preview.setEnabled(False)
+        self.format_preview.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+
+        layout.addWidget(self.format_preview)
+        self.input_layout.addWidget(self.input_format_widget)
+        self.input_layout.addWidget(widget)
+        self.format_preview.setText(self.preview_format())
+
+    def preview_format(self):
+        items = ["asset", "stage"]
+        string = "_".join(items)
+        final = "{0}_{1}".format(string, "version_extra.ma")
+        return final
+
+
+
 
 
 class Title(QtGui.QWidget):
@@ -694,7 +742,7 @@ class Title(QtGui.QWidget):
 
         self.label = QtGui.QLabel(label)
         self.label.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        self.label.setMinimumSize(QtCore.QSize(100, 20))
+        self.label.setMinimumSize(QtCore.QSize(60, 20))
 
         self.layout.addWidget(self.label)
 
@@ -721,7 +769,7 @@ class groupInput(QtGui.QWidget):
 
 
         self.label = QtGui.QLabel(label)
-        self.label.setMinimumSize(QtCore.QSize(100, 30))
+        self.label.setMinimumSize(QtCore.QSize(60, 30))
         self.input = inputWidget
         self.input.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding )
         self.input.setMinimumSize(QtCore.QSize(0, 30))
