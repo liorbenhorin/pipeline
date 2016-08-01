@@ -1340,11 +1340,7 @@ class pipelineTreeView(QtGui.QTreeView):
         the rest will be collapsed
         '''
 
-        self.collapseAll()
-
-        for row in range(self.model().rowCount(self.rootIndex())):
-            x = self.model().index(row,0,self.rootIndex())
-            self.setExpanded(x,True)
+        self.initialExpension()
 
         
         '''
@@ -1352,7 +1348,13 @@ class pipelineTreeView(QtGui.QTreeView):
         '''
         self.saveState()
 
+    def initialExpension(self):
+        if self.model():
+            self.collapseAll()
 
+            for row in range(self.model().rowCount(self.rootIndex())):
+                x = self.model().index(row, 0, self.rootIndex())
+                self.setExpanded(x, True)
 
     @property
     def tableView(self):
