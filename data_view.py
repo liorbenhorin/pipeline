@@ -1339,18 +1339,13 @@ class pipelineTreeView(QtGui.QTreeView):
         the projects name folder
         the rest will be collapsed
         '''
-        
-        
-        self.expandAll()
-        i =  self.model().index(0,0,self.rootIndex())
-        
-        for row in range(self.model().rowCount(i)):
-            x = self.model().index(row,0,i)
-            self.setExpanded(x,False)
-        
-        
-        
-        
+
+        self.collapseAll()
+
+        for row in range(self.model().rowCount(self.rootIndex())):
+            x = self.model().index(row,0,self.rootIndex())
+            self.setExpanded(x,True)
+
         
         '''
         save the expended state of the tree
@@ -1713,7 +1708,7 @@ class pipelineTreeView(QtGui.QTreeView):
             base_folder_name = res["name"]
             for i in range(0, res["quantity"]):
                 number = files.set_padding(i, res["padding"])
-                folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 0 else base_folder_name
+                folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 1 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
                 node = dt.AssetNode(folder_name, path=path, parent=parent_node, virtual=True)
                 # if node is not False:

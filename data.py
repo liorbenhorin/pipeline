@@ -283,16 +283,17 @@ class Node(QtCore.QObject, object):
 
         if create:
             create_mathod = getattr(self, "create", None)
-            print "calling create method:"
+            #print "calling create method:"
             if callable(create_mathod):
                 if self._virtual:
                     self.create(path=self._path)
-                    print "creating! --> ", self._path, "<--"
+                    #print "creating! --> ", self._path, "<--"
                 else:
-                    print "already real --> ", self._path, "<--"
+                    pass
+                    #print "already real --> ", self._path, "<--"
                 return
 
-        print "not a folder"
+        #print "not a folder"
 
 
     @property
