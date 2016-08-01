@@ -701,13 +701,19 @@ class StageNode(RootNode):
                 self.settings = kwargs[key]
 
         self.pipelineUI = None
+        self._formatDepth = 2
+
         for key in kwargs:
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
                 self.edited.connect(self.pipelineUI.updateVersionsTable)
+            if key == "name_format":
+                self._name_format = kwargs[key]
+
 
         if self.data_file:
             self.stage_file = self.data_file.read()
+
 
         self.resource = new_icon if not self._virtual else  creation_icon
 
@@ -740,7 +746,7 @@ class StageNode(RootNode):
 
     def formatFileName(self):
 
-        depth = 2
+        depth = self._name_format
         levels = []
         current = self
         for i in range(depth):

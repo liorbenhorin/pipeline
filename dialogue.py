@@ -698,7 +698,7 @@ class newAssetDialog(newFolderDialog):
             layout.setContentsMargins(5, 2, 5, 2)
             layout.setAlignment(QtCore.Qt.AlignLeft)
             checkbox = QtGui.QCheckBox(stage)
-            self.stages_options[stage] = [checkbox, checkbox.isChecked()]
+            self.stages_options[stage] = checkbox
             layout.addWidget(checkbox)
             self.input_layout.addWidget(widget)
 
@@ -735,6 +735,18 @@ class newAssetDialog(newFolderDialog):
         final = "{0}_{1}".format(string, "version_extra.ma")
         self.format_preview.setText(final)
 
+
+    def result(self):
+        res = {}
+        res["name"] = self.name_input.text()
+        res["quantity"] = self.quantity_slider.value()
+        res["padding"] = self.padding_slider.value()
+        stages = {}
+        for option in self.stages_options:
+            stages[option] = self.stages_options[option].isChecked() # {stage: bool}
+        res["stages"] = stages
+        res["name_format"] = self.depth_slider.value()
+        return res
 
 class Title(QtGui.QWidget):
     def __init__(self, parent, label="Input"):

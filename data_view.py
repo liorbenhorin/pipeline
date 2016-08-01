@@ -1706,7 +1706,6 @@ class pipelineTreeView(QtGui.QTreeView):
         for i in depth_list:
             ancestors.append(self.sourceModel.getNode(i))
 
-
         assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"], ancestors = ancestors)
         result = assetDlg.exec_()
         res = assetDlg.result()
@@ -1720,8 +1719,21 @@ class pipelineTreeView(QtGui.QTreeView):
                 # if node is not False:
                 self.sourceModel.insertRows(0, 0, parent=parent, node=node)
                 self._proxyModel.invalidate()
-                self.updateTable(self.fromProxyIndex(parent))
+
                 self.update.emit()
+
+                new_index = self.sourceModel.indexFromNode(node, QtCore.QModelIndex())
+                for s in res["stages"]:
+                    if res["stages"][s]:
+                        path = os.path.join(parent_node.path, folder_name, s)
+                        #formatDepth
+                        stageNode = dt.StageNode(s, parent=node, path=path, virtual=True, name_format = res["name_format"])
+                        # if node is not False:
+                        self._sourceModel.insertRows(0, 0, parent=new_index, node=stageNode)
+                        self._proxyModel.invalidate()
+
+                        self.update.emit()
+
 
 
     def create_new_stage(self, parent):
