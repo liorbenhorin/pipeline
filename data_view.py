@@ -1678,7 +1678,7 @@ class pipelineTreeView(QtGui.QTreeView):
             base_folder_name = res["name"]
             for i in range(0,res["quantity"]):
                 number = files.set_padding(i, res["padding"])
-                folder_name = "%s_%s"%(base_folder_name, number)
+                folder_name = "%s_%s"%(base_folder_name, number) if res["quantity"] > 0 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
                 node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True)
                 #if node is not False:
@@ -1701,15 +1701,20 @@ class pipelineTreeView(QtGui.QTreeView):
         #     self._proxyModel.invalidate()
         #     self.updateTable( self.fromProxyIndex(parent))
         #     self.update.emit()
+        depth_list = self.sourceModel.listAncestos(parent)
+        ancestors = []
+        for i in depth_list:
+            ancestors.append(self.sourceModel.getNode(i))
 
-        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"])
+
+        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"], ancestors = ancestors)
         result = assetDlg.exec_()
         res = assetDlg.result()
         if result == QtGui.QDialog.Accepted:
             base_folder_name = res["name"]
             for i in range(0, res["quantity"]):
                 number = files.set_padding(i, res["padding"])
-                folder_name = "%s_%s" % (base_folder_name, number)
+                folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 0 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
                 node = dt.AssetNode(folder_name, path=path, parent=parent_node, virtual=True)
                 # if node is not False:

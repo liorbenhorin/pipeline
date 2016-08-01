@@ -376,8 +376,8 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
                 return
         
         data = [index]
-        for i in range(self.rowCount(index)):
-            data.append(self.index(i, 0, index))
+        #for i in range(self.rowCount(index)):
+        #    data.append(self.index(i, 0, index))
             
         rec(data, index)
         if len(data)>0:
