@@ -15,7 +15,8 @@ global _folder_
 global _dummy_
 global _new_
 global _catagory_
-
+global _admin_
+_admin_ = "admin"
 _catagory_ = "catagory"
 _new_ = "new"
 _node_ = "node"
@@ -505,7 +506,7 @@ class LevelsModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.DisplayRole:
 
-            if index.column() == 1:
+            if index.column() == 0:
                 return node.name
 
 
@@ -513,32 +514,11 @@ class LevelsModel(QtCore.QAbstractItemModel):
             if index.column() == 0:
                 resource = node.resource
                 return QtGui.QIcon(QtGui.QPixmap(resource))
-            if index.column() == 4:
-                resource = node.note_decoration
-                return QtGui.QIcon(QtGui.QPixmap(resource))
 
-        if role == PipelineVersionsModel2.sortRole:
-            return node.number
-
-        if role == PipelineVersionsModel2.filterRole:
-            return node.number
-
-        if role == QtCore.Qt.SizeHintRole:
-            return QtCore.QSize(0,19)
-
-        # this is for expending state - the result must be uniqe!!!
         if role == 165:
             return node.id
 
-        if role == PipelineProjectModel.expendedRole:
 
-            return self.isExpended(index)
-
-        #if role == QtCore.Qt.FontRole:
-         #  if node.typeInfo() == "COMPONENT":
-          #     boldFont = QtGui.QFont()
-           #    boldFont.setBold(True)
-            #   return boldFont
 
     """INPUTS: QModelIndex, QVariant, int (flag)"""
     def setData(self, index, value, role=QtCore.Qt.EditRole):
@@ -550,25 +530,9 @@ class LevelsModel(QtCore.QAbstractItemModel):
             if role == QtCore.Qt.EditRole:
                 node.setData(index.column(), value)
                 self.dataChanged.emit(index, index)
-            if role == PipelineProjectModel.expendedRole:
-                node.expendedState(self.isExpended(index))
-                self.dataChanged.emit(index, index)
                 return True
 
         return False
-
-
-    """INPUTS: int, Qt::Orientation, int"""
-    """OUTPUT: QVariant, strings are cast to QString which is a QVariant"""
-    def headerData(self, section, orientation, role):
-        if role == QtCore.Qt.DisplayRole:
-            if section == 0:
-                return "Project"
-            else:
-                return "Type"
-
-    """INPUTS: QModelIndex"""
-    """OUTPUT: int (flag)"""
 
 
 
@@ -584,12 +548,9 @@ class LevelsModel(QtCore.QAbstractItemModel):
             node = self.getNode(index)
 
             if node.typeInfo() == _root_:
-                return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
+                return  QtCore.Qt.ItemIsEnabled
 
-            #if node.typeInfo() == _stage_:
-            #    return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
-
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable# | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
     """INPUTS: QModelIndex"""
     """OUTPUT: QModelIndex"""
@@ -702,6 +663,356 @@ class LevelsModel(QtCore.QAbstractItemModel):
         else:
             # if the node is not in the tree return an empty index
             return QtCore.QModelIndex()
+
+
+
+class PipelineLevelsModel(QtCore.QAbstractTableModel):
+
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
+
+    def __init__(self, items = [], parent = None):
+        QtCore.QAbstractTableModel.__init__(self, parent)
+        self.__items = items
+
+
+    def headerData(self, section, orientation, role):
+
+        if role == QtCore.Qt.DisplayRole:
+
+            if orientation == QtCore.Qt.Horizontal:
+                if section == 0:
+                    return "Section"
+                else:
+                    return "{0} {1}".format("level", str(section))
+            else:
+                return
+
+
+
+    def rowCount(self, parent):
+        return len(self.__items)
+
+    def columnCount(self, parent):
+        return 7
+
+    def data(self, index, role):
+        row = index.row()
+
+        if role == QtCore.Qt.EditRole:
+            if len(self.__items[row]._levels) > index.column()-1:
+                if self.__items[row]._levels[index.column()-1] != "":
+                    return self.__items[row]._levels[index.column()-1]
+                else:
+                    return "n/a"
+            else:
+                return "n/a"
+
+
+        if role == QtCore.Qt.DecorationRole:
+            if index.column() == 0:
+                resource = self.__items[index.row()].resource
+                return QtGui.QIcon(QtGui.QPixmap(resource))
+
+        if role == QtCore.Qt.DisplayRole:
+
+
+            if index.column() == 0:
+                return self.__items[row].name
+
+            else:
+                if len(self.__items[row]._levels) > index.column() - 1:
+                    if self.__items[row]._levels[index.column()-1] != "":
+                        return self.__items[row]._levels[index.column()-1]
+
+            #return "n/a"
+
+    def flags(self, index):
+
+        if index.isValid():
+
+            if index.column() == 0:
+                return QtCore.Qt.ItemIsEnabled
+
+            return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+    """CUSTOM"""
+    """INPUTS: QModelIndex"""
+    def getNode(self, index):
+        if index.isValid():
+            return self.__items[index.row()]
+
+        return None
+
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+
+            row = index.row()
+            column = index.column()
+            if role == QtCore.Qt.EditRole:
+                if column == 0:
+                    self.__items[row].name = value
+                    self.dataChanged.emit(index, index)
+
+                    return True
+                else:
+                    self.__items[row]._levels[column-1] = value
+                    self.dataChanged.emit(index, index)
+
+                    return True
+
+
+        return False
+
+    #=====================================================#
+    #INSERTING & REMOVING
+    #=====================================================#
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+        self.endInsertRows()
+
+        return True
+
+    def removeRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, position, position + rows - 1)
+
+        for i in range(rows):
+            value = self.__items[position]
+            self.__items.remove(value)
+
+        self.endRemoveRows()
+        return True
+
+
+class PipelineStagesModel(QtCore.QAbstractTableModel):
+
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
+
+    def __init__(self, items = [], parent = None):
+        QtCore.QAbstractTableModel.__init__(self, parent)
+        self.__items = items
+
+
+    def headerData(self, section, orientation, role):
+
+        if role == QtCore.Qt.DisplayRole:
+
+            if orientation == QtCore.Qt.Horizontal:
+                if section == 0:
+                    return "Section"
+                else:
+                    return "{0} {1}".format("Stage", str(section))
+            else:
+                return
+
+
+
+    def rowCount(self, parent):
+        return len(self.__items)
+
+    def columnCount(self, parent):
+        return 7
+
+    def data(self, index, role):
+        row = index.row()
+
+        if role == QtCore.Qt.EditRole:
+            if len(self.__items[row]._levels) > index.column()-1:
+                if self.__items[row]._levels[index.column()-1] != "":
+                    return self.__items[row]._levels[index.column()-1]
+                else:
+                    return "n/a"
+            else:
+                return "n/a"
+
+
+        if role == QtCore.Qt.DecorationRole:
+            if index.column() == 0:
+                resource = self.__items[index.row()].resource
+                return QtGui.QIcon(QtGui.QPixmap(resource))
+
+        if role == QtCore.Qt.DisplayRole:
+
+
+            if index.column() == 0:
+                return self.__items[row].name
+
+            else:
+                if len(self.__items[row]._levels) > index.column() - 1:
+                    if self.__items[row]._levels[index.column()-1] != "":
+                        return self.__items[row]._levels[index.column()-1]
+
+            #return "n/a"
+
+    def flags(self, index):
+
+        if index.isValid():
+
+            if index.column() == 0:
+                return QtCore.Qt.ItemIsEnabled
+
+            return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+    """CUSTOM"""
+    """INPUTS: QModelIndex"""
+    def getNode(self, index):
+        if index.isValid():
+            return self.__items[index.row()]
+
+        return None
+
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+
+            row = index.row()
+            column = index.column()
+            if role == QtCore.Qt.EditRole:
+                if column == 0:
+                    self.__items[row].name = value
+                    self.dataChanged.emit(index, index)
+
+                    return True
+                else:
+                    self.__items[row]._levels[column-1] = value
+                    self.dataChanged.emit(index, index)
+
+                    return True
+
+
+        return False
+
+    #=====================================================#
+    #INSERTING & REMOVING
+    #=====================================================#
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+        self.endInsertRows()
+
+        return True
+
+    def removeRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, position, position + rows - 1)
+
+        for i in range(rows):
+            value = self.__items[position]
+            self.__items.remove(value)
+
+        self.endRemoveRows()
+        return True
+
+
+class PipelineUsersModel(QtCore.QAbstractTableModel):
+
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
+
+    def __init__(self, items = [], parent = None):
+        QtCore.QAbstractTableModel.__init__(self, parent)
+        self.__items = items
+
+
+    def headerData(self, section, orientation, role):
+
+        if role == QtCore.Qt.DisplayRole:
+
+            if orientation == QtCore.Qt.Horizontal:
+                if section == 0:
+                    return "Username"
+                if section == 1:
+                    return "Password"
+                if section == 2:
+                    return "Role"
+
+            if orientation == QtCore.Qt.Vertical:
+                item = self.__items[section]
+                return self.__items.index(item)
+
+
+    def rowCount(self, parent):
+        return len(self.__items)
+
+    def columnCount(self, parent):
+        return 3
+
+    def data(self, index, role):
+        row = index.row()
+
+        if role == QtCore.Qt.EditRole:
+            return
+
+        if role == QtCore.Qt.DisplayRole:
+
+            if index.column() == 0:
+                return self.__items[row].name
+            if index.column() == 1:
+                return self.__items[row]._password
+            if index.column() == 2:
+                return self.__items[row]._role
+
+
+    def flags(self, index):
+
+        if index.isValid():
+
+            return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
+
+    """CUSTOM"""
+    """INPUTS: QModelIndex"""
+    def getNode(self, index):
+        if index.isValid():
+            return self.__items[index.row()]
+
+        return None
+
+    def setData(self, index, value, role = QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+
+            row = index.row()
+            column = index.column()
+            if role == QtCore.Qt.EditRole:
+
+                if column == 0:
+                    self.__items[row].name = value
+                    self.dataChanged.emit(index, index)
+
+                    return True
+                if column == 1:
+                    self.__items[row]._password = value
+                    self.dataChanged.emit(index, index)
+
+                    return True
+                if column == 2:
+                    self.__items[row]._role = value
+                    self.dataChanged.emit(index, index)
+
+                    return True
+
+
+        return False
+
+    #=====================================================#
+    #INSERTING & REMOVING
+    #=====================================================#
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+        self.endInsertRows()
+
+        return True
+
+    def removeRows(self, position, rows, parent = QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, position, position + rows - 1)
+
+        for i in range(rows):
+            value = self.__items[position]
+            self.__items.remove(value)
+
+        self.endRemoveRows()
+        return True
+
+
+
+
 
 
 class PipelineVersionsModel2(QtCore.QAbstractItemModel):

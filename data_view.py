@@ -28,7 +28,8 @@ global _new_
 global _catagory_
 global _assets_
 global _animation_
-
+global _admin_
+_admin_ = "admin"
 _assets_ = "asset"
 _animation_ = "animation"
 _catagory_ = "catagory"
@@ -273,6 +274,59 @@ def setComboValue(QComboBox, String):
 #         painter.fillRect(option.rect, QtGui.QColor(10,10,10))
 
 
+class RoleComboBoxDelegate(QtGui.QItemDelegate):
+
+    def __init__(self, parent):
+        QtGui.QItemDelegate.__init__(self, parent)
+
+    def createEditor(self, parent, option, index):
+
+
+    # QWidget * ComboBoxItemDelegate::createEditor(QWidget * parent, const
+    # QStyleOptionViewItem & option, const
+    # QModelIndex & index) const
+    # {
+    # // ComboBox
+    # ony in column
+    # 2
+    # if (index.column() != 1)
+    # return QStyledItemDelegate::createEditor(parent, option, index);
+    #
+    # // Create
+    # the
+    # combobox and populate
+    # it
+    # QComboBox * cb = new
+    # QComboBox(parent);
+    # int
+    # row = index.row();
+    # cb->addItem(QString("one in row %1").arg(row));
+    # cb->addItem(QString("two in row %1").arg(row));
+    # cb->addItem(QString("three in row %1").arg(row));
+    # return cb;
+
+}
+
+    # def paint(self, painter, option, index):
+    #
+    #     if not self.parent().indexWidget(index):
+    #
+    #
+    #         label = "Edit"
+    #         icon = edit_icon
+    #
+    #
+    #         button = QtGui.QPushButton(
+    #             label,
+    #             index.data(),
+    #             self.parent(),
+    #             clicked=self.parent().editProject
+    #         )
+    #
+    #         button.setIconSize(QtCore.QSize(20, 20))
+    #         button.setIcon(QtGui.QIcon(icon))
+    #         self.parent().setIndexWidget(index, button)
+
 class EditProjectButtonDelegate(QtGui.QItemDelegate):
 
     def __init__(self, parent):
@@ -322,6 +376,30 @@ class SetProjectButtonDelegate(QtGui.QItemDelegate):
             button.setIconSize(QtCore.QSize(20, 20))
             button.setIcon(QtGui.QIcon(icon))
             self.parent().setIndexWidget(index, button)
+
+class PipelineLevelsView(QtGui.QTableView):
+    def __init__(self, parent = None):
+        super(PipelineLevelsView, self).__init__(parent)
+
+        self.verticalHeader().setHidden(True)
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+
+    def setModel(self, model = None):
+        super(PipelineLevelsView, self).setModel(model)
+
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+
+class PipelineUsersView(QtGui.QTableView):
+    def __init__(self, parent = None):
+        super(PipelineUsersView, self).__init__(parent)
+
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+
+    def setModel(self, model = None):
+        super(PipelineUsersView, self).setModel(model)
+        self.setItemDelegateForColumn(2, RoleComboBoxDelegate(self))
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+
 
 class PipelineProjectsView(QtGui.QTableView):
     def __init__(self, parentWidget = None, parent = None):
@@ -2152,7 +2230,7 @@ class levelsTreeView(QtGui.QTreeView):
         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.setAlternatingRowColors(True)
         self.setSortingEnabled(True)
-
+        self.header().setHidden(True)
         # local variables
 
         # stylesheet

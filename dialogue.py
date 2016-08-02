@@ -48,13 +48,15 @@ from PySide import QtCore, QtGui
 import os
 import ast
 
-# import modules.data as data
-# reload(data)
+import modules.data as data
+reload(data)
 #
 # import data_model as dtm
 # reload(dtm)
 # #
 
+global _admin_
+_admin_ = "admin"
 
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
@@ -928,7 +930,7 @@ class projectDialog(QtGui.QDialog):
         self.levels_widget.setMinimumHeight(200)
         self.levels_widget.setMinimumWidth(450)
         self.variable_tabs.tab_widget.addTab(self.levels_widget, "Levels")
-        self.levels_tree = dtv.levelsTreeView(self.levels_widget)
+        self.levels_tree = dtv.PipelineLevelsView(self.levels_widget)
         self.level_layout.addWidget(self.levels_tree)
         self.levels_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -937,7 +939,7 @@ class projectDialog(QtGui.QDialog):
         self.stages_widget.setMinimumHeight(200)
         self.stages_widget.setMinimumWidth(450)
         self.variable_tabs.tab_widget.addTab(self.stages_widget, "Stages")
-        self.stages_tree = dtv.levelsTreeView(self.stages_widget)
+        self.stages_tree = dtv.PipelineLevelsView(self.stages_widget)
         self.stages_layout.addWidget(self.stages_tree)
         self.stages_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -946,7 +948,7 @@ class projectDialog(QtGui.QDialog):
         self.users_widget.setMinimumHeight(200)
         self.users_widget.setMinimumWidth(450)
         self.variable_tabs.tab_widget.addTab(self.users_widget, "Users")
-        self.users_tree = dtv.levelsTreeView(self.users_widget)
+        self.users_tree = dtv.PipelineUsersView(self.users_widget)
         self.users_layout.addWidget(self.users_tree)
         self.users_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -966,25 +968,37 @@ class projectDialog(QtGui.QDialog):
         buttons.rejected.connect(self.reject)
         self.layout.addWidget(buttons)
 
-        self.populated_levels()
+        self.populated_variables()
 
 
-    def populated_levels(self):
+    def populated_variables(self):
 
         import data_model as dtm
         reload(dtm)
         import data as dt
         reload(dt)
 
-        levels_root = dt.Node("root")
-        scenes_root = dt.Node("scense", levels_root)
-        assets_root = dt.Node("scense", levels_root)
+        level1 = dt.LevelsNode("scenes")
+        level1.setLevels(["EP","SEQ"])
+        level2 = dt.LevelsNode("assets")
+        level2.setLevels(["type","asset","stage"])
 
-        self.levels_model = dtm.LevelsModel(levels_root)
-
+        self.levels_model = dtm.PipelineLevelsModel([level1,level2])
         self.levels_tree.setModel(self.levels_model)
 
 
+        stages1 = dt.LevelsNode("scenes")
+        stages1.setLevels([ "layout","shot","lightning"])
+        stages2 = dt.LevelsNode("assets")
+        stages2.setLevels(["model", "rig", "cip","shading"])
+
+        self.stages_model = dtm.PipelineStagesModel([stages1, stages2])
+        self.stages_tree.setModel(self.stages_model)
+
+
+        user1 = dt.UserNode("Administrator", "1234", _admin_)
+        self.users_model = dtm.PipelineUsersModel([user1])
+        self.users_tree.setModel(self.users_model)
 
 class WidgetLayout(QtGui.QWidget):
     def __init__(self, parent=None, layout = None):

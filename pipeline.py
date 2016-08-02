@@ -110,7 +110,8 @@ global _new_
 global _catagory_
 global _assets_
 global _animation_
-
+global _admin_
+_admin_ = "admin"
 _assets_ = "asset"
 _animation_ = "animation"
 _catagory_ = "catagory"

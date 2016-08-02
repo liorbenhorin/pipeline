@@ -25,7 +25,8 @@ global _new_
 global _catagory_
 global _assets_
 global _animation_
-
+global _admin_
+_admin_ = "admin"
 _assets_ = "asset"
 _animation_ = "animation"
 _catagory_ = "catagory"
@@ -609,7 +610,56 @@ class DummyNode(Node):
     def typeInfo(self):
         return _dummy_
 
+class LevelsNode(Node):
 
+    def __init__(self, name, parent=None):
+        super(LevelsNode, self).__init__(name, parent)
+
+        self.resource = dummy_icon
+        self._levels = []
+        for i in range(6):
+            self._levels.append("")
+
+    def setLevels(self, list):
+        for index, item in enumerate(list):
+            self._levels[index] = item
+
+    def typeInfo(self):
+        return _dummy_
+
+class StagesNode(Node):
+
+    def __init__(self, name, parent=None):
+        super(StagesNode, self).__init__(name, parent)
+
+        self.resource = dummy_icon
+        self._levels = []
+        for i in range(6):
+            self._levels.append("")
+
+    def setLevels(self, list):
+        for index, item in enumerate(list):
+            self._levels[index] = item
+
+    def typeInfo(self):
+        return _dummy_
+
+
+class UserNode(Node):
+
+    def __init__(self, name, password = None, role = None, parent=None):
+        super(UserNode, self).__init__(name, parent)
+
+        self.resource = dummy_icon
+        self._password = password
+        self._role = role
+
+    def setLevels(self, list):
+        for index, item in enumerate(list):
+            self._levels[index] = item
+
+    def typeInfo(self):
+        return _dummy_
 
 class ClientNode(Node):
 
