@@ -937,10 +937,7 @@ class PipelineUsersModel(QtCore.QAbstractTableModel):
     def data(self, index, role):
         row = index.row()
 
-        if role == QtCore.Qt.EditRole:
-            return
-
-        if role == QtCore.Qt.DisplayRole:
+        if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
 
             if index.column() == 0:
                 return self.__items[row].name
@@ -965,27 +962,26 @@ class PipelineUsersModel(QtCore.QAbstractTableModel):
         return None
 
     def setData(self, index, value, role = QtCore.Qt.EditRole):
+
+        row = index.row()
+        column = index.column()
         if role == QtCore.Qt.EditRole:
 
-            row = index.row()
-            column = index.column()
-            if role == QtCore.Qt.EditRole:
+            if column == 0:
+                self.__items[row].name = value
+                self.dataChanged.emit(index, index)
 
-                if column == 0:
-                    self.__items[row].name = value
-                    self.dataChanged.emit(index, index)
+                return True
+            if column == 1:
+                self.__items[row]._password = value
+                self.dataChanged.emit(index, index)
 
-                    return True
-                if column == 1:
-                    self.__items[row]._password = value
-                    self.dataChanged.emit(index, index)
+                return True
+            if column == 2:
+                self.__items[row]._role = value
+                self.dataChanged.emit(index, index)
 
-                    return True
-                if column == 2:
-                    self.__items[row]._role = value
-                    self.dataChanged.emit(index, index)
-
-                    return True
+                return True
 
 
         return False

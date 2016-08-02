@@ -29,6 +29,11 @@ global _catagory_
 global _assets_
 global _animation_
 global _admin_
+global _super_
+global _standard_
+
+_standard_ = "standard"
+_super_ = "super"
 _admin_ = "admin"
 _assets_ = "asset"
 _animation_ = "animation"
@@ -278,54 +283,29 @@ class RoleComboBoxDelegate(QtGui.QItemDelegate):
 
     def __init__(self, parent):
         QtGui.QItemDelegate.__init__(self, parent)
+        self.cb = None
 
     def createEditor(self, parent, option, index):
 
+        cb = QtGui.QComboBox(parent)
+        roles = [_admin_,_super_,_standard_]
+        cb.addItems(roles)
+        return cb
 
-    # QWidget * ComboBoxItemDelegate::createEditor(QWidget * parent, const
-    # QStyleOptionViewItem & option, const
-    # QModelIndex & index) const
-    # {
-    # // ComboBox
-    # ony in column
-    # 2
-    # if (index.column() != 1)
-    # return QStyledItemDelegate::createEditor(parent, option, index);
-    #
-    # // Create
-    # the
-    # combobox and populate
-    # it
-    # QComboBox * cb = new
-    # QComboBox(parent);
-    # int
-    # row = index.row();
-    # cb->addItem(QString("one in row %1").arg(row));
-    # cb->addItem(QString("two in row %1").arg(row));
-    # cb->addItem(QString("three in row %1").arg(row));
-    # return cb;
+    def setEditorData(self, editor, index):
+            cb = editor
+            string = index.data(QtCore.Qt.EditRole)
+            i = cb.findText(string)
+            if i>= 0:
+                cb.setCurrentIndex(i)
+            else:
+                cb.setCurrentIndex(0)
 
-}
+    def setModelData(self, editor, model, index ):
+        cb = editor
+        model.setData(index, cb.currentText(), QtCore.Qt.EditRole)
 
-    # def paint(self, painter, option, index):
-    #
-    #     if not self.parent().indexWidget(index):
-    #
-    #
-    #         label = "Edit"
-    #         icon = edit_icon
-    #
-    #
-    #         button = QtGui.QPushButton(
-    #             label,
-    #             index.data(),
-    #             self.parent(),
-    #             clicked=self.parent().editProject
-    #         )
-    #
-    #         button.setIconSize(QtCore.QSize(20, 20))
-    #         button.setIcon(QtGui.QIcon(icon))
-    #         self.parent().setIndexWidget(index, button)
+
 
 class EditProjectButtonDelegate(QtGui.QItemDelegate):
 
