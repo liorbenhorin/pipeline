@@ -989,9 +989,10 @@ class PipelineUsersModel(QtCore.QAbstractTableModel):
     #=====================================================#
     #INSERTING & REMOVING
     #=====================================================#
-    def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
+    def insertRows(self, position, rows, parent = QtCore.QModelIndex(), node = None):
         self.beginInsertRows(parent, position, position + rows - 1)
-
+        for row in range(rows):
+            self.__items.insert(position + row, node)
         self.endInsertRows()
 
         return True
@@ -1005,6 +1006,10 @@ class PipelineUsersModel(QtCore.QAbstractTableModel):
 
         self.endRemoveRows()
         return True
+
+    @property
+    def items(self):
+        return self.__items
 
 
 

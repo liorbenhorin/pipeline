@@ -380,6 +380,27 @@ class PipelineUsersView(QtGui.QTableView):
         self.setItemDelegateForColumn(2, RoleComboBoxDelegate(self))
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 
+    def contextMenuEvent(self, event):
+
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()
+
+        actions = []
+        actions.append(QtGui.QAction("New user", menu, triggered=functools.partial(self.new_user, index)))
+        menu.addActions(actions)
+
+        menu.exec_(event.globalPos())
+        event.accept()  # TELL QT IVE HANDLED THIS THING
+        return
+
+    def new_user(self, index):
+        user = dt.UserNode("New user", "1234", _admin_)
+        if index.isValid():
+            row = index.row()
+        else:
+            row = len(self.model().items)
+
+        self.model().insertRows(row+1,1,QtCore.QModelIndex(),node = user)
 
 class PipelineProjectsView(QtGui.QTableView):
     def __init__(self, parentWidget = None, parent = None):
