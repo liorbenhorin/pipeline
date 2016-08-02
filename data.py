@@ -23,7 +23,11 @@ global _folder_
 global _dummy_
 global _new_
 global _catagory_
+global _assets_
+global _animation_
 
+_assets_ = "asset"
+_animation_ = "animation"
 _catagory_ = "catagory"
 _new_ = "new"
 _node_ = "node"
@@ -318,7 +322,7 @@ class RootNode(Node):#, Metadata_file):
 
         self.name = name
         self.resource = folder_icon
-
+        self._section = None
 
         #Metadata_file.__init__(self, **kwargs)
 
@@ -332,6 +336,8 @@ class RootNode(Node):#, Metadata_file):
                 self.data_file_path = os.path.join(kwargs[key],"%s.%s"%(self.name,"json"))
             if key == "virtual":
                 self._virtual = kwargs[key]
+            if key == "section":
+                self._section = kwargs[key]
 
         if self.data_file_path:
             self.set_data_file(self.data_file_path)
@@ -371,6 +377,9 @@ class RootNode(Node):#, Metadata_file):
         return _root_
 
 
+    @property
+    def section(self):
+        return self._section
 
 
     def model_tree(self):
@@ -386,12 +395,12 @@ class RootNode(Node):#, Metadata_file):
                         p  = os.path.join(path,dir)
  
                         if assetDir( p ):
-                            node = AssetNode(os.path.split(p)[1], path=p, parent = parent)
+                            node = AssetNode(os.path.split(p)[1], path=p, parent = parent, section = self.section)
                             rec(p, node)
                         elif stageDir( p ):
-                            node = StageNode(os.path.split(p)[1],  path=p, parent = parent)
+                            node = StageNode(os.path.split(p)[1],  path=p, parent = parent, section = self.section)
                         else:                         
-                            node = FolderNode(os.path.split(p)[1], path=p, parent = parent)                        
+                            node = FolderNode(os.path.split(p)[1], path=p, parent = parent, section = self.section)
                             rec(p, node)
                 else:
                     pass

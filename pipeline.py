@@ -108,7 +108,11 @@ global _folder_
 global _dummy_
 global _new_
 global _catagory_
+global _assets_
+global _animation_
 
+_assets_ = "asset"
+_animation_ = "animation"
 _catagory_ = "catagory"
 _new_ = "new"
 _node_ = "node"
@@ -1803,9 +1807,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.project:
 
             _root = dt.RootNode("root", path = self.project.path, parent = self.project)
-            assets = dt.FolderNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root)
+            assets = dt.FolderNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = _assets_)
             assets.model_tree()
-            scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root)
+            scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = _animation_)
             scenes.model_tree()
 
             '''

@@ -26,7 +26,11 @@ global _dummy_
 global _version_
 global _new_
 global _catagory_
+global _assets_
+global _animation_
 
+_assets_ = "asset"
+_animation_ = "animation"
 _catagory_ = "catagory"
 _new_ = "new"
 _version_ = "version"
@@ -1695,7 +1699,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 number = files.set_padding(i, res["padding"])
                 folder_name = "%s_%s"%(base_folder_name, number) if res["quantity"] > 0 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
-                node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True)
+                node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True, section = parent_node.section)
                 #if node is not False:
                 self.sourceModel.insertRows(0, 0, parent=parent, node=node)
                 self._proxyModel.invalidate()
@@ -1721,7 +1725,7 @@ class pipelineTreeView(QtGui.QTreeView):
         for i in depth_list:
             ancestors.append(self.sourceModel.getNode(i))
 
-        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"], ancestors = ancestors)
+        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages[parent_node.section], ancestors = ancestors)
         result = assetDlg.exec_()
         res = assetDlg.result()
         if result == QtGui.QDialog.Accepted:
@@ -1730,7 +1734,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 number = files.set_padding(i, res["padding"])
                 folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 1 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
-                node = dt.AssetNode(folder_name, path=path, parent=parent_node, virtual=True)
+                node = dt.AssetNode(folder_name, path=path, parent=parent_node, virtual=True, section = parent_node.section)
                 # if node is not False:
                 self.sourceModel.insertRows(0, 0, parent=parent, node=node)
                 self._proxyModel.invalidate()
@@ -1742,7 +1746,7 @@ class pipelineTreeView(QtGui.QTreeView):
                     if res["stages"][s]:
                         path = os.path.join(parent_node.path, folder_name, s)
                         #formatDepth
-                        stageNode = dt.StageNode(s, parent=node, path=path, virtual=True, name_format = res["name_format"])
+                        stageNode = dt.StageNode(s, parent=node, path=path, virtual=True, name_format = res["name_format"], section = parent_node.section)
                         # if node is not False:
                         self._sourceModel.insertRows(0, 0, parent=new_index, node=stageNode)
                         self._proxyModel.invalidate()
@@ -1761,7 +1765,7 @@ class pipelineTreeView(QtGui.QTreeView):
         for i in depth_list:
             ancestors.append(self.sourceModel.getNode(i))
 
-        assetDlg = dlg.newStageDialog(parent_name=parent_node.name, stages=self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"], ancestors=ancestors)
+        assetDlg = dlg.newStageDialog(parent_name=parent_node.name, stages=self.pipelineUI.project.stages[parent_node.section], ancestors=ancestors)
         result = assetDlg.exec_()
         res = assetDlg.result()
         if result == QtGui.QDialog.Accepted:
@@ -1769,7 +1773,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 if res["stages"][s]:
                     path = os.path.join(parent_node.path, s)
                     # formatDepth
-                    stageNode = dt.StageNode(s, parent=parent_node, asset_name = parent_node.name, path=path, virtual=True, name_format=res["name_format"])
+                    stageNode = dt.StageNode(s, parent=parent_node, asset_name = parent_node.name, path=path, virtual=True, name_format=res["name_format"], section = parent_node.section)
                     # if node is not False:
                     self._sourceModel.insertRows(0, 0, parent=parent, node=stageNode)
                     self._proxyModel.invalidate()
