@@ -1683,12 +1683,8 @@ class pipelineTreeView(QtGui.QTreeView):
         return True
 
     def create_new_folder(self, parent):
-        #newTreeFolderDialog
 
         parent_node = self.sourceModel.getNode(parent)
-
-
-        #folder_name, ok = QtGui.QInputDialog.getText(self, 'New Folder', 'Enter Folder name:')
 
         folderDlg = dlg.newFolderDialog()
         result = folderDlg.exec_()
@@ -1710,16 +1706,6 @@ class pipelineTreeView(QtGui.QTreeView):
     def create_new_asset(self, parent):
         parent_node = self.sourceModel.getNode(parent)
 
-        # folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
-        #
-        # if ok:
-        #     path = os.path.join(parent_node.path, folder_name)
-        #     node = dt.AssetNode(folder_name, parent = parent_node, path = path, virtual = True)#.create( path = path)
-        #     #if node is not False:
-        #     self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
-        #     self._proxyModel.invalidate()
-        #     self.updateTable( self.fromProxyIndex(parent))
-        #     self.update.emit()
         depth_list = self.sourceModel.listAncestos(parent)
         ancestors = []
         for i in depth_list:
@@ -1786,69 +1772,7 @@ class pipelineTreeView(QtGui.QTreeView):
                         self._proxyModel.invalidate()
 
                         self.update.emit()
-        #newStageDialog
 
-        # parent_node = self.sourceModel.getNode(parent)
-        #
-        # stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
-        # stageDlg = dlg.newStage(stages=stages)
-        # result = stageDlg.exec_()
-        # stage_name = stageDlg.result()
-        # if result == QtGui.QDialog.Accepted:
-        #
-        #     path = os.path.join(parent_node.path, stage_name)
-        #     node = dt.StageNode(stage_name, parent=parent_node, path=path, virtual = True)
-        #     #if node is not False:
-        #     self._sourceModel.insertRows(0, 0, parent=parent, node=node)
-        #     self._proxyModel.invalidate()
-        #     self.updateTable(self.fromProxyIndex(parent))
-        #     self.update.emit()
-
-    # def create_new_folder(self, parent):
-    #     parent_node = self.sourceModel.getNode(parent)
-    #
-    #     folder_name, ok = QtGui.QInputDialog.getText(self, 'New Folder', 'Enter Folder name:')
-    #
-    #     if ok:
-    #         path = os.path.join(parent_node.path, folder_name)
-    #         node = dt.FolderNode(folder_name, parent = parent_node).create( path = path)
-    #         if node is not False:
-    #             self.sourceModel.insertRows( 0, 0, parent = parent , node = node)
-    #             self._proxyModel.invalidate()
-    #             self.updateTable( self.fromProxyIndex(parent))
-    #             self.update.emit()
-        
-    # def create_new_asset(self, parent):
-    #     parent_node = self.sourceModel.getNode(parent)
-    #
-    #     folder_name, ok = QtGui.QInputDialog.getText(self, 'New Asset', 'Enter Asset name:')
-    #
-    #     if ok:
-    #         path = os.path.join(parent_node.path, folder_name)
-    #         node = dt.AssetNode(folder_name, parent = parent_node).create( path = path)
-    #         if node is not False:
-    #             self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
-    #             self._proxyModel.invalidate()
-    #             self.updateTable( self.fromProxyIndex(parent))
-    #             self.update.emit()
-        
-    # def create_new_stage(self, parent):
-    #     parent_node = self.sourceModel.getNode(parent)
-    #
-    #     stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
-    #     stageDlg = dlg.newStage(stages = stages)
-    #     result = stageDlg.exec_()
-    #     stage_name  = stageDlg.result()
-    #     if result == QtGui.QDialog.Accepted:
-    #
-    #         path = os.path.join(parent_node.path, stage_name)
-    #         node = dt.StageNode(stage_name, parent = parent_node).create( path = path)
-    #         if node is not False:
-    #
-    #             self._sourceModel.insertRows( 0, 0, parent = parent , node = node)
-    #             self._proxyModel.invalidate()
-    #             self.updateTable( self.fromProxyIndex(parent))
-    #             self.update.emit()
 
     def updateTable(self, index):
         selection = QtGui.QItemSelection(index, index)        
@@ -1863,7 +1787,7 @@ class pipelineTreeView(QtGui.QTreeView):
         self._tree_as_flat_list = list
 
     def list_flat_hierarchy(self):
-        print "<---listing"
+
         list = []
         for i in self.sourceModel.listHierarchy(QtCore.QModelIndex()):
             list.append(self.sourceModel.getNode(i))
@@ -2215,9 +2139,66 @@ class ComboDynamicWidget(ComboWidget):
         self.setParent(None)
         self.deleteLater()
         self._child = None
-        del self        
-        
+        del self
 
-    
-    
+class levelsTreeView(QtGui.QTreeView):
+
+    update = QtCore.Signal()
+
+    def __init__(self, parent=None):
+        super(levelsTreeView, self).__init__(parent)
+
+        # display options
+        self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.setAlternatingRowColors(True)
+        self.setSortingEnabled(True)
+
+        # local variables
+
+        # stylesheet
+        self.setStyleSheet('''
+
+                           QTreeView::item:focus {
+                           }
+                           QTreeView::item:hover {
+                                background: #101010;
+                           }
+                           QTreeView {
+                                outline: 0;
+                           }
+                           QTreeView::branch:has-siblings:!adjoins-item {
+                                border-image:url(''' + vline + ''') 0;
+                           }
+
+                           QTreeView::branch:has-siblings:adjoins-item {
+                                border-image:url(''' + branch_more + ''') 0;
+                           }
+
+                           QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+                                border-image:url(''' + branch_end + ''') 0;
+                           }
+
+                           QTreeView::branch:has-children:!has-siblings:closed,
+                           QTreeView::branch:closed:has-children:has-siblings {
+                                border-image: none;
+                                image:url(''' + branch_closed + ''') 0;
+                           }
+
+                           QTreeView::branch:open:has-children:!has-siblings,
+                           QTreeView::branch:open:has-children:has-siblings  {
+                                border-image: none;
+                                image: url(''' + branch_open + ''') 0;
+                           }''')
+
+
+
+    def setModel(self, model):
+
+        super(levelsTreeView, self).setModel(model)
+
+
+
+
+
+
             

@@ -446,6 +446,263 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
         return data
 
 
+class LevelsModel(QtCore.QAbstractItemModel):
+
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
+    sortRole   = QtCore.Qt.UserRole
+    filterRole = QtCore.Qt.UserRole + 1
+    expendedRole = QtCore.Qt.UserRole + 2
+
+    """INPUTS: Node, QObject"""
+    def __init__(self, root, parent=None):
+        super(LevelsModel, self).__init__(parent)
+        self._rootNode = root
+        self._tempIndex = None
+        self._rowHeight = 32
+
+    def staticIndex(self, index):
+        return QtCore.QPersistentModelIndex(index)
+
+
+    @property
+    def rootNode(self):
+        return self._rootNode
+
+    """INPUTS: QModelIndex"""
+    """OUTPUT: int"""
+    def rowCount(self, parent):
+        if not parent.isValid():
+            parentNode = self._rootNode
+        else:
+            parentNode = parent.internalPointer()
+
+        return parentNode.childCount()
+
+    """INPUTS: QModelIndex"""
+    """OUTPUT: int"""
+    def columnCount(self, parent):
+        return 1
+
+
+
+    """INPUTS: QModelIndex, int"""
+    """OUTPUT: QVariant, strings are cast to QString which is a QVariant"""
+    def data(self, index, role):
+
+        if not index.isValid():
+            return None
+
+        node = index.internalPointer()
+
+        if role == QtCore.Qt.SizeHintRole:
+            return QtCore.QSize(40,22)
+
+        if role == QtCore.Qt.EditRole:
+            if index.column() == 0:
+                return node.name
+
+
+
+        if role == QtCore.Qt.DisplayRole:
+
+            if index.column() == 1:
+                return node.name
+
+
+        if role == QtCore.Qt.DecorationRole:
+            if index.column() == 0:
+                resource = node.resource
+                return QtGui.QIcon(QtGui.QPixmap(resource))
+            if index.column() == 4:
+                resource = node.note_decoration
+                return QtGui.QIcon(QtGui.QPixmap(resource))
+
+        if role == PipelineVersionsModel2.sortRole:
+            return node.number
+
+        if role == PipelineVersionsModel2.filterRole:
+            return node.number
+
+        if role == QtCore.Qt.SizeHintRole:
+            return QtCore.QSize(0,19)
+
+        # this is for expending state - the result must be uniqe!!!
+        if role == 165:
+            return node.id
+
+        if role == PipelineProjectModel.expendedRole:
+
+            return self.isExpended(index)
+
+        #if role == QtCore.Qt.FontRole:
+         #  if node.typeInfo() == "COMPONENT":
+          #     boldFont = QtGui.QFont()
+           #    boldFont.setBold(True)
+            #   return boldFont
+
+    """INPUTS: QModelIndex, QVariant, int (flag)"""
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+
+        if index.isValid():
+
+            node = index.internalPointer()
+
+            if role == QtCore.Qt.EditRole:
+                node.setData(index.column(), value)
+                self.dataChanged.emit(index, index)
+            if role == PipelineProjectModel.expendedRole:
+                node.expendedState(self.isExpended(index))
+                self.dataChanged.emit(index, index)
+                return True
+
+        return False
+
+
+    """INPUTS: int, Qt::Orientation, int"""
+    """OUTPUT: QVariant, strings are cast to QString which is a QVariant"""
+    def headerData(self, section, orientation, role):
+        if role == QtCore.Qt.DisplayRole:
+            if section == 0:
+                return "Project"
+            else:
+                return "Type"
+
+    """INPUTS: QModelIndex"""
+    """OUTPUT: int (flag)"""
+
+
+
+    """INPUTS: QModelIndex"""
+    """OUTPUT: int (flag)"""
+    def flags(self, index):
+
+        if not index.isValid():
+
+            return QtCore.Qt.ItemIsEnabled #| QtCore.Qt.ItemIsDropEnabled
+
+        if index.isValid():
+            node = self.getNode(index)
+
+            if node.typeInfo() == _root_:
+                return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
+
+            #if node.typeInfo() == _stage_:
+            #    return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable# | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |
+
+    """INPUTS: QModelIndex"""
+    """OUTPUT: QModelIndex"""
+    """Should return the parent of the node with the given QModelIndex"""
+    def parent(self, index):
+
+        node = self.getNode(index)
+        parentNode = node.parent()
+
+        if parentNode == self._rootNode:
+            return QtCore.QModelIndex()
+
+        if parentNode:
+            return self.createIndex(parentNode.row(), 0, parentNode)
+
+        else:
+            return QtCore.QModelIndex()
+
+    """INPUTS: int, int, QModelIndex"""
+    """OUTPUT: QModelIndex"""
+    """Should return a QModelIndex that corresponds to the given row, column and parent node"""
+
+
+    def index( self, row, column, parentIndex ):
+
+        if not self.hasIndex( row, column, parentIndex ):
+            return    QtCore.QModelIndex()
+
+        parent = self.getNode( parentIndex )
+        return  self.createIndex( row, column, parent.child( row ) )
+
+
+
+    """CUSTOM"""
+    """INPUTS: QModelIndex"""
+    def getNode(self, index):
+        if index.isValid():
+            node = index.internalPointer()
+            if node:
+                return node
+
+        return self._rootNode
+
+
+    """INPUTS: int, int, QModelIndex"""
+    def insertRows(self, position, rows, parent=QtCore.QModelIndex(), node = None):
+        parentNode = self.getNode(parent)
+
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+
+        for row in range(rows):
+
+            childCount = parentNode.childCount()
+            childNode = node
+            success = parentNode.insertChild(position, childNode)
+
+        self.endInsertRows()
+        return True
+
+
+    def removeRows( self, row, count, parentIndex, **kwargs ):
+
+        '''Remove a number of rows from the model at the given row and parent.'''
+        self.beginRemoveRows( parentIndex, row, row+count-1 )
+        parent = self.getNode( parentIndex )
+        for x in range( count ):
+
+            # remove rows is being called in every drop action,
+            # we need to know if the remove is with the intention to actually delete the data in the nodes
+
+            if "kill" in kwargs:
+                if kwargs["kill"] == True:
+                    parent.child(row).delete()
+
+
+            parent.removeChild( row )
+        self.endRemoveRows()
+        self.dataChanged.emit( parentIndex, parentIndex )
+        return True
+
+
+
+    def indexFromNode(self, node, rootIndex):
+        '''
+        recursive function to get Index from a node,
+        we use a unique node id to do this
+        the id is stored as a UserRole int 165
+
+        '''
+        def rec(d, index):
+
+            for row in range(self.rowCount(index)):
+
+
+                i = self.index(row,0, index)
+                id = self.data(i, 165)
+                if id == node.id:
+                    d.append(i)
+                else:
+                    pass
+
+                rec(d, i)
+
+
+        data = []
+        rec(data, rootIndex)
+        if len(data)>0:
+            return data[0]
+        else:
+            # if the node is not in the tree return an empty index
+            return QtCore.QModelIndex()
+
 
 class PipelineVersionsModel2(QtCore.QAbstractItemModel):
 

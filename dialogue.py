@@ -48,8 +48,12 @@ from PySide import QtCore, QtGui
 import os
 import ast
 
-import modules.data as data
-reload(data)
+# import modules.data as data
+# reload(data)
+#
+# import data_model as dtm
+# reload(dtm)
+# #
 
 
 def set_icons():
@@ -81,6 +85,9 @@ def set_icons():
     global buffer_icon
     global counter_icon
     global text_icon
+    global time_icon
+
+    time_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "time"))
 
     buffer_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "buffer"))
     counter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "counter"))
@@ -846,7 +853,7 @@ class groupInput(QtGui.QWidget):
 
         if label:
             self.label = QtGui.QLabel(label)
-            self.label.setMinimumSize(QtCore.QSize(60, 30))
+            self.label.setMinimumSize(QtCore.QSize(100, 30))
             self.layout.addWidget(self.label)
 
         if inputWidget:
@@ -857,6 +864,146 @@ class groupInput(QtGui.QWidget):
 
 
 
+
+
+
+class projectDialog(QtGui.QDialog):
+    def __init__(self, parent=None, **kwargs):
+        super(projectDialog, self).__init__(parent)
+
+        import data_view as dtv
+        reload(dtv)
+
+
+
+
+        self.layout = QtGui.QVBoxLayout(self)
+
+
+        self.input_widget = QtGui.QWidget(self)
+        self.input_layout = QtGui.QVBoxLayout(self.input_widget)
+
+        self.title = Title(self, label= "New project")
+        self.input_layout.addWidget(self.title)
+
+
+        self.name_widget = groupInput(self, label="Project name", inputWidget=QtGui.QLineEdit(self), ic=text_icon)
+        self.name_input = self.name_widget.input
+        self.input_layout.addWidget(self.name_widget)
+
+
+        self.input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
+
+        self.padding_slider = self.input_padding_widget.input
+        self.padding_slider.setMinimum(0)
+        self.padding_slider.setMaximum(6)
+        self.padding_slider.setValue(3)
+        self.input_layout.addWidget(self.input_padding_widget)
+
+
+        self.input_fps_widget = groupInput(self, label="Default fps", inputWidget=QtGui.QComboBox(self), ic=time_icon)
+        self.fps_input = self.input_fps_widget.input
+        self.fps_input.setEditable(False)
+        rates = ["PAL (25fps)", "Film (24fps)", "NTSC (30fps)"]
+        self.fps_input.addItems(rates)
+        self.input_layout.addWidget(self.input_fps_widget)
+        i = self.fps_input.findText(rates[0], QtCore.Qt.MatchFixedString)
+        if i >= 0:
+            self.fps_input.setCurrentIndex(i)
+
+
+        self.suffix_widget = groupInput(self, label="Project suffix", inputWidget=QtGui.QLineEdit(self), ic=text_icon)
+        self.suffix_input = self.suffix_widget.input
+        self.input_layout.addWidget(self.suffix_widget)
+
+        self.var_title = Title(self, label= "Project variables")
+        self.input_layout.addWidget(self.var_title)
+
+        self.variable_tabs = Tabs(self)
+        self.input_layout.addWidget(self.variable_tabs)
+
+
+        self.levels_widget = QtGui.QWidget()
+        self.level_layout = QtGui.QVBoxLayout(self.levels_widget)
+        self.levels_widget.setMinimumHeight(200)
+        self.levels_widget.setMinimumWidth(450)
+        self.variable_tabs.tab_widget.addTab(self.levels_widget, "Levels")
+        self.levels_tree = dtv.levelsTreeView(self.levels_widget)
+        self.level_layout.addWidget(self.levels_tree)
+        self.levels_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+        self.stages_widget = QtGui.QWidget()
+        self.stages_layout = QtGui.QVBoxLayout(self.stages_widget)
+        self.stages_widget.setMinimumHeight(200)
+        self.stages_widget.setMinimumWidth(450)
+        self.variable_tabs.tab_widget.addTab(self.stages_widget, "Stages")
+        self.stages_tree = dtv.levelsTreeView(self.stages_widget)
+        self.stages_layout.addWidget(self.stages_tree)
+        self.stages_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+        self.users_widget = QtGui.QWidget()
+        self.users_layout = QtGui.QVBoxLayout(self.users_widget)
+        self.users_widget.setMinimumHeight(200)
+        self.users_widget.setMinimumWidth(450)
+        self.variable_tabs.tab_widget.addTab(self.users_widget, "Users")
+        self.users_tree = dtv.levelsTreeView(self.users_widget)
+        self.users_layout.addWidget(self.users_tree)
+        self.users_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+
+        self.layout.addWidget(self.input_widget)
+        self.input_layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setContentsMargins(5, 5, 5, 10)
+
+
+        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+
+        buttons = QtGui.QDialogButtonBox(
+            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
+            QtCore.Qt.Horizontal, self)
+
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        self.layout.addWidget(buttons)
+
+        self.populated_levels()
+
+
+    def populated_levels(self):
+
+        import data_model as dtm
+        reload(dtm)
+        import data as dt
+        reload(dt)
+
+        levels_root = dt.Node("root")
+        scenes_root = dt.Node("scense", levels_root)
+        assets_root = dt.Node("scense", levels_root)
+
+        self.levels_model = dtm.LevelsModel(levels_root)
+
+        self.levels_tree.setModel(self.levels_model)
+
+
+
+class WidgetLayout(QtGui.QWidget):
+    def __init__(self, parent=None, layout = None):
+        super(WidgetLayout, self).__init__(parent)
+
+        self.layout = layout
+        self.layout.setContentsMargins(5, 5, 5, 5)
+        #self.layout.setAlignment(QtCore.Qt.AlignLeft)
+
+
+class Tabs(QtGui.QWidget):
+    def __init__(self, parent = None):
+        super(Tabs, self).__init__(parent)
+
+        self.layout = QtGui.QVBoxLayout(self)
+        self.tab_widget = QtGui.QTabWidget(self)
+        self.layout.addWidget(self.tab_widget)
+        self.layout.setContentsMargins(5, 5, 5, 10)
+        #self.tab_widget.setIconSize(QtCore.QSize(16,16))
 
 
 

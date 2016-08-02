@@ -3547,6 +3547,14 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.ui.close_pushButton.setIconSize(QtCore.QSize(20,20))    
 
     def create_project(self):
+        projectDlg = dlg.projectDialog()
+        result = projectDlg.exec_()
+        res = projectDlg.result()
+        if result == QtGui.QDialog.Accepted:
+            print res
+
+        return
+
         global create_edit_projectsWindow
         try:
             create_edit_projectsWindow.close()
@@ -3566,6 +3574,10 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.create_edit_project(project_file = pipeline_project(path = path, settings = self.pipeline_window.settings))       
         
     def create_edit_project(self, **kwargs):
+
+
+
+
         project_file = None
         for key in kwargs:
             if key == "project_file":
