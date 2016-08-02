@@ -1786,6 +1786,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def commit_tree(self):
         self.tree.commit()
         self.populate_project_tree()
+        self.populate_navbar()
         self.tree_change_options()
 
     def discard_tree(self):
