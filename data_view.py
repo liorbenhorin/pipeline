@@ -1752,21 +1752,46 @@ class pipelineTreeView(QtGui.QTreeView):
 
 
     def create_new_stage(self, parent):
+
+
         parent_node = self.sourceModel.getNode(parent)
 
-        stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
-        stageDlg = dlg.newStage(stages=stages)
-        result = stageDlg.exec_()
-        stage_name = stageDlg.result()
-        if result == QtGui.QDialog.Accepted:
+        depth_list = self.sourceModel.listAncestos(parent)
+        ancestors = []
+        for i in depth_list:
+            ancestors.append(self.sourceModel.getNode(i))
 
-            path = os.path.join(parent_node.path, stage_name)
-            node = dt.StageNode(stage_name, parent=parent_node, path=path, virtual = True)
-            #if node is not False:
-            self._sourceModel.insertRows(0, 0, parent=parent, node=node)
-            self._proxyModel.invalidate()
-            self.updateTable(self.fromProxyIndex(parent))
-            self.update.emit()
+        assetDlg = dlg.newStageDialog(parent_name=parent_node.name, stages=self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"], ancestors=ancestors)
+        result = assetDlg.exec_()
+        res = assetDlg.result()
+        if result == QtGui.QDialog.Accepted:
+            for s in res["stages"]:
+                if res["stages"][s]:
+                    path = os.path.join(parent_node.path, s)
+                    # formatDepth
+                    stageNode = dt.StageNode(s, parent=parent_node, asset_name = parent_node.name, path=path, virtual=True, name_format=res["name_format"])
+                    # if node is not False:
+                    self._sourceModel.insertRows(0, 0, parent=parent, node=stageNode)
+                    self._proxyModel.invalidate()
+
+                    self.update.emit()
+        #newStageDialog
+
+        # parent_node = self.sourceModel.getNode(parent)
+        #
+        # stages = self.pipelineUI.project.stages["asset"] + self.pipelineUI.project.stages["animation"]
+        # stageDlg = dlg.newStage(stages=stages)
+        # result = stageDlg.exec_()
+        # stage_name = stageDlg.result()
+        # if result == QtGui.QDialog.Accepted:
+        #
+        #     path = os.path.join(parent_node.path, stage_name)
+        #     node = dt.StageNode(stage_name, parent=parent_node, path=path, virtual = True)
+        #     #if node is not False:
+        #     self._sourceModel.insertRows(0, 0, parent=parent, node=node)
+        #     self._proxyModel.invalidate()
+        #     self.updateTable(self.fromProxyIndex(parent))
+        #     self.update.emit()
 
     # def create_new_folder(self, parent):
     #     parent_node = self.sourceModel.getNode(parent)

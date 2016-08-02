@@ -676,17 +676,13 @@ class newFolderDialog(newNodeDialog):
         return res
 
 
+
+
+
+
 class newAssetDialog(newFolderDialog):
     def __init__(self, parent =  None, name_label_sting = "Name", title = "Create new asset", stages = [], ancestors = None):
         super(newAssetDialog, self).__init__(parent, name_label_sting, title)
-
-
-        self.ancestors = ancestors
-        self.ancestors_names = []
-        [self.ancestors_names.append("<{}>".format(node.name)) for node in self.ancestors]
-        self.ancestors_names.reverse()
-        self.max_depth = len(self.ancestors_names)
-
 
         self.create_stages_title = Title(self, label = "Add stages:")
         self.input_layout.addWidget(self.create_stages_title)
@@ -702,38 +698,11 @@ class newAssetDialog(newFolderDialog):
             layout.addWidget(checkbox)
             self.input_layout.addWidget(widget)
 
-        self.file_name_title = Title(self, label = "File name format:")
-        self.input_layout.addWidget(self.file_name_title)
 
+        self.name_format_widget = NameFormatWidget( self, name_input=self.name_input, ancestors=ancestors)
+        self.input_layout.addWidget(self.name_format_widget)
+        self.name_input.textChanged.connect(self.name_format_widget.preview_format)
 
-        self.input_format_widget = groupInput(self, label="Format Depth", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
-
-        self.depth_slider = self.input_format_widget.input
-        self.depth_slider.setMinimum(0)
-        self.depth_slider.setMaximum(self.max_depth)
-        self.depth_slider.setValue(2)
-
-
-        self.format_preview_widget = groupInput(self, inputWidget=QtGui.QLineEdit(self))
-        self.format_preview = self.format_preview_widget.input
-        self.format_preview.setEnabled(False)
-        self.preview_format()
-
-
-        self.input_layout.addWidget(self.input_format_widget)
-        self.input_layout.addWidget(self.format_preview_widget)
-
-        self.depth_slider.valueChanged.connect(self.preview_format)
-        self.name_input.textChanged.connect(self.preview_format)
-
-    def preview_format(self):
-
-        levels = self.ancestors_names[-self.depth_slider.value():] if self.depth_slider.value() > 0 else []
-        new_name = "<{}>".format(self.name_input.text()) if self.name_input.text() else "<{}>".format("asset_name")
-        levels.append(new_name)
-        string = "_".join(levels)
-        final = "{0}_{1}".format(string, "version_extra.ma")
-        self.format_preview.setText(final)
 
 
     def result(self):
@@ -745,8 +714,100 @@ class newAssetDialog(newFolderDialog):
         for option in self.stages_options:
             stages[option] = self.stages_options[option].isChecked() # {stage: bool}
         res["stages"] = stages
-        res["name_format"] = self.depth_slider.value()
+        res["name_format"] = self.name_format_widget.depth_slider.value()
         return res
+
+
+
+class newStageDialog(newNodeDialog):
+    def __init__(self, parent =  None, parent_name = None, name_label_sting = "Name", title = "Create new stage", stages = [], ancestors = None):
+        super(newStageDialog, self).__init__(parent, name_label_sting, title)
+
+
+        self.name_widget.setParent(None)
+        self.name_widget.deleteLater()
+
+
+        #self.create_stages_title = Title(self, label = "Add stages:")
+        #self.input_layout.addWidget(self.create_stages_title)
+
+        self.stages_options = {}
+        for stage in stages:
+            widget = QtGui.QWidget(self)
+            layout = QtGui.QVBoxLayout(widget)
+            layout.setContentsMargins(5, 2, 5, 2)
+            layout.setAlignment(QtCore.Qt.AlignLeft)
+            checkbox = QtGui.QCheckBox(stage)
+            self.stages_options[stage] = checkbox
+            layout.addWidget(checkbox)
+            self.input_layout.addWidget(widget)
+
+
+        self.name_format_widget = NameFormatWidget( self, parent_name=parent_name, ancestors=ancestors)
+        self.input_layout.addWidget(self.name_format_widget)
+        #self.name_input.textChanged.connect(self.name_format_widget.preview_format)
+
+
+
+    def result(self):
+        res = {}
+        stages = {}
+        for option in self.stages_options:
+            stages[option] = self.stages_options[option].isChecked() # {stage: bool}
+        res["stages"] = stages
+        res["name_format"] = self.name_format_widget.depth_slider.value()
+        return res
+
+
+
+class NameFormatWidget(QtGui.QWidget):
+    def __init__(self, parent = None, parent_name = None, name_input = None, ancestors = None):
+        super(NameFormatWidget, self).__init__(parent)
+
+        self.name_input = name_input
+        self.ancestors = ancestors
+        self.parent_name = parent_name
+
+        self.ancestors_names = []
+        [self.ancestors_names.append("<{}>".format(node.name)) for node in self.ancestors]
+        self.ancestors_names.reverse()
+        self.max_depth = len(self.ancestors_names)
+
+        self.layout = QtGui.QVBoxLayout(self)
+        self.layout.setContentsMargins(5, 2, 5, 2)
+        self.layout.setAlignment(QtCore.Qt.AlignLeft)
+
+        self.file_name_title = Title(self, label="File name format:")
+        self.layout.addWidget(self.file_name_title)
+
+        self.input_format_widget = groupInput(self, label="Format Depth", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
+
+        self.depth_slider = self.input_format_widget.input
+        self.depth_slider.setMinimum(0)
+        self.depth_slider.setMaximum(self.max_depth)
+        self.depth_slider.setValue(2)
+
+        self.format_preview_widget = groupInput(self, inputWidget=QtGui.QLineEdit(self))
+        self.format_preview = self.format_preview_widget.input
+        self.format_preview.setEnabled(False)
+        self.preview_format()
+
+        self.layout.addWidget(self.input_format_widget)
+        self.layout.addWidget(self.format_preview_widget)
+
+        self.depth_slider.valueChanged.connect(self.preview_format)
+
+
+    def preview_format(self):
+        levels = self.ancestors_names[-self.depth_slider.value():] if self.depth_slider.value() > 0 else []
+        if self.name_input:
+            new_name = "<{}>".format(self.name_input.text()) if self.name_input.text() else "<{}>".format("asset_name")
+            levels.append(new_name)
+
+        levels.append("<stage>")
+        string = "_".join(levels)
+        final = "{0}_{1}".format(string, "version_extra.ma")
+        self.format_preview.setText(final)
 
 class Title(QtGui.QWidget):
     def __init__(self, parent, label="Input"):
