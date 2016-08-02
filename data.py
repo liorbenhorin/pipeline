@@ -442,7 +442,17 @@ class AssetNode(RootNode):
         self.data_file = data.jsonDict().create(path, dict)
         self.data_file = self.data_file.read()
         return self
-        
+
+    @property
+    def stages(self):
+        stages = []
+
+        for dir in files.list_dir_folders(self._path):
+
+            if stageDir(os.path.join(self._path, dir)):
+                stages.append(dir)
+
+        return stages
         
     def typeInfo(self):
         return _asset_

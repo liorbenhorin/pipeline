@@ -1765,20 +1765,27 @@ class pipelineTreeView(QtGui.QTreeView):
         for i in depth_list:
             ancestors.append(self.sourceModel.getNode(i))
 
-        assetDlg = dlg.newStageDialog(parent_name=parent_node.name, stages=self.pipelineUI.project.stages[parent_node.section], ancestors=ancestors)
-        result = assetDlg.exec_()
-        res = assetDlg.result()
-        if result == QtGui.QDialog.Accepted:
-            for s in res["stages"]:
-                if res["stages"][s]:
-                    path = os.path.join(parent_node.path, s)
-                    # formatDepth
-                    stageNode = dt.StageNode(s, parent=parent_node, asset_name = parent_node.name, path=path, virtual=True, name_format=res["name_format"], section = parent_node.section)
-                    # if node is not False:
-                    self._sourceModel.insertRows(0, 0, parent=parent, node=stageNode)
-                    self._proxyModel.invalidate()
+        new_stages = []
+        for stage in self.pipelineUI.project.stages[parent_node.section]:
+            if stage not in parent_node.stages:
+                new_stages.append(stage)
 
-                    self.update.emit()
+        if new_stages:
+
+            assetDlg = dlg.newStageDialog(parent_name=parent_node.name, stages=new_stages, ancestors=ancestors)
+            result = assetDlg.exec_()
+            res = assetDlg.result()
+            if result == QtGui.QDialog.Accepted:
+                for s in res["stages"]:
+                    if res["stages"][s]:
+                        path = os.path.join(parent_node.path, s)
+                        # formatDepth
+                        stageNode = dt.StageNode(s, parent=parent_node, asset_name = parent_node.name, path=path, virtual=True, name_format=res["name_format"], section = parent_node.section)
+                        # if node is not False:
+                        self._sourceModel.insertRows(0, 0, parent=parent, node=stageNode)
+                        self._proxyModel.invalidate()
+
+                        self.update.emit()
         #newStageDialog
 
         # parent_node = self.sourceModel.getNode(parent)
