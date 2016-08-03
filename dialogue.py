@@ -874,10 +874,6 @@ class projectDialog(QtGui.QDialog):
         super(projectDialog, self).__init__(parent)
 
         import data_view as dtv
-        reload(dtv)
-
-
-
 
         self.layout = QtGui.QVBoxLayout(self)
 
@@ -974,9 +970,9 @@ class projectDialog(QtGui.QDialog):
     def populated_variables(self):
 
         import data_model as dtm
-        reload(dtm)
+        #reload(dtm)
         import data as dt
-        reload(dt)
+        #reload(dt)
 
         level1 = dt.LevelsNode("scenes")
         level1.setLevels(["EP","SEQ"])

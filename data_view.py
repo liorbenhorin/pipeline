@@ -1416,7 +1416,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
     def setModel(self,model):
 
-        super(pipelineTreeView,self).setModel(model)
+        super(pipelineTreeView, self).setModel(model)
 
         self.changed = False
 

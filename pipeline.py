@@ -1671,7 +1671,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.populate_projects()
         self.stage_ui()
         self.populate_project_tree()
-        self.populate_navbar()
+ #       self.populate_navbar()
 
     def tree_change_options(self):
         if self.tree.changed:
@@ -1766,7 +1766,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             if list:
                 self.projects = dtm.PipelineProjectsModel(list)
-                self.setProject(current)
+                #self.setProject(current)
                 if current:
                     self.setProject(current)
                     #self.populate_navbar()
@@ -2076,7 +2076,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.settings.project = None
             self.populate_navbar()
 
-        self.populate_project_tree()
+        #self.populate_project_tree()
 
 
     def set_thumbnail(self,Qpixmap):
@@ -3327,7 +3327,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         global projectsWindow
         try:
-            projectsWindow.close()
+            projectsWindow.close_window()
         except:
             pass
         projectsWindow=pipeLine_projects_UI(parent=self, pipeline_window=self)
@@ -3446,7 +3446,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
         self.populate_clients()
         dtv.setComboValue(self.ui.clients_comboBox, self.pipeline_window.settings.client)
-        self.populate_projects()
+        #self.populate_projects()
 
 
     def populate_clients(self):
@@ -3548,6 +3548,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.ui.close_pushButton.setIconSize(QtCore.QSize(20,20))    
 
     def create_project(self):
+
         projectDlg = dlg.projectDialog()
         result = projectDlg.exec_()
         res = projectDlg.result()
@@ -3556,14 +3557,14 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
         return
 
-        global create_edit_projectsWindow
-        try:
-            create_edit_projectsWindow.close()
-        except:
-            pass
-
-        create_edit_projectsWindow = pipeLine_create_edit_project_UI(parent = self, pipelineUI=self.pipeline_window)
-        create_edit_projectsWindow.show()
+        # global create_edit_projectsWindow
+        # try:
+        #     create_edit_projectsWindow.close()
+        # except:
+        #     pass
+        #
+        # create_edit_projectsWindow = pipeLine_create_edit_project_UI(parent = self, pipelineUI=self.pipeline_window)
+        # create_edit_projectsWindow.show()
     
     def edit_project(self):
         widget = self.sender()
