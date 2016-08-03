@@ -1,6 +1,6 @@
 {
-    "_project": "first", 
-    "client": "Client_a", 
+    "_project": "bbb", 
+    "client": "Client_b", 
     "current_open_file": null, 
     "current_project": null, 
     "project_premissions": null, 
@@ -13,7 +13,7 @@
         "sequence": null, 
         "shot": null
     }, 
-    "stage": "model", 
+    "stage": "rig", 
     "user": [
         null, 
         null

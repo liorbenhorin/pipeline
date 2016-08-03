@@ -3570,11 +3570,6 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             users = res["users"]
             levels = res["levels"]
             stages = res["stages"]
-            print users
-            print levels
-            print stages
-            return
-
 
 
             project = dt.ProjectNode(project_name, self.pipeline_window.client, pipelineUI = self.pipeline_window).create(path=project_path,

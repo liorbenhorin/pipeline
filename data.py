@@ -1565,7 +1565,9 @@ class ProjectNode(RootNode):
                padding = 3,
                file_type = "ma",
                fps = 25,
-               users = {"0":["Admin","1234","admin"]}):
+               users = {"0":["Admin","1234","admin"]},
+               levels = {},
+               stages = {}):
 
 
         project_key = data.id_generator()
@@ -1604,15 +1606,15 @@ class ProjectNode(RootNode):
             files.create_directory(os.path.join(path, fl_folders[0], fl_folders[1], fl_folder))
 
 
-        stages = {}
-        stages["asset"] = ["model", "rig", "clip", "shading", "lightning"]
-        stages["animation"] = ["layout", "Animation"]
+        # stages = {}
+        # stages["asset"] = ["model", "rig", "clip", "shading", "lightning"]
+        # stages["animation"] = ["layout", "Animation"]
 
         project_data["stages"] = stages
 
-        levels = {}
-        levels["asset"] = ["type", "asset", "stage", "ccc"]
-        levels["animation"] = ["Ep", "Seq"]
+        # levels = {}
+        # levels["asset"] = ["type", "asset", "stage", "ccc"]
+        # levels["animation"] = ["Ep", "Seq"]
 
         project_data["levels"] = levels
 

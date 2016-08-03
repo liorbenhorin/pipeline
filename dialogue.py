@@ -976,18 +976,18 @@ class projectDialog(QtGui.QDialog):
     def populated_variables(self):
 
 
-        level1 = dt.LevelsNode("scenes")
+        level1 = dt.LevelsNode("animation")
         level1.setLevels(["EP","SEQ"])
-        level2 = dt.LevelsNode("assets")
+        level2 = dt.LevelsNode("asset")
         level2.setLevels(["type","asset","stage"])
 
         self.levels_model = dtm.PipelineLevelsModel([level1,level2])
         self.levels_tree.setModel(self.levels_model)
 
 
-        stages1 = dt.LevelsNode("scenes")
+        stages1 = dt.LevelsNode("animation")
         stages1.setLevels([ "layout","shot","lightning"])
-        stages2 = dt.LevelsNode("assets")
+        stages2 = dt.LevelsNode("asset")
         stages2.setLevels(["model", "rig", "cip","shading"])
 
         self.stages_model = dtm.PipelineStagesModel([stages1, stages2])
