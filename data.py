@@ -777,14 +777,14 @@ class StageNode(RootNode):
                 self.settings = kwargs[key]
 
         self.pipelineUI = None
-        self._formatDepth = 2
 
+        self._name_format = 2
         for key in kwargs:
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
                 self.edited.connect(self.pipelineUI.updateVersionsTable)
-            # if key == "name_format":
-            #     self._name_format = kwargs[key]
+            if key == "name_format":
+                self._name_format = kwargs[key]
             #
 
         if self.data_file:
@@ -793,15 +793,15 @@ class StageNode(RootNode):
 
         self.resource = new_icon if not self._virtual else  creation_icon
 
-    def create(self,  path=None, name_format = 2):
+    def create(self,  path=None):
         super(StageNode, self).create(path)
         #if node:
         dict = {}
         dict["typeInfo"] = _stage_
         dict[_stage_] = self.name
         dict[_asset_] = self.parent().name
-        dict["name_format"] = name_format
-        self.name_format = name_format
+        dict["name_format"] = self._name_format
+        self.name_format = self._name_format
 
         path = os.path.join(path, "%s.%s" % (self.name, "json"))
 
@@ -833,7 +833,7 @@ class StageNode(RootNode):
 
     def formatFileName(self):
 
-        depth = self.name_format
+        depth = self.name_format+1
         levels = []
         current = self
         for i in range(depth):
