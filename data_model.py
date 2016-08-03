@@ -784,6 +784,11 @@ class PipelineLevelsModel(QtCore.QAbstractTableModel):
         return True
 
 
+    @property
+    def items(self):
+        return self.__items
+
+
 class PipelineStagesModel(QtCore.QAbstractTableModel):
 
     MIMEDATA = 'application/x-qabstractitemmodeldatalist'
@@ -900,6 +905,11 @@ class PipelineStagesModel(QtCore.QAbstractTableModel):
 
         self.endRemoveRows()
         return True
+
+
+    @property
+    def items(self):
+        return self.__items
 
 
 class PipelineUsersModel(QtCore.QAbstractTableModel):

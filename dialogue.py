@@ -999,15 +999,32 @@ class projectDialog(QtGui.QDialog):
         self.users_tree.setModel(self.users_model)
 
 
+    def exctract_stages_levels_data(self, model):
+        if model:
+             levels = {}
+             for index, root in enumerate(model.items):
+                 levels[root.name] = filter(lambda a: a != "", root._levels)
+
+             return levels
+
+    def exctract_users_data(self, model):
+        if model:
+            users = {}
+            for index, user in enumerate(model.items):
+                users[index] = [user.name, user._password, user._role]
+
+            return users
+
+
     def result(self):
         res = {}
         res["name"] = self.name_input.text()
         res["fps"] = self.fps_input.currentText()
         res["padding"] = self.padding_slider.value()
         res["suffix"] = self.suffix_input.text()
-        res["levels"] = self.levels_model
-        res["stages"] = self.stages_model
-        res["users"] = self.users_tree.model()
+        res["levels"] = self.exctract_stages_levels_data(self.levels_model)
+        res["stages"] = self.exctract_stages_levels_data(self.stages_model)
+        res["users"] = self.exctract_users_data(self.users_tree.model())
         return res
 
 class WidgetLayout(QtGui.QWidget):

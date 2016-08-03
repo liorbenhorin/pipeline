@@ -3567,7 +3567,13 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             if res["fps"] == "NTSC (30fps)":
                 fps = 30
 
-            users = None
+            users = res["users"]
+            levels = res["levels"]
+            stages = res["stages"]
+            print users
+            print levels
+            print stages
+            return
 
 
 
@@ -3575,7 +3581,9 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                                                                                   padding=padding,
                                                                                   file_type=file_type,
                                                                                   fps=fps,
-                                                                                  users=users
+                                                                                  users=users,
+                                                                                  levels = levels,
+                                                                                  stages = stages
                                                                                   )
 
             if self.pipeline_window.projects:

@@ -1565,7 +1565,7 @@ class ProjectNode(RootNode):
                padding = 3,
                file_type = "ma",
                fps = 25,
-               users = {"Admin":(1234,"admin")}):
+               users = {"0":["Admin","1234","admin"]}):
 
 
         project_key = data.id_generator()
