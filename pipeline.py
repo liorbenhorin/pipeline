@@ -2076,7 +2076,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.settings.project = None
             self.populate_navbar()
 
-        #self.populate_project_tree()
+        self.populate_project_tree()
 
 
     def set_thumbnail(self,Qpixmap):

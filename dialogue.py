@@ -58,6 +58,12 @@ reload(data)
 global _admin_
 _admin_ = "admin"
 
+import data_view as dtv
+import data_model as dtm
+import data as dt
+
+
+# reload(dt)
 def set_icons():
     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
     if not os.path.exists(localIconPath):
@@ -873,7 +879,7 @@ class projectDialog(QtGui.QDialog):
     def __init__(self, parent=None, **kwargs):
         super(projectDialog, self).__init__(parent)
 
-        import data_view as dtv
+
 
         self.layout = QtGui.QVBoxLayout(self)
 
@@ -969,10 +975,7 @@ class projectDialog(QtGui.QDialog):
 
     def populated_variables(self):
 
-        import data_model as dtm
-        #reload(dtm)
-        import data as dt
-        #reload(dt)
+
 
         level1 = dt.LevelsNode("scenes")
         level1.setLevels(["EP","SEQ"])
