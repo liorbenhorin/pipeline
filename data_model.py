@@ -1078,33 +1078,37 @@ class PipelineVersionsModel2(QtCore.QAbstractItemModel):
             return QtCore.QSize(40,self._rowHeight)
 
         if role == QtCore.Qt.EditRole:
-            if index.column() == 0:
-                return node.fullName
-            if index.column() == 1:
-                return node.author
-            if index.column() == 2:
-                return node.note
+            if node.typeInfo() != _new_:
+                if index.column() == 0:
+                    return node.fullName
+                if index.column() == 1:
+                    return node.author
+                if index.column() == 2:
+                    return node.note
 
             return node.data(index.column())
 
         if role == QtCore.Qt.DisplayRole:
+            if node.typeInfo() != _new_:
+                if index.column() == 1:
+                    return node.number
 
-            if index.column() == 1:
-                return node.number
+                if index.column() == 2:
+                    return node.author
 
-            if index.column() == 2:
-                return node.author
-
-            if index.column() == 3:
-                return node.date
+                if index.column() == 3:
+                    return node.date
 
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
                 resource = node.resource
                 return QtGui.QIcon(QtGui.QPixmap(resource))
-            if index.column() == 4:
-                resource = node.note_decoration
-                return QtGui.QIcon(QtGui.QPixmap(resource))
+
+            if node.typeInfo() != _new_:
+
+                if index.column() == 4:
+                    resource = node.note_decoration
+                    return QtGui.QIcon(QtGui.QPixmap(resource))
 
         if role == PipelineVersionsModel2.sortRole:
             return node.number

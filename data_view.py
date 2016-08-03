@@ -748,7 +748,10 @@ class PipelineVersionsView(QtGui.QTreeView):
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
         if self.model().sourceModel().getNode(index).typeInfo() == _new_:
-            self.model().sourceModel().getNode(index).parent().initialVersion()
+            parent_index = index.parent()
+            node = self.model().sourceModel().getNode(index).parent()
+            self.model().sourceModel().removeRows(index.row(),1, parent_index)
+            node.initialVersion()
         else:
             self.model().sourceModel().getNode(index).load()
             self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)
@@ -2064,7 +2067,7 @@ class ComboDynamicWidget(ComboWidget):
 
         self._child = None            
         self._model = None
-        
+        self.section = None
         
         # Init calls
         self.createModel()              
@@ -2086,17 +2089,17 @@ class ComboDynamicWidget(ComboWidget):
             
             if self._stage in self._project.stages["asset"]:
                 options = self._project.levels["asset"]
-
+                self.section = _assets_
                 if len(options) >  depth:
                     self._level = options[depth]
-                
+
                     return
                 
             if self._stage in self._project.stages["animation"]:
                 options = self._project.levels["animation"]
                 if len(options) > depth:
                     self._level = options[depth]
-                
+                    self.section = _animation_a
                     return
           
         self._level = "n/a"
@@ -2162,6 +2165,7 @@ class ComboDynamicWidget(ComboWidget):
 
         self._node = None
 
+
         if dt.assetDir(path):
 
 
@@ -2173,7 +2177,7 @@ class ComboDynamicWidget(ComboWidget):
 
             self._node = dt.AssetNode(os.path.split(path)[1], parent=p, path=os.path.join(path),
                                       project=self._project,
-                                      settings=self._settings, pipelineUI=self.parent)
+                                      settings=self._settings, pipelineUI=self.parent, section = self.section)
 
             for dir in files.list_dir_folders(path):
 
@@ -2190,7 +2194,7 @@ class ComboDynamicWidget(ComboWidget):
 
 
                         stage = dt.StageNode(dir, parent=self._node , path=os.path.join(path,dir), project=self._project,
-                                     settings=self._settings, pipelineUI= self.parent)
+                                     settings=self._settings, pipelineUI= self.parent, section = self.section)
 
                         self.parent.stageNode(stage)
                         self.parent.updateVersionsTable()

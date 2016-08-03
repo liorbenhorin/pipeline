@@ -695,6 +695,12 @@ class NewNode(Node):
         super(NewNode, self).__init__(name, parent)
         self.resource = add_icon
 
+        # for key in kwargs:
+        #     if key == "name_format":
+        #         self._name_format = kwargs[key]
+        #     if key == "section":
+        #         self._section = kwargs[key]
+
     def typeInfo(self):
         return _new_
 
@@ -777,9 +783,9 @@ class StageNode(RootNode):
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
                 self.edited.connect(self.pipelineUI.updateVersionsTable)
-            if key == "name_format":
-                self._name_format = kwargs[key]
-
+            # if key == "name_format":
+            #     self._name_format = kwargs[key]
+            #
 
         if self.data_file:
             self.stage_file = self.data_file.read()
@@ -787,13 +793,15 @@ class StageNode(RootNode):
 
         self.resource = new_icon if not self._virtual else  creation_icon
 
-    def create(self,  path=None):
+    def create(self,  path=None, name_format = 2):
         super(StageNode, self).create(path)
         #if node:
         dict = {}
         dict["typeInfo"] = _stage_
         dict[_stage_] = self.name
         dict[_asset_] = self.parent().name
+        dict["name_format"] = name_format
+        self.name_format = name_format
 
         path = os.path.join(path, "%s.%s" % (self.name, "json"))
 
@@ -801,6 +809,15 @@ class StageNode(RootNode):
         self.stage_file = self.data_file.read()
 
         return self
+
+    @property
+    def name_format(self):
+        if self.stage_file:
+            return self.stage_file["name_format"]
+
+    @name_format.setter
+    def name_format(self, value):
+        self._name_format = value
 
     @property
     def stage(self):
@@ -816,7 +833,7 @@ class StageNode(RootNode):
 
     def formatFileName(self):
 
-        depth = self._name_format
+        depth = self.name_format
         levels = []
         current = self
         for i in range(depth):
@@ -829,6 +846,8 @@ class StageNode(RootNode):
         return files.set_padding(int, self.project.project_padding)
 
     def initialVersion(self):
+
+
 
         files.assure_folder_exists(self.versions_path)
 
@@ -1201,9 +1220,14 @@ class StageNode(RootNode):
                     for key in versions_dict:
                         skip = False
                         if self._children:
-                            for c in self._children:
-                                if c.path == versions_dict[key]:
+                            if isinstance(self._children, list):
+                                for c in self._children:
+                                    if c.path == versions_dict[key]:
+                                        skip = True
+                            else:
+                                if self._children.path == versions_dict[key]:
                                     skip = True
+
                         if not skip:
                             padded_number = self.padding(key)
                             author = "n/a"
@@ -1241,7 +1265,7 @@ class StageNode(RootNode):
 
     @property
     def emptyVersions(self):
-
+        #, name_format = self._name_format, section = self._section
         return [NewNode("new...", parent = self)]
 
 
