@@ -13,9 +13,9 @@
         "sequence": null, 
         "shot": null
     }, 
-    "stage": "lightning", 
+    "stage": "model", 
     "user": [
-        null, 
-        null
+        "root", 
+        "1234"
     ]
 }

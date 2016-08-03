@@ -294,7 +294,7 @@ projects_form_class, projects_base_class = loadUiType(projects_uiFile)
 create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_create_edit_project_UI.ui')
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
 
-version = 'Snowball | 0.0.0'
+version = 'Snowball | 0.0.1'
 
 
 def set_icons():
@@ -1632,6 +1632,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.thumbnail_button()
         self.init_settings()
         self._decode_users()
+        self.ui.users_pushButton.setText("Not logged in")
 
         self.tree = dtv.pipelineTreeView(self)
         self.navWidget = QtGui.QWidget()
@@ -1650,10 +1651,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.collapseTree_pushButton.clicked.connect(self.collapseTree)
         self.ui.expendTree_pushButton.clicked.connect(self.expendTree)
 
-        if self.settings.user[0] is not None:
-            self.ui.users_pushButton.setText(self.settings.user[0])
-        else:
-            self.ui.users_pushButton.setText("Not logged In")
+        # if self.settings.user[0] is not None:
+        #     self.ui.users_pushButton.setText(self.settings.user[0])
+        # else:
+        #     self.ui.users_pushButton.setText("Not logged In")
 
         self._dataMapper = None
         self.dynamicCombo = None
@@ -2070,11 +2071,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.project = project
             self.populate_navbar()
 
+
+            role = self.project.validate_user(self.settings.user[0], self.settings.user[1])
+            if role:
+                self.ui.users_pushButton.setText("{0} > {1}".format(self.settings.user[0], self.project.name))
+                self.project_ui_Enable(True)
+            else:
+                self.project_ui_Enable(False)
+
         else:
             self.ui.projects_pushButton.setText("No Project")
             self.project = None
             self.settings.project = None
             self.populate_navbar()
+            self.project_ui_Enable(False)
 
         self.populate_project_tree()
 
@@ -3332,7 +3342,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             pass
         projectsWindow=pipeLine_projects_UI(parent=self, pipeline_window=self)
         projectsWindow.show()
-        
+
+
+    def project_ui_Enable(self, bool):
+
+        self.ui.navBarWidget.setEnabled(bool)
+        self.ui.tabWidget.setEnabled(bool)
+
     def login_window(self):
 
         login = dlg.Login()
@@ -3342,22 +3358,37 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if user != "":
                 self.settings.user = [user, password]
                 self.ui.users_pushButton.setText(user)
-                self.unload_project()  
-                return True
+                if self.project:
+                    role = self.project.validate_user(user, password)
+                    if role:
+
+                        """
+                        TAKE ACTION DEPENDING ON ROLE
+                        """
+                        self.ui.users_pushButton.setText("{0} > {1}".format(user,self.project.name))
+                        self.project_ui_Enable(True)
+
+                        #self.unload_project()
+                        return True
                             
         self.settings.user = [None, None]
-        self.ui.users_pushButton.setText("Not logged In")         
-        self.settings.role = None
-        self.project = None
-        self.settings.current_project = None
-        self.init_current_project()
-        try:
-            if projectsWindow:
-                projectsWindow.updateProjectsTable()
-        except:
-           pass
-           
-        log.info ( "logged out")    
+        self.ui.users_pushButton.setText("Not logged In")
+        '''
+        TAKE ACTION WHEN NO USER IS LOGGED IN
+        '''
+        self.project_ui_Enable(False)
+
+        #self.settings.role = None
+        #self.project = None
+        #self.settings.current_project = None
+        #self.init_current_project()
+        #try:
+        #    if projectsWindow:
+        #        projectsWindow.updateProjectsTable()
+        #except:
+        #   pass
+        #
+        #log.info ( "logged out")
         return False
             
             

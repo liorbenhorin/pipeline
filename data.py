@@ -1670,6 +1670,13 @@ class ProjectNode(RootNode):
     def edit(self):
         print "eding the project"
 
+    def validate_user(self, username = None, password = None):
+        for key in self.users:
+            if self.users[key][0] == username and self.users[key][1] == password:
+                return self.users[key][2]
+
+        return None
+
     def set(self):
         if self.data_file:
             import pymel.core as pm
@@ -1874,6 +1881,22 @@ class ProjectNode(RootNode):
             self.data_file.edit(data)
             self.project_file = self.data_file.read()
 
+
+    @property
+    def users(self):
+        if self.project_file:
+            return self.project_file["users"]
+        else:
+            return None
+
+
+    @users.setter
+    def users(self, dict):
+        if self.data_file:
+            data = {}
+            data["users"] = dict
+            self.data_file.edit(data)
+            self.project_file = self.data_file.read()
 
 def stageDir(dir):
 

@@ -996,7 +996,7 @@ class projectDialog(QtGui.QDialog):
         self.stages_tree.setModel(self.stages_model)
 
 
-        user1 = dt.UserNode("Administrator", "1234", _admin_)
+        user1 = dt.UserNode("root", "1234", _admin_)
         self.users_model = dtm.PipelineUsersModel([user1])
         self.users_tree.setModel(self.users_model)
 
