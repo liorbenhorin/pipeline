@@ -129,8 +129,12 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.ForegroundRole:
 
-                if node._virtual:
+                if node._virtual or node._deathrow:
                     return QtGui.QColor(150,150,150)
+
+                if node.typeInfo() == _stage_:
+                    return QtGui.QColor("#afa0e7")
+
 
         if role == QtCore.Qt.FontRole:
             font = QtGui.QFont()

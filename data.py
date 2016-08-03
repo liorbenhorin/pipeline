@@ -274,6 +274,10 @@ class Node(QtCore.QObject, object):
 
     def commit(self):
         self.commit_me()
+        if self._deathrow:
+            self.delete()
+
+            return False
 
         for child in self._children:
             child.commit()
