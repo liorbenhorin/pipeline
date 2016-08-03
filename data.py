@@ -1591,7 +1591,8 @@ class ProjectNode(RootNode):
                fps = 25,
                users = {"0":["Admin","1234","admin"]},
                levels = {},
-               stages = {}):
+               stages = {},
+               suffix = None):
 
 
         project_key = data.id_generator()
@@ -1602,6 +1603,7 @@ class ProjectNode(RootNode):
         project_data["fps"] = fps
         project_data["defult_file_type"] = file_type
         project_data["users"] = users
+        project_data["suffix"] = suffix
         #project_data["playblast_outside"] = playblast_outside
 
         folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",

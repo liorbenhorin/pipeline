@@ -3570,6 +3570,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             users = res["users"]
             levels = res["levels"]
             stages = res["stages"]
+            suffix = res["suffix"]
 
 
             project = dt.ProjectNode(project_name, self.pipeline_window.client, pipelineUI = self.pipeline_window).create(path=project_path,
@@ -3578,8 +3579,8 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                                                                                   fps=fps,
                                                                                   users=users,
                                                                                   levels = levels,
-                                                                                  stages = stages
-                                                                                  )
+                                                                                  stages = stages,
+                                                                                  suffix = suffix)
 
             if self.pipeline_window.projects:
                 self.pipeline_window.projects.insertRows(0, 1, node=project)
