@@ -878,7 +878,7 @@ class StageNode(RootNode):
 
         first_version = {}
         first_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
-        first_version["author"] = "no user"# self.settings.user[0]
+        first_version["author"] = self.settings.user[0]
         first_version["note"] = None
 
         versions = {}
@@ -964,7 +964,7 @@ class StageNode(RootNode):
 
                 new_version = {}
                 new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
-                new_version["author"] = "no user"  # self.settings.user[0]
+                new_version["author"] = self.settings.user[0]
                 new_version["note"] = None
 
                 versions = self.versions_
@@ -1245,7 +1245,7 @@ class StageNode(RootNode):
                         if not skip:
                             padded_number = self.padding(key)
                             author = "n/a"
-                            note = "n/a"
+                            note = ""
                             date = "n/a"
                             versions_data = self.versions_
                             if versions_data:

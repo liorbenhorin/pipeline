@@ -667,7 +667,7 @@ class PipelineVersionsView(QtGui.QTreeView):
         self.clearModel()
         if model:
 
-
+            model._rowHeight = self._slider.listSlider.value()
             self._proxyModel = dtm.PipelineVersionsProxyModel()
             self._proxyModel.setSourceModel(model)
 
@@ -691,7 +691,7 @@ class PipelineVersionsView(QtGui.QTreeView):
 
 
 
-            self.header().resizeSection(0, 32)
+            self.header().resizeSection(0, self._slider.listSlider.value())
             self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
 
 
