@@ -1616,9 +1616,10 @@ class ProjectNode(RootNode):
 
         project_data["levels"] = levels
 
-        path = os.path.join(path, "%s.%s" % (self.name, "json"))
+        self._path = path
+        data_path = os.path.join(path, "%s.%s" % (self.name, "json"))
 
-        self.data_file = data.jsonDict().create(path, project_data)
+        self.data_file = data.jsonDict().create(data_path, project_data)
         self.project_file = self.data_file.read()
 
 

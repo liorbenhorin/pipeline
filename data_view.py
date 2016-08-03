@@ -1436,32 +1436,33 @@ class pipelineTreeView(QtGui.QTreeView):
 
         super(pipelineTreeView, self).setModel(model)
 
-        self.changed = False
+        if model:
+            self.changed = False
 
-        self.proxyModel = self.model()
-        self.sourceModel = self.proxyModel.sourceModel()        
-        
-        '''
-        this will expend the tree only on the first level, which should be
-        the projects name folder
-        the rest will be collapsed
-        '''
+            self.proxyModel = self.model()
+            self.sourceModel = self.proxyModel.sourceModel()
 
-        self.initialExpension()
+            '''
+            this will expend the tree only on the first level, which should be
+            the projects name folder
+            the rest will be collapsed
+            '''
 
-        
-        '''
-        save the expended state of the tree
-        '''
-        self.saveState()
+            self.initialExpension()
 
 
-        self.header().setStretchLastSection(False)
+            '''
+            save the expended state of the tree
+            '''
+            self.saveState()
 
-        self.header().setResizeMode(0, QtGui.QHeaderView.Stretch)
 
-        self.header().resizeSection(1, 100)
-        self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
+            self.header().setStretchLastSection(False)
+
+            self.header().setResizeMode(0, QtGui.QHeaderView.Stretch)
+
+            self.header().resizeSection(1, 100)
+            self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
 
 
 

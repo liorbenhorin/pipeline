@@ -3553,9 +3553,39 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         result = projectDlg.exec_()
         res = projectDlg.result()
         if result == QtGui.QDialog.Accepted:
-            print res
 
-        return
+            project_path = os.path.join(self.pipeline_window.client.path, res["name"])
+            project_name = res["name"]
+            padding = res["padding"]
+            file_type = "ma"
+            fps = 25
+
+            if res["fps"] == "PAL (25fps)":
+                fps = 25
+            if res["fps"] == "Film (24fps)":
+                fps = 24
+            if res["fps"] == "NTSC (30fps)":
+                fps = 30
+
+            users = None
+
+
+
+            project = dt.ProjectNode(project_name, self.pipeline_window.client, pipelineUI = self.pipeline_window).create(path=project_path,
+                                                                                  padding=padding,
+                                                                                  file_type=file_type,
+                                                                                  fps=fps,
+                                                                                  users=users
+                                                                                  )
+
+            if self.pipeline_window.projects:
+                self.pipeline_window.projects.insertRows(0, 1, node=project)
+            else:
+                self.populate_projects()
+
+
+
+            project.set()
 
         # global create_edit_projectsWindow
         # try:
