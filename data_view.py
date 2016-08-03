@@ -13,6 +13,8 @@ reload(dtm)
 import modules.files as files
 reload(files)
 
+import modules.jsonData as data
+
 import dialogue as dlg
 reload(dlg)
 
@@ -387,6 +389,7 @@ class PipelineUsersView(QtGui.QTableView):
 
         actions = []
         actions.append(QtGui.QAction("New user", menu, triggered=functools.partial(self.new_user, index)))
+        actions.append(QtGui.QAction("Import users from a json file", menu, triggered = self.import_users ))
         menu.addActions(actions)
 
         menu.exec_(event.globalPos())
@@ -401,6 +404,21 @@ class PipelineUsersView(QtGui.QTableView):
             row = len(self.model().items)
 
         self.model().insertRows(row+1,1,QtCore.QModelIndex(),node = user)
+
+    def import_users(self):
+        path = QtGui.QFileDialog.getOpenFileName(self, "Select the users file", filter="json files (*.json)")
+        if path[0]:
+            users_file = data.jsonDict(path=str(path[0]))
+            users_file = users_file.read()
+            print users_file, "="
+            self.setModel(None)
+            users = []
+            for key in users_file:
+                users.append(dt.UserNode(key, users_file[key][0], users_file[key][1]))
+
+            if users:
+                self.setModel(dtm.PipelineUsersModel(users))
+
 
 class PipelineProjectsView(QtGui.QTableView):
     def __init__(self, parentWidget = None, parent = None):

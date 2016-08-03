@@ -976,7 +976,6 @@ class projectDialog(QtGui.QDialog):
     def populated_variables(self):
 
 
-
         level1 = dt.LevelsNode("scenes")
         level1.setLevels(["EP","SEQ"])
         level2 = dt.LevelsNode("assets")
@@ -998,6 +997,18 @@ class projectDialog(QtGui.QDialog):
         user1 = dt.UserNode("Administrator", "1234", _admin_)
         self.users_model = dtm.PipelineUsersModel([user1])
         self.users_tree.setModel(self.users_model)
+
+
+    def result(self):
+        res = {}
+        res["name"] = self.name_input.text()
+        res["fps"] = self.fps_input.currentText()
+        res["padding"] = self.padding_slider.value()
+        res["suffix"] = self.suffix_input.text()
+        res["levels"] = self.levels_model
+        res["stages"] = self.stages_model
+        res["users"] = self.users_tree.model()
+        return res
 
 class WidgetLayout(QtGui.QWidget):
     def __init__(self, parent=None, layout = None):
