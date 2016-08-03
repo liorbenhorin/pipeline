@@ -53,7 +53,9 @@ def set_icons():
 
     global comment_icon
     global comment_full_icon
+    global delete_folder_icon
 
+    delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "delete_folder"))
     comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "comment"))
     comment_full_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "comment_full"))
 
@@ -137,6 +139,9 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
                 if node._virtual:
                     font.setItalic(True)
                     font.setBold(True)
+                if node._deathrow:
+                    font.setItalic(True)
+
 
 
             if index.column() == 1:
@@ -146,8 +151,12 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
 
         if role == QtCore.Qt.DecorationRole:
             if index.column() == 0:
-                resource = node.resource
-                return QtGui.QIcon(QtGui.QPixmap(resource))
+                if not node._deathrow:
+                    resource = node.resource
+                    return QtGui.QIcon(QtGui.QPixmap(resource))
+                else:
+                    return QtGui.QIcon(QtGui.QPixmap(delete_folder_icon))
+
             
         if role == PipelineProjectModel.sortRole:
             return node.typeInfo()
@@ -226,7 +235,9 @@ class PipelineProjectModel(QtCore.QAbstractItemModel):
 
         if index.isValid():
             node = self.getNode(index)
-            
+            if node._deathrow:
+                return QtCore.Qt.NoItemFlags
+
             if node.typeInfo() == _root_:
                 return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
             

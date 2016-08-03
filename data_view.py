@@ -1732,19 +1732,26 @@ class pipelineTreeView(QtGui.QTreeView):
 
         actions = []  
           
-        if node:
+        if node and not node._deathrow:
 
-            if node.typeInfo() == _folder_: 
+
+
+            if node.typeInfo() == _folder_ or node.typeInfo() == _root_:
                 actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, src) ))
                 actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, src) ))
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-                
+                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+
             elif node.typeInfo() == _asset_:
                 actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage, src) ))
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
             elif node.typeInfo() == _stage_:
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+                    pass
+                    #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+
+
+            if not node.typeInfo() == _root_:
+                actions.append(QtGui.QAction("Delete", menu, triggered=functools.partial(self.delete, src)))
 
         else:
             event.accept()
@@ -1775,11 +1782,12 @@ class pipelineTreeView(QtGui.QTreeView):
         #self.tableView.update(QtGui.QItemSelection())
         
         node = self.asModelNode(index)
-        parentIndex = self.sourceModel.parent(index)
-        self.sourceModel.removeRows(node.row(),1,parentIndex, kill=True)
+        node.deathrow()
+        # parentIndex = self.sourceModel.parent(index)
+        # self.sourceModel.removeRows(node.row(),1,parentIndex, kill=True)
         self._proxyModel.invalidate()
-
-        self.updateTable( self.fromProxyIndex(parentIndex))
+        #
+        # self.updateTable( self.fromProxyIndex(parentIndex))
         self.update.emit()
         return True
 

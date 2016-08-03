@@ -113,6 +113,7 @@ class Node(QtCore.QObject, object):
         self._resource = folder_icon
         self._id = data.id_generator()
         self._virtual = False
+        self._deathrow = False
 
         if parent is not None:
             parent.addChild(self)
@@ -298,7 +299,14 @@ class Node(QtCore.QObject, object):
                     #print "already real --> ", self._path, "<--"
                 return
 
-        #print "not a folder"
+    def deathrow(self):
+        self.deathrow_me()
+
+        for child in self._children:
+            child.deathrow()        #print "not a folder"
+
+    def deathrow_me(self):
+        self._deathrow = True
 
 
     @property

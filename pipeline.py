@@ -1809,9 +1809,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.project:
 
             _root = dt.RootNode("root", path = self.project.path, parent = self.project)
-            assets = dt.FolderNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = _assets_)
+            assets = dt.RootNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = _assets_)
             assets.model_tree()
-            scenes = dt.FolderNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = _animation_)
+            scenes = dt.RootNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = _animation_)
             scenes.model_tree()
 
             '''
