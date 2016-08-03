@@ -390,11 +390,20 @@ class PipelineUsersView(QtGui.QTableView):
         actions = []
         actions.append(QtGui.QAction("New user", menu, triggered=functools.partial(self.new_user, index)))
         actions.append(QtGui.QAction("Import users from a json file", menu, triggered = self.import_users ))
+
+        if index.isValid():
+            actions.append(QtGui.QAction("Remove user", menu, triggered=functools.partial(self.remove_user, index)))
         menu.addActions(actions)
 
         menu.exec_(event.globalPos())
         event.accept()  # TELL QT IVE HANDLED THIS THING
         return
+
+
+    def remove_user(self, index):
+        row = index.row()
+        parent = index.parent()
+        self.model().removeRows(row, 1, parent)
 
     def new_user(self, index):
         user = dt.UserNode("New user", "1234", _admin_)
