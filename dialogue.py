@@ -785,7 +785,9 @@ class NameFormatWidget(QtGui.QWidget):
 
         self.ancestors_names = []
         [self.ancestors_names.append("<{}>".format(node.name)) for node in self.ancestors]
+
         self.ancestors_names.reverse()
+        self.ancestors_names.pop(0)
         self.max_depth = len(self.ancestors_names)
 
         self.layout = QtGui.QVBoxLayout(self)
@@ -977,7 +979,7 @@ class projectDialog(QtGui.QDialog):
 
 
         level1 = dt.LevelsNode("animation")
-        level1.setLevels(["EP","SEQ"])
+        level1.setLevels(["EP","SEQ","SHOT"])
         level2 = dt.LevelsNode("asset")
         level2.setLevels(["type","asset","stage"])
 

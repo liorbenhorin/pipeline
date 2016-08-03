@@ -833,12 +833,14 @@ class StageNode(RootNode):
 
     def formatFileName(self):
 
-        depth = self.name_format+1
-        levels = []
-        current = self
+        depth = self.name_format
+        node = self.parent()
+        levels = [self.name, node.name]
+
         for i in range(depth):
-            levels.append(current.name)
-            current = current.parent()
+            node = node.parent()
+            levels.append(node.name)
+
 
         return "_".join(reversed(levels))
 

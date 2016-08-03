@@ -2099,7 +2099,7 @@ class ComboDynamicWidget(ComboWidget):
                 options = self._project.levels["animation"]
                 if len(options) > depth:
                     self._level = options[depth]
-                    self.section = _animation_a
+                    self.section = _animation_
                     return
           
         self._level = "n/a"
