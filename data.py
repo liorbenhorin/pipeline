@@ -432,6 +432,7 @@ class RootNode(Node):#, Metadata_file):
             type = _folder_
             if self.section in self.project.levels:
                 level = self.project.levels[self.section]
+
                 levelName = level[depth]
 
                 if levelName == level[-1]:
