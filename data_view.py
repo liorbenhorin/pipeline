@@ -1747,7 +1747,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
             if node.typeInfo() == _folder_ or node.typeInfo() == _root_:
                 actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, src) ))
-                actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, src) ))
+                actions.append(QtGui.QAction("Create new %s"%(node.levelName), menu, triggered = functools.partial(self.create_new_folder, src) ))
                 #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
             elif node.typeInfo() == _asset_:

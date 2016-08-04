@@ -342,6 +342,11 @@ class RootNode(Node):#, Metadata_file):
 
         self.data_file = None
         self.data_file_path = None
+        self._settings = None
+
+
+        self.project = None
+
 
         for key in kwargs:
             if key == "path":
@@ -351,6 +356,12 @@ class RootNode(Node):#, Metadata_file):
                 self._virtual = kwargs[key]
             if key == "section":
                 self._section = kwargs[key]
+            if key == "project":
+                self._project = kwargs[key]
+            if key == "settings":
+                self._settings = kwargs[key]
+            if key == "project":
+                self.project = kwargs[key]
 
         if self.data_file_path:
             self.set_data_file(self.data_file_path)
@@ -394,6 +405,24 @@ class RootNode(Node):#, Metadata_file):
     def section(self):
         return self._section
 
+    @property
+    def settings(self):
+        return self._settings
+
+    @property
+    def levelName(self):
+        if self.settings and self.project:
+            relative_path = os.path.relpath(self._path, self.project._path)#current_project_path)
+            depth = relative_path.count(os.sep)
+
+            if self.section in self.project.levels:
+                level = self.project.levels[self.section]
+                levelName = level[depth]
+                return levelName
+
+        return "n/a"
+
+
 
     def model_tree(self):
         
@@ -408,12 +437,12 @@ class RootNode(Node):#, Metadata_file):
                         p  = os.path.join(path,dir)
  
                         if assetDir( p ):
-                            node = AssetNode(os.path.split(p)[1], path=p, parent = parent, section = self.section)
+                            node = AssetNode(os.path.split(p)[1], path=p, parent = parent, section = self.section, settings = self.settings, project = self.project)
                             rec(p, node)
                         elif stageDir( p ):
-                            node = StageNode(os.path.split(p)[1],  path=p, parent = parent, section = self.section)
+                            node = StageNode(os.path.split(p)[1],  path=p, parent = parent, section = self.section, settings = self.settings, project = self.project)
                         else:                         
-                            node = FolderNode(os.path.split(p)[1], path=p, parent = parent, section = self.section)
+                            node = FolderNode(os.path.split(p)[1], path=p, parent = parent, section = self.section, settings = self.settings, project = self.project)
                             rec(p, node)
                 else:
                     pass
@@ -778,15 +807,12 @@ class StageNode(RootNode):
 
         changed = QtCore.Signal()
 
-        self.project = None
-        for key in kwargs:
-            if key == "project":
-                self.project = kwargs[key]
 
-        self.settings = None
-        for key in kwargs:
-            if key == "settings":
-                self.settings = kwargs[key]
+
+        # self.settings = None
+        # for key in kwargs:
+        #     if key == "settings":
+        #         self.settings = kwargs[key]
 
         self.pipelineUI = None
 
@@ -1586,10 +1612,10 @@ class ProjectNode(RootNode):
         if self.data_file:
             self.project_file = self.data_file.read()
 
-        self.settings = None
-        for key in kwargs:
-            if key == "settings":
-                self.settings = kwargs[key]
+        # self.settings = None
+        # for key in kwargs:
+        #     if key == "settings":
+        #         self.settings = kwargs[key]
 
 
         self.pipelineUI = None

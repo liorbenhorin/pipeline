@@ -1809,10 +1809,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def populate_project_tree(self):
         if self.project:
 
-            _root = dt.RootNode("root", path = self.project.path, parent = self.project)
-            assets = dt.RootNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = _assets_)
+            _root = dt.RootNode("root", path = self.project.path, parent = self.project, settings = self.settings, project = self.project)
+            assets = dt.RootNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = _assets_, settings = self.settings, project = self.project)
             assets.model_tree()
-            scenes = dt.RootNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = _animation_)
+            scenes = dt.RootNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = _animation_, settings = self.settings, project = self.project)
             scenes.model_tree()
 
             '''
