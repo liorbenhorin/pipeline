@@ -980,7 +980,7 @@ class projectDialog(QtGui.QDialog):
 
 
         level1 = dt.LevelsNode("animation")
-        level1.setLevels(["EP","SEQ","SHOT"])
+        level1.setLevels(["EP","SEQ","SHOT","stage"])
         level2 = dt.LevelsNode("asset")
         level2.setLevels(["type","asset","stage"])
 
