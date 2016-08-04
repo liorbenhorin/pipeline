@@ -618,7 +618,7 @@ class newStage(QtGui.QDialog):
 
 
 class newNodeDialog(QtGui.QDialog):
-    def __init__(self, parent=None, name_label_string = "", title = ""):
+    def __init__(self, parent=None, string = "", name_label_string = "", title = ""):
         super(newNodeDialog, self).__init__(parent)
 
 
@@ -638,6 +638,7 @@ class newNodeDialog(QtGui.QDialog):
         self.name_widget = groupInput(self, label=name_label_string, inputWidget=QtGui.QLineEdit(self),  ic=text_icon)
 
         self.name_input = self.name_widget.input
+        self.name_input.setText(string)
 
 
         self.create_title = Title(self, label=title)
@@ -660,8 +661,8 @@ class newNodeDialog(QtGui.QDialog):
 
 
 class newFolderDialog(newNodeDialog):
-    def __init__(self, parent =  None, name_label_sting = "Name", title = "Create new folder"):
-        super(newFolderDialog, self).__init__(parent, name_label_sting, title)
+    def __init__(self, parent =  None, string = "", name_label_sting = "Name", title = "Create new folder"):
+        super(newFolderDialog, self).__init__(parent, string, name_label_sting, title)
 
 
         self.input_quantity_widget = groupInput(self, label = "Quantity", inputWidget=QtGui.QSpinBox(self), ic= buffer_icon)
@@ -696,8 +697,8 @@ class newFolderDialog(newNodeDialog):
 
 
 class newAssetDialog(newFolderDialog):
-    def __init__(self, parent =  None, name_label_sting = "Name", title = "Create new asset", stages = [], ancestors = None):
-        super(newAssetDialog, self).__init__(parent, name_label_sting, title)
+    def __init__(self, parent =  None, string = "", name_label_sting = "Name", title = "Create new asset", stages = [], ancestors = None):
+        super(newAssetDialog, self).__init__(parent, string, name_label_sting, title)
 
         self.create_stages_title = Title(self, label = "Add stages:")
         self.input_layout.addWidget(self.create_stages_title)
@@ -735,8 +736,8 @@ class newAssetDialog(newFolderDialog):
 
 
 class newStageDialog(newNodeDialog):
-    def __init__(self, parent =  None, parent_name = None, name_label_sting = "Name", title = "Create new stage", stages = [], ancestors = None):
-        super(newStageDialog, self).__init__(parent, name_label_sting, title)
+    def __init__(self, parent =  None, string = "", parent_name = None, name_label_sting = "Name", title = "Create new stage", stages = [], ancestors = None):
+        super(newStageDialog, self).__init__(parent, string, name_label_sting, title)
 
 
         self.name_widget.setParent(None)

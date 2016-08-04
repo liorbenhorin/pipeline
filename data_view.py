@@ -1743,19 +1743,22 @@ class pipelineTreeView(QtGui.QTreeView):
           
         if node and not node._deathrow:
             level_name, level_type = node.level_options
+
             if level_type == _folder_:
                 actions.append(
-                    QtGui.QAction("Create new <{0}> <{1}>".format(node.level_options[0], node.level_options[1]), menu,
-                                  triggered=functools.partial(self.create_new_folder, src)))
+                    QtGui.QAction("Create new {0}".format(level_name), menu,
+                                  triggered=functools.partial(self.create_new_folder, src,level_name )))
 
             elif level_type == _asset_:
-                actions.append(QtGui.QAction("Create new %s" % (_asset_), menu,
-                                             triggered=functools.partial(self.create_new_asset, src)))
+                actions.append(QtGui.QAction("Create new {0}".format(level_name), menu,
+                                             triggered=functools.partial(self.create_new_asset, src, level_name)))
 
-            #elif
-            if node.typeInfo() == _folder_ or node.typeInfo() == _root_:
-                actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, src) ))
-                actions.append(QtGui.QAction("Create new <{0}> <{1}>".format(node.level_options[0], node.level_options[1]), menu, triggered = functools.partial(self.create_new_folder, src) ))
+            elif level_type == _stage_:
+                actions.append(QtGui.QAction("Create new {0}".format(level_name), menu,
+                                             triggered=functools.partial(self.create_new_stage, src)))
+            #if node.typeInfo() == _folder_ or node.typeInfo() == _root_:
+            #    actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, src) ))
+            #    actions.append(QtGui.QAction("Create new <{0}> <{1}>".format(node.level_options[0], node.level_options[1]), menu, triggered = functools.partial(self.create_new_folder, src) ))
 
             elif node.typeInfo() == _asset_:
                 actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage, src) ))
@@ -1803,11 +1806,17 @@ class pipelineTreeView(QtGui.QTreeView):
         self.update.emit()
         return True
 
-    def create_new_folder(self, parent):
+    def create_new_folder(self, parent, string):
 
         parent_node = self.sourceModel.getNode(parent)
 
-        folderDlg = dlg.newFolderDialog()
+
+        depth_list = self.sourceModel.listAncestos(parent)
+        ancestors = []
+        for i in depth_list:
+            ancestors.append(self.sourceModel.getNode(i))
+
+        folderDlg = dlg.newFolderDialog(string = string)
         result = folderDlg.exec_()
         res = folderDlg.result()
         if result == QtGui.QDialog.Accepted:
@@ -1816,7 +1825,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 number = files.set_padding(i, res["padding"])
                 folder_name = "%s_%s"%(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
-                node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True, section = parent_node.section)
+                node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True, section = parent_node.section, project = self.pipelineUI.project, depth = len(ancestors))
                 #if node is not False:
                 self.sourceModel.insertRows(0, 0, parent=parent, node=node)
                 self._proxyModel.invalidate()
@@ -1824,7 +1833,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 self.update.emit()
 
 
-    def create_new_asset(self, parent):
+    def create_new_asset(self, parent, string):
         parent_node = self.sourceModel.getNode(parent)
 
         depth_list = self.sourceModel.listAncestos(parent)
@@ -1832,7 +1841,7 @@ class pipelineTreeView(QtGui.QTreeView):
         for i in depth_list:
             ancestors.append(self.sourceModel.getNode(i))
 
-        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages[parent_node.section], ancestors = ancestors)
+        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages[parent_node.section], ancestors = ancestors, string = string )
         result = assetDlg.exec_()
         res = assetDlg.result()
         if result == QtGui.QDialog.Accepted:
@@ -1853,7 +1862,7 @@ class pipelineTreeView(QtGui.QTreeView):
                     if res["stages"][s]:
                         path = os.path.join(parent_node.path, folder_name, s)
                         #formatDepth
-                        stageNode = dt.StageNode(s, parent=node, path=path, virtual=True, name_format = res["name_format"], section = parent_node.section)
+                        stageNode = dt.StageNode(s, parent=node, path=path, virtual=True, name_format = res["name_format"], section = parent_node.section, project = self.pipelineUI.project, depth = len(ancestors))
                         # if node is not False:
                         self._sourceModel.insertRows(0, 0, parent=new_index, node=stageNode)
                         self._proxyModel.invalidate()
@@ -1887,7 +1896,7 @@ class pipelineTreeView(QtGui.QTreeView):
                     if res["stages"][s]:
                         path = os.path.join(parent_node.path, s)
                         # formatDepth
-                        stageNode = dt.StageNode(s, parent=parent_node, asset_name = parent_node.name, path=path, virtual=True, name_format=res["name_format"], section = parent_node.section)
+                        stageNode = dt.StageNode(s, parent=parent_node, asset_name = parent_node.name, path=path, virtual=True, name_format=res["name_format"], section = parent_node.section, settings = self.pipelineUI.settings)
                         # if node is not False:
                         self._sourceModel.insertRows(0, 0, parent=parent, node=stageNode)
                         self._proxyModel.invalidate()

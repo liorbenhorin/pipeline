@@ -346,7 +346,7 @@ class RootNode(Node):#, Metadata_file):
 
 
         self.project = None
-
+        self._depth = None
 
         for key in kwargs:
             if key == "path":
@@ -362,6 +362,8 @@ class RootNode(Node):#, Metadata_file):
                 self._settings = kwargs[key]
             if key == "project":
                 self.project = kwargs[key]
+            if key == "depth":
+                self._depth = kwargs[key]
 
         if self.data_file_path:
             self.set_data_file(self.data_file_path)
@@ -411,6 +413,19 @@ class RootNode(Node):#, Metadata_file):
 
     @property
     def level_options(self):
+        if self._depth and self.project:
+            depth = self._depth
+            type = _folder_
+            if self.section in self.project.levels:
+                level = self.project.levels[self.section]
+                levelName = level[depth]
+                if levelName == level[-1]:
+                    type = _stage_
+                elif levelName == level[-2]:
+                    type = _asset_
+                return levelName, type
+
+
         if self.settings and self.project:
             relative_path = os.path.relpath(self._path, self.project._path)
             depth = relative_path.count(os.sep)
@@ -418,11 +433,15 @@ class RootNode(Node):#, Metadata_file):
             if self.section in self.project.levels:
                 level = self.project.levels[self.section]
                 levelName = level[depth]
-                if depth+1 == len(level):
+
+                if levelName == level[-1]:
+                    type = _stage_
+                elif levelName == level[-2]:
                     type = _asset_
+
                 return levelName, type
 
-        return "n/a"
+        return "n/a", "n/a"
 
 
 
