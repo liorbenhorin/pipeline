@@ -410,15 +410,17 @@ class RootNode(Node):#, Metadata_file):
         return self._settings
 
     @property
-    def levelName(self):
+    def level_options(self):
         if self.settings and self.project:
-            relative_path = os.path.relpath(self._path, self.project._path)#current_project_path)
+            relative_path = os.path.relpath(self._path, self.project._path)
             depth = relative_path.count(os.sep)
-
+            type = _folder_
             if self.section in self.project.levels:
                 level = self.project.levels[self.section]
                 levelName = level[depth]
-                return levelName
+                if depth+1 == len(level):
+                    type = _asset_
+                return levelName, type
 
         return "n/a"
 

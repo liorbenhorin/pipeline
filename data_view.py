@@ -1742,21 +1742,24 @@ class pipelineTreeView(QtGui.QTreeView):
         actions = []  
           
         if node and not node._deathrow:
+            level_name, level_type = node.level_options
+            if level_type == _folder_:
+                actions.append(
+                    QtGui.QAction("Create new <{0}> <{1}>".format(node.level_options[0], node.level_options[1]), menu,
+                                  triggered=functools.partial(self.create_new_folder, src)))
 
+            elif level_type == _asset_:
+                actions.append(QtGui.QAction("Create new %s" % (_asset_), menu,
+                                             triggered=functools.partial(self.create_new_asset, src)))
 
-
+            #elif
             if node.typeInfo() == _folder_ or node.typeInfo() == _root_:
                 actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset, src) ))
-                actions.append(QtGui.QAction("Create new %s"%(node.levelName), menu, triggered = functools.partial(self.create_new_folder, src) ))
-                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+                actions.append(QtGui.QAction("Create new <{0}> <{1}>".format(node.level_options[0], node.level_options[1]), menu, triggered = functools.partial(self.create_new_folder, src) ))
 
             elif node.typeInfo() == _asset_:
                 actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage, src) ))
-                #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
-            elif node.typeInfo() == _stage_:
-                    pass
-                    #actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 
 
             if not node.typeInfo() == _root_:
