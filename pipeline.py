@@ -1670,6 +1670,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._stageNode = None
         self._version = None
 
+        self.ui.tree_progressBar.valueChanged.connect(self.tree_progress_update)
+        self.ui.tree_progressBar.setValue(0)
+        self.tree_change_options()
         # self.populate_clients()
         # self.populate_projects()
         # self.stage_ui()
@@ -1820,8 +1823,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def populate_project_tree(self):
         if self.project:
 
-            self.ui.tree_progressBar.valueChanged.connect(self.tree_progress_update)
-            self.ui.tree_progressBar.setValue(0)
+
 
             _root = dt.RootNode("root", path = self.project.path, parent = self.project, settings = self.settings, project = self.project)
 

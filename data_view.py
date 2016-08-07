@@ -1855,13 +1855,25 @@ class pipelineTreeView(QtGui.QTreeView):
             base_folder_name = res["name"]
 
 
-
             for i in range(0,res["quantity"]):
                 QtGui.QApplication.processEvents()
                 self.percentage_complete.emit(remap(i, 0, res["quantity"], 0, 100))
 
                 number = files.set_padding(i, res["padding"])
-                folder_name = "%s_%s"%(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
+                if base_folder_name != "":
+                    folder_name = "%s_%s"%(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
+                else:
+                    folder_name = "{0}".format(number) if res["quantity"] > 1 else "unnamed_folder"
+
+
+                skip = False
+                for child in parent_node.children:
+                    if child.name == folder_name:
+                        skip = True
+                if skip:
+                    print "folder exists!"
+                    continue
+
                 path = os.path.join(parent_node.path, folder_name)
                 node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True, section = parent_node.section, project = self.pipelineUI.project, depth = len(ancestors))
 
@@ -1891,7 +1903,19 @@ class pipelineTreeView(QtGui.QTreeView):
                 QtGui.QApplication.processEvents()
                 self.percentage_complete.emit(remap(i, 0, res["quantity"], 0, 100))
                 number = files.set_padding(i, res["padding"])
-                folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 1 else base_folder_name
+                if base_folder_name != "":
+                    folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 1 else base_folder_name
+                else:
+                    folder_name = "{0}".format(number) if res["quantity"] > 1 else "unnamed_folder"
+
+                skip = False
+                for child in parent_node.children:
+                    if child.name == folder_name:
+                        skip = True
+                if skip:
+                    print "folder exists!"
+                    continue
+
                 path = os.path.join(parent_node.path, folder_name)
                 node = dt.AssetNode(folder_name, path=path, parent=parent_node, virtual=True, section = parent_node.section)
                 # if node is not False:
@@ -1912,6 +1936,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
 
             self.update.emit()
+            self.percentage_complete.emit(0)
 
 
 

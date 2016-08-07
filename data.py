@@ -156,6 +156,10 @@ class Node(QtCore.QObject, object):
             parent.addChild(self)
 
 
+    @property
+    def children(self):
+        return self._children
+
     def attrs(self):
 
         classes = self.__class__.__mro__
@@ -969,7 +973,7 @@ class StageNode(RootNode):
 
         version_number = self.padding(1)
 
-        file_name = "%s_%s.%s" % (self.formatFileName(), version_number, "ma")
+        file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "v",version_number, "ma")
 
         scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 
@@ -1055,7 +1059,8 @@ class StageNode(RootNode):
 
                 version_number = set_padding(last_version.name+1, self.project.project_padding)
 
-                file_name = "%s_%s.%s" % (self.formatFileName(), version_number, "ma")
+                file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "v", version_number, "ma")
+                #file_name = "%s_%s.%s" % (self.formatFileName(), version_number, "ma")
 
                 scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 

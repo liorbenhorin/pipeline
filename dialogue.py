@@ -55,6 +55,14 @@ reload(data)
 # reload(dtm)
 # #
 
+
+global preset
+preset = {}
+preset["project_name"] = "puppies"
+preset["prefix"] = "pdt"
+preset["padding"] = 2
+
+
 global _admin_
 _admin_ = "admin"
 
@@ -979,6 +987,10 @@ class projectDialog(QtGui.QDialog):
 
         self.populated_variables()
 
+        self.name_input.setText(preset["project_name"])
+        self.padding_slider.setValue(preset["padding"])
+        self.prefix_input.setText(preset["prefix"])
+
 
     def populated_variables(self):
 
@@ -986,7 +998,7 @@ class projectDialog(QtGui.QDialog):
         level1 = dt.LevelsNode("animation")
         level1.setLevels(["EP","SEQ","SHOT","stage"])
         level2 = dt.LevelsNode("asset")
-        level2.setLevels(["type","asset","stage"])
+        level2.setLevels(["EP","type","asset","stage"])
 
         self.levels_model = dtm.PipelineLevelsModel([level1,level2])
         self.levels_tree.setModel(self.levels_model)
@@ -995,7 +1007,7 @@ class projectDialog(QtGui.QDialog):
         stages1 = dt.LevelsNode("animation")
         stages1.setLevels([ "layout","shot","lightning"])
         stages2 = dt.LevelsNode("asset")
-        stages2.setLevels(["model", "rig", "cip","shading"])
+        stages2.setLevels(["model", "rig", "clip","shading"])
 
         self.stages_model = dtm.PipelineStagesModel([stages1, stages2])
         self.stages_tree.setModel(self.stages_model)
@@ -1028,8 +1040,8 @@ class projectDialog(QtGui.QDialog):
         res["name"] = self.name_input.text()
         res["fps"] = self.fps_input.currentText()
         res["padding"] = self.padding_slider.value()
-        res["prefix"] = self.suffix_input.text()
-        res["suffix"] = self.prefix_input.text()
+        res["prefix"] = self.prefix_input.text()
+        res["suffix"] = self.suffix_input.text()
         res["levels"] = self.exctract_stages_levels_data(self.levels_model)
         res["stages"] = self.exctract_stages_levels_data(self.stages_model)
         res["users"] = self.exctract_users_data(self.users_tree.model())
