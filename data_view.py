@@ -1426,7 +1426,9 @@ class pipelineTreeView(QtGui.QTreeView):
         self.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
         self.setDropIndicatorShown(True)
         self.resizeColumnToContents(True) 
-                
+
+        # self.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+
         #local variables
         self.pipelineUI = self.parent()
         self._ignoreExpentions = False
@@ -1756,14 +1758,16 @@ class pipelineTreeView(QtGui.QTreeView):
         return modelRootIndex
         # get the first childe of the model's root                                   
         #return self.sourceModel.index(0,0,modelRootIndex)
-      
+
+
+
     
-    def mouseReleaseEvent(self, event):
-        
-        super(pipelineTreeView, self).mouseReleaseEvent(event)
-        self.saveSelection()
-        #self.tableView.update(self.selectionModel().selection())
-        event.accept
+    # def mouseReleaseEvent(self, event):
+    #
+    #     super(pipelineTreeView, self).mouseReleaseEvent(event)
+    #     self.saveSelection()
+    #     #self.tableView.update(self.selectionModel().selection())
+    #     event.accept
    
     def contextMenuEvent(self, event):
         

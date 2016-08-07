@@ -1428,8 +1428,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         '''
 
-        self.ui.users_pushButton.clicked.connect(self.populate_project_tree)
-        #---------->self.ui.users_pushButton.clicked.connect(self.login_window)
+
+        self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
         #self.ui.asset_component_files_tabWidget.currentChanged.connect(self.update_component_files_tab)
         self.ui.stage_note_label.mousePressEvent = self.version_note
@@ -3633,6 +3633,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             users = res["users"]
             levels = res["levels"]
             stages = res["stages"]
+            prefix = res["prefix"]
             suffix = res["suffix"]
 
 
@@ -3643,7 +3644,8 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                                                                                   users=users,
                                                                                   levels = levels,
                                                                                   stages = stages,
-                                                                                  suffix = suffix)
+                                                                                  suffix = suffix,
+                                                                                  prefix=prefix)
 
             if self.pipeline_window.projects:
                 self.pipeline_window.projects.insertRows(0, 1, node=project)

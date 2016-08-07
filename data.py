@@ -12,7 +12,7 @@ import modules.files as files
 reload(files)
 import modules.jsonData as data
 reload(data)
-#import modules.maya_warpper as maya
+import modules.maya_warpper as maya
 # reload(maya)
 
 global _node_
@@ -947,10 +947,11 @@ class StageNode(RootNode):
 
         for i in range(depth):
             node = node.parent()
-            levels.append(node.name)
+            if node:
+                levels.append(node.name)
 
-
-        return "_".join(reversed(levels))
+        name = self.pipelineUI.project.prefix + "_" + "_".join(reversed(levels)) if self.pipelineUI.project.prefix else "_".join(reversed(levels))
+        return name
 
     def padding(self, int):
         return files.set_padding(int, self.project.project_padding)
@@ -1702,7 +1703,8 @@ class ProjectNode(RootNode):
                users = {"0":["Admin","1234","admin"]},
                levels = {},
                stages = {},
-               suffix = None):
+               suffix = None,
+               prefix = None):
 
 
         project_key = data.id_generator()
@@ -1714,6 +1716,7 @@ class ProjectNode(RootNode):
         project_data["defult_file_type"] = file_type
         project_data["users"] = users
         project_data["suffix"] = suffix
+        project_data["prefix"] = prefix
         #project_data["playblast_outside"] = playblast_outside
 
         folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
@@ -1993,6 +1996,20 @@ class ProjectNode(RootNode):
             data["users"] = dict
             self.data_file.edit(data)
             self.project_file = self.data_file.read()
+
+    @property
+    def prefix(self):
+        if self.project_file:
+            return self.project_file["prefix"]
+        else:
+            return None
+
+    @property
+    def suffix(self):
+        if self.project_file:
+            return self.project_file["suffix"]
+        else:
+            return None
 
 def stageDir(dir):
 

@@ -919,6 +919,10 @@ class projectDialog(QtGui.QDialog):
             self.fps_input.setCurrentIndex(i)
 
 
+        self.prefix_widget = groupInput(self, label="Project prefix", inputWidget=QtGui.QLineEdit(self), ic=text_icon)
+        self.prefix_input = self.prefix_widget.input
+        self.input_layout.addWidget(self.prefix_widget)
+
         self.suffix_widget = groupInput(self, label="Project suffix", inputWidget=QtGui.QLineEdit(self), ic=text_icon)
         self.suffix_input = self.suffix_widget.input
         self.input_layout.addWidget(self.suffix_widget)
@@ -1024,7 +1028,8 @@ class projectDialog(QtGui.QDialog):
         res["name"] = self.name_input.text()
         res["fps"] = self.fps_input.currentText()
         res["padding"] = self.padding_slider.value()
-        res["suffix"] = self.suffix_input.text()
+        res["prefix"] = self.suffix_input.text()
+        res["suffix"] = self.prefix_input.text()
         res["levels"] = self.exctract_stages_levels_data(self.levels_model)
         res["stages"] = self.exctract_stages_levels_data(self.stages_model)
         res["users"] = self.exctract_users_data(self.users_tree.model())
