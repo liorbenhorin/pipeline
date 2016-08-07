@@ -1788,6 +1788,11 @@ class pipelineTreeView(QtGui.QTreeView):
 
                 level_name, level_type = node.level_options
 
+                if node.typeInfo() == _root_:
+
+                    actions.append(QtGui.QAction("Create tree...", menu,
+                                  triggered=functools.partial(self.create_new_tree, src)))
+
                 if level_type == _folder_:
                     actions.append(
                         QtGui.QAction("Create new {0}".format(level_name), menu,
@@ -1838,6 +1843,16 @@ class pipelineTreeView(QtGui.QTreeView):
         self.update.emit()
         return True
 
+    def create_new_tree(self, parent):
+        parent_node = self.sourceModel.getNode(parent)
+
+        folderDlg = dlg.newTreeDialog(project=self.pipelineUI.project, section = parent_node.section)
+        result = folderDlg.exec_()
+        res = folderDlg.result()
+        if result == QtGui.QDialog.Accepted:
+            print res
+
+
     def create_new_folder(self, parent, string):
 
         parent_node = self.sourceModel.getNode(parent)
@@ -1861,7 +1876,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
                 number = files.set_padding(i, res["padding"])
                 if base_folder_name != "":
-                    folder_name = "%s_%s"%(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
+                    folder_name = "{0}{1}".format(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
                 else:
                     folder_name = "{0}".format(number) if res["quantity"] > 1 else "unnamed_folder"
 
@@ -1894,7 +1909,7 @@ class pipelineTreeView(QtGui.QTreeView):
         for i in depth_list:
             ancestors.append(self.sourceModel.getNode(i))
 
-        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages[parent_node.section], ancestors = ancestors, string = string )
+        assetDlg = dlg.newAssetDialog(stages = self.pipelineUI.project.stages[parent_node.section], ancestors = ancestors, string = string, project = self.pipelineUI.project)
         result = assetDlg.exec_()
         res = assetDlg.result()
         if result == QtGui.QDialog.Accepted:
@@ -1904,7 +1919,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 self.percentage_complete.emit(remap(i, 0, res["quantity"], 0, 100))
                 number = files.set_padding(i, res["padding"])
                 if base_folder_name != "":
-                    folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 1 else base_folder_name
+                    folder_name = "{0}{1}".format(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
                 else:
                     folder_name = "{0}".format(number) if res["quantity"] > 1 else "unnamed_folder"
 
@@ -1958,7 +1973,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
         if new_stages:
 
-            assetDlg = dlg.newStageDialog(parent_name=parent_node.name, stages=new_stages, ancestors=ancestors)
+            assetDlg = dlg.newStageDialog(parent_name=parent_node.name, stages=new_stages, ancestors=ancestors, project = self.pipelineUI.project)
             result = assetDlg.exec_()
             res = assetDlg.result()
             if result == QtGui.QDialog.Accepted:

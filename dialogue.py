@@ -673,6 +673,7 @@ class newFolderDialog(newNodeDialog):
         super(newFolderDialog, self).__init__(parent, string, name_label_sting, title)
 
 
+
         self.input_quantity_widget = groupInput(self, label = "Quantity", inputWidget=QtGui.QSpinBox(self), ic= buffer_icon)
 
         self.quantity_slider = self.input_quantity_widget.input
@@ -705,11 +706,12 @@ class newFolderDialog(newNodeDialog):
 
 
 class newAssetDialog(newFolderDialog):
-    def __init__(self, parent =  None, string = "", name_label_sting = "Name", title = "Create new asset", stages = [], ancestors = None):
+    def __init__(self, parent =  None, string = "", name_label_sting = "Name", title = "Create new asset", stages = [], ancestors = None, project = None):
         super(newAssetDialog, self).__init__(parent, string, name_label_sting, title)
 
         self.create_stages_title = Title(self, label = "Add stages:")
         self.input_layout.addWidget(self.create_stages_title)
+        self.project = project
 
         self.stages_options = {}
         for stage in stages:
@@ -722,8 +724,10 @@ class newAssetDialog(newFolderDialog):
             layout.addWidget(checkbox)
             self.input_layout.addWidget(widget)
 
+        ancestors_names = []
+        [ancestors_names.append("<{}>".format(node.name)) for node in ancestors]
 
-        self.name_format_widget = NameFormatWidget( self, name_input=self.name_input, ancestors=ancestors)
+        self.name_format_widget = NameFormatWidget( self, name_input=self.name_input, ancestors=ancestors_names, project = self.project)
         self.input_layout.addWidget(self.name_format_widget)
         self.name_input.textChanged.connect(self.name_format_widget.preview_format)
 
@@ -744,10 +748,10 @@ class newAssetDialog(newFolderDialog):
 
 
 class newStageDialog(newNodeDialog):
-    def __init__(self, parent =  None, string = "", parent_name = None, name_label_sting = "Name", title = "Create new stage", stages = [], ancestors = None):
+    def __init__(self, parent =  None, string = "", parent_name = None, name_label_sting = "Name", title = "Create new stage", stages = [], ancestors = None, project = None):
         super(newStageDialog, self).__init__(parent, string, name_label_sting, title)
 
-
+        self.project = project
         self.name_widget.setParent(None)
         self.name_widget.deleteLater()
 
@@ -766,8 +770,10 @@ class newStageDialog(newNodeDialog):
             layout.addWidget(checkbox)
             self.input_layout.addWidget(widget)
 
+        ancestors_names = []
+        [ancestors_names.append("<{}>".format(node.name)) for node in ancestors]
 
-        self.name_format_widget = NameFormatWidget( self, parent_name=parent_name, ancestors=ancestors)
+        self.name_format_widget = NameFormatWidget( self, parent_name=parent_name, ancestors=ancestors_names, project = self.project)
         self.input_layout.addWidget(self.name_format_widget)
         #self.name_input.textChanged.connect(self.name_format_widget.preview_format)
 
@@ -784,19 +790,108 @@ class newStageDialog(newNodeDialog):
 
 
 
+class newTreeDialog(newFolderDialog):
+    def __init__(self, parent =  None, string = "", name_label_sting = "Name", title = "Create new tree", stages = [], project = None, section = None):
+        super(newTreeDialog, self).__init__(parent, string, name_label_sting, title)
+        self.project = project
+        self.levels_names = self.project.levels[section]
+        levels = []
+        self.name_widget.label.setText("{} name".format(self.levels_names[0]))
+        self.name_input.setText(self.levels_names[0])
+        levels.append([self.levels_names[0], self.name_input, self.quantity_slider, self.padding_slider])
+        names = []
+        for i in range(1,len(self.levels_names)-1):
+            names.append(self.levels_names[i])
+
+
+
+        for level in names:
+            name_widget = groupInput(self, label=level, inputWidget=QtGui.QLineEdit(self),
+                                          ic=text_icon)
+            name_widget.label.setText("{} name".format(level))
+            create_title = Title(self, label=level)
+            name_input = name_widget.input
+            name_input.setText(level)
+            self.input_layout.addWidget(create_title)
+            self.input_layout.addWidget(name_widget)
+
+            input_quantity_widget = groupInput(self, label="Quantity", inputWidget=QtGui.QSpinBox(self),
+                                                    ic=buffer_icon)
+
+            quantity_slider = self.input_quantity_widget.input
+            quantity_slider.setMinimum(1)
+            quantity_slider.setMaximum(1000)
+            quantity_slider.setValue(1)
+            self.input_layout.addWidget(input_quantity_widget)
+            input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self),
+                                                   ic=counter_icon)
+
+            padding_slider = input_padding_widget.input
+            padding_slider.setMinimum(0)
+            padding_slider.setMaximum(6)
+            padding_slider.setValue(3)
+            self.input_layout.addWidget(input_padding_widget)
+            levels.append([level, name_input, quantity_slider, padding_slider])
+
+
+        self.create_stages_title = Title(self, label = "Add stages:")
+        self.input_layout.addWidget(self.create_stages_title)
+        self.project = project
+        stages = self.project.stages[section]
+
+        self.stages_options = {}
+        for stage in stages:
+            widget = QtGui.QWidget(self)
+            layout = QtGui.QVBoxLayout(widget)
+            layout.setContentsMargins(5, 2, 5, 2)
+            layout.setAlignment(QtCore.Qt.AlignLeft)
+            checkbox = QtGui.QCheckBox(stage)
+            self.stages_options[stage] = checkbox
+            layout.addWidget(checkbox)
+            self.input_layout.addWidget(widget)
+
+        ancestors = list(self.project.levels[section])
+        ancestors = ancestors[:-1]
+
+
+        self.name_format_widget = NameFormatWidget( self,  multi_inputs = levels, ancestors=ancestors, project = self.project)
+        self.input_layout.addWidget(self.name_format_widget)
+        for l in levels:
+            l[1].textChanged.connect(self.name_format_widget.preview_format)
+            l[3].valueChanged.connect(self.name_format_widget.preview_format)
+
+
+    def result(self):
+        res = {}
+        res["name"] = self.name_input.text()
+        res["quantity"] = self.quantity_slider.value()
+        res["padding"] = self.padding_slider.value()
+        stages = {}
+        for option in self.stages_options:
+            stages[option] = self.stages_options[option].isChecked() # {stage: bool}
+        res["stages"] = stages
+        res["name_format"] = self.name_format_widget.depth_slider.value()
+        return res
+
+
+
 class NameFormatWidget(QtGui.QWidget):
-    def __init__(self, parent = None, parent_name = None, name_input = None, ancestors = None):
+    def __init__(self, parent = None, parent_name = None, name_input = None, multi_inputs = None, ancestors = None, project = None):
         super(NameFormatWidget, self).__init__(parent)
 
+        self.project = project
+
         self.name_input = name_input
+        self.multi_inputs = multi_inputs
         self.ancestors = ancestors
         self.parent_name = parent_name
 
-        self.ancestors_names = []
-        [self.ancestors_names.append("<{}>".format(node.name)) for node in self.ancestors]
+        self.ancestors_names = ancestors
 
-        self.ancestors_names.reverse()
-        self.ancestors_names.pop(0)
+        if not multi_inputs:
+            self.ancestors_names.reverse()
+            self.ancestors_names.pop(0)
+
         self.max_depth = len(self.ancestors_names)
 
         self.layout = QtGui.QVBoxLayout(self)
@@ -811,7 +906,7 @@ class NameFormatWidget(QtGui.QWidget):
         self.depth_slider = self.input_format_widget.input
         self.depth_slider.setMinimum(0)
         self.depth_slider.setMaximum(self.max_depth)
-        self.depth_slider.setValue(2)
+        self.depth_slider.setValue(self.max_depth)
 
         self.format_preview_widget = groupInput(self, inputWidget=QtGui.QLineEdit(self))
         self.format_preview = self.format_preview_widget.input
@@ -824,15 +919,42 @@ class NameFormatWidget(QtGui.QWidget):
         self.depth_slider.valueChanged.connect(self.preview_format)
 
 
+    def pad_proxy(self, val):
+        pad = ""
+        for i in range(val):
+            pad += "#"
+        return pad
+
     def preview_format(self):
         levels = self.ancestors_names[-self.depth_slider.value():] if self.depth_slider.value() > 0 else []
         if self.name_input:
             new_name = "<{}>".format(self.name_input.text()) if self.name_input.text() else "<{}>".format("asset_name")
             levels.append(new_name)
 
+
+
+        if self.multi_inputs:
+            levels = []
+            if self.depth_slider.value() > 0:
+                for input in self.multi_inputs[-self.depth_slider.value():]:
+                    text = input[1]
+                    pad = input[3]
+                    new_name = "<{}>".format(text.text()) if text.text() else "<{}>".format(self.pad_proxy(pad.value()))
+                    levels.append(new_name)
+            else:
+                input = self.multi_inputs[-1]
+                text = input[1]
+                pad = input[3]
+                new_name = "<{}>".format(text.text()) if text.text() else "<{}>".format(self.pad_proxy(pad.value()))
+                levels.append(new_name)
+
         levels.append("<stage>")
+
         string = "_".join(levels)
-        final = "{0}_{1}".format(string, "version_extra.ma")
+
+        pad = self.pad_proxy(self.project.project_padding)
+
+        final = "{0}_{1}_{2}{3}.{4}".format(self.project.prefix, string, "v", pad,"ma") if self.project.prefix else "{0}_{1}{2}.{3}".format( string, "v", pad,"ma")
         self.format_preview.setText(final)
 
 class Title(QtGui.QWidget):
@@ -996,16 +1118,16 @@ class projectDialog(QtGui.QDialog):
 
 
         level1 = dt.LevelsNode("animation")
-        level1.setLevels(["EP","SEQ","SHOT","stage"])
+        level1.setLevels(["ep","seq","sc","stage"])
         level2 = dt.LevelsNode("asset")
-        level2.setLevels(["EP","type","asset","stage"])
+        level2.setLevels(["ep","type","asset","stage"])
 
         self.levels_model = dtm.PipelineLevelsModel([level1,level2])
         self.levels_tree.setModel(self.levels_model)
 
 
         stages1 = dt.LevelsNode("animation")
-        stages1.setLevels([ "layout","shot","lightning"])
+        stages1.setLevels([ "layout","anim","lightning"])
         stages2 = dt.LevelsNode("asset")
         stages2.setLevels(["model", "rig", "clip","shading"])
 
