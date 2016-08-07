@@ -795,10 +795,10 @@ class newTreeDialog(newFolderDialog):
         super(newTreeDialog, self).__init__(parent, string, name_label_sting, title)
         self.project = project
         self.levels_names = self.project.levels[section]
-        levels = []
+        self.levels = []
         self.name_widget.label.setText("{} name".format(self.levels_names[0]))
         self.name_input.setText(self.levels_names[0])
-        levels.append([self.levels_names[0], self.name_input, self.quantity_slider, self.padding_slider])
+        self.levels.append([self.levels_names[0], self.name_input, self.quantity_slider, self.padding_slider])
         names = []
         for i in range(1,len(self.levels_names)-1):
             names.append(self.levels_names[i])
@@ -818,7 +818,7 @@ class newTreeDialog(newFolderDialog):
             input_quantity_widget = groupInput(self, label="Quantity", inputWidget=QtGui.QSpinBox(self),
                                                     ic=buffer_icon)
 
-            quantity_slider = self.input_quantity_widget.input
+            quantity_slider = input_quantity_widget.input
             quantity_slider.setMinimum(1)
             quantity_slider.setMaximum(1000)
             quantity_slider.setValue(1)
@@ -831,7 +831,7 @@ class newTreeDialog(newFolderDialog):
             padding_slider.setMaximum(6)
             padding_slider.setValue(3)
             self.input_layout.addWidget(input_padding_widget)
-            levels.append([level, name_input, quantity_slider, padding_slider])
+            self.levels.append([level, name_input, quantity_slider, padding_slider])
 
 
         self.create_stages_title = Title(self, label = "Add stages:")
@@ -854,18 +854,22 @@ class newTreeDialog(newFolderDialog):
         ancestors = ancestors[:-1]
 
 
-        self.name_format_widget = NameFormatWidget( self,  multi_inputs = levels, ancestors=ancestors, project = self.project)
+        self.name_format_widget = NameFormatWidget( self,  multi_inputs = self.levels, ancestors=ancestors, project = self.project)
         self.input_layout.addWidget(self.name_format_widget)
-        for l in levels:
+        for l in self.levels:
             l[1].textChanged.connect(self.name_format_widget.preview_format)
             l[3].valueChanged.connect(self.name_format_widget.preview_format)
 
 
     def result(self):
         res = {}
-        res["name"] = self.name_input.text()
-        res["quantity"] = self.quantity_slider.value()
-        res["padding"] = self.padding_slider.value()
+        #res["name"] = self.name_input.text()
+        #res["quantity"] = self.quantity_slider.value()
+        #res["padding"] = self.padding_slider.value()
+        levels = []
+        for level in self.levels:
+            levels.append([level[0],level[1].text(),level[2].value(),level[3].value()])
+        res["levels"] = levels
         stages = {}
         for option in self.stages_options:
             stages[option] = self.stages_options[option].isChecked() # {stage: bool}

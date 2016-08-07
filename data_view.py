@@ -1844,13 +1844,31 @@ class pipelineTreeView(QtGui.QTreeView):
         return True
 
     def create_new_tree(self, parent):
+
         parent_node = self.sourceModel.getNode(parent)
 
         folderDlg = dlg.newTreeDialog(project=self.pipelineUI.project, section = parent_node.section)
         result = folderDlg.exec_()
         res = folderDlg.result()
         if result == QtGui.QDialog.Accepted:
-            print res
+            levels = res["levels"]
+            #rec(levels, 0)
+            deep = len(levels)
+
+            for i in range(deep):
+                for x in range(levels[i][2]):
+                    if i > 0:
+                        print "build -->",  levels[i][0], "parent is -->" ,levels[i-1][0]
+                    else:
+                        print "build -->", levels[i][0], "parent is --> main"
+
+
+
+
+
+
+
+
 
 
     def create_new_folder(self, parent, string):

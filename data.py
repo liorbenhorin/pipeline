@@ -524,6 +524,15 @@ class RootNode(Node):#, Metadata_file):
 
 
 
+#
+# class TreeNode(Node):
+#
+#     def __init__(self, name,  parent=None, quantity = None, padding = None):
+#         super(TreeNode, self).__init__(name, parent)
+#         self._quantity = quantity
+#         self._padding = padding
+#
+#
 
 
 class FolderNode(RootNode):
