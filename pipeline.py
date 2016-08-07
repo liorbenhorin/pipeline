@@ -1674,6 +1674,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.populate_project_tree()
  #       self.populate_navbar()
 
+    def tree_progress_update(self, value):
+
+        if value > 0 and value < 99:
+            self.ui.treeProgress_widget.setHidden(False)
+        else:
+            self.ui.treeProgress_widget.setHidden(True)
+
     def tree_change_options(self):
         if self.tree.changed:
             self.ui.tree_changed_opts_widget.setHidden(False)
@@ -1841,6 +1848,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             '''
 
+            self.tree.percentage_complete.connect(self.ui.tree_progressBar.setValue)
+            self.ui.tree_progressBar.valueChanged.connect(self.tree_progress_update)
+            self.ui.tree_progressBar.setValue(0)
             self.tree.setModel( self._proxyModel )
             self._proxyModel.treeView = self.tree
 

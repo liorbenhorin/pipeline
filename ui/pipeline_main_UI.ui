@@ -136,7 +136,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -485,6 +485,19 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
          </widget>
         </item>
         <item>
+         <widget class="QWidget" name="treeProgress_widget" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QProgressBar" name="tree_progressBar">
+             <property name="value">
+              <number>24</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QWidget" name="tree_changed_opts_widget" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
@@ -521,6 +534,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
        <zorder>project_widget</zorder>
        <zorder>widget_5</zorder>
        <zorder>tree_changed_opts_widget</zorder>
+       <zorder>treeProgress_widget</zorder>
       </widget>
      </widget>
     </item>

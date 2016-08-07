@@ -669,7 +669,7 @@ class newFolderDialog(newNodeDialog):
 
         self.quantity_slider = self.input_quantity_widget.input
         self.quantity_slider.setMinimum(1)
-        self.quantity_slider.setMaximum(100)
+        self.quantity_slider.setMaximum(1000)
         self.quantity_slider.setValue(1)
 
 

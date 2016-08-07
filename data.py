@@ -13,7 +13,7 @@ reload(files)
 import modules.jsonData as data
 reload(data)
 import modules.maya_warpper as maya
-reload(maya)
+# reload(maya)
 
 global _node_
 global _root_

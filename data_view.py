@@ -50,6 +50,41 @@ _folder_ = "folder"
 _dummy_ = "dummy"
 
 
+def remap( x, oMin, oMax, nMin, nMax ):
+
+    #range check
+    if oMin == oMax:
+        print "Warning: Zero input range"
+        return None
+
+    if nMin == nMax:
+        print "Warning: Zero output range"
+        return None
+
+    #check reversed input range
+    reverseInput = False
+    oldMin = min( oMin, oMax )
+    oldMax = max( oMin, oMax )
+    if not oldMin == oMin:
+        reverseInput = True
+
+    #check reversed output range
+    reverseOutput = False
+    newMin = min( nMin, nMax )
+    newMax = max( nMin, nMax )
+    if not newMin == nMin :
+        reverseOutput = True
+
+    portion = (x-oldMin)*(newMax-newMin)/(oldMax-oldMin)
+    if reverseInput:
+        portion = (oldMax-x)*(newMax-newMin)/(oldMax-oldMin)
+
+    result = portion + newMin
+    if reverseOutput:
+        result = newMax - portion
+
+    return result
+
 # def set_icons():
 #     global localIconPath
 #
@@ -1373,7 +1408,7 @@ class PipelineContentsView(QtGui.QTableView):
                 self.versionsView.setModel_(None)
                    
 class pipelineTreeView(QtGui.QTreeView):
-
+    percentage_complete = QtCore.Signal(int)
     update = QtCore.Signal()
 
     def __init__(self,parent = None):
@@ -1812,16 +1847,24 @@ class pipelineTreeView(QtGui.QTreeView):
         res = folderDlg.result()
         if result == QtGui.QDialog.Accepted:
             base_folder_name = res["name"]
+
+
+
             for i in range(0,res["quantity"]):
+                QtGui.QApplication.processEvents()
+                self.percentage_complete.emit(remap(i, 0, res["quantity"], 0, 100))
+
                 number = files.set_padding(i, res["padding"])
                 folder_name = "%s_%s"%(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
                 node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual = True, section = parent_node.section, project = self.pipelineUI.project, depth = len(ancestors))
-                #if node is not False:
+
                 self.sourceModel.insertRows(0, 0, parent=parent, node=node)
                 self._proxyModel.invalidate()
-                self.updateTable(self.fromProxyIndex(parent))
-                self.update.emit()
+
+
+            self.update.emit()
+
 
 
     def create_new_asset(self, parent, string):
@@ -1838,6 +1881,8 @@ class pipelineTreeView(QtGui.QTreeView):
         if result == QtGui.QDialog.Accepted:
             base_folder_name = res["name"]
             for i in range(0, res["quantity"]):
+                QtGui.QApplication.processEvents()
+                self.percentage_complete.emit(remap(i, 0, res["quantity"], 0, 100))
                 number = files.set_padding(i, res["padding"])
                 folder_name = "%s_%s" % (base_folder_name, number) if res["quantity"] > 1 else base_folder_name
                 path = os.path.join(parent_node.path, folder_name)
@@ -1846,7 +1891,7 @@ class pipelineTreeView(QtGui.QTreeView):
                 self.sourceModel.insertRows(0, 0, parent=parent, node=node)
                 self._proxyModel.invalidate()
 
-                self.update.emit()
+
 
                 new_index = self.sourceModel.indexFromNode(node, QtCore.QModelIndex())
                 for s in res["stages"]:
@@ -1858,7 +1903,9 @@ class pipelineTreeView(QtGui.QTreeView):
                         self._sourceModel.insertRows(0, 0, parent=new_index, node=stageNode)
                         self._proxyModel.invalidate()
 
-                        self.update.emit()
+
+            self.update.emit()
+
 
 
 
@@ -1893,12 +1940,9 @@ class pipelineTreeView(QtGui.QTreeView):
                         self._sourceModel.insertRows(0, 0, parent=parent, node=stageNode)
                         self._proxyModel.invalidate()
 
-                        self.update.emit()
+                self.update.emit()
 
 
-    def updateTable(self, index):
-        selection = QtGui.QItemSelection(index, index)        
-        #self.tableView.update(selection)
 
     @property
     def tree_as_flat_list(self):
