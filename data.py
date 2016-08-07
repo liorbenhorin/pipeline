@@ -12,7 +12,7 @@ import modules.files as files
 reload(files)
 import modules.jsonData as data
 reload(data)
-import modules.maya_warpper as maya
+#import modules.maya_warpper as maya
 # reload(maya)
 
 global _node_
@@ -78,6 +78,42 @@ def set_icons():
 
 set_icons()
 
+
+def remap( x, oMin, oMax, nMin, nMax ):
+
+    #range check
+    if oMin == oMax:
+        print "Warning: Zero input range"
+        return None
+
+    if nMin == nMax:
+        print "Warning: Zero output range"
+        return None
+
+    #check reversed input range
+    reverseInput = False
+    oldMin = min( oMin, oMax )
+    oldMax = max( oMin, oMax )
+    if not oldMin == oMin:
+        reverseInput = True
+
+    #check reversed output range
+    reverseOutput = False
+    newMin = min( nMin, nMax )
+    newMax = max( nMin, nMax )
+    if not newMin == nMin :
+        reverseOutput = True
+
+    portion = (x-oldMin)*(newMax-newMin)/(oldMax-oldMin)
+    if reverseInput:
+        portion = (oldMax-x)*(newMax-newMin)/(oldMax-oldMin)
+
+    result = portion + newMin
+    if reverseOutput:
+        result = newMax - portion
+
+    return result
+
 class Metadata_file():
     
     def __init__(self,**kwargs):
@@ -102,7 +138,8 @@ class Metadata_file():
 
 
 class Node(QtCore.QObject, object):
-    
+
+
     def __init__(self, name,  parent=None, **kwargs):
         super(Node, self).__init__()
         
@@ -326,7 +363,8 @@ class Node(QtCore.QObject, object):
 
 
 class RootNode(Node):#, Metadata_file):
-    
+    percentage_complete = QtCore.Signal(int)
+
     def __init__(self, name, parent=None, **kwargs):
 
 
@@ -447,29 +485,39 @@ class RootNode(Node):#, Metadata_file):
 
 
     def model_tree(self):
-        
+        import time
         '''
         returns a flat list of all descending childs from the given index
-        '''     
-        def rec(path, parent):
+        '''
+        c = 0
+        def rec(path, parent, count):
             if path:
                 folders = files.list_dir_folders(path)
                 if folders:
-                    for dir in folders: 
+                    for dir in folders:
+                        count += 1
+
+                        QtGui.QApplication.processEvents()
+                        self.percentage_complete.emit(count)
+
+
                         p  = os.path.join(path,dir)
- 
+
                         if assetDir( p ):
                             node = AssetNode(os.path.split(p)[1], path=p, parent = parent, section = self.section, settings = self.settings, project = self.project)
-                            rec(p, node)
+                            rec(p, node, count)
                         elif stageDir( p ):
                             node = StageNode(os.path.split(p)[1],  path=p, parent = parent, section = self.section, settings = self.settings, project = self.project)
-                        else:                         
+                        else:
                             node = FolderNode(os.path.split(p)[1], path=p, parent = parent, section = self.section, settings = self.settings, project = self.project)
-                            rec(p, node)
+                            rec(p, node, count)
                 else:
                     pass
 
-        rec(self.path, self)
+        rec(self.path, self, c)
+        self.percentage_complete.emit(0)
+
+
 
 
 
@@ -1464,7 +1512,7 @@ class StageNode(RootNode):
                     
                     file_name = "%s_%s_%s_%s.%s"%(self.asset_name,self.component_name,"MASTER",version_number,"ma")                                                       
                     if not from_file:                    
-                        scene_path = maya.save_scene_as(path = self.masters_path, file_name = file_name )                         
+                        scene_path = maya.save_scene_as(path = self.masters_path, file_name = file_name )
                     else:                      
                         scene_path = os.path.join(self.masters_path,file_name)
                         files.file_copy(from_file, scene_path )

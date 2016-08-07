@@ -1427,7 +1427,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.disable(self.ui.actionCollect_component)
         
         '''
-        self.ui.users_pushButton.clicked.connect(self.login_window)
+
+        self.ui.users_pushButton.clicked.connect(self.populate_project_tree)
+        #---------->self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
         #self.ui.asset_component_files_tabWidget.currentChanged.connect(self.update_component_files_tab)
         self.ui.stage_note_label.mousePressEvent = self.version_note
@@ -1668,10 +1670,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._stageNode = None
         self._version = None
 
-        self.populate_clients()
-        self.populate_projects()
-        self.stage_ui()
-        self.populate_project_tree()
+        # self.populate_clients()
+        # self.populate_projects()
+        # self.stage_ui()
+        #self.populate_project_tree()
  #       self.populate_navbar()
 
     def tree_progress_update(self, value):
@@ -1812,15 +1814,31 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.tree:
             self.tree.expandAll()
 
+    # def tempV(self, v):
+    #     print v, "****"
 
     def populate_project_tree(self):
         if self.project:
 
+            self.ui.tree_progressBar.valueChanged.connect(self.tree_progress_update)
+            self.ui.tree_progressBar.setValue(0)
+
             _root = dt.RootNode("root", path = self.project.path, parent = self.project, settings = self.settings, project = self.project)
+
             assets = dt.RootNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = _assets_, settings = self.settings, project = self.project)
+            assets.percentage_complete.connect(self.ui.tree_progressBar.setValue)
             assets.model_tree()
+            assets.percentage_complete.disconnect()
+
             scenes = dt.RootNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = _animation_, settings = self.settings, project = self.project)
+            scenes.percentage_complete.connect(self.ui.tree_progressBar.setValue)
             scenes.model_tree()
+            scenes.percentage_complete.disconnect()
+
+
+
+
+
 
             '''
             creating the tree model,
@@ -1849,8 +1867,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             '''
 
             self.tree.percentage_complete.connect(self.ui.tree_progressBar.setValue)
-            self.ui.tree_progressBar.valueChanged.connect(self.tree_progress_update)
-            self.ui.tree_progressBar.setValue(0)
+            #self.ui.tree_progressBar.valueChanged.connect(self.tree_progress_update)
+
             self.tree.setModel( self._proxyModel )
             self._proxyModel.treeView = self.tree
 
@@ -3434,6 +3452,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred )
         self.setMinimumWidth(350)
         self.setMaximumWidth(900)
+
+        self.populate_clients()
+        self.populate_projects()
+        self.stage_ui()
 
 
 
