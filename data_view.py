@@ -1845,22 +1845,82 @@ class pipelineTreeView(QtGui.QTreeView):
 
     def create_new_tree(self, parent):
 
+        def rec(items, p):
+            #print items
+            #print list[deep], "<<<"
+            times = items[0][2]
+            name = items[0][1]
+            nodes = items[0][4]
+
+            for i in range(times):
+                nodes.append(i)
+                print "create node for", name, "--->", nodes[i]
+                #print name, "X"
+                if len(items) > 1:
+                    l = list(items[1:])
+                    rec(l, nodes[i])
+                else:
+                    pass
+                    #print "stay in loop on", name
+
+
         parent_node = self.sourceModel.getNode(parent)
+
+        depth_list = self.sourceModel.listAncestos(parent)
+        ancestors = []
+        for i in depth_list:
+            ancestors.append(self.sourceModel.getNode(i))
+
+
 
         folderDlg = dlg.newTreeDialog(project=self.pipelineUI.project, section = parent_node.section)
         result = folderDlg.exec_()
         res = folderDlg.result()
         if result == QtGui.QDialog.Accepted:
             levels = res["levels"]
-            #rec(levels, 0)
-            deep = len(levels)
-
-            for i in range(deep):
-                for x in range(levels[i][2]):
-                    if i > 0:
-                        print "build -->",  levels[i][0], "parent is -->" ,levels[i-1][0]
-                    else:
-                        print "build -->", levels[i][0], "parent is --> main"
+            rec(levels, "null")
+            # deep = len(levels)
+            #
+            # for i in range(deep):
+            #     quantitiy = levels[i][2]
+            #     name = levels[i][1]
+            #     padding = levels[i][3]
+            #     levels[i].append([])
+            #
+            #     for x in range(quantitiy):
+            #
+            #         # if i > 0:
+            #         #     print "build -->",  levels[i][0], "parent is -->" ,levels[i-1][0]
+            #         # else:
+            #         #     print "build -->", levels[i][0], "parent is --> main"
+            #
+            #         base_folder_name = name
+            #
+            #         number = files.set_padding(i, padding)
+            #         if base_folder_name != "":
+            #             folder_name = "{0}{1}".format(base_folder_name, number) if quantitiy > 1 else base_folder_name
+            #         else:
+            #             folder_name = "{0}".format(number) if quantitiy > 1 else "unnamed_folder"
+            #
+            #         # skip = False
+            #         # for child in parent_node.children:
+            #         #     if child.name == folder_name:
+            #         #         skip = True
+            #         # if skip:
+            #         #     print "folder exists!"
+            #         #     continue
+            #         if i > 0 :
+            #             parent =
+            #             parent_node = levels[i][4][]
+            #
+            #         path = os.path.join(parent_node.path, folder_name)
+            #         node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual=True,
+            #                              section=parent_node.section, project=self.pipelineUI.project,
+            #                              depth=len(ancestors))
+            #
+            #         self.sourceModel.insertRows(0, 0, parent=parent, node=node)
+            #         self._proxyModel.invalidate()
+            #         levels[i][4].append(node)
 
 
 

@@ -868,7 +868,7 @@ class newTreeDialog(newFolderDialog):
         #res["padding"] = self.padding_slider.value()
         levels = []
         for level in self.levels:
-            levels.append([level[0],level[1].text(),level[2].value(),level[3].value()])
+            levels.append([level[0],level[1].text(),level[2].value(),level[3].value(),[]])
         res["levels"] = levels
         stages = {}
         for option in self.stages_options:
