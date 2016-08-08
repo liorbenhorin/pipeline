@@ -2008,7 +2008,7 @@ class PipelineVersionsProxyModel(QtGui.QSortFilterProxyModel):
 
         if super(PipelineVersionsProxyModel, self).filterAcceptsRow(sourceRow, sourceParent):
 
-             if self.sourceModel().getNode(id).typeInfo() == _version_:
+             if self.sourceModel().getNode(id).typeInfo() == _version_ or self.sourceModel().getNode(id).typeInfo() == _new_:
                     return True
 
              return False
@@ -2027,7 +2027,7 @@ class PipelineMastersProxyModel(QtGui.QSortFilterProxyModel):
     def filterAcceptsRow(self, sourceRow, sourceParent):
         # hide components from the treeview
         id = self.sourceModel().index(sourceRow, 0, sourceParent)
-        print "!!!"
+
         if super(PipelineMastersProxyModel, self).filterAcceptsRow(sourceRow, sourceParent):
 
              if self.sourceModel().getNode(id).typeInfo() == _master_:

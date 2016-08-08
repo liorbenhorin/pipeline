@@ -736,7 +736,7 @@ class PipelineMastersView(QtGui.QTreeView):
 
             self.sortByColumn(1, QtCore.Qt.DescendingOrder)
 
-            self.update()
+            #self.update()
 
 
     #@QtCore.Slot()
@@ -747,6 +747,7 @@ class PipelineMastersView(QtGui.QTreeView):
         button = self.sender()
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
+        print index, "->", self.model().sourceModel().getNode(index).name
         if self.model().sourceModel().getNode(index).typeInfo() == _new_:
             parent_index = index.parent()
             node = self.model().sourceModel().getNode(index).parent()
@@ -954,7 +955,9 @@ class PipelineVersionsView(QtGui.QTreeView):
             parent_index = index.parent()
             node = self.model().sourceModel().getNode(index).parent()
             self.model().sourceModel().removeRows(index.row(),1, parent_index)
-            node.initialVersion()
+            version = node.initialVersion()
+            self.parent.version = self.parent._stageNode._children[0]
+
         else:
             self.model().sourceModel().getNode(index).load()
             self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)

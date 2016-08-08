@@ -2081,6 +2081,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.mastersView and self._stageNode:
             Model = self._stageNode.mastersModel
             self.mastersView.setModel_(Model)
+        else:
+            self.mastersView.setModel_(None)
+
 
     def updateVersionsTable(self):
 
@@ -2807,8 +2810,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def master_save(self):
         if self.versionsView and self._stageNode:
-            self.ui.stage_tabWidget.setCurrentIndex(1)
             self._stageNode.new_master(self.version)
+            self.ui.stage_tabWidget.setCurrentIndex(1)
+            self.version = self._stageNode.masterNode
         # if self.set_component_selection():
         #     if self.component:
         #         self.toggle_scene_open_script()

@@ -918,12 +918,14 @@ class StageNode(RootNode):
         #         self.settings = kwargs[key]
 
         self.pipelineUI = None
+        self._masterNode = None
 
         self._name_format = 2
         for key in kwargs:
             if key == "pipelineUI":
                 self.pipelineUI = kwargs[key]
                 self.edited.connect(self.pipelineUI.updateVersionsTable)
+                self.edited.connect(self.pipelineUI.updateMastersTable)
             if key == "name_format":
                 self._name_format = kwargs[key]
             #
@@ -1079,7 +1081,7 @@ class StageNode(RootNode):
             if self.data_file:
                 files.assure_folder_exists(self.masters_path)
 
-                version_number = set_padding(0, self.project.project_padding)
+                version_number = set_padding(1, self.project.project_padding)
 
                 if self.master:
                     last_version = self.master._children[-1]
@@ -1111,11 +1113,12 @@ class StageNode(RootNode):
                 versions = new_version
                 self.master_ = versions
 
-                master = MasterNode(_master_, parent=self, path=file_name, author=new_version["author"],
-                           number=None, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
+                # master = MasterNode(_master_, parent=self, path=file_name, author=new_version["author"],
+                #            number=None, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
+                #
+                # master_child = MasterNode(version_number, parent=master, path=file_name, author=new_version["author"],
+                #                           number=version_number, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
 
-                master_child = MasterNode(version_number, parent=master, path=file_name, author=new_version["author"],
-                                          number=version_number, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
 
                 self.edited.emit()
 
@@ -1172,7 +1175,10 @@ class StageNode(RootNode):
                 #else:
                 #    last = 0
 
-                last_version = self._children[-1]
+                childes = []
+                [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
+
+                last_version = childes[-1] #self._children[-1]
 
                 version_number = set_padding(last_version.name+1, self.project.project_padding)
 
@@ -1193,6 +1199,10 @@ class StageNode(RootNode):
 
 
                 self.edited.emit()
+
+                childes = []
+                [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
+                self.pipelineUI.version = childes[-1]
 
 
     def removeVersionData(self, padded_number):
@@ -1480,8 +1490,9 @@ class StageNode(RootNode):
                                         if c.path == versions_dict[key]:
                                             skip = True
                             else:
-                                if self._children.path == versions_dict[key]:
-                                    skip = True
+                                if not c.typeInfo() == _master_:
+                                    if self._children.path == versions_dict[key]:
+                                        skip = True
 
                         if not skip:
                             padded_number = self.padding(key)
@@ -1535,15 +1546,14 @@ class StageNode(RootNode):
 
                     for key in versions_dict:
                         skip = False
-                        # if self._children:
-                        #     if isinstance(self._children, list):
-                        #         for c in self._children:
-                        #             if not c.typeInfo() == _master_:
-                        #                 if c.path == versions_dict[key]:
-                        #                     skip = True
-                        #     else:
-                        #         if self._children.path == versions_dict[key]:
-                        #             skip = True
+                        if master_node._children:
+                            if isinstance(master_node._children, list):
+                                for c in master_node._children:
+                                    if c.path == versions_dict[key]:
+                                        skip = True
+                            else:
+                                if master_node._children.path == versions_dict[key]:
+                                    skip = True
 
                         if not skip:
                             padded_number = self.padding(key)
@@ -1642,7 +1652,12 @@ class StageNode(RootNode):
         if self.project:
             if self.data_file:
                 file_name = "{0}.{1}".format(self.formatFileName(), "ma")
-                if os.path.isfile(os.path.join(self._path, file_name)):
+                master_file = os.path.join(self._path, file_name)
+                if os.path.isfile(master_file):
+
+                    if self.masterNode:
+                        self.populate_master_versions(self.masterNode)
+                        return self.masterNode
 
                     author = "n/a"
                     note = ""
@@ -1660,26 +1675,34 @@ class StageNode(RootNode):
                         if "origin" in versions_data:
                             origin = versions_data["origin"]
 
-                    master =  MasterNode(_master_, parent=self, path=file_name, author=author,
+                    master =  MasterNode(_master_, parent=self, path=master_file, author=author,
                                       number=0, date=date, note=note, origin=origin, stage=self)
 
 
 
 
                     self.populate_master_versions(master)
-
+                    self.masterNode = master
                     return master
 
 
         return None
 
     @property
+    def masterNode(self):
+        return self._masterNode
+
+    @masterNode.setter
+    def masterNode(self, node):
+        self._masterNode = node
+
+    @property
     def mastersModel(self):
-        for node in self._children:
-            if node.typeInfo() == _master_:
-                r = node.row()
-                self.removeChild(r)
-                del r
+        # for node in self._children:
+        #     if node.typeInfo() == _master_:
+        #         r = node.row()
+        #         self.removeChild(r)
+        #         del r
 
         if self.master:
             return dtm.PipelineMastersModel(self)
