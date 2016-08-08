@@ -1429,6 +1429,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.disable(self.ui.actionCollect_component)
         
         '''
+        self.connect(self.ui.stage_tabWidget, QtCore.SIGNAL('currentChanged(int)'), self.updatgeStageTab)
+
         self.ui.clearTree_pushButton.clicked.connect(self.clear_project_tree)
         self.ui.updateTree_pushButton.clicked.connect(self.populate_project_tree)
         self.ui.users_pushButton.clicked.connect(self.login_window)
@@ -1907,6 +1909,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.versionsTabLayout.addWidget(self.versionsView)
         self.versionsView.addSlider()
 
+        self.mastersView = dtv.PipelineMastersView(parentWidget=self.ui.mastersTab, parent=self)
+        self.ui.mastersTabLayout.addWidget(self.mastersView)
+        self.mastersView.addSlider()
+
         self._dataMapper = QtGui.QDataWidgetMapper()
 
     def populate_navbar(self):
@@ -2064,6 +2070,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def setVersionSelection(self, index, oldIndex):
         index = self.versionsView.model().mapToSource(index)
         self._dataMapper.setCurrentModelIndex(index)
+
+    def updatgeStageTab(self, tab_index):
+        if tab_index == 1: #<- masters tab
+            self.updateMastersTable()
+        else:
+            self.mastersView.setModel_(None)
+
+    def updateMastersTable(self):
+        if self.mastersView and self._stageNode:
+            Model = self._stageNode.mastersModel
+            self.mastersView.setModel_(Model)
 
     def updateVersionsTable(self):
 

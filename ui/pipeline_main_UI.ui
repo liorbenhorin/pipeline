@@ -303,11 +303,11 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                </property>
               </layout>
              </widget>
-             <widget class="QWidget" name="tab_2">
+             <widget class="QWidget" name="mastersTab">
               <attribute name="title">
                <string>Masters</string>
               </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_8">
+              <layout class="QVBoxLayout" name="mastersTabLayout">
                <item>
                 <widget class="QCheckBox" name="publicMaster_checkBox">
                  <property name="text">
@@ -317,9 +317,6 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
                   <bool>false</bool>
                  </property>
                 </widget>
-               </item>
-               <item>
-                <widget class="QTableView" name="mastersTableView"/>
                </item>
               </layout>
              </widget>

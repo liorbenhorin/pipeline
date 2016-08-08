@@ -61,7 +61,9 @@ def set_icons():
     global comment_full_icon
     global new_icon
     global creation_icon
+    global master_icon
 
+    master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "save_master"))
     creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
     new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
     comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
@@ -713,16 +715,20 @@ class VersionNode(Node):
             #return comment_icon
 
 
-class MasterNode(Node):
+class MasterNode(VersionNode):
 
     def __init__(self, name ,path = None,  number = None, author = None, date = None, note = None, stage = None, origin = None, parent=None):
-        super(MasterNode, self).__init__(name, parent, path=path, number=number, author= author, date=date, note=note, stage=stage)
+        super(MasterNode, self).__init__(name, parent=parent, path=path, number=number, author= author, date=date, note=note, stage=stage)
 
         self._origin = origin
 
     @property
     def origin(self):
         return self._origin
+
+    @property
+    def master_icon(self):
+        return master_icon
 
     def typeInfo(self):
         return _master_
@@ -905,7 +911,6 @@ class StageNode(RootNode):
 
         changed = QtCore.Signal()
 
-        self._version_children = []
 
         # self.settings = None
         # for key in kwargs:
@@ -1546,7 +1551,7 @@ class StageNode(RootNode):
                             note = ""
                             date = "n/a"
                             origin = "n/a"
-                            versions_data = self.versions_
+                            versions_data = self.masters_
                             if versions_data:
 
                                 if padded_number in versions_data:
@@ -1633,6 +1638,7 @@ class StageNode(RootNode):
 
     @property
     def master(self):
+
         if self.project:
             if self.data_file:
                 file_name = "{0}.{1}".format(self.formatFileName(), "ma")
@@ -1655,13 +1661,30 @@ class StageNode(RootNode):
                             origin = versions_data["origin"]
 
                     master =  MasterNode(_master_, parent=self, path=file_name, author=author,
-                                      number=None, date=date, note=note, origin=origin, stage=self)
+                                      number=0, date=date, note=note, origin=origin, stage=self)
+
+
+
+
                     self.populate_master_versions(master)
 
                     return master
 
 
         return None
+
+    @property
+    def mastersModel(self):
+        for node in self._children:
+            if node.typeInfo() == _master_:
+                r = node.row()
+                self.removeChild(r)
+                del r
+
+        if self.master:
+            return dtm.PipelineMastersModel(self)
+        else:
+            return None
 
     # @property
     # def master(self):

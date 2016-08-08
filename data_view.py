@@ -615,6 +615,163 @@ class HeaderViewFilter2(QtCore.QObject):
             #print logicalIndex, "*"
             return True
 
+class PipelineMastersView(QtGui.QTreeView):
+    def __init__(self, parentWidget = None, parent = None):
+        super(PipelineMastersView, self).__init__(parent)
+
+        self.parent = parent
+        self.parentWidget = parentWidget
+
+        self.setAlternatingRowColors(True)
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.setWordWrap(True)
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+
+        self.setSortingEnabled(True)
+
+        # Set the delegate for column 0 of our table
+        self._proxyModel = None
+        self.header().setHidden(True)
+        # self.setStyleSheet('''
+        #
+        #     QTreeView::item:hover {
+        #         background: #101010;
+        #     }
+        #     QTreeView {
+        #         outline: 0;
+        #     }
+        #     ''')
+        self.setStyleSheet('''
+
+            QTreeView::item:focus {
+            }
+            QTreeView::item:hover {
+                 background: #101010;
+            }
+            QTreeView {
+                 outline: 0;
+            }
+            QTreeView::branch:has-siblings:!adjoins-item {
+                 border-image:url(''' + vline + ''') 0;
+            }
+
+            QTreeView::branch:has-siblings:adjoins-item {
+                 border-image:url(''' + branch_more + ''') 0;
+            }
+
+            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+                 border-image:url(''' + branch_end + ''') 0;
+            }
+
+            QTreeView::branch:has-children:!has-siblings:closed,
+            QTreeView::branch:closed:has-children:has-siblings {
+                 border-image: none;
+                 image:url(''' + branch_closed + ''') 0;
+            }
+
+            QTreeView::branch:open:has-children:!has-siblings,
+            QTreeView::branch:open:has-children:has-siblings  {
+                 border-image: none;
+                 image: url(''' + branch_open + ''') 0;
+            }''')
+
+    def addSlider(self):
+
+        self._slider = IconScaleSlider(self)
+        self.parentWidget.layout().addWidget(self._slider)
+        self._slider.listSlider.sliderMoved.connect(self.icons_size)
+        self.icons_size(32)
+
+
+    def icons_size(self, int):
+        self.setIconSize(QtCore.QSize(int, int))
+        self.header().resizeSection(0, int)
+        self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
+        try:
+            self.model().sourceModel()._rowHeight = int
+        except:
+            print "no model"
+        self.update()
+
+    def clearModel(self):
+        self.setModel(None)
+        if self._proxyModel:
+            self._proxyModel.setSourceModel(None)
+            self._proxyModel = None
+
+
+    def setModel_(self, model = None):
+        self.clearModel()
+        if model:
+
+            model._rowHeight = self._slider.listSlider.value()
+            self._proxyModel = dtm.PipelineMastersProxyModel()
+            self._proxyModel.setSourceModel(model)
+            self._proxyModel.setDynamicSortFilter(True)
+            self._proxyModel.setSortRole(dtm.PipelineMastersModel.sortRole)
+            self.setModel(self._proxyModel)
+
+            self.setIndentation(0)
+            self.expandAll()
+
+            self.header().resizeSection(0, self._slider.listSlider.value())
+            self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
+
+
+            self.header().resizeSection(1, 32)
+            self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
+
+            self.header().setStretchLastSection(False)
+
+            self.header().setResizeMode(2, QtGui.QHeaderView.Stretch)
+            self.header().setResizeMode(3, QtGui.QHeaderView.Stretch)
+            self.header().setResizeMode(4, QtGui.QHeaderView.Stretch)
+
+            self.header().resizeSection(5, 32)
+            self.header().setResizeMode(5, QtGui.QHeaderView.Fixed)
+            self.header().resizeSection(6, 32)
+            self.header().setResizeMode(6, QtGui.QHeaderView.Fixed)
+
+            self.setItemDelegateForColumn(6,  loadButtonDelegate(self))
+
+            self.sortByColumn(1, QtCore.Qt.DescendingOrder)
+
+            self.update()
+
+
+    #@QtCore.Slot()
+    def MultiButtonClicked(self):
+        # This slot will be called when our button is clicked.
+        # self.sender() returns a refence to the QPushButton created
+        # by the delegate, not the delegate itself.
+        button = self.sender()
+        index = self.indexAt(button.pos())
+        index = self.model().mapToSource(index)
+        if self.model().sourceModel().getNode(index).typeInfo() == _new_:
+            parent_index = index.parent()
+            node = self.model().sourceModel().getNode(index).parent()
+            self.model().sourceModel().removeRows(index.row(),1, parent_index)
+            node.initialVersion()
+        else:
+            self.model().sourceModel().getNode(index).load()
+            self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)
+            self.parent.version = self.model().sourceModel().getNode(index)
+            self.setCurrentIndex(self.model().mapFromSource(index))
+
+
+    #@QtCore.Slot()
+    def deletActionClicked(self):
+        # This slot will be called when our button is clicked.
+        # self.sender() returns a refence to the QPushButton created
+        # by the delegate, not the delegate itself.
+        button = self.sender().parent()
+        index = self.indexAt(button.pos())
+        index = self.model().mapToSource(index)
+        self.model().sourceModel().getNode(index).delete_me()
+
+
+
+
 
 class PipelineVersionsView(QtGui.QTreeView):
     def __init__(self, parentWidget = None, parent = None):
