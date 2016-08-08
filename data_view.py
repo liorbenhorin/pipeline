@@ -690,7 +690,7 @@ class PipelineMastersView(QtGui.QTreeView):
         try:
             self.model().sourceModel()._rowHeight = int
         except:
-            print "no model"
+            pass
         self.update()
 
     def clearModel(self):
@@ -848,7 +848,7 @@ class PipelineVersionsView(QtGui.QTreeView):
         try:
             self.model().sourceModel()._rowHeight = int
         except:
-            print "no model"
+            pass
         self.update()
 
     def clearModel(self):
@@ -2349,13 +2349,14 @@ class ComboWidget(QtGui.QWidget):
         #self.parent = parent
         
         #self._parent = parent_box
+        self.setHidden(True)
         self._parent_layout = parent_layout  
 
         # UI
         self.setMaximumHeight(30)  
         self.layout = QtGui.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignLeft)
-        self.comboBox = QtGui.QComboBox(self)
+        self.comboBox = QtGui.QComboBox(parent)
         self.comboBox.setIconSize(QtCore.QSize(24 ,24)  ) 
         self.comboBox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.layout.addWidget(self.comboBox)
@@ -2386,6 +2387,7 @@ class ComboStaticWidget(ComboWidget):
         self._items = items
         self._model = None
         self.createModel()
+        self.setHidden(False)
 
     def createModel(self):
         
@@ -2463,6 +2465,7 @@ class ComboDynamicWidget(ComboWidget):
                     
         # connections                
         self.comboBox.currentIndexChanged.connect(self.update)
+        self.setHidden(False)
 
 
     def navigate(self, items):
@@ -2470,7 +2473,7 @@ class ComboDynamicWidget(ComboWidget):
         for i in range(0, len(items)):
             if setComboValue(current.comboBox, items[i]):
                 current.update()
-                QtGui.QApplication.processEvents()
+                #QtGui.QApplication.processEvents()
                 current = current._child
 
 
@@ -2541,7 +2544,7 @@ class ComboDynamicWidget(ComboWidget):
                                  box_list = self._box_list,
                                  parent_box = self,
                                  parent_layout = self._parent_layout,
-                                 parent = self.parent)    
+                                 parent = self.parent)
             self._child = widget   
  
     def update(self):

@@ -1678,6 +1678,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.tree_progressBar.setValue(0)
         self.tree_change_options()
 
+
+        self.populate_clients()
+        self.populate_projects()
+        self.stage_ui()
+        self.exctract_current_file_location()
         # self.populate_clients()
         # self.populate_projects()
         # self.stage_ui()
@@ -1688,33 +1693,34 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         file = maya.current_open_file()
 
         name = files.file_name_no_extension(files.file_name(file))
-        print name, "<<<"
+
         elements = name.split("_")
         #if len(elements)>1:
-        print elements, "<"
-        if self.project.prefix:
-            elements.pop(0)
-        '''This will not work on masters!!! need to find a way to know if the filename ends with a stage or with a version'''
 
-        master = True
-        if len(elements[-1]) == self.project.project_padding + 1:
-            if files.is_number(elements[-1][1:]):
-                master = False
+        if len( elements ) > 1:
+            if self.project.prefix:
+                elements.pop(0)
+            '''This will not work on masters!!! need to find a way to know if the filename ends with a stage or with a version'''
 
-        if master:
-            stage = elements[-1]
-        else:
-            stage = elements[-2]
+            master = True
+            if len(elements[-1]) == self.project.project_padding + 1:
+                if files.is_number(elements[-1][1:]):
+                    master = False
 
-
-
-        if dtv.setComboValue(self.stageCombo.comboBox, stage):
             if master:
-                self.dynamicCombo.navigate(elements[:-1])
-                self.ui.stage_tabWidget.setCurrentIndex(1)
+                stage = elements[-1]
             else:
-                self.dynamicCombo.navigate(elements[:-2])
-                self.ui.stage_tabWidget.setCurrentIndex(0)
+                stage = elements[-2]
+
+
+
+            if dtv.setComboValue(self.stageCombo.comboBox, stage):
+                if master:
+                    self.dynamicCombo.navigate(elements[:-1])
+                    self.ui.stage_tabWidget.setCurrentIndex(1)
+                else:
+                    self.dynamicCombo.navigate(elements[:-2])
+                    self.ui.stage_tabWidget.setCurrentIndex(0)
 
 
 
@@ -3532,10 +3538,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.setMinimumWidth(350)
         self.setMaximumWidth(900)
 
-        self.populate_clients()
-        self.populate_projects()
-        self.stage_ui()
-        self.exctract_current_file_location()
+        # self.populate_clients()
+        # self.populate_projects()
+        # self.stage_ui()
+        # self.exctract_current_file_location()
         #self.updateVersionsTable()
 
 
@@ -4356,11 +4362,9 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 def show():
 
     try:
-        print "delete model"
         del treeModel
-
     except:
-        print "cant delete model"
+        pass
     
     #about = dlg.test2()#(None,"About",
     #about.exec_() 
