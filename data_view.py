@@ -49,7 +49,7 @@ _asset_ = "asset"
 _folder_ = "folder" 
 _dummy_ = "dummy"
 
-
+global counter
 
 # def set_icons():
 #     global localIconPath
@@ -1415,8 +1415,9 @@ class pipelineTreeView(QtGui.QTreeView):
 
     def __init__(self,parent = None):
         super(pipelineTreeView, self).__init__(parent)
-        
-        
+
+        global counter
+
         # display options
         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
         self.setAlternatingRowColors(True)
@@ -1520,7 +1521,7 @@ class pipelineTreeView(QtGui.QTreeView):
     def initialExpension(self):
         if self.model():
             self.collapseAll()
-
+            return
             for row in range(self.model().rowCount(self.rootIndex())):
                 x = self.model().index(row, 0, self.rootIndex())
                 self.setExpanded(x, True)
@@ -1844,8 +1845,10 @@ class pipelineTreeView(QtGui.QTreeView):
         return True
 
     def create_new_tree(self, parent):
-
-
+        global counter
+        global total_items
+        counter = 0
+        total_items = 0
         parent_node = self.sourceModel.getNode(parent)
 
         depth_list = self.sourceModel.listAncestos(parent)
@@ -1854,6 +1857,9 @@ class pipelineTreeView(QtGui.QTreeView):
             ancestors.append(self.sourceModel.getNode(i))
 
         def rec(items, p, stages, name_format):
+
+            global counter
+            global total_items
             """ recursive function for generating a tree out of the instructions list called items
             the function creates nodes by instruction in the first item in the list, then while the list is longer then 1,
             it sends the list againg but without the current item
@@ -1890,6 +1896,10 @@ class pipelineTreeView(QtGui.QTreeView):
 
                     self.sourceModel.insertRows(0, 0, parent=i, node=node)
                     self._proxyModel.invalidate()
+                    counter += 1
+                    # QtGui.QApplication.processEvents()
+                    # #print remap(current, 0, total_items, 0, 100)
+                    # self.percentage_complete.emit(remap(current, 0, total_items, 0, 100))
 
                     '''for an asset, generate stages:'''
 
@@ -1904,6 +1914,10 @@ class pipelineTreeView(QtGui.QTreeView):
                             # if node is not False:
                             self._sourceModel.insertRows(0, 0, parent=new_index, node=stageNode)
                             self._proxyModel.invalidate()
+                            #counter += 1
+                            # QtGui.QApplication.processEvents()
+                            # #print remap(current, 0, total_items, 0, 100)
+                            # self.percentage_complete.emit(remap(current, 0, total_items, 0, 100))
 
                 else:
                     node = dt.FolderNode(folder_name, path=path, parent=p, virtual=True,
@@ -1913,9 +1927,16 @@ class pipelineTreeView(QtGui.QTreeView):
 
                     self.sourceModel.insertRows(0, 0, parent=i, node=node)
                     self._proxyModel.invalidate()
+                    counter += 1
+
 
 
                 if len(items) > 1:
+
+                    QtGui.QApplication.processEvents()
+
+                    print remap(counter, 0, total_items, 0, 100), "--->", counter, "--->", total_items
+                    self.percentage_complete.emit(remap(counter, 0, total_items, 0, 100))
                     l = list(items[1:])
                     rec(l, node, stages, name_format)
                 else:
@@ -1928,8 +1949,24 @@ class pipelineTreeView(QtGui.QTreeView):
         res = folderDlg.result()
         if result == QtGui.QDialog.Accepted:
             levels = res["levels"]
+
+            total_current_level = levels[0][2]
+            total_items = total_current_level
+
+            for i in range(1, len(levels)):
+                total_current_level = (total_current_level * levels[i][2])
+                total_items += total_current_level
+
+            # total_items = levels[0][2]
+            # old_total = total_items*levels[1][2]
+            # for i in range(2, len(levels)):
+            #     total_items += (old_total * levels[i][2])
+            #     old_total = levels[i-1][2]*levels[i][2]
+
+            print total_items, "<<<<<------"
             rec(levels, parent_node, res["stages"], res["name_format"])
             self.update.emit()
+            self.percentage_complete.emit(0)
 
 
 
