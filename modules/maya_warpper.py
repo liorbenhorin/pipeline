@@ -53,11 +53,11 @@ import string
 import random
 import logging
 
-import pipeline.dialogue as dlg
-reload(dlg)
+#import pipeline.dialogue as dlg
+#reload(dlg)
 
 import pipeline.modules.files as files
-reload(files)
+#reload(files)
 
 def new_scene():
     checkState()

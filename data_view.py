@@ -16,7 +16,7 @@ reload(files)
 import modules.jsonData as data
 
 import dialogue as dlg
-reload(dlg)
+#reload(dlg)
 
 
 global _node_

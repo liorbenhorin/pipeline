@@ -355,7 +355,9 @@ def set_icons():
 
     global collapse_icon
     global expend_icon
+    global creation_icon
 
+    creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
     comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
     comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
     collapse_icon = os.path.join(localIconPath, "%s.svg" % "unfold-less")
@@ -1427,8 +1429,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.disable(self.ui.actionCollect_component)
         
         '''
-
-
+        self.ui.clearTree_pushButton.clicked.connect(self.clear_project_tree)
+        self.ui.updateTree_pushButton.clicked.connect(self.populate_project_tree)
         self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
         #self.ui.asset_component_files_tabWidget.currentChanged.connect(self.update_component_files_tab)
@@ -1888,6 +1890,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self.tree.setModel(None)
 
+    def clear_project_tree(self):
+
+        self.tree.setModel(None)
+        try:
+            del treeModel
+        except:
+            pass
+
+
     def stage_ui(self):
 
         #self.ui.stages_version_splitter.setSizes([0, 600])
@@ -2116,7 +2127,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.populate_navbar()
             self.project_ui_Enable(False)
 
-        self.populate_project_tree()
+        #self.populate_project_tree()
 
 
     def set_thumbnail(self,Qpixmap):
@@ -2182,11 +2193,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                        self.ui.commitTree_pushButton,
                        self.ui.discardTree_pushButton,
                        self.ui.collapseTree_pushButton,
-                       self.ui.expendTree_pushButton
+                       self.ui.expendTree_pushButton,
+                       self.ui.updateTree_pushButton,
+                       self.ui.clearTree_pushButton
                        ]:
             
             button.setIconSize(QtCore.QSize(20,20))
 
+        self.ui.clearTree_pushButton.setIcon(QtGui.QIcon(creation_icon))
+        self.ui.updateTree_pushButton.setIcon(QtGui.QIcon(reload_icon))
         self.ui.collapseTree_pushButton.setIcon(QtGui.QIcon(collapse_icon))
         self.ui.expendTree_pushButton.setIcon(QtGui.QIcon(expend_icon))
 

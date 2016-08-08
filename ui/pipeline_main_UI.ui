@@ -413,6 +413,20 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
             <number>0</number>
            </property>
            <item>
+            <widget class="QPushButton" name="updateTree_pushButton">
+             <property name="text">
+              <string>Load</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="clearTree_pushButton">
+             <property name="text">
+              <string>Clear</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="expendTree_pushButton">
              <property name="minimumSize">
               <size>
@@ -456,6 +470,9 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
            </item>
            <item>
             <widget class="QLineEdit" name="assetsFilter_lineEdit">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="minimumSize">
               <size>
                <width>0</width>

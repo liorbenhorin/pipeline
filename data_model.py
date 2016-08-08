@@ -5,7 +5,7 @@ import os
 import functools
 
 import data as dt
-reload(dt)
+#reload(dt)
 
 global _node_
 global _root_
@@ -54,6 +54,7 @@ def set_icons():
     global comment_icon
     global comment_full_icon
     global delete_folder_icon
+
 
     delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "delete_folder"))
     comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "comment"))
@@ -1546,58 +1547,58 @@ class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
     def treeView(self, object):
         self._treeView = object
                     
-    def filterAcceptsRow(self,sourceRow,sourceParent):
-
-        # hide components from the treeview
-        id =  self.sourceModel().index(sourceRow,0,sourceParent)    
-
-        if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent): 
-            
-            
-            #if self.sourceModel().getNode(id).typeInfo() == _stage_:
-            #    return False
-                      
-            return True
-        
-        return self.hasAcceptedChildren(sourceRow,sourceParent)
-
-    def hasAcceptedChildren(self,sourceRow,sourceParent):
-
-        model=self.sourceModel()
-        sourceIndex=model.index(sourceRow,0,sourceParent)
-        if not sourceIndex.isValid():
-            return False
-        indexes=model.rowCount(sourceIndex)
-        for i in range(indexes):
-            if self.filterAcceptsRow(i,sourceIndex):
-                return True
-        
-        return False
-
-    def setFilterRegExp(self, exp):
-             
-        super(PipelineProjectProxyModel, self).setFilterRegExp(exp)
-        if self.treeView:
-
-            
-            if len(exp)>0:
-                '''
-                i dont need to read the tree in each text change
-                only once
-                ----> this can be more elegant
-                '''  
-                if len(exp) == 1:
-                    self.treeView.list_flat_hierarchy()  
-                
-                self.treeView.filterContents()
-                      
-                self.treeView._ignoreExpentions = True
-                self.treeView.expandAll()
-                self.treeView._ignoreExpentions = False
-            else:
-                self.treeView._ignoreExpentions = True
-                self.treeView.restoreState()          
-                self.treeView._ignoreExpentions = False         
+    # def filterAcceptsRow(self,sourceRow,sourceParent):
+    #
+    #     # hide components from the treeview
+    #     id =  self.sourceModel().index(sourceRow,0,sourceParent)
+    #
+    #     if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent):
+    #
+    #
+    #         #if self.sourceModel().getNode(id).typeInfo() == _stage_:
+    #         #    return False
+    #
+    #         return True
+    #
+    #     return self.hasAcceptedChildren(sourceRow,sourceParent)
+    #
+    # def hasAcceptedChildren(self,sourceRow,sourceParent):
+    #
+    #     model=self.sourceModel()
+    #     sourceIndex=model.index(sourceRow,0,sourceParent)
+    #     if not sourceIndex.isValid():
+    #         return False
+    #     indexes=model.rowCount(sourceIndex)
+    #     for i in range(indexes):
+    #         if self.filterAcceptsRow(i,sourceIndex):
+    #             return True
+    #
+    #     return False
+    #
+    # def setFilterRegExp(self, exp):
+    #
+    #     super(PipelineProjectProxyModel, self).setFilterRegExp(exp)
+    #     if self.treeView:
+    #
+    #
+    #         if len(exp)>0:
+    #             '''
+    #             i dont need to read the tree in each text change
+    #             only once
+    #             ----> this can be more elegant
+    #             '''
+    #             if len(exp) == 1:
+    #                 self.treeView.list_flat_hierarchy()
+    #
+    #             self.treeView.filterContents()
+    #
+    #             self.treeView._ignoreExpentions = True
+    #             self.treeView.expandAll()
+    #             self.treeView._ignoreExpentions = False
+    #         else:
+    #             self.treeView._ignoreExpentions = True
+    #             self.treeView.restoreState()
+    #             self.treeView._ignoreExpentions = False
 
 
 class PipelineContentsProxyModel(QtGui.QSortFilterProxyModel):
