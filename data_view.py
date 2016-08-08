@@ -2464,6 +2464,17 @@ class ComboDynamicWidget(ComboWidget):
         # connections                
         self.comboBox.currentIndexChanged.connect(self.update)
 
+
+    def navigate(self, items):
+        current = self
+        for i in range(0, len(items)):
+            if setComboValue(current.comboBox, items[i]):
+                current.update()
+                QtGui.QApplication.processEvents()
+                current = current._child
+
+
+
     def listDirectory(self):
         dir = self._path
         dirs = files.list_dir_folders(dir)   
@@ -2496,7 +2507,7 @@ class ComboDynamicWidget(ComboWidget):
 
     def createModel(self):
         
-        list = [dt.CatagoryNode(self._level)]
+        list = [dt.CatagoryNode("<{}>".format(self._level))]
 
         if self._level != "n/a":
             if self._subdirectories:

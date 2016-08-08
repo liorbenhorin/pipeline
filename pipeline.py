@@ -1677,11 +1677,47 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.tree_progressBar.valueChanged.connect(self.tree_progress_update)
         self.ui.tree_progressBar.setValue(0)
         self.tree_change_options()
+
         # self.populate_clients()
         # self.populate_projects()
         # self.stage_ui()
         #self.populate_project_tree()
  #       self.populate_navbar()
+
+    def exctract_current_file_location(self):
+        file = maya.current_open_file()
+
+        name = files.file_name_no_extension(files.file_name(file))
+        print name, "<<<"
+        elements = name.split("_")
+        #if len(elements)>1:
+        print elements, "<"
+        if self.project.prefix:
+            elements.pop(0)
+        '''This will not work on masters!!! need to find a way to know if the filename ends with a stage or with a version'''
+
+        master = True
+        if len(elements[-1]) == self.project.project_padding + 1:
+            if files.is_number(elements[-1][1:]):
+                master = False
+
+        if master:
+            stage = elements[-1]
+        else:
+            stage = elements[-2]
+
+
+
+        if dtv.setComboValue(self.stageCombo.comboBox, stage):
+            if master:
+                self.dynamicCombo.navigate(elements[:-1])
+                self.ui.stage_tabWidget.setCurrentIndex(1)
+            else:
+                self.dynamicCombo.navigate(elements[:-2])
+                self.ui.stage_tabWidget.setCurrentIndex(0)
+
+
+
 
     def tree_progress_update(self, value):
 
@@ -3499,6 +3535,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.populate_clients()
         self.populate_projects()
         self.stage_ui()
+        self.exctract_current_file_location()
         #self.updateVersionsTable()
 
 

@@ -335,8 +335,14 @@ def dict_versions(versions,padding):
             versions_dict[int(number.lstrip("0"))] = version
 
     return versions_dict
-        
- 
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 def sort_version(versions_dict):
     '''
     @return: list of tuples: [(version, "path"),...]
