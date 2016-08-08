@@ -136,7 +136,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -376,6 +376,11 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Dresser</string>
+       </attribute>
       </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">

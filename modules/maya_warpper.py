@@ -91,13 +91,14 @@ def checkState():
 
     # if there are, save them first ... then we can proceed 
     if fileCheckState:
-      # This is maya's native call to save, with dialogs, etc.
-      # No need to write your own.
-      if dlg.warning("warning", "Scene Not Saved", "Scene Not Saved, Do you want to save it first?"):
-        cmds.SaveScene()
-      pass
+        import pipeline.dialogue as dlg
+        # This is maya's native call to save, with dialogs, etc.
+        # No need to write your own.
+        if dlg.warning("warning", "Scene Not Saved", "Scene Not Saved, Do you want to save it first?"):
+            cmds.SaveScene()
+
     else:
-      pass
+        pass
       
       
 
