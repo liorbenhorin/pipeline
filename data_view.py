@@ -2235,13 +2235,13 @@ class ComboStaticWidget(ComboWidget):
         
         RemoveOption = False
         
-        if list:
-            RemoveOption = True
-        
-        list.append(dt.AddNode("Add..."))
-        
-        if RemoveOption:
-            list.append(dt.AddNode("Remove..."))
+        # if list:
+        #     RemoveOption = True
+        #
+        # list.append(dt.AddNode("Add..."))
+        #
+        # if RemoveOption:
+        #     list.append(dt.AddNode("Remove..."))
         
         self._model = dtm.PipelineListModel(list) 
         self.comboBox.setModel(self._model)  
@@ -2346,13 +2346,13 @@ class ComboDynamicWidget(ComboWidget):
         
         RemoveOption = False
         
-        if list:
-            RemoveOption = True
-        
-        list.append(dt.AddNode("Add..."))
-        
-        if RemoveOption:
-            list.append(dt.AddNode("Remove..."))
+        # if list:
+        #     RemoveOption = True
+        #
+        # list.append(dt.AddNode("Add..."))
+        #
+        # if RemoveOption:
+        #     list.append(dt.AddNode("Remove..."))
         
         self._model = dtm.PipelineListModel(list) 
         self.comboBox.setModel(self._model)    

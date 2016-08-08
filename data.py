@@ -26,6 +26,8 @@ global _catagory_
 global _assets_
 global _animation_
 global _admin_
+global _master_
+_master_ = "master"
 _admin_ = "admin"
 _assets_ = "asset"
 _animation_ = "animation"
@@ -711,6 +713,19 @@ class VersionNode(Node):
             #return comment_icon
 
 
+class MasterNode(Node):
+
+    def __init__(self, name ,path = None,  number = None, author = None, date = None, note = None, stage = None, origin = None, parent=None):
+        super(MasterNode, self).__init__(name, parent, path=path, number=number, author= author, date=date, note=note, stage=stage)
+
+        self._origin = origin
+
+    @property
+    def origin(self):
+        return self._origin
+
+    def typeInfo(self):
+        return _master_
 
 class CatagoryNode(Node):
 
@@ -890,7 +905,7 @@ class StageNode(RootNode):
 
         changed = QtCore.Signal()
 
-
+        self._version_children = []
 
         # self.settings = None
         # for key in kwargs:
@@ -1052,11 +1067,99 @@ class StageNode(RootNode):
         return self
         '''
 
-    def new_version(self):
-        print "new v!"
+    def new_master(self, from_node = None):
+        print "saving master from ", self.name, "---", from_node.name
+
         if self.project:
             if self.data_file:
+                files.assure_folder_exists(self.masters_path)
 
+                version_number = set_padding(0, self.project.project_padding)
+
+                if self.master:
+                    last_version = self.master._children[-1]
+
+                    version_number = set_padding(last_version.name + 1, self.project.project_padding)
+
+                file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "p", version_number, "ma")
+                scene_path = maya.save_scene_as(path=self.masters_path, file_name=file_name)
+
+                file_name = "{0}.{1}".format(self.formatFileName(), "ma")
+                scene_path = maya.save_scene_as(path=self._path, file_name=file_name)
+
+
+
+
+                new_version = {}
+                new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"), "@", time.strftime("%H:%M"))
+                new_version["author"] = self.settings.user[0]
+                new_version["note"] = None
+                new_version["origin"] = [from_node.typeInfo(), from_node.name]
+
+                versions = self.masters_
+                if not versions:
+                    versions = {}
+                versions[version_number] = new_version
+                self.masters_ = versions
+
+
+                versions = new_version
+                self.master_ = versions
+
+                master = MasterNode(_master_, parent=self, path=file_name, author=new_version["author"],
+                           number=None, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
+
+                master_child = MasterNode(version_number, parent=master, path=file_name, author=new_version["author"],
+                                          number=version_number, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
+
+                self.edited.emit()
+
+            # new_master = {}
+            # new_master["date_created"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+            # new_master["author"] = self.settings.user[0]
+            # new_master["note"] = "No notes"
+            #
+            # if self.masters:
+            #     # master versions existst
+            #
+            #     masters = self.masters
+            #     last = masters[len(masters) - 1]
+            #     version_number = set_padding(last + 1, self.project.project_padding)
+            #
+            # else:
+            #
+            #     # this will be the first master
+            #     version_number = set_padding(1, self.project.project_padding)
+            #
+            # maya.clean_up_file()
+            #
+            # file_name = "%s_%s_%s_%s.%s" % (self.asset_name, self.component_name, "MASTER", version_number, "ma")
+            # if not from_file:
+            #     scene_path = maya.save_scene_as(path=self.masters_path, file_name=file_name)
+            # else:
+            #     scene_path = os.path.join(self.masters_path, file_name)
+            #     files.file_copy(from_file, scene_path)
+            #
+            # new_master["path"] = scene_path
+            # masters = self.masters_
+            # masters[str(set_padding(0, self.project.project_padding))] = new_master
+            # masters[version_number] = new_master
+            #
+            # self.masters_ = masters
+            #
+            # master_name = "%s_%s_%s.%s" % (self.asset_name, self.component_name, "MASTER", "ma")
+            # master_file = os.path.join(self.settings.current_project_path, self.project.assets_dir, self.catagory_name,
+            #                            self.asset_name, self.component_name, master_name)
+            # files.file_copy(scene_path, master_file)
+            #
+            # maya.open_scene(master_file)
+            #
+
+
+    def new_version(self):
+        if self.project:
+            if self.data_file:
+                files.assure_folder_exists(self.versions_path)
                 #versions = self.versions
                 #versions = self.versions
                 #if versions:
@@ -1148,20 +1251,41 @@ class StageNode(RootNode):
             self.stage_file = self.data_file.read()
 
 
-
-    @property  
+    @property
     def masters_(self):
-        if self.data_file:
-            return self.data_file["masters"]
-    
+        if self.stage_file:
+            if "masters" in self.stage_file:
+                return self.stage_file["masters"]
+            else:
+                return None
+
+
     @masters_.setter
-    def masters_(self,masters):
-       
+    def masters_(self, versions):
         if self.data_file:
             data = {}
-            data["masters"] = masters
+            data["masters"] = versions
             self.data_file.edit(data)
-            self.data_file = self.data_file.read()
+            self.stage_file = self.data_file.read()
+
+
+    @property
+    def master_(self):
+        if self.stage_file:
+            if "master" in self.stage_file:
+                return self.stage_file["master"]
+            else:
+                return None
+
+
+    @master_.setter
+    def master_(self, versions):
+        if self.data_file:
+            data = {}
+            data["master"] = versions
+            self.data_file.edit(data)
+            self.stage_file = self.data_file.read()
+
 
     @property
     def component_name(self):
@@ -1347,8 +1471,9 @@ class StageNode(RootNode):
                         if self._children:
                             if isinstance(self._children, list):
                                 for c in self._children:
-                                    if c.path == versions_dict[key]:
-                                        skip = True
+                                    if not c.typeInfo() == _master_:
+                                        if c.path == versions_dict[key]:
+                                            skip = True
                             else:
                                 if self._children.path == versions_dict[key]:
                                     skip = True
@@ -1392,6 +1517,56 @@ class StageNode(RootNode):
     def emptyVersions(self):
         #, name_format = self._name_format, section = self._section
         return [NewNode("new...", parent = self)]
+
+
+    def populate_master_versions(self, master_node):
+        if self.project:
+            if self.data_file:
+                versions = files.list_directory(self.masters_path, self.project.project_file_type)
+                if versions:
+                    versions_dict = files.dict_versions(versions, self.project.project_padding)
+
+                    version_nodes = []
+
+                    for key in versions_dict:
+                        skip = False
+                        # if self._children:
+                        #     if isinstance(self._children, list):
+                        #         for c in self._children:
+                        #             if not c.typeInfo() == _master_:
+                        #                 if c.path == versions_dict[key]:
+                        #                     skip = True
+                        #     else:
+                        #         if self._children.path == versions_dict[key]:
+                        #             skip = True
+
+                        if not skip:
+                            padded_number = self.padding(key)
+                            author = "n/a"
+                            note = ""
+                            date = "n/a"
+                            origin = "n/a"
+                            versions_data = self.versions_
+                            if versions_data:
+
+                                if padded_number in versions_data:
+                                    thisVersion = versions_data[padded_number]
+                                    if "author" in thisVersion:
+                                        author = thisVersion["author"]
+                                    if "note" in thisVersion:
+                                        note = thisVersion["note"]
+                                    if "date" in thisVersion:
+                                        date = thisVersion["date"]
+                                    if "origin" in thisVersion:
+                                        origin = thisVersion["origin"]
+
+                            MasterNode(key, parent=master_node, path=versions_dict[key], author=author,
+                                        number=padded_number, date=date, note=note, origin = origin, stage=self)
+
+                    return True
+
+        self._newNode = NewNode("new...", parent=self)
+        return None
 
 
     def last_version(self):
@@ -1439,34 +1614,66 @@ class StageNode(RootNode):
         else:
             return None   
     
-    @property
-    def masters(self):
-        if self.project:
-            if self.data_file:
-                if self.settings:
-                   
-                    masters = files.list_directory(self.masters_path,self.project.project_file_type)
-                    
-                    if masters:
-                        masters_dict = files.dict_versions(masters,self.project.project_padding)
-                        
-                        sorted_masters = files.sort_version(masters_dict)
-                        return sorted_masters
-                    else:
-                        return None
+    # @property
+    # def masters(self):
+    #     if self.project:
+    #         if self.data_file:
+    #             if self.settings:
+    #
+    #                 masters = files.list_directory(self.masters_path,self.project.project_file_type)
+    #
+    #                 if masters:
+    #                     masters_dict = files.dict_versions(masters,self.project.project_padding)
+    #
+    #                     sorted_masters = files.sort_version(masters_dict)
+    #                     return sorted_masters
+    #                 else:
+    #                     return None
 
 
     @property
     def master(self):
         if self.project:
             if self.data_file:
-                if self.settings:
-                    master_name = "%s_%s_%s.%s"%(self.asset_name,self.component_name,"MASTER","ma")
-                    
-                    master_file = os.path.join(self.stage_path,master_name) 
-                    if os.path.isfile(master_file):
-                        return master_file
+                file_name = "{0}.{1}".format(self.formatFileName(), "ma")
+                if os.path.isfile(os.path.join(self._path, file_name)):
+
+                    author = "n/a"
+                    note = ""
+                    date = "n/a"
+                    origin = "n/a"
+                    versions_data = self.master_
+
+                    if versions_data:
+                        if "author" in versions_data:
+                            author = versions_data["author"]
+                        if "note" in versions_data:
+                            note = versions_data["note"]
+                        if "date" in versions_data:
+                            date = versions_data["date"]
+                        if "origin" in versions_data:
+                            origin = versions_data["origin"]
+
+                    master =  MasterNode(_master_, parent=self, path=file_name, author=author,
+                                      number=None, date=date, note=note, origin=origin, stage=self)
+                    self.populate_master_versions(master)
+
+                    return master
+
+
         return None
+
+    # @property
+    # def master(self):
+    #     if self.project:
+    #         if self.data_file:
+    #             if self.settings:
+    #                 master_name = "%s_%s_%s.%s"%(self.asset_name,self.component_name,"MASTER","ma")
+    #
+    #                 master_file = os.path.join(self.stage_path,master_name)
+    #                 if os.path.isfile(master_file):
+    #                     return master_file
+    #     return None
         
     '''
     @property
@@ -1500,7 +1707,7 @@ class StageNode(RootNode):
         return None
 
         
-    def new_master(self, from_file = False):
+    def old_new_master(self, from_file = False):
         if self.project:
             if self.data_file:
                 if self.settings:

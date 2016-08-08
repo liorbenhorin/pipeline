@@ -1930,6 +1930,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             self.stageSelect()
             self.stageCombo.comboBox.currentIndexChanged.connect(self.stageChanged)
+            self.updateVersionsTable()
             return True
 
         if isinstance(self.stageCombo, dtv.ComboStaticWidget):
@@ -2703,6 +2704,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def version_save(self):
         if self.versionsView and self._stageNode:
+            self.ui.stage_tabWidget.setCurrentIndex(0)
             self._stageNode.new_version()
         # if self.set_component_selection():
         #     if self.component:
@@ -2787,15 +2789,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         files.explore(file)        
 
     def master_save(self):
-        if self.set_component_selection():
-            if self.component:
-                self.toggle_scene_open_script()
-                self.component.new_version()
-                self.component.new_master(from_file = False)
-                self.toggle_scene_open_script()
-                self.update_masters()
-                self.update_published_masters()
-                self.ui.asset_component_files_tabWidget.setCurrentIndex(1)
+        if self.versionsView and self._stageNode:
+            self.ui.stage_tabWidget.setCurrentIndex(1)
+            self._stageNode.new_master(self.version)
+        # if self.set_component_selection():
+        #     if self.component:
+        #         self.toggle_scene_open_script()
+        #         self.component.new_version()
+        #         self.component.new_master(from_file = False)
+        #         self.toggle_scene_open_script()
+        #         self.update_masters()
+        #         self.update_published_masters()
+        #         self.ui.asset_component_files_tabWidget.setCurrentIndex(1)
              
 
     def master_open(self):    
@@ -3473,6 +3478,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.populate_clients()
         self.populate_projects()
         self.stage_ui()
+        #self.updateVersionsTable()
 
 
 

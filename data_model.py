@@ -16,6 +16,10 @@ global _dummy_
 global _new_
 global _catagory_
 global _admin_
+global _version_
+global _master_
+_master_ = "master"
+_version_ = "version"
 _admin_ = "admin"
 _catagory_ = "catagory"
 _new_ = "new"
@@ -1547,58 +1551,58 @@ class PipelineProjectProxyModel(QtGui.QSortFilterProxyModel):
     def treeView(self, object):
         self._treeView = object
                     
-    # def filterAcceptsRow(self,sourceRow,sourceParent):
-    #
-    #     # hide components from the treeview
-    #     id =  self.sourceModel().index(sourceRow,0,sourceParent)
-    #
-    #     if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent):
-    #
-    #
-    #         #if self.sourceModel().getNode(id).typeInfo() == _stage_:
-    #         #    return False
-    #
-    #         return True
-    #
-    #     return self.hasAcceptedChildren(sourceRow,sourceParent)
-    #
-    # def hasAcceptedChildren(self,sourceRow,sourceParent):
-    #
-    #     model=self.sourceModel()
-    #     sourceIndex=model.index(sourceRow,0,sourceParent)
-    #     if not sourceIndex.isValid():
-    #         return False
-    #     indexes=model.rowCount(sourceIndex)
-    #     for i in range(indexes):
-    #         if self.filterAcceptsRow(i,sourceIndex):
-    #             return True
-    #
-    #     return False
-    #
-    # def setFilterRegExp(self, exp):
-    #
-    #     super(PipelineProjectProxyModel, self).setFilterRegExp(exp)
-    #     if self.treeView:
-    #
-    #
-    #         if len(exp)>0:
-    #             '''
-    #             i dont need to read the tree in each text change
-    #             only once
-    #             ----> this can be more elegant
-    #             '''
-    #             if len(exp) == 1:
-    #                 self.treeView.list_flat_hierarchy()
-    #
-    #             self.treeView.filterContents()
-    #
-    #             self.treeView._ignoreExpentions = True
-    #             self.treeView.expandAll()
-    #             self.treeView._ignoreExpentions = False
-    #         else:
-    #             self.treeView._ignoreExpentions = True
-    #             self.treeView.restoreState()
-    #             self.treeView._ignoreExpentions = False
+    def filterAcceptsRow(self,sourceRow,sourceParent):
+
+        # hide components from the treeview
+        id =  self.sourceModel().index(sourceRow,0,sourceParent)
+
+        if super(PipelineProjectProxyModel,self).filterAcceptsRow(sourceRow,sourceParent):
+
+
+            #if self.sourceModel().getNode(id).typeInfo() == _stage_:
+            #    return False
+
+            return True
+
+        return self.hasAcceptedChildren(sourceRow,sourceParent)
+
+    def hasAcceptedChildren(self,sourceRow,sourceParent):
+
+        model=self.sourceModel()
+        sourceIndex=model.index(sourceRow,0,sourceParent)
+        if not sourceIndex.isValid():
+            return False
+        indexes=model.rowCount(sourceIndex)
+        for i in range(indexes):
+            if self.filterAcceptsRow(i,sourceIndex):
+                return True
+
+        return False
+
+    def setFilterRegExp(self, exp):
+
+        super(PipelineProjectProxyModel, self).setFilterRegExp(exp)
+        if self.treeView:
+
+
+            if len(exp)>0:
+                '''
+                i dont need to read the tree in each text change
+                only once
+                ----> this can be more elegant
+                '''
+                if len(exp) == 1:
+                    self.treeView.list_flat_hierarchy()
+
+                self.treeView.filterContents()
+
+                self.treeView._ignoreExpentions = True
+                self.treeView.expandAll()
+                self.treeView._ignoreExpentions = False
+            else:
+                self.treeView._ignoreExpentions = True
+                self.treeView.restoreState()
+                self.treeView._ignoreExpentions = False
 
 
 class PipelineContentsProxyModel(QtGui.QSortFilterProxyModel):
@@ -1672,8 +1676,202 @@ class PipelineVersionsProxyModel(QtGui.QSortFilterProxyModel):
         self.setFilterRole(0)
         self.setFilterKeyColumn(0)
 
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        # hide components from the treeview
+        id = self.sourceModel().index(sourceRow, 0, sourceParent)
+
+        if super(PipelineVersionsProxyModel, self).filterAcceptsRow(sourceRow, sourceParent):
+             if self.sourceModel().getNode(id).typeInfo() == _version_:
+                    return True
+
+             return False
+
+
+class PipelineMastersProxyModel(QtGui.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(PipelineMastersProxyModel, self).__init__(parent)
+
+        self.setDynamicSortFilter(True)
+        self.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.setSortRole(0)
+        self.setFilterRole(0)
+        self.setFilterKeyColumn(0)
+
+    def filterAcceptsRow(self, sourceRow, sourceParent):
+        # hide components from the treeview
+        id = self.sourceModel().index(sourceRow, 0, sourceParent)
+
+        if super(PipelineMastersProxyModel, self).filterAcceptsRow(sourceRow, sourceParent):
+             if self.sourceModel().getNode(id).typeInfo() == _master_:
+                    return True
+
+             return False
+
 
 class PipelineVersionsModel(QtCore.QAbstractTableModel):#QAbstractTableModel):
+
+    MIMEDATA = 'application/x-qabstractitemmodeldatalist'
+
+    def __init__(self, items=[], parent=None):
+        QtCore.QAbstractTableModel.__init__(self, parent)
+        self.__items = items
+
+    @property
+    def items(self):
+        return self.__items
+
+    def headerData(self, section, orientation, role):
+
+        if role == QtCore.Qt.DisplayRole:
+
+            if orientation == QtCore.Qt.Horizontal:
+                if section == 1:
+                    return "Author"
+                if section == 2:
+                    return "Date Saved"
+
+            if orientation == QtCore.Qt.Vertical:
+                if self.__items[section].typeInfo() != _new_:
+                    return self.__items[section].number
+                else:
+                    return section
+            else:
+                return
+                #
+                # if role == QtCore.Qt.DecorationRole:
+                #
+                #     if orientation == QtCore.Qt.Horizontal:
+                #         if section == 0:
+                #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+                #         if section == 1:
+                #             return QtGui.QIcon(QtGui.QPixmap(cube_icon))
+                #     else:
+                #         return
+
+    def rowCount(self, parent):
+        return len(self.__items)
+
+    def columnCount(self, parent):
+        return 5
+
+    def data(self, index, role):
+
+        if role == QtCore.Qt.EditRole:
+            row = index.row()
+            if self.__items[row].typeInfo() != _new_:
+                row = index.row()
+                if index.column() == 3:
+                    return self.__items[row].fullName
+                if index.column() == 0:
+                    return self.__items[row].author
+                if index.column() == 4:
+                    return self.__items[row].number
+                if index.column() == 6:
+                    resource = self.__items[row].resource
+                    return QtGui.QPixmap(resource)
+
+            return self.__items[index.row()].name
+
+        if role == QtCore.Qt.DecorationRole:
+            row = index.row()
+            if self.__items[row].typeInfo() != _new_:
+                if index.column() == 0:
+                    resource = self.__items[index.row()].resource
+                    return QtGui.QIcon(QtGui.QPixmap(resource))
+
+                if index.column() == 3:
+                    resource = self.__items[index.row()].note_decoration
+                    return QtGui.QIcon(QtGui.QPixmap(resource))
+
+
+        if role == QtCore.Qt.DisplayRole:
+            row = index.row()
+            if self.__items[row].typeInfo() != _new_:
+                if index.column() == 1:
+                    return self.__items[row].author
+                if index.column() == 2:
+                    return self.__items[row].date
+                #if index.column() == 3:
+                #    return self.__items[row].note
+                if index.column() == 6:
+                    return self.__items[row].fullName
+                if index.column() == 1:
+                    return self.__items[row].number
+
+            if role == 100: #SortRole
+                row = index.row()
+                if self.__items[row].typeInfo() != _new_:
+                    if index.column() == 0:
+                        return self.__items[row].number
+
+    def indexFromNode(self, node):
+        if node in self.__items:
+            row = self.__items.index(node)
+            return self.index(row, 0, QtCore.QModelIndex())
+
+    def index(self, row, column, parent):
+        if not self.hasIndex(row, column):
+            return QtCore.QModelIndex()
+
+        return self.createIndex(row, column)
+
+    def flags(self, index):
+
+        if index.isValid():
+
+            if self.getNode(index).typeInfo() == _dummy_:
+                return QtCore.Qt.NoItemFlags
+
+        return QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled
+
+    """CUSTOM"""
+    """INPUTS: QModelIndex"""
+
+    def getNode(self, index):
+        if index.isValid():
+            return self.__items[index.row()]
+
+        return None
+
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        if role == QtCore.Qt.EditRole:
+
+            row = index.row()
+
+            if role == QtCore.Qt.EditRole:
+
+                if index.column() == 0:
+                    self.__items[row].resource = value
+                else:
+                    self.__items[row].name = value
+                self.dataChanged.emit(index, index)
+
+                return True
+
+        return False
+
+    # =====================================================#
+    # INSERTING & REMOVING
+    # =====================================================#
+    def insertRows(self, position, rows, parent=QtCore.QModelIndex()):
+        self.beginInsertRows(parent, position, position + rows - 1)
+
+        self.endInsertRows()
+
+        return True
+
+    def removeRows(self, position, rows, parent=QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, position, position + rows - 1)
+
+        for i in range(rows):
+            value = self.__items[position]
+            self.__items.remove(value)
+
+        self.endRemoveRows()
+        return True
+
+
+class PipelineMastersModel(QtCore.QAbstractTableModel):#QAbstractTableModel):
 
     MIMEDATA = 'application/x-qabstractitemmodeldatalist'
 
