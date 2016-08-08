@@ -863,13 +863,18 @@ class newTreeDialog(newFolderDialog):
 
     def result(self):
         res = {}
-        #res["name"] = self.name_input.text()
-        #res["quantity"] = self.quantity_slider.value()
-        #res["padding"] = self.padding_slider.value()
+
+
+
         levels = []
         for level in self.levels:
-            levels.append([level[0],level[1].text(),level[2].value(),level[3].value(),[]])
+            levels.append([level[0],level[1].text(),level[2].value(),level[3].value()])
         res["levels"] = levels
+        '''
+        res["levels"] is a list with instruction for tree creation:
+        [ [level_name, folder_name, padding, quantitiy] , ... for each level ]
+        '''
+
         stages = {}
         for option in self.stages_options:
             stages[option] = self.stages_options[option].isChecked() # {stage: bool}

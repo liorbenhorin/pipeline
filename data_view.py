@@ -1853,22 +1853,16 @@ class pipelineTreeView(QtGui.QTreeView):
         for i in depth_list:
             ancestors.append(self.sourceModel.getNode(i))
 
-        def rec(items, p):
-
+        def rec(items, p, stages, name_format):
+            """ recursive function for generating a tree out of the instructions list called items
+            the function creates nodes by instruction in the first item in the list, then while the list is longer then 1,
+            it sends the list againg but without the current item
+            the parent is the currently created node"""
             times = items[0][2]
             name = items[0][1]
             padding = items[0][3]
-            #nodes = items[0][4]
 
             for i in range(times):
-                #nodes.append(i)
-                #print "create node for", name, "--->", nodes[i]
-
-                # if i > 0:
-                #     print "build -->",  levels[i][0], "parent is -->" ,levels[i-1][0]
-                # else:
-                #     print "build -->", levels[i][0], "parent is --> main"
-
                 base_folder_name = name
 
                 number = files.set_padding(i, padding)
@@ -1888,25 +1882,44 @@ class pipelineTreeView(QtGui.QTreeView):
                 i = self.sourceModel.indexFromNode(p, QtCore.QModelIndex())
                 depth_list = self.sourceModel.listAncestos(i)
 
-                path = os.path.join(parent_node.path, folder_name)
-                node = dt.FolderNode(folder_name, path=path, parent=p, virtual=True,
+                path = os.path.join(p.path, folder_name)
+
+                if len(items) == 1:
+                    node = dt.AssetNode(folder_name, path=path, parent=p, virtual=True,
+                                        section=p.section)
+
+                    self.sourceModel.insertRows(0, 0, parent=i, node=node)
+                    self._proxyModel.invalidate()
+
+                    '''for an asset, generate stages:'''
+
+                    new_index = self.sourceModel.indexFromNode(node, QtCore.QModelIndex())
+                    for s in stages:
+                        if stages[s]:
+                            path = os.path.join(p.path, folder_name, s)
+                            # formatDepth
+                            stageNode = dt.StageNode(s, parent=node, path=path, virtual=True,
+                                                     name_format=name_format, section=p.section,
+                                                     project=self.pipelineUI.project, depth=len(depth_list))
+                            # if node is not False:
+                            self._sourceModel.insertRows(0, 0, parent=new_index, node=stageNode)
+                            self._proxyModel.invalidate()
+
+                else:
+                    node = dt.FolderNode(folder_name, path=path, parent=p, virtual=True,
                                      section=p.section, project=self.pipelineUI.project,
                                      depth=len(depth_list))
 
 
-                self.sourceModel.insertRows(0, 0, parent=i, node=node)
-                self._proxyModel.invalidate()
+                    self.sourceModel.insertRows(0, 0, parent=i, node=node)
+                    self._proxyModel.invalidate()
 
-                #nodes.append(node)
 
                 if len(items) > 1:
                     l = list(items[1:])
-                    rec(l, node)
+                    rec(l, node, stages, name_format)
                 else:
                     pass
-
-
-
 
 
 
@@ -1915,56 +1928,8 @@ class pipelineTreeView(QtGui.QTreeView):
         res = folderDlg.result()
         if result == QtGui.QDialog.Accepted:
             levels = res["levels"]
-            rec(levels, parent_node)
-            # deep = len(levels)
-            #
-            # for i in range(deep):
-            #     quantitiy = levels[i][2]
-            #     name = levels[i][1]
-            #     padding = levels[i][3]
-            #     levels[i].append([])
-            #
-            #     for x in range(quantitiy):
-            #
-                    # # if i > 0:
-                    # #     print "build -->",  levels[i][0], "parent is -->" ,levels[i-1][0]
-                    # # else:
-                    # #     print "build -->", levels[i][0], "parent is --> main"
-                    #
-                    # base_folder_name = name
-                    #
-                    # number = files.set_padding(i, padding)
-                    # if base_folder_name != "":
-                    #     folder_name = "{0}{1}".format(base_folder_name, number) if quantitiy > 1 else base_folder_name
-                    # else:
-                    #     folder_name = "{0}".format(number) if quantitiy > 1 else "unnamed_folder"
-                    #
-                    # # skip = False
-                    # # for child in parent_node.children:
-                    # #     if child.name == folder_name:
-                    # #         skip = True
-                    # # if skip:
-                    # #     print "folder exists!"
-                    # #     continue
-                    # if i > 0 :
-                    #     parent =
-                    #     parent_node = levels[i][4][]
-                    #
-                    # path = os.path.join(parent_node.path, folder_name)
-                    # node = dt.FolderNode(folder_name, path=path, parent=parent_node, virtual=True,
-                    #                      section=parent_node.section, project=self.pipelineUI.project,
-                    #                      depth=len(ancestors))
-                    #
-                    # self.sourceModel.insertRows(0, 0, parent=parent, node=node)
-                    # self._proxyModel.invalidate()
-            #         levels[i][4].append(node)
-
-
-
-
-
-
-
+            rec(levels, parent_node, res["stages"], res["name_format"])
+            self.update.emit()
 
 
 
