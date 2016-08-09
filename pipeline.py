@@ -135,6 +135,7 @@ reload(dlg)
 
 
 global treeModel
+global dresserModel
 
 log_file = os.path.join(os.path.dirname(__file__), 'pipeline_log.txt')
 log = logging.getLogger(__name__)
@@ -1431,6 +1432,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         self.connect(self.ui.stage_tabWidget, QtCore.SIGNAL('currentChanged(int)'), self.updatgeStageTab)
 
+        self.ui.updateDresser_pushButton.clicked.connect(self.populate_dresser_tree)
+        self.ui.clearDresser_pushButton.clicked.connect(self.clear_dresser_tree)
+
         self.ui.clearTree_pushButton.clicked.connect(self.clear_project_tree)
         self.ui.updateTree_pushButton.clicked.connect(self.populate_project_tree)
         self.ui.users_pushButton.clicked.connect(self.login_window)
@@ -1702,17 +1706,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
  #       self.populate_navbar()
 
     def exctract_current_file_location(self):
+        ''' THIS WILL ONLY WORK FOR STAGES THAT ARE SAVED WITH ALL DEPTH NAME,
+        FOR STAGES WITH LOWER NAME FORMAT NEED TO ADD A FIX'''
+
         file = maya.current_open_file()
 
         name = files.file_name_no_extension(files.file_name(file))
 
         elements = name.split("_")
-        #if len(elements)>1:
 
         if len( elements ) > 1:
             if self.project.prefix:
                 elements.pop(0)
-            '''This will not work on masters!!! need to find a way to know if the filename ends with a stage or with a version'''
 
             master = True
             if len(elements[-1]) == self.project.project_padding + 1:
@@ -1723,8 +1728,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 stage = elements[-1]
             else:
                 stage = elements[-2]
-
-
 
             if dtv.setComboValue(self.stageCombo.comboBox, stage):
                 if master:
@@ -1878,6 +1881,35 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     # def tempV(self, v):
     #     print v, "****"
 
+    def populate_dresser_tree(self):
+        if self.project:
+            _root = dt.RootNode("root", path=self.project.path, parent=self.project, settings=self.settings,
+                                project=self.project)
+
+            assets = dt.RootNode("assets", path=os.path.join(self.project.path, 'assets'), parent=_root,
+                                 section=_assets_, settings=self.settings, project=self.project)
+
+            assets.model_dresser_tree()
+            # scenes = dt.RootNode("scenes", path=os.path.join(self.project.path, 'scenes'), parent=_root,
+            #                      section=_animation_, settings=self.settings, project=self.project)
+
+            dresserModel = dtm.PipelineProjectModel(_root, self)
+
+
+            _proxyModel = dtm.PipelineProjectProxyModel(self)
+            _proxyModel.setSourceModel(dresserModel)
+            _proxyModel.setDynamicSortFilter(True)
+            _proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+            _proxyModel.setSortRole(0)
+            _proxyModel.setFilterRole(0)
+            _proxyModel.setFilterKeyColumn(0)
+
+            self.dresser_tree.setModel(_proxyModel)
+        else:
+
+            self.dresser_tree.setModel(None)
+
+
     def populate_project_tree(self):
         if self.project:
 
@@ -1905,7 +1937,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             it's the main tree model object, its global so it is deleted every restart of Pipeline
             '''
 
-            treeModel = dtm.PipelineProjectModel(_root)
+            treeModel = dtm.PipelineProjectModel(_root, self)
 
 
             '''
@@ -1954,6 +1986,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         except:
             pass
 
+    def clear_dresser_tree(self):
+        self.dresser_tree.setModel(None)
+        try:
+            del dresserModel
+        except:
+            pass
 
     def stage_ui(self):
 
@@ -4385,6 +4423,7 @@ def show():
 
     try:
         del treeModel
+        del dresserModel
     except:
         pass
     
