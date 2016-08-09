@@ -591,9 +591,20 @@ class RootNode(Node):#, Metadata_file):
         def dicts(t):
             return {k: dicts(t[k]) for k in t}
 
+        z = dicts(x)
+
         import json
         print json.dumps(dicts(x), indent=4)
 
+        def treeM(dict, parent):
+            for key in dict:
+                print "parent { ", parent, " }"
+                print "         bulding-->", key
+                p = key
+                i = dict[key]
+                treeM(i, p)
+
+        treeM(z, self)
 
 
 
