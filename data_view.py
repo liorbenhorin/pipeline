@@ -877,7 +877,8 @@ class PipelineVersionsView(QtGui.QTreeView):
 
             self.setIndentation(0)
 
-
+            self.proxyModel = self.model()
+            self.sourceModel = self.proxyModel.sourceModel()
 
             #self.header().setResizeMode(QtGui.QHeaderView.Stretch)
 
@@ -964,6 +965,45 @@ class PipelineVersionsView(QtGui.QTreeView):
             self.parent.version = self.model().sourceModel().getNode(index)
             self.setCurrentIndex(self.model().mapFromSource(index))
 
+    def contextMenuEvent(self, event):
+
+        handled = True
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()
+        node = None
+
+        if index.isValid():
+            src = self.asModelIndex(index)
+            node = self.asModelNode(src)
+
+        actions = []
+
+        if node and not node._deathrow:
+
+            if node.typeInfo() == _version_:
+
+                actions.append(QtGui.QAction("Explore...", menu,
+                                             triggered=functools.partial(self.explore, src)))
+            else:
+
+                event.accept()
+                return
+
+        else:
+            event.accept()
+            return
+
+        menu.addActions(actions)
+
+        menu.exec_(event.globalPos())
+        event.accept()
+
+        return
+
+    def explore(self, index):
+        node = self.asModelNode(index)
+        node.explore()
+
 
     #@QtCore.Slot()
     def deletActionClicked(self):
@@ -975,7 +1015,28 @@ class PipelineVersionsView(QtGui.QTreeView):
         index = self.model().mapToSource(index)
         self.model().sourceModel().getNode(index).delete_me()
 
+    def asModelIndex(self, index):
+        return self.proxyModel.mapToSource(index)
 
+    def asModelNode(self, index):
+        return self.sourceModel.getNode(index)
+
+
+    @property
+    def proxyModel(self):
+        return self._proxyModel
+
+    @proxyModel.setter
+    def proxyModel(self, model):
+        self._proxyModel = model
+
+    @property
+    def sourceModel(self):
+        return self._sourceModel
+
+    @sourceModel.setter
+    def sourceModel(self, model):
+        self._sourceModel = model
     # def delete(self):
     #     # This slot will be called when our button is clicked.
     #     # self.sender() returns a refence to the QPushButton created

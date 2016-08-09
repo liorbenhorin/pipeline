@@ -823,6 +823,9 @@ class VersionNode(Node):
     def typeInfo(self):
         return _version_
 
+    def explore(self):
+        files.explore(self.path)
+
     def reference(self):
         maya.reference_scene(self.path)
 
@@ -1332,6 +1335,11 @@ class StageNode(RootNode):
                 childes = []
                 [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
                 self.pipelineUI.version = childes[-1]
+
+
+                includes = [files.reletive_path(self.project._path, item[0]) for item in maya.list_referenced_files()]
+                print includes
+
 
 
     def reference_master_to_current(self):
