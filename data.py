@@ -1144,6 +1144,7 @@ class StageNode(RootNode):
         first_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
         first_version["author"] = self.settings.user[0]
         first_version["note"] = None
+        first_version["include"] = [files.reletive_path(self.project._path, path) for path in maya.reference_file_paths()]
 
         versions = {}
         versions[version_number] = first_version
@@ -1234,6 +1235,8 @@ class StageNode(RootNode):
                 new_version["author"] = self.settings.user[0]
                 new_version["note"] = None
                 new_version["origin"] = [from_node.typeInfo(), from_node.name]
+                new_version["include"] = [files.reletive_path(self.project._path, path) for path in maya.reference_file_paths()]
+
 
                 versions = self.masters_
                 if not versions:
@@ -1323,6 +1326,7 @@ class StageNode(RootNode):
                 new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
                 new_version["author"] = self.settings.user[0]
                 new_version["note"] = None
+                new_version["include"] = [files.reletive_path(self.project._path, path) for path in maya.reference_file_paths()]
 
                 versions = self.versions_
                 versions[version_number] = new_version
@@ -1336,9 +1340,6 @@ class StageNode(RootNode):
                 [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
                 self.pipelineUI.version = childes[-1]
 
-
-                includes = [files.reletive_path(self.project._path, item[0]) for item in maya.list_referenced_files()]
-                print includes
 
 
 

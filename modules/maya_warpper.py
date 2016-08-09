@@ -112,6 +112,10 @@ def import_scene(path = None):
         namesspace = files.file_name_no_extension(files.file_name(path))
         return cmds.file(path, i = True, f = True, ns = namesspace, esn = False)    
         
+def reference_file_paths():
+
+    return [cmds.referenceQuery(ref, filename = True) for ref in cmds.ls(rf=True)]
+
 
 def list_referenced_files():
     results = []
