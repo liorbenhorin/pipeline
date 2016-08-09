@@ -1650,6 +1650,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         # add to the designer ui
         self.ui.verticalLayout_18.addWidget(self.navWidget)
 
+        self.dresser_tree = dtv.pipelineTreeView(self)
+        self.drasserWidget = QtGui.QWidget()
+        h_layout = QtGui.QVBoxLayout()
+        h_layout.setContentsMargins(0, 0, 0, 0)
+        self.drasserWidget.setLayout(h_layout)
+        h_layout.addWidget(self.dresser_tree)
+
+        # add to the designer ui
+        self.ui.verticalLayout_8.addWidget(self.drasserWidget)
+
+
+
         self.tree.update.connect(self.populate_navbar)
         self.tree.update.connect(self.tree_change_options)
         self.ui.commitTree_pushButton.clicked.connect(self.commit_tree)
@@ -2258,11 +2270,20 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                        self.ui.collapseTree_pushButton,
                        self.ui.expendTree_pushButton,
                        self.ui.updateTree_pushButton,
-                       self.ui.clearTree_pushButton
+                       self.ui.clearTree_pushButton,
+                       self.ui.collapseDresser_pushButton,
+                       self.ui.expendDresser_pushButton,
+                       self.ui.updateDresser_pushButton,
+                       self.ui.clearDresser_pushButton
                        ]:
             
             button.setIconSize(QtCore.QSize(20,20))
 
+
+        self.ui.clearDresser_pushButton.setIcon(QtGui.QIcon(creation_icon))
+        self.ui.updateDresser_pushButton.setIcon(QtGui.QIcon(reload_icon))
+        self.ui.collapseDresser_pushButton.setIcon(QtGui.QIcon(collapse_icon))
+        self.ui.expendDresser_pushButton.setIcon(QtGui.QIcon(expend_icon))
         self.ui.clearTree_pushButton.setIcon(QtGui.QIcon(creation_icon))
         self.ui.updateTree_pushButton.setIcon(QtGui.QIcon(reload_icon))
         self.ui.collapseTree_pushButton.setIcon(QtGui.QIcon(collapse_icon))
@@ -2284,6 +2305,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.comp_note_label.setPixmap(comment_icon)#.scaled(16,16))
 
         self.ui.searchIcon_label.setPixmap(search_icon)
+        self.ui.dresser_searchIcon_label.setPixmap(search_icon)
 
         
 
