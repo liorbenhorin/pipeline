@@ -1126,7 +1126,6 @@ class StageNode(RootNode):
     def initialVersion(self):
 
 
-
         files.assure_folder_exists(self.versions_path)
 
 
@@ -1155,60 +1154,11 @@ class StageNode(RootNode):
         self.stage_file = self.data_file.read()
 
         self.edited.emit()
-        #self.pipelineUI.updateVersionsTable()
-        return
-        '''
-        self.project = project
-        self.settings = settings
-        
-        versions_path = os.path.join(path, "versions")       
-        masters_path = os.path.join(path, "masters")
-        tumbnails_path =  os.path.join(path, "tumbnails") 
-        
-        for folder_path in [versions_path, masters_path, tumbnails_path]:
-            files.create_directory(folder_path)
 
-        if not create_from:
-            maya.new_scene()
-            maya.set_fps(self.project.project_fps)
-            maya.rewind()
-            
-        elif create_from == "current_scene":
-            pass    
-            
-        version_number = set_padding(1,self.project.project_padding)
-        
-        file_name = "%s_%s_%s.%s"%(asset_name,component_name,version_number,"ma")    
-        
-        scene_path = maya.save_scene_as(path = versions_path, file_name = file_name )       
-        
-        first_version = {}
-        first_version["path"] = scene_path
-        first_version["date_created"] = "%s %s"%(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
-        first_version["author"] = self.settings.user[0]
-        first_version["note"] = "No notes"
-        
-        versions = {}
-        versions[version_number] = first_version
-        
-        masters = {}
-                               
-        component_data = {}
-        component_data["component_name"] = component_name
-        component_data["asset_name"] = asset_name
-        component_data["catagory_name"] = catagory_name
-        component_data["versions"] = versions
-        component_data["masters"] = masters
-        
-        path = os.path.join(path,"%s.%s"%(component_name,"pipe"))           
-        self.data_file = data.pickleDict().create(path, component_data)  
-        self.data_file = self.data_file.read()
-       
-        return self
-        '''
+        return
+
 
     def new_master(self, from_node = None):
-        print "saving master from ", self.name, "---", from_node.name
 
         if self.project:
             if self.data_file:
@@ -1226,8 +1176,6 @@ class StageNode(RootNode):
 
                 file_name = "{0}.{1}".format(self.formatFileName(), "ma")
                 scene_path = maya.save_scene_as(path=self._path, file_name=file_name)
-
-
 
 
                 new_version = {}
@@ -1248,67 +1196,15 @@ class StageNode(RootNode):
                 versions = new_version
                 self.master_ = versions
 
-                # master = MasterNode(_master_, parent=self, path=file_name, author=new_version["author"],
-                #            number=None, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
-                #
-                # master_child = MasterNode(version_number, parent=master, path=file_name, author=new_version["author"],
-                #                           number=version_number, date=new_version["date"], note=new_version["note"], origin=new_version["origin"], stage=self)
-
-
                 self.edited.emit()
 
-            # new_master = {}
-            # new_master["date_created"] = "%s %s" % (time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
-            # new_master["author"] = self.settings.user[0]
-            # new_master["note"] = "No notes"
-            #
-            # if self.masters:
-            #     # master versions existst
-            #
-            #     masters = self.masters
-            #     last = masters[len(masters) - 1]
-            #     version_number = set_padding(last + 1, self.project.project_padding)
-            #
-            # else:
-            #
-            #     # this will be the first master
-            #     version_number = set_padding(1, self.project.project_padding)
-            #
-            # maya.clean_up_file()
-            #
-            # file_name = "%s_%s_%s_%s.%s" % (self.asset_name, self.component_name, "MASTER", version_number, "ma")
-            # if not from_file:
-            #     scene_path = maya.save_scene_as(path=self.masters_path, file_name=file_name)
-            # else:
-            #     scene_path = os.path.join(self.masters_path, file_name)
-            #     files.file_copy(from_file, scene_path)
-            #
-            # new_master["path"] = scene_path
-            # masters = self.masters_
-            # masters[str(set_padding(0, self.project.project_padding))] = new_master
-            # masters[version_number] = new_master
-            #
-            # self.masters_ = masters
-            #
-            # master_name = "%s_%s_%s.%s" % (self.asset_name, self.component_name, "MASTER", "ma")
-            # master_file = os.path.join(self.settings.current_project_path, self.project.assets_dir, self.catagory_name,
-            #                            self.asset_name, self.component_name, master_name)
-            # files.file_copy(scene_path, master_file)
-            #
-            # maya.open_scene(master_file)
-            #
 
 
     def new_version(self):
         if self.project:
             if self.data_file:
                 files.assure_folder_exists(self.versions_path)
-                #versions = self.versions
-                #versions = self.versions
-                #if versions:
-                #    last = versions[-1]
-                #else:
-                #    last = 0
+
 
                 childes = []
                 [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
@@ -1318,7 +1214,6 @@ class StageNode(RootNode):
                 version_number = set_padding(last_version.name+1, self.project.project_padding)
 
                 file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "v", version_number, "ma")
-                #file_name = "%s_%s.%s" % (self.formatFileName(), version_number, "ma")
 
                 scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 
@@ -1333,14 +1228,11 @@ class StageNode(RootNode):
                 self.versions_ = versions
 
 
-
                 self.edited.emit()
 
                 childes = []
                 [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
                 self.pipelineUI.version = childes[-1]
-
-
 
 
     def reference_master_to_current(self):
