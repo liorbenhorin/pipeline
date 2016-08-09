@@ -746,7 +746,7 @@ class AssetNode(RootNode):
 
 class VersionNode(Node):
 
-    def __init__(self, name,path = None,  number = None, author = None, date = None, note = None, stage = None, parent=None):
+    def __init__(self, name,path = None,  number = None, author = None, date = None, note = None, stage = None, include = None, parent=None):
         super(VersionNode, self).__init__(name, parent)
 
         self._path = path
@@ -755,6 +755,7 @@ class VersionNode(Node):
         self._note = note
         self._author = author
         self._stage = stage
+        self._include = include
 
         self.resource = large_image_icon_dark
 
@@ -778,6 +779,14 @@ class VersionNode(Node):
     @property
     def stage(self):
         return self._stage
+
+    @property
+    def include(self):
+        return self._include
+
+    @include.setter
+    def include(self, data):
+        self._include = data
 
     @property
     def number(self):
@@ -815,7 +824,6 @@ class VersionNode(Node):
         return _version_
 
     def reference(self):
-        print "REF", self.path
         maya.reference_scene(self.path)
 
     def load(self):
@@ -1328,10 +1336,20 @@ class StageNode(RootNode):
 
     def reference_master_to_current(self):
         self.master
-        print "mastering"
         if self.masterNode:
-            print "master!"
             self.masterNode.reference()
+
+
+    def editVersionData(self, padded_number, key, value):
+        data = {}
+        data["versions"] = self.stage_file["versions"]
+        print data
+        data["versions"][padded_number][key] = value
+        print data
+        self.data_file.edit(data)
+        self.stage_file = self.data_file.read()
+
+        self.edited.emit()
 
 
     def removeVersionData(self, padded_number):
@@ -1628,6 +1646,7 @@ class StageNode(RootNode):
                             author = "n/a"
                             note = ""
                             date = "n/a"
+                            include = None
                             versions_data = self.versions_
                             if versions_data:
 
@@ -1639,12 +1658,14 @@ class StageNode(RootNode):
                                         note = thisVersion["note"]
                                     if "date" in thisVersion:
                                         date = thisVersion["date"]
+                                    if "include" in thisVersion:
+                                        include = thisVersion["include"]
 
                         # version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
 
 
                             VersionNode(key, parent=self, path=versions_dict[key], author=author,
-                                    number=padded_number, date=date, note=note, stage=self)
+                                    number=padded_number, date=date, note=note, include = include, stage=self)
 
                     return True
 

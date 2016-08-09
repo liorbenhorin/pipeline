@@ -2588,11 +2588,22 @@ class pipelineDresserView(QtGui.QTreeView):
 
 
     def reference_to_current(self, index):
+        if self.pipelineUI.version and self.pipelineUI._stageNode.name:
+            node = self.asModelNode(index)
+            node.reference_master_to_current()
+            print self.pipelineUI.version.name, "--->", self.pipelineUI._stageNode.name
+            data = self.pipelineUI.version.include
+            if isinstance(data, list):
+                data.append(node._masterNode.path)
+            else:
+                data = [node._masterNode.path]
 
-        node = self.asModelNode(index)
-        print "ref", node.name
-        node.reference_master_to_current()
-        return True
+            self.pipelineUI.version.include = data
+
+            self.pipelineUI._stageNode.editVersionData(self.pipelineUI.version.number, "include", data)
+            return True
+        else:
+            print "no version or stage node, so referecing is not recomended since it can not be listed"
 
 
 
