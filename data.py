@@ -569,6 +569,16 @@ class RootNode(Node):#, Metadata_file):
                                     elements.pop(0)
                                 path_elements = exctract_current_path_levels(os.path.dirname(file), absoulut_path=root._path)
                                 if elements[-2:] == path_elements[-2:]:
+
+                                    for i in range(len(path_elements)):
+                                        if i == len(path_elements)-1:  # stage
+                                            path_elements[i] = "{0}_{1}".format(_stage_ ,path_elements[i])
+                                        elif i == len(path_elements)-2: #asset
+                                            path_elements[i] = "{0}_{1}".format(_asset_, path_elements[i])
+                                        else:
+                                            path_elements[i] = "{0}_{1}".format(_folder_, path_elements[i])
+
+
                                     masters.append(path_elements)
 
                     else:
@@ -596,15 +606,16 @@ class RootNode(Node):#, Metadata_file):
         import json
         print json.dumps(dicts(x), indent=4)
 
-        def treeM(dict, parent):
+        def treeM(dict, parent, root_path):
             for key in dict:
                 print "parent { ", parent, " }"
-                print "         bulding-->", key
+                print "         bulding-->", key.split("_")[0], "--->" ,os.path.join(root_path, key.split("_")[1])
                 p = key
                 i = dict[key]
-                treeM(i, p)
+                root_path = os.path.join(root_path, key.split("_")[1])
+                treeM(i, p, root_path)
 
-        treeM(z, self)
+        treeM(z, self, self._path)
 
 
 
