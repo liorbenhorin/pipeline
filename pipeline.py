@@ -1441,16 +1441,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.users_pushButton.clicked.connect(self.login_window)
         self.ui.projects_pushButton.clicked.connect(self.projects_window)
         #self.ui.asset_component_files_tabWidget.currentChanged.connect(self.update_component_files_tab)
-        self.ui.stage_note_label.mousePressEvent = self.version_note
+        # self.ui.stage_note_label.mousePressEvent = self.version_note
         #self.ui.shot_notes_label.mousePressEvent = self.shot_note   
         self.ui.save_version_pushButton.clicked.connect(self.version_save)
         self.ui.save_master_pushButton.clicked.connect(self.master_save)
-        self.ui.import_version_pushButton.clicked.connect(self.version_import)                
+        # self.ui.import_version_pushButton.clicked.connect(self.version_import)
         #self.ui.import_shot_version_pushButton.clicked.connect(self.shot_import)  
         #self.ui.save_shot_version_pushButton.clicked.connect(self.shot_version_save)
         #self.ui.playblast_shot_pushButton.clicked.connect(self.shot_record_playblast)
         #self.ui.asset_scenes_switch_pushButton.clicked.connect(self.asset_scenes_switch)
-        self.ui.publicMaster_checkBox.clicked.connect(self.public_master_toggle)
+        # self.ui.publicMaster_checkBox.clicked.connect(self.public_master_toggle)
         
         self.playblast_menu = QtGui.QMenu(parent = self.ui.playblast_shot_pushButton)
         self.playblast_shot = QtGui.QAction("Record Playblast",self)
@@ -1716,34 +1716,34 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def exctract_current_file_location(self):
         ''' THIS WILL ONLY WORK FOR STAGES THAT ARE SAVED WITH ALL DEPTH NAME,
         FOR STAGES WITH LOWER NAME FORMAT NEED TO ADD A FIX'''
+        if self.project:
+            file = maya.current_open_file()
 
-        file = maya.current_open_file()
+            name = files.file_name_no_extension(files.file_name(file))
 
-        name = files.file_name_no_extension(files.file_name(file))
+            elements = name.split("_")
 
-        elements = name.split("_")
+            if len( elements ) > 1:
+                if self.project.prefix:
+                    elements.pop(0)
 
-        if len( elements ) > 1:
-            if self.project.prefix:
-                elements.pop(0)
+                master = True
+                if len(elements[-1]) == self.project.project_padding + 1:
+                    if files.is_number(elements[-1][1:]):
+                        master = False
 
-            master = True
-            if len(elements[-1]) == self.project.project_padding + 1:
-                if files.is_number(elements[-1][1:]):
-                    master = False
-
-            if master:
-                stage = elements[-1]
-            else:
-                stage = elements[-2]
-
-            if dtv.setComboValue(self.stageCombo.comboBox, stage):
                 if master:
-                    self.dynamicCombo.navigate(elements[:-1])
-                    self.ui.stage_tabWidget.setCurrentIndex(1)
+                    stage = elements[-1]
                 else:
-                    self.dynamicCombo.navigate(elements[:-2])
-                    self.ui.stage_tabWidget.setCurrentIndex(0)
+                    stage = elements[-2]
+
+                if dtv.setComboValue(self.stageCombo.comboBox, stage):
+                    if master:
+                        self.dynamicCombo.navigate(elements[:-1])
+                        self.ui.stage_tabWidget.setCurrentIndex(1)
+                    else:
+                        self.dynamicCombo.navigate(elements[:-2])
+                        self.ui.stage_tabWidget.setCurrentIndex(0)
 
 
 
@@ -2244,7 +2244,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             role = self.project.validate_user(self.settings.user[0], self.settings.user[1])
             if role:
-                self.ui.users_pushButton.setText("{0} > {1}".format(self.settings.user[0], self.project.name))
+                self.ui.users_pushButton.setText("{0}".format(self.settings.user[0]))
                 self.project_ui_Enable(True)
             else:
                 self.project_ui_Enable(False)
@@ -2369,62 +2369,62 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def verify_projects(self):
         self.project = None
         projects = self.settings.projects
-        
-        if projects:            
-            for p in projects:                                    
-                project_file_path = os.path.join(self.settings.project_path(project_key = p),"project.json")  
-                                
-                if os.path.isfile(project_file_path):                    
-                    project = pipeline_project(path = project_file_path)                    
+
+        if projects:
+            for p in projects:
+                project_file_path = os.path.join(self.settings.project_path(project_key = p),"project.json")
+
+                if os.path.isfile(project_file_path):
+                    project = pipeline_project(path = project_file_path)
                     project_key = project.project_key
-                    
+
                     if p == project_key:
                         projects[p][1] = "ONLINE"
                     else:
-                        projects[p][1] = "OFFLINE"                        
-                    
+                        projects[p][1] = "OFFLINE"
+
                     del project
-                
+
                 else:
                     projects[p][1] = "OFFLINE"
-                    
+
             self.settings.projects = projects
-                        
+
             if self.settings.current_project_status == "OFFLINE":
                 self.update_current_open_project(None)
                 return False
-                
+
         return True
 
-    def set_project(self,**kwargs):  
+    def set_project(self,**kwargs):
         from_pm = False
         if "from_projects_manager" in kwargs:
             from_pm = kwargs["from_projects_manager"]
-            
-            
-        if self.settings.current_project:            
-            self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.json"), settings = self.settings)
-            
 
-                                       
+
+        if self.settings.current_project:
+            self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.json"), settings = self.settings)
+
+
+
             self.settings.role = None
             username = self.settings.user[0]
             password = self.settings.user[1]
-            
+
             if self.project.project_users != None:
                 if username in self.project.project_users:
                     if self.project.project_users[username][0] == password:
                         self.settings.role = self.project.project_users[username][1]
-                        self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))                                                          
-                        
-                        
+                        self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))
+
+
                         return True
-            
+
 
                 if not self.settings.role:
-                    
+
                     if from_pm:
-                                        
+
                         login = dlg.Login()
                         result = login.exec_()
                         q_user, q_password  = login.result()
@@ -2433,29 +2433,29 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                 if self.project.project_users[q_user][0] == q_password:
                                     self.settings.user = [q_user, q_password]
                                     self.settings.role = self.project.project_users[q_user][1]
-                                    self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))                                                          
-                                    return True 
-                                
-                                                                 
-                            
-                                log.info("Login faild") 
-                                     
+                                    self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))
+                                    return True
+
+
+
+                                log.info("Login faild")
+
                     self.project = None
                     self.settings.current_project = None
-                    
+
                     if projectsWindow:
                         try:
                             projectsWindow.updateProjectsTable()
                         except:
                             pass
-                    
+
                     return False
-       
-        
+
+
             else:
                 return True
 
-                
+
         else:
             self.settings.role = None
             self.project = None
@@ -2464,7 +2464,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def update_current_open_project(self,project_key,**kwargs):
         '''
-        thie method is used from the projects window, when a project is being set, 
+        thie method is used from the projects window, when a project is being set,
         update the settings file,
         call the set project and init project methods
 
@@ -2473,34 +2473,74 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         from_pm = False
         if "from_projects_manager" in kwargs:
             from_pm = kwargs["from_projects_manager"]
-        
-                     
+
+
         if project_key:
 
             #if self.settings.current_project != project_key:
-                
-            self.settings.current_project = project_key
-            
 
-            
+            self.settings.current_project = project_key
+
+
+
             if from_pm:
                 if self.set_project(from_projects_manager=True):
                     self.init_current_project()
-                
+
                     return True
             else:
                 if self.set_project():
                     self.init_current_project()
-                
-                    return True                
+
+                    return True
         else:
-            
+
             self.settings.current_project = None
             self.set_project()
-            self.init_current_project()            
+            self.init_current_project()
             #return True
-        
+
         return False
+
+    # def update_current_open_project(self,project_key,**kwargs):
+    #     '''
+    #     thie method is used from the projects window, when a project is being set,
+    #     update the settings file,
+    #     call the set project and init project methods
+    #
+    #     '''
+    #
+    #     from_pm = False
+    #     if "from_projects_manager" in kwargs:
+    #         from_pm = kwargs["from_projects_manager"]
+    #
+    #
+    #     if project_key:
+    #
+    #         #if self.settings.current_project != project_key:
+    #
+    #         self.settings.current_project = project_key
+    #
+    #
+    #
+    #         if from_pm:
+    #             if self.set_project(from_projects_manager=True):
+    #                 self.init_current_project()
+    #
+    #                 return True
+    #         else:
+    #             if self.set_project():
+    #                 self.init_current_project()
+    #
+    #                 return True
+    #     else:
+    #
+    #         self.settings.current_project = None
+    #         self.set_project()
+    #         self.init_current_project()
+    #         #return True
+    #
+    #     return False
 
     def _decode_users(self):        
         decode = getattr(self.ui,dlg._decode_strings()[0])
@@ -2517,21 +2557,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 projectsWindow.updateProjectsTable()
         except:
            pass
-        
-            
+
+
     def init_current_project(self):
-        
+
         '''
         startup of project ui:
-            reset all selections            
-            write the project name to the ui           
-            update the catagories table            
-            update the sequences table            
+            reset all selections
+            write the project name to the ui
+            update the catagories table
+            update the sequences table
             update the published masters table
-            
-        
+
+
         '''
-        self.active_version = None       
+        self.active_version = None
         self._catagory_name = None
         self._asset_name = None
         self._component_name = None
@@ -2543,63 +2583,63 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._shot = None
         self._shot_version = None
         self._shot_playblast_version = None
- 
-        #if self.settings.current_project_name: 
-        if self.project:             
-            self.ui.projects_pushButton.setText(self.settings.current_project_name)  
-            #self.enable(self.ui.assets_selection_frame)  
-            #self.enable(self.ui.shots_assets_tabWidget)               
 
-             
+        #if self.settings.current_project_name:
+        if self.project:
+            self.ui.projects_pushButton.setText(self.settings.current_project_name)
+            #self.enable(self.ui.assets_selection_frame)
+            #self.enable(self.ui.shots_assets_tabWidget)
 
-            self.enable(self.ui.save_master_pushButton, level = 1)        
+
+
+            self.enable(self.ui.save_master_pushButton, level = 1)
             self.enable(self.ui.save_version_pushButton, level = 1)
             self.enable(self.ui.import_version_pushButton, level = 1)
             #self.enable(self.ui.save_shot_version_pushButton, level = 2)
             #self.enable(self.ui.import_shot_version_pushButton, level = 2)
-            
+
             '''
             if self.settings.role > 1 and self.settings.role < 3:
-                
+
                 if self.ui.scenes_main_widget.isHidden():
-                    self.asset_scenes_switch()            
+                    self.asset_scenes_switch()
                 #self.ui.asset_scenes_switch_pushButton.setHidden(True)
             else:
                 pass
                 #self.ui.asset_scenes_switch_pushButton.setHidden(False)
-               '''     
-                    
-                    
+               '''
+
+
             #self.update_category()
             #self.update_sequence()
             #self.update_published_masters()
 
         else:
             self.ui.projects_pushButton.setText("No Project")
-            #self.disable(self.ui.assets_selection_frame)  
+            #self.disable(self.ui.assets_selection_frame)
             #self.disable(self.ui.shots_assets_tabWidget)
             #self.update_category()
             #self.update_sequence()
             #self.update_published_masters()
-            log.info ( "logged out") 
-                                       
+            log.info ( "logged out")
 
 
 
-  
-            
+
+
+
     def create_catagory(self):
         catagory_name, ok = QtGui.QInputDialog.getText(self, 'New catagory', 'Enter catagory name:')
-        
+
         if ok:
             result = self.project.create_catagory(project_path = self.settings.current_project_path, catagory_name = catagory_name)
             if result:
                 self.update_category()
 
     def delete_catagory(self):
-        
-        if self.catagory_name:  
-                 
+
+        if self.catagory_name:
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this catagory?" ):
 
                 result = self.project.delete_catagory(project_path = self.settings.current_project_path, catagory_name = self.catagory_name)
@@ -2608,54 +2648,54 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def create_asset(self):
         asset_name, ok = QtGui.QInputDialog.getText(self, 'New asset', 'Enter asset name:')
-        
+
         if ok:
-            
+
             result = self.project.create_asset(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = asset_name)
             if result:
                 self.update_asset()
 
     def delete_asset(self):
- 
+
         if self.asset_name:
-                 
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this asset?" ):
-                
+
                 result = self.project.delete_asset(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name)
                 if result:
                     self.update_asset()
 
     def _create_component(self, component_name = None, create_from = None):
-        
-            self.toggle_scene_open_script()           
-            result = self.project.create_component(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, component_name = component_name, create_from = create_from)            
+
             self.toggle_scene_open_script()
-            
+            result = self.project.create_component(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, component_name = component_name, create_from = create_from)
+            self.toggle_scene_open_script()
+
             return result
-     
+
     def create_component(self):
         component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
-        
+
         if ok:
             result = self._create_component(component_name = component_name, create_from = None)
-            
+
             if result:
-                
+
                 self.component = result
                 self.update_component()
                 self.table_selection_by_string(self.ui.components_tableWidget,component_name)
                 self.update_component_selection()
-                
+
     def create_component_from_current_scene(self):
 
-        
+
         component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
-        
+
         if ok:
             result = self._create_component(component_name = component_name, create_from = "current_scene")
-            
+
             if result:
-                
+
                 self.component = result
                 self.update_component()
                 self.table_selection_by_string(self.ui.components_tableWidget,component_name)
@@ -2670,21 +2710,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if result == QtGui.QDialog.Accepted:
             log.info(input)
             temp_file = maya.new_scene_from_selection(project_path = self.settings.current_project_path, mode = input[1])
-            if temp_file:                
-                result = self._create_component(component_name = input[0], create_from = "current_scene")                
+            if temp_file:
+                result = self._create_component(component_name = input[0], create_from = "current_scene")
                 if result:
-                    files.delete_file(temp_file)                   
+                    files.delete_file(temp_file)
                     self.component = result
                     self.update_component()
-                    self.table_selection_by_string(self.ui.components_tableWidget,input[0])  
-                    self.update_component_selection()   
-                 
+                    self.table_selection_by_string(self.ui.components_tableWidget,input[0])
+                    self.update_component_selection()
+
 
     def create_component_from_file(self):
-        
+
         path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
         if path[0]:
-            
+
             component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
 
             if ok:
@@ -2692,39 +2732,39 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     log.info("OBJ import not supported yet")
                     return
                 else:
-                    if maya.open_scene(path[0]):                       
-                        result = self._create_component(component_name = component_name, create_from = "current_scene")                
-                        if result:                  
+                    if maya.open_scene(path[0]):
+                        result = self._create_component(component_name = component_name, create_from = "current_scene")
+                        if result:
                             self.component = result
                             self.update_component()
-                            self.table_selection_by_string(self.ui.components_tableWidget,component_name) 
+                            self.table_selection_by_string(self.ui.components_tableWidget,component_name)
                             self.update_component_selection()
 
 
-        
-  
+
+
     def delete_component(self):
         if self.component_name:
-                 
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this component?" ):
 
                 result = self.project.delete_component(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, component_name = self.component_name)
                 if result:
-                    self.update_component()      
+                    self.update_component()
 
 
     def create_sequence(self):
         sequence_name, ok = QtGui.QInputDialog.getText(self, 'New sequence', 'Enter sequence name:')
-        
+
         if ok:
             result = self.project.create_sequence(sequence_name = sequence_name)
             if result:
                 self.update_sequence()
 
-        
+
     def delete_sequence(self):
-        if self.sequence_name:  
-                 
+        if self.sequence_name:
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this sequence?" ):
 
                 result = self.project.delete_sequence(sequence_name = self.sequence_name)
@@ -2733,17 +2773,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def _create_shot(self, sequence_name = None, shot_name = None, create_from = None):
-        
-            self.toggle_scene_open_script()           
-            result = self.project.create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = create_from)           
+
             self.toggle_scene_open_script()
-            
+            result = self.project.create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = create_from)
+            self.toggle_scene_open_script()
+
             return result
 
     def create_shot(self):
 
         shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
-        
+
         if ok:
 
             result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = None)
@@ -2756,7 +2796,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def create_shot_from_current_scene(self):
         shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
-        
+
         if ok:
 
             result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = "current_scene")
@@ -2766,11 +2806,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 self.update_shot()
                 self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
                 self.update_shot_selection()
-    
+
     def create_shot_from_file(self):
         path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
         if path[0]:
-            
+
             shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
 
             if ok:
@@ -2778,29 +2818,29 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     log.info("OBJ import not supported yet")
                     return
                 else:
-                    if maya.open_scene(path[0]):                       
-                        result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = "current_scene")                
-                        if result:                  
+                    if maya.open_scene(path[0]):
+                        result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = "current_scene")
+                        if result:
                             self.shot = result
                             self.update_shot()
                             self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
-                            self.update_shot_selection()   
-        
+                            self.update_shot_selection()
+
     def delete_shot(self):
-        if self.shot_name:  
-                 
+        if self.shot_name:
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
 
                 result = self.project.delete_shot(sequence_name = self.sequence_name, shot_name = self.shot_name)
                 if result:
                     self.update_shot()
-   
+
 
 
     def version_note(self, event):
-        
+
         if self.master_version and not isinstance(self.master_version,list):
-        
+
             note_inpute = dlg.Note(plainText = self.component.note("masters",self.master_version))
             note = note_inpute.exec_()
             text = note_inpute.result()
@@ -2808,22 +2848,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 self.component.note("masters",self.master_version, note=text)
                 self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
                 self.update_masters()
-        
+
         elif self.catagory_version and not isinstance(self.catagory_version,list):
             note_inpute = dlg.Note(plainText = self.component.note("versions",self.catagory_version))
             note = note_inpute.exec_()
             text = note_inpute.result()
             if note == QtGui.QDialog.Accepted:
-                
+
                 self.component.note("versions",self.catagory_version, note=text)
                 self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
-                self.update_versions()                    
+                self.update_versions()
 
     def version_import(self):
         if self.settings:
             path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
             if path[0]:
-                
+
                 type, ok = QtGui.QInputDialog.getItem(self, 'Import As', 'Import file as:',["Version", "Master"], 0, False)
                 if ok:
                     print "file path:, ", path[0]
@@ -2846,33 +2886,33 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self._stageNode.new_version()
 
         
-    def version_open(self):  
-          
+    def version_open(self):
+
         widget = self.sender()
         index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
         version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-        
+
         file = self.component.file_path("versions",version)
         self.settings.current_open_file = file
         self.toggle_scene_open_script()
         maya.open_scene(file)
         self.toggle_scene_open_script()
         self.update_versions()
-        
+
         '''
         when opening a file, save the ui navigation selection to the settings file
-        '''  
-        self.update_component_selection()   
-        
-        self.enable(self.ui.actionCollect_component, level = 4) 
-          
-            
+        '''
+        self.update_component_selection()
+
+        self.enable(self.ui.actionCollect_component, level = 4)
+
+
     def version_reference(self):
         widget = self.sender()
         widget = widget.parent()
         index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
         version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-        
+
         file = self.component.file_path("versions",version)
         maya.reference_scene(file)
 
@@ -2881,7 +2921,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         widget = widget.parent()
         index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
         version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-        
+
         file = self.component.file_path("versions",version)
         maya.import_scene(file)
 
@@ -2889,307 +2929,297 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
         if not isinstance(self.catagory_version,list):
-            widget = self.sender()        
+            widget = self.sender()
             widget = widget.parent()
             index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
             version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-            
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
-                
+
                 result = self.component.delete_version("versions", version)
                 if result:
                     self.update_versions()
-            
+
         else:
-            
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
-                
+
                 # make sure not to delete the active file
                 versions = self.catagory_version
                 if self.active_version in versions:
                     versions.remove(self.active_version)
-                
+
                 result = self.component.delete_version("versions", versions)
                 if result:
                     self.update_versions()
-                    
-                    
+
+
     def version_explore(self):
         widget = self.sender()
         widget = widget.parent()
         index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
         version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-        
+
         file = self.component.file_path("versions",version)
-        files.explore(file)        
+        files.explore(file)
 
     def master_save(self):
         if self.versionsView and self._stageNode:
             self._stageNode.new_master()
             self.ui.stage_tabWidget.setCurrentIndex(1)
-            #self.version = self._stageNode.masterNode
-        # if self.set_component_selection():
-        #     if self.component:
-        #         self.toggle_scene_open_script()
-        #         self.component.new_version()
-        #         self.component.new_master(from_file = False)
-        #         self.toggle_scene_open_script()
-        #         self.update_masters()
-        #         self.update_published_masters()
-        #         self.ui.asset_component_files_tabWidget.setCurrentIndex(1)
-             
-
-    def master_open(self):    
-        widget = self.sender()
-        index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_masters_tableWidget.item(index.row(),0).text()      
-        file = self.component.file_path("masters",version)       
-        if os.path.isfile(file):
-            self.settings.current_open_file = file
-            self.toggle_scene_open_script()
-            maya.open_scene(file)
-            self.toggle_scene_open_script()
-            self.update_masters()
-            
-            self.update_component_selection()
-            
-            self.enable(self.ui.actionCollect_component, level = 4) 
-            
-            return 
 
 
-    def master_add(self):
-        widget = self.sender()
-        print widget
-        index = self.ui.published_assets_tableWidget.indexAt(widget.pos())
-        file = self.ui.published_assets_tableWidget.item(index.row(),0).text()
-        maya.reference_scene(file)
+    # def master_open(self):
+    #     widget = self.sender()
+    #     index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
+    #     file = self.component.file_path("masters",version)
+    #     if os.path.isfile(file):
+    #         self.settings.current_open_file = file
+    #         self.toggle_scene_open_script()
+    #         maya.open_scene(file)
+    #         self.toggle_scene_open_script()
+    #         self.update_masters()
+    #
+    #         self.update_component_selection()
+    #
+    #         self.enable(self.ui.actionCollect_component, level = 4)
+    #
+    #         return
 
 
-    def master_reference(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
-        file = self.component.file_path("masters",version)
-        maya.reference_scene(file)
-
-    def master_add_import(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
+    # def master_add(self):
+    #     widget = self.sender()
+    #     print widget
+    #     index = self.ui.published_assets_tableWidget.indexAt(widget.pos())
+    #     file = self.ui.published_assets_tableWidget.item(index.row(),0).text()
+    #     maya.reference_scene(file)
+    #
+    #
+    # def master_reference(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
+    #     file = self.component.file_path("masters",version)
+    #     maya.reference_scene(file)
+    #
+    # def master_add_import(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.component.file_path("masters",version)
+    #     maya.import_scene(file)
+    #
         
-        file = self.component.file_path("masters",version)
-        maya.import_scene(file)
-        
-        
-    def master_delete(self):
+    # def master_delete(self):
+    #
+    #
+    #     if not isinstance(self.master_version,list):
+    #         widget = self.sender()
+    #         widget = widget.parent()
+    #         index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
+    #         version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
+    #
+    #             result = self.component.delete_version("masters", version)
+    #             if result:
+    #                 self.update_masters()
+    #                 self.update_published_masters()
+    #
+    #     else:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
+    #
+    #             # make sure not to delete the active file
+    #             versions = self.master_version
+    #             if self.active_version in versions:
+    #                 versions.remove(self.active_version)
+    #
+    #             result = self.component.delete_version("masters", versions)
+    #             if result:
+    #                 self.update_masters()
+    #                 self.update_published_masters()
+    #
 
 
-        if not isinstance(self.master_version,list):
-            widget = self.sender()        
-            widget = widget.parent()
-            index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
-            version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
-            
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
-                
-                result = self.component.delete_version("masters", version)
-                if result:
-                    self.update_masters()
-                    self.update_published_masters()
-            
-        else:
-            
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
-                
-                # make sure not to delete the active file
-                versions = self.master_version
-                if self.active_version in versions:
-                    versions.remove(self.active_version)
-                
-                result = self.component.delete_version("masters", versions)
-                if result:
-                    self.update_masters()
-                    self.update_published_masters()
-    
+    # def master_explore(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.component.file_path("masters",version)
+    #     files.explore(file)
+    #
+    # def master_make_master(self):
+    #
+    #
+    #
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
+    #
+    #     if dlg.warning("critical", "Delete", "Are you sure you want to make this version the master?" ):
+    #         if maya.current_open_file() == self.component.master:
+    #             maya.new_scene()
+    #             maya.set_fps(self.project.project_fps)
+    #             maya.rewind()
+    #
+    #         self.component.make_master(version)
+    #         maya.open_scene(self.component.master)
+    #         self.update_masters()
 
+    # def public_master_toggle(self):
+    #
+    #     if self.ui.publicMaster_checkBox.isChecked() == True:
+    #
+    #         self.component.component_public_state = True
+    #
+    #     else:
+    #
+    #         self.component.component_public_state = False
+    #
+    #     self.update_published_masters()
+    #
+    # def shot_note(self, event):
+    #
+    #
+    #     if self.shot_version and not isinstance(self.shot_version,list):
+    #
+    #         note_inpute = dlg.Note(plainText = self.shot.note("versions",self.shot_version))
+    #         note = note_inpute.exec_()
+    #         text = note_inpute.result()
+    #         if note == QtGui.QDialog.Accepted:
+    #             self.shot.note("versions",self.shot_version, note=text)
+    #             self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
+    #             self.update_shots()
+    #
+    #     elif self.shot_playblast_version and not isinstance(self.shot_playblast_version,list):
+    #         note_inpute = dlg.Note(plainText = self.shot.playblast_note(self.shot_playblast_version))
+    #         note = note_inpute.exec_()
+    #         text = note_inpute.result()
+    #         if note == QtGui.QDialog.Accepted:
+    #             self.shot.playblast_note(self.shot_playblast_version, note=text)
+    #             self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
+    #             self.update_shot_playblasts()
+    #
+    #
+    #
+    # def shot_version_save(self):
+    #     if self.set_shot_selection():
+    #         if self.shot:
+    #             self.shot.new_version()
+    #             self.update_shots()
 
-    def master_explore(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
-        
-        file = self.component.file_path("masters",version)
-        files.explore(file)  
-
-    def master_make_master(self):
-        
-        
-        
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.component_masters_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_masters_tableWidget.item(index.row(),0).text()
-        
-        if dlg.warning("critical", "Delete", "Are you sure you want to make this version the master?" ):
-            if maya.current_open_file() == self.component.master:
-                maya.new_scene() 
-                maya.set_fps(self.project.project_fps)
-                maya.rewind()   
-                            
-            self.component.make_master(version)            
-            maya.open_scene(self.component.master)
-            self.update_masters()
-
-    def public_master_toggle(self):
-
-        if self.ui.publicMaster_checkBox.isChecked() == True:
-            
-            self.component.component_public_state = True
-            
-        else:
-            
-            self.component.component_public_state = False   
-        
-        self.update_published_masters()
-
-    def shot_note(self, event):
-
-
-        if self.shot_version and not isinstance(self.shot_version,list):
-        
-            note_inpute = dlg.Note(plainText = self.shot.note("versions",self.shot_version))
-            note = note_inpute.exec_()
-            text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
-                self.shot.note("versions",self.shot_version, note=text)
-                self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
-                self.update_shots()
-        
-        elif self.shot_playblast_version and not isinstance(self.shot_playblast_version,list):
-            note_inpute = dlg.Note(plainText = self.shot.playblast_note(self.shot_playblast_version))
-            note = note_inpute.exec_()
-            text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
-                self.shot.playblast_note(self.shot_playblast_version, note=text)
-                self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
-                self.update_shot_playblasts() 
-
-
-
-    def shot_version_save(self):
-        if self.set_shot_selection():
-            if self.shot:
-                self.shot.new_version()
-                self.update_shots()
-
-
-    def shot_version_open(self):    
-        widget = self.sender()
-        index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
-        
-        file = self.shot.file_path("versions",version)
-        self.settings.current_open_file = file
-        self.toggle_scene_open_script()
-        maya.open_scene(file)
-        self.toggle_scene_open_script()
-        self.update_shots()
-        
-        self.update_shot_selection()
-        #self.settings.catagory_selection = None
-        #self.settings.asset_selection = None
-        #self.settings.component_selection = None
-        #self.settings.sequence_selection = self.sequence_name
-        #self.settings.shot_selection = self.shot_name 
-        self.enable(self.ui.actionCollect_component, level = 4) 
-
-
-    def shot_reference(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
-        
-        file = self.shot.file_path("versions",version)
-        maya.reference_scene(file)
-
-
-    def shot_add_import(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
-        
-        file = self.shot.file_path("versions",version)
-        maya.import_scene(file)
-
-    def shot_delete(self):
-
-
-        if not isinstance(self.shot_version,list):
-            widget = self.sender()        
-            widget = widget.parent()
-            index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
-            version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
-            
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
-                
-                result = self.shot.delete_version("versions", version)
-                if result:
-                    self.update_shots()
-                    self.update_shot_playblasts()
-            
-        else:
-            
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
-                
-                # make sure not to delete the active file
-                versions = self.shot_version
-                if self.active_version in versions:
-                    versions.remove(self.active_version)
-                
-                result = self.shot.delete_version("versions", versions)
-                if result:
-                    self.update_shots()
-                    self.update_shot_playblasts()
-
-    def shot_import(self):
-        if self.settings:
-            path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
-            if path[0]:
-                
-                # ask if this should be a version or a master?"
-                
-                print "file path:, ", path[0]
-                if path[1] == "OBJ file (*.obj)":
-                    print "importing obj"
-                else:
-                    if maya.open_scene(path[0]):
-                        self.shot.new_version()
-                        self.update_shots()
-                        self.update_shot_playblasts()
+    #
+    # def shot_version_open(self):
+    #     widget = self.sender()
+    #     index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.shot.file_path("versions",version)
+    #     self.settings.current_open_file = file
+    #     self.toggle_scene_open_script()
+    #     maya.open_scene(file)
+    #     self.toggle_scene_open_script()
+    #     self.update_shots()
+    #
+    #     self.update_shot_selection()
+    #     #self.settings.catagory_selection = None
+    #     #self.settings.asset_selection = None
+    #     #self.settings.component_selection = None
+    #     #self.settings.sequence_selection = self.sequence_name
+    #     #self.settings.shot_selection = self.shot_name
+    #     self.enable(self.ui.actionCollect_component, level = 4)
+    #
+    #
+    # def shot_reference(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.shot.file_path("versions",version)
+    #     maya.reference_scene(file)
+    #
+    #
+    # def shot_add_import(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.shot.file_path("versions",version)
+    #     maya.import_scene(file)
+    #
+    # def shot_delete(self):
+    #
+    #
+    #     if not isinstance(self.shot_version,list):
+    #         widget = self.sender()
+    #         widget = widget.parent()
+    #         index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
+    #         version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
+    #
+    #             result = self.shot.delete_version("versions", version)
+    #             if result:
+    #                 self.update_shots()
+    #                 self.update_shot_playblasts()
+    #
+    #     else:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
+    #
+    #             # make sure not to delete the active file
+    #             versions = self.shot_version
+    #             if self.active_version in versions:
+    #                 versions.remove(self.active_version)
+    #
+    #             result = self.shot.delete_version("versions", versions)
+    #             if result:
+    #                 self.update_shots()
+    #                 self.update_shot_playblasts()
+    #
+    # def shot_import(self):
+    #     if self.settings:
+    #         path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+    #         if path[0]:
+    #
+    #             # ask if this should be a version or a master?"
+    #
+    #             print "file path:, ", path[0]
+    #             if path[1] == "OBJ file (*.obj)":
+    #                 print "importing obj"
+    #             else:
+    #                 if maya.open_scene(path[0]):
+    #                     self.shot.new_version()
+    #                     self.update_shots()
+    #                     self.update_shot_playblasts()
                    
-                    
-    def shot_explore(self):
+    #
+    # def shot_explore(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.shot.file_path("versions",version)
+    #     files.explore(file)
+    #
+    #
+    def shot_playblast_open(self):
         widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.shots_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.shots_versions_tableWidget.item(index.row(),0).text()
-        
-        file = self.shot.file_path("versions",version)
-        files.explore(file) 
-    
-    
-    def shot_playblast_open(self):  
-        widget = self.sender()
-        
+
         index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
         version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
-        
+
         file = self.shot.playblast_path(version)
         files.run(file)
 
@@ -3198,24 +3228,24 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
         if not isinstance(self.shot_playblast_version,list):
-            widget = self.sender()        
+            widget = self.sender()
             widget = widget.parent()
             index = self.ui.shots_playblasts_tableWidget.indexAt(widget.pos())
             version = self.ui.shots_playblasts_tableWidget.item(index.row(),0).text()
-            
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this preview?" ):
-                
+
                 result = self.shot.delete_playblast(version)
                 if result:
                     self.update_shot_playblasts()
-            
+
         else:
-            
+
             if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
-                
+
                 # make sure not to delete the active file
                 versions = self.shot_playblast_version
-                
+
                 result = self.shot.delete_playblast(versions)
                 if result:
                     self.update_shot_playblasts()
@@ -3273,38 +3303,38 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def sequence_rename(self):
         sequence_name, ok = QtGui.QInputDialog.getText(self, 'Rename sequence', 'Enter sequence name:')
-        
+
         if ok:
-            
+
             if sequence_name == self.sequence_name:
                 dlg.massage("critical", "Sorry", "This sequence exsists" )
                 return False
-                                
+
             if dlg.warning("critical", "Rename", "If this sequence contains components that are referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
                 self.toggle_scene_open_script()
                 maya.new_scene()
                 self.toggle_scene_open_script()
 
                 if self.project.rename_sequence(project_path = self.settings.current_project_path, sequence_name = self.sequence_name,new_name = sequence_name ):
-                    
+
                     self.update_sequence()
                     self.settings.sequence_selection = sequence_name
-                    #self.set_sequence_selection() 
+                    #self.set_sequence_selection()
         
     def shot_rename(self):
         shot_name, ok = QtGui.QInputDialog.getText(self, 'Rename shot', 'Enter shot name:')
-        
+
         if ok:
             if shot_name == self.shot.shot_name:
                 dlg.massage("critical", "Sorry", "This shot exsists" )
-                return False    
-            
+                return False
+
             if dlg.warning("critical", "Rename", "If this shot is referenced in other scenes, you will need to menually relink them.\n\nCurrent scene will close.\n\nProceed?" ):
                 self.toggle_scene_open_script()
                 maya.new_scene()
                 self.toggle_scene_open_script()
-                
-                                
+
+
                 if self.shot.rename(shot_name):
                     self.update_shot()
                     self.settings.shot_selection = shot_name
@@ -3373,134 +3403,134 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.set_component_selection()
                     
                     #re open the component that was open...
-
-    def collect_component(self):
-
-        dialog = dlg.collect_component_options(self, title = "Collect component options")
-        result = dialog.exec_()
-        input = dialog.result()
-
-        if result == QtGui.QDialog.Accepted:
-
-            # where to collect the files        
-            
-            collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
-            if collect_path:
-                                                   
-                log.info(input)
-                ref = input[0]
-                texture = input[1]
-                      
-                file = maya.current_open_file()
-                component_dummy = pipeline_component()
-                pipe_file = component_dummy.get_data_file(path = file)            
-                component_name = None
-                
-                if pipe_file:
-                    component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
-                    
-                    
-                    # detarmain wheter the scenes is a shot or a component
-                    if component.type == "shot":
-                        component = pipeline_shot(path = pipe_file, project = self.project, settings = self.settings) 
-                        component_name = component.shot_name
-                        
-                    if component.type == "component":
-                        component_name = component.component_name
-                    
-                        
-                    collect_path = os.path.join(collect_path,'%s_%s'%(component_name,'collect'))
-                                           
-                    path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
-                    files.assure_path_exists(path)
-                    files.file_copy(file,path)
-                   
-                    pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
-                    files.assure_path_exists(pipe_file_copy)
-                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
-                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
-                    files.file_copy(pipe_file,pipe_file_copy)
-
-                    if component.thumbnail_path:
-                        tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
-                        files.assure_path_exists(tumb_file_copy)
-                        files.file_copy(component.thumbnail_path,tumb_file_copy)
-
-                else: #active file is not a component or a shot from pipeline
-                    dlg.massage("massage", "Failed", "Component collection failed" )
-                    return False
-                
-                dependencies = maya.list_referenced_files()
-
-                for dep in dependencies:
-                    if texture: # for texture files
-                        
-                        if dep[1] == 'file':
-                            #filename = files.file_name(dep[0])
-                            
-                            if files.is_subdir(self.settings.current_project_path, dep[0]): #if texture is in the projects folder
-                                                            
-                                path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
-                                files.assure_path_exists(path)
-                                files.file_copy(dep[0],path)
-                                
-                            else: #if texture if not in the project
-                    
-                                path = os.path.join(collect_path,"sourceimages",files.file_name(dep[0]))
-                                files.assure_path_exists(path)
-                                files.file_copy(dep[0],path)      
-                        
-                    if ref: # for refernce files
-                        
-                        if dep[1] == 'reference':
-
-                            
-                            filename = files.file_name(dep[0])
-                            
-                            if files.is_subdir(self.settings.current_project_path, dep[0]): #if file is in the projects folder
-                                #print dep[0]
-                                #print files.is_subdir(self.settings.current_project_path, dep[0])
-                                                            
-                                path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
-                                files.assure_path_exists(path)
-                                files.file_copy(dep[0],path)
-                                
-                                        
-                                component_dummy = pipeline_component()
-                                pipe_file = component_dummy.get_data_file(path = dep[0])            
-                              
-                                if pipe_file:
-                                    component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings) 
-                                    
-                                    # detarmain wheter the scenes is a shot or a component
-                                    if component.type == "shot":
-                                        component = pipeline_shot(path = pipe_file, project = self.project, settings = self.settings) 
-
-                                    pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
-                                    files.assure_path_exists(pipe_file_copy)
-                                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
-                                    files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
-                                    files.file_copy(pipe_file,pipe_file_copy)
-
-                                    if component.thumbnail_path:
-                                        tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
-                                        files.assure_path_exists(tumb_file_copy)
-                                        files.file_copy(component.thumbnail_path,tumb_file_copy)
-                            
-                            else: #if ref if not in the project
-                    
-                                path = os.path.join(collect_path,"scenes","reference",files.file_name(dep[0]))
-                                files.assure_path_exists(path)
-                                files.file_copy(dep[0],path)  
-                        
-                
-                fps = self.project.project_fps
-                padding = self.project.project_padding
-                file_type = self.project.project_file_type                   
-                project_file = pipeline_project().create(collect_path, name = '%s_%s'%(component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)   
-                
-                dlg.massage("massage", "Success", "Component collected successfully" )
-            
+    #
+    # def collect_component(self):
+    #
+    #     dialog = dlg.collect_component_options(self, title = "Collect component options")
+    #     result = dialog.exec_()
+    #     input = dialog.result()
+    #
+    #     if result == QtGui.QDialog.Accepted:
+    #
+    #         # where to collect the files
+    #
+    #         collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+    #         if collect_path:
+    #
+    #             log.info(input)
+    #             ref = input[0]
+    #             texture = input[1]
+    #
+    #             file = maya.current_open_file()
+    #             component_dummy = pipeline_component()
+    #             pipe_file = component_dummy.get_data_file(path = file)
+    #             component_name = None
+    #
+    #             if pipe_file:
+    #                 component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings)
+    #
+    #
+    #                 # detarmain wheter the scenes is a shot or a component
+    #                 if component.type == "shot":
+    #                     component = pipeline_shot(path = pipe_file, project = self.project, settings = self.settings)
+    #                     component_name = component.shot_name
+    #
+    #                 if component.type == "component":
+    #                     component_name = component.component_name
+    #
+    #
+    #                 collect_path = os.path.join(collect_path,'%s_%s'%(component_name,'collect'))
+    #
+    #                 path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,file))
+    #                 files.assure_path_exists(path)
+    #                 files.file_copy(file,path)
+    #
+    #                 pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+    #                 files.assure_path_exists(pipe_file_copy)
+    #                 files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+    #                 files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
+    #                 files.file_copy(pipe_file,pipe_file_copy)
+    #
+    #                 if component.thumbnail_path:
+    #                     tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+    #                     files.assure_path_exists(tumb_file_copy)
+    #                     files.file_copy(component.thumbnail_path,tumb_file_copy)
+    #
+    #             else: #active file is not a component or a shot from pipeline
+    #                 dlg.massage("massage", "Failed", "Component collection failed" )
+    #                 return False
+    #
+    #             dependencies = maya.list_referenced_files()
+    #
+    #             for dep in dependencies:
+    #                 if texture: # for texture files
+    #
+    #                     if dep[1] == 'file':
+    #                         #filename = files.file_name(dep[0])
+    #
+    #                         if files.is_subdir(self.settings.current_project_path, dep[0]): #if texture is in the projects folder
+    #
+    #                             path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+    #                             files.assure_path_exists(path)
+    #                             files.file_copy(dep[0],path)
+    #
+    #                         else: #if texture if not in the project
+    #
+    #                             path = os.path.join(collect_path,"sourceimages",files.file_name(dep[0]))
+    #                             files.assure_path_exists(path)
+    #                             files.file_copy(dep[0],path)
+    #
+    #                 if ref: # for refernce files
+    #
+    #                     if dep[1] == 'reference':
+    #
+    #
+    #                         filename = files.file_name(dep[0])
+    #
+    #                         if files.is_subdir(self.settings.current_project_path, dep[0]): #if file is in the projects folder
+    #                             #print dep[0]
+    #                             #print files.is_subdir(self.settings.current_project_path, dep[0])
+    #
+    #                             path = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,dep[0]))
+    #                             files.assure_path_exists(path)
+    #                             files.file_copy(dep[0],path)
+    #
+    #
+    #                             component_dummy = pipeline_component()
+    #                             pipe_file = component_dummy.get_data_file(path = dep[0])
+    #
+    #                             if pipe_file:
+    #                                 component = pipeline_component(path = pipe_file, project = self.project, settings = self.settings)
+    #
+    #                                 # detarmain wheter the scenes is a shot or a component
+    #                                 if component.type == "shot":
+    #                                     component = pipeline_shot(path = pipe_file, project = self.project, settings = self.settings)
+    #
+    #                                 pipe_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,pipe_file))
+    #                                 files.assure_path_exists(pipe_file_copy)
+    #                                 files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"masters"))
+    #                                 files.assure_folder_exists(os.path.join(os.path.dirname(pipe_file_copy),"versions"))
+    #                                 files.file_copy(pipe_file,pipe_file_copy)
+    #
+    #                                 if component.thumbnail_path:
+    #                                     tumb_file_copy = os.path.join(collect_path,files.reletive_path(self.settings.current_project_path,component.thumbnail_path))
+    #                                     files.assure_path_exists(tumb_file_copy)
+    #                                     files.file_copy(component.thumbnail_path,tumb_file_copy)
+    #
+    #                         else: #if ref if not in the project
+    #
+    #                             path = os.path.join(collect_path,"scenes","reference",files.file_name(dep[0]))
+    #                             files.assure_path_exists(path)
+    #                             files.file_copy(dep[0],path)
+    #
+    #
+    #             fps = self.project.project_fps
+    #             padding = self.project.project_padding
+    #             file_type = self.project.project_file_type
+    #             project_file = pipeline_project().create(collect_path, name = '%s_%s'%(component_name,'collect'), padding = padding, file_type = file_type, fps = fps, users = None)
+    #
+    #             dlg.massage("massage", "Success", "Component collected successfully" )
+    #
             
 
     def enable(self, Qwidget, level = None):
@@ -3551,7 +3581,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                         """
                         TAKE ACTION DEPENDING ON ROLE
                         """
-                        self.ui.users_pushButton.setText("{0} > {1}".format(user,self.project.name))
+                        self.ui.users_pushButton.setText("{0}".format(user))
                         self.project_ui_Enable(True)
 
                         #self.unload_project()
@@ -3564,17 +3594,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         self.project_ui_Enable(False)
 
-        #self.settings.role = None
-        #self.project = None
-        #self.settings.current_project = None
-        #self.init_current_project()
-        #try:
-        #    if projectsWindow:
-        #        projectsWindow.updateProjectsTable()
-        #except:
-        #   pass
-        #
-        #log.info ( "logged out")
         return False
             
             
@@ -3611,15 +3630,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.setMinimumWidth(350)
         self.setMaximumWidth(900)
 
-        # self.populate_clients()
-        # self.populate_projects()
-        # self.stage_ui()
-        # self.exctract_current_file_location()
-        #self.updateVersionsTable()
-
-
-
-                     
    
 class pipeLine_projects_UI(QtGui.QMainWindow):
     def __init__(self, parent=None, pipeline_window=None):
@@ -3669,6 +3679,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
         self.populate_clients()
         dtv.setComboValue(self.ui.clients_comboBox, self.pipeline_window.settings.client)
+        #print self.projectsTableView.model().sourceModel().items[0].name
         #self.populate_projects()
 
 
@@ -3824,16 +3835,16 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         #
         # create_edit_projectsWindow = pipeLine_create_edit_project_UI(parent = self, pipelineUI=self.pipeline_window)
         # create_edit_projectsWindow.show()
-    
+
     def edit_project(self):
         widget = self.sender()
         index = self.ui.projects_tableWidget.indexAt(widget.pos())
         wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
-        
-        projects = self.pipeline_window.settings.projects        
-        path = os.path.join(projects[wanted_project_key][0],"project.json")        
-        self.create_edit_project(project_file = pipeline_project(path = path, settings = self.pipeline_window.settings))       
-        
+
+        projects = self.pipeline_window.settings.projects
+        path = os.path.join(projects[wanted_project_key][0],"project.json")
+        self.create_edit_project(project_file = pipeline_project(path = path, settings = self.pipeline_window.settings))
+
     def create_edit_project(self, **kwargs):
 
 
@@ -3853,22 +3864,22 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
         create_edit_projectsWindow=pipeLine_create_edit_project_UI(parent=self,pipelineUI = None, projects_window = self)#,project_file = project_file)
         create_edit_projectsWindow.show()
-        
+
     def relink_project(self):
         widget = self.sender()
         index = self.ui.projects_tableWidget.indexAt(widget.pos())
         wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
-        
+
         path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
         if os.path.isfile(path[0]):
-            
-            project_path = os.path.dirname(str(path[0])) 
+
+            project_path = os.path.dirname(str(path[0]))
             project_file = data.jsonDict(path=str(path[0]))
-            project_name = project_file.read("project_name")["project_name"] 
-            project_key = project_file.read("project_key")["project_key"] 
+            project_name = project_file.read("project_name")["project_name"]
+            project_key = project_file.read("project_key")["project_key"]
 
             if wanted_project_key == project_key:
-                
+
                 projects = self.pipeline_window.settings.projects
                 edited_projects = data.edit_key(dict = projects,key = project_key,value = [project_path, "ONLINE",project_name])
 
@@ -3880,18 +3891,18 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                 dlg.massage("critical", "Sorry", "The selected *.json file dose not match the selected project" )
         else:
             dlg.massage("critical", "Sorry", "No file selected" )
-        
+
     def unload_project(self):
         row = self.ui.projects_tableWidget.currentRow()
         if row != -1:
             project_key = str(self.ui.projects_tableWidget.item(row,4).text())
             projects = self.pipeline_window.settings.projects
             del projects[project_key]
-            
+
             if project_key == self.pipeline_window.settings.current_project:
                 #self.pipeline_window.settings.current_project = None
                 self.pipeline_window.update_current_open_project(None)
-            
+
             self.pipeline_window.settings.projects = projects
             self.updateProjectsTable()
             self.setColumnWidth_projectsTable()
@@ -3899,47 +3910,47 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
     def load_project(self):
         path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
         if path[0]:
-            project_path = os.path.dirname(str(path[0]))        
+            project_path = os.path.dirname(str(path[0]))
             project_file = data.jsonDict(path=str(path[0]))
             project_name = project_file.read("project_name")["project_name"]
             project_key = project_file.read("project_key")["project_key"]
-            
+
             self.add_project(project_name = project_name, project_path = project_path, project_key = project_key)
 
     def add_project(self,project_name = None,project_path = None, project_key = None):
-        
-        projects = self.pipeline_window.settings.projects    
 
-         
+        projects = self.pipeline_window.settings.projects
+
+
         projects[project_key] = [project_path, "ONLINE", project_name]
         self.pipeline_window.settings.projects = projects
 
-        
-        self.updateProjectsTable()
-        return True        
 
-    
+        self.updateProjectsTable()
+        return True
+
+
 
     def set_project_button(self):
-            
+
         widget = self.sender()
         index = self.ui.projects_tableWidget.indexAt(widget.pos())
         project_key = self.ui.projects_tableWidget.item(index.row(),4).text()
 
         self.set_project(project_key = project_key)
-        
+
     def set_project(self,project_key = None):
         import pymel.core as pm
         import maya.mel as mel
         if project_key:
-            projects = self.pipeline_window.settings.projects      
+            projects = self.pipeline_window.settings.projects
             project_path = projects[project_key][0]
             project_Name = projects[project_key][2]
 
             if self.pipeline_window.update_current_open_project(project_key,from_projects_manager=True):
-                
+
                 #if self.pipeline_window.settings.current_project:
-                    
+
                 pm.workspace.open(project_path)
                 pm.workspace.chdir(project_path)
 
@@ -3949,59 +3960,59 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                     mel.eval(melCmd)
                 except:
                     pass
-                                             
-                self.pipeline_window.ui.projects_pushButton.setText(project_Name)                
+
+                self.pipeline_window.ui.projects_pushButton.setText(project_Name)
                 self.updateProjectsTable()
-                
-                log.info ( "project changed to: %s"%project_Name)                
-            
+
+                log.info ( "project changed to: %s"%project_Name)
+
             else:
-                log.info ( "Cannot set project") 
-                
-       
+                log.info ( "Cannot set project")
+
+
     def updateProjectsTable(self):
         self.ui.projects_tableWidget.clearContents()
-        
+
         projects = self.pipeline_window.settings.projects
-        
-  
+
+
         self.ui.projects_tableWidget.setRowCount(len(projects))
-        
+
         active_color = QtGui.QColor()
         active_color.setNamedColor("green")
-        
+
         for index, key in enumerate(projects):
-            
+
             project_status = projects[key][1]
             active_project = True if self.pipeline_window.settings.current_project == key and project_status == "ONLINE" else False
 
-                      
-            project_name = QtGui.QTableWidgetItem(projects[key][2])            
+
+            project_name = QtGui.QTableWidgetItem(projects[key][2])
             project_name.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
             project_name.setFont(self.boldFont)
             if active_project:
-                project_name.setBackground(active_color) 
-                
+                project_name.setBackground(active_color)
+
             self.ui.projects_tableWidget.setItem(index,0,project_name)
-        
+
             if project_status == "OFFLINE":
-                
+
                 offlineButtonItem = QtGui.QPushButton(project_status)
                 offlineButtonItem.setIcon(QtGui.QIcon(offline_icon))
                 offlineButtonItem.setIconSize(QtCore.QSize(20,20))
-                
+
                 self.ui.projects_tableWidget.setCellWidget(index,1,offlineButtonItem)
                 offlineButtonItem.clicked.connect(self.relink_project)
-                
-            else:   
+
+            else:
                 status = QtGui.QTableWidgetItem(project_status)
                 status.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 if active_project:
-                    status.setBackground(active_color) 
-                self.ui.projects_tableWidget.setItem(index,1,status)            
-            
+                    status.setBackground(active_color)
+                self.ui.projects_tableWidget.setItem(index,1,status)
+
             if project_status == "ONLINE":
-                
+
                 editButtonItem = QtGui.QPushButton( "Edit")
                 editButtonItem.setIcon(QtGui.QIcon(edit_icon))
                 editButtonItem.setIconSize(QtCore.QSize(20,20))
@@ -4011,29 +4022,29 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                     editButtonItem.setEnabled(False)
                 if self.pipeline_window.settings.role > 0:
                     editButtonItem.setEnabled(False)
-                    
+
             '''
             if active_project:
                 active = QtGui.QTableWidgetItem("Active")
                 active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 active.setFont(self.boldFont)
-                active.setBackground(active_color) 
-                self.ui.projects_tableWidget.setItem(index,3,active)   
+                active.setBackground(active_color)
+                self.ui.projects_tableWidget.setItem(index,3,active)
             else:
             '''
             if project_status == "ONLINE":
-                setButtonItem = QtGui.QPushButton("Set Project")                  
-                setButtonItem.clicked.connect(self.set_project_button)                         
+                setButtonItem = QtGui.QPushButton("Set Project")
+                setButtonItem.clicked.connect(self.set_project_button)
                 setButtonItem.setIcon(QtGui.QIcon(set_icon))
-                setButtonItem.setIconSize(QtCore.QSize(20,20))        
-                self.ui.projects_tableWidget.setCellWidget(index,3,setButtonItem)                        
-      
+                setButtonItem.setIconSize(QtCore.QSize(20,20))
+                self.ui.projects_tableWidget.setCellWidget(index,3,setButtonItem)
+
             key = QtGui.QTableWidgetItem(key)
             key.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
             self.ui.projects_tableWidget.setItem(index,4,key)
 
 
-    def init_projectssTable(self):        
+    def init_projectssTable(self):
         self.ui.projects_tableWidget.horizontalHeader().setVisible(False)
         self.ui.projects_tableWidget.verticalHeader().setVisible(False)
         self.ui.projects_tableWidget.setWordWrap(False)
@@ -4044,15 +4055,15 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.ui.projects_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.ui.projects_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.ui.projects_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-    
-    def setColumnWidth_projectsTable(self):        
+
+    def setColumnWidth_projectsTable(self):
 
         self.ui.projects_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(0,200)
         self.ui.projects_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.ResizeToContents )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(1,200)
         self.ui.projects_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )        
+        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(2,100)
         self.ui.projects_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(3,100)
@@ -4064,17 +4075,17 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
 class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
     def __init__(self, parent=None, pipelineUI = None, **kwargs):
-         
-        super(pipeLine_create_edit_project_UI, self).__init__(parent)      
-        self.setWindowFlags(QtCore.Qt.Tool)                
+
+        super(pipeLine_create_edit_project_UI, self).__init__(parent)
+        self.setWindowFlags(QtCore.Qt.Tool)
         form_class, base_class = create_edit_project_form_class, create_edit_project_base_class
-               
+
         self.ui = form_class()
         self.ui.setupUi(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("Create Project")
         self.pipelineUI = pipelineUI
-        
+
         self.setMaximumHeight(500)
 
         self.ui.label_4.setHidden(True)
@@ -4091,74 +4102,74 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         for key in kwargs:
             if key == "project_file":
                 self.project_file = kwargs[key]
-                 
+
         #connect ui
-        self.roles = ["admin","guest","rigger","animator"]            
-        self.init_usersTable()       
+        self.roles = ["admin","guest","rigger","animator"]
+        self.init_usersTable()
         self.ui.set_project_path_pushButton.clicked.connect(self.set_project_path)
-        
+
         if not self.project_file:
             self.ui.create_edit_project_pushButton.setText("Create")
             self.ui.create_edit_project_pushButton.clicked.connect(self.create_project)
             self.init_new_project()
         else:
             self.ui.create_edit_project_pushButton.setText("Edit")
-            self.ui.create_edit_project_pushButton.clicked.connect(self.edit_project)    
-            self.ui.static_widget.setHidden(True)        
+            self.ui.create_edit_project_pushButton.clicked.connect(self.edit_project)
+            self.ui.static_widget.setHidden(True)
             self.init_edit_project()
-            
+
             self.ui.set_project_path_pushButton.setEnabled(False)
             self.ui.padding_spinBox.setEnabled(False)
             self.ui.project_name_lineEdit.setEnabled(False)
             self.ui.project_path_lineEdit.setEnabled(False)
 
             self.ui.playblast_sister_dir_checkBox.setChecked(self.project_file.playblast_outside)
-            
-           
-        self.ui.cancel_pushButton.clicked.connect(self.cancel)                
-        
+
+
+        self.ui.cancel_pushButton.clicked.connect(self.cancel)
+
 
         self.playblast_help_button()
-        
-        
+
+
         self.boldFont=QtGui.QFont()
-        self.boldFont.setBold(True)  
+        self.boldFont.setBold(True)
         self.set_icons()
-        
+
 
         self.updateUsersTable()
 
-            
+
     def playblast_help_button(self):
 
 
-        
+
         self.playblast_help_label = QtGui.QLabel()
         sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
         sizepolicy.setHeightForWidth(self.playblast_help_label.sizePolicy().hasHeightForWidth())
         self.playblast_help_label.setSizePolicy(sizepolicy)
-        self.playblast_help_label.setMinimumSize(QtCore.QSize(30, 30)) 
-       
+        self.playblast_help_label.setMinimumSize(QtCore.QSize(30, 30))
+
         self.ui.horizontalLayout_3.addWidget(self.playblast_help_label)
-        self.ui.horizontalLayout_3.setContentsMargins(0,0,0,0)               
-                       
+        self.ui.horizontalLayout_3.setContentsMargins(0,0,0,0)
+
         layout = QtGui.QHBoxLayout(self.playblast_help_label)
         layout.setContentsMargins(0,0,0,0)
-        
-        
-        self.playblast_help = alpha_button(self,help_icon)  
-        self.playblast_help.set_pixmap(help_icon)      
+
+
+        self.playblast_help = alpha_button(self,help_icon)
+        self.playblast_help.set_pixmap(help_icon)
         sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
         sizepolicy2.setHeightForWidth(self.playblast_help.sizePolicy().hasHeightForWidth())
         self.playblast_help.setSizePolicy(sizepolicy2)
-        self.playblast_help.setMinimumSize(QtCore.QSize(30, 30))          
+        self.playblast_help.setMinimumSize(QtCore.QSize(30, 30))
         self.playblast_help.button.setAlignment(QtCore.Qt.AlignCenter)
-        layout.addWidget(self.playblast_help)        
+        layout.addWidget(self.playblast_help)
         self.connect(self.playblast_help, QtCore.SIGNAL('clicked()'), self.playblast_help_popup)
-        
+
         self.spacer = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
         self.ui.horizontalLayout_3.addItem(self.spacer)
-        
+
 
     def playblast_help_popup(self):
         dlg.massage("massage","Playblasts","Playblasts can consume a lot of disk space,\nWhen working on a project on a shared disk or cloud, This can slow the syncing proccess.\nHave more control by keeping them in a sister directory.")
@@ -4169,39 +4180,39 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
         self.ui.set_project_path_pushButton.setIcon(QtGui.QIcon(search_icon))
         self.ui.set_project_path_pushButton.setIconSize(QtCore.QSize(20,20))
-               
+
         self.ui.cancel_pushButton.setIcon(QtGui.QIcon(no_icon))
         self.ui.cancel_pushButton.setIconSize(QtCore.QSize(20,20))
 
     def init_new_project(self):
         self.ui.project_name_lineEdit.setText(self.project_name)
         self.users = {}
-        self.users["Admin"] = ["1234", self.roles[0]] 
+        self.users["Admin"] = ["1234", self.roles[0]]
 
     def init_edit_project(self):
         self.ui.project_name_lineEdit.setText(self.project_file.project_name)
-        if self.project_file.project_users != None:        
-            self.users = self.project_file.project_users  
+        if self.project_file.project_users != None:
+            self.users = self.project_file.project_users
             self.ui.users_checkBox.setChecked(True)
         else:
             self.users = {}
-            self.users["Admin"] = ["1234", self.roles[0]]  
-                       
+            self.users["Admin"] = ["1234", self.roles[0]]
+
         self.ui.padding_spinBox.setValue(self.project_file.project_padding)
-        
+
         type = "Maya Ascii (*.ma)"
-                
+
         if self.project_file.project_file_type == "mb":
             type = "Maya Binary (*.mb)"
-        
+
         fps = "PAL (25fps)"
-            
-        if self.project_file.project_fps == 24: 
-            fps = "Film (24fps)"            
-        if self.project_file.project_fps == 30: 
+
+        if self.project_file.project_fps == 24:
+            fps = "Film (24fps)"
+        if self.project_file.project_fps == 30:
             fps =  "NTSC (30fps)"
-                      
-        
+
+
         i = self.ui.file_type_comboBox.findText(type, QtCore.Qt.MatchFixedString)
         if i >= 0:
          self.ui.file_type_comboBox.setCurrentIndex(i)
@@ -4209,9 +4220,9 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         i = self.ui.fps_comboBox.findText(fps, QtCore.Qt.MatchFixedString)
         if i >= 0:
          self.ui.fps_comboBox.setCurrentIndex(i)
-        
 
-    
+
+
     def set_project_path(self):
 
         path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
@@ -4219,7 +4230,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
 
 
-    def init_usersTable(self):        
+    def init_usersTable(self):
         self.ui.users_tableWidget.horizontalHeader().setVisible(True)
         self.ui.users_tableWidget.verticalHeader().setVisible(False)
         self.ui.users_tableWidget.setWordWrap(False)
@@ -4234,7 +4245,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.ui.users_tableWidget.horizontalHeader().resizeSection(0,200)
         self.ui.users_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Stretch )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(1,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)     
+        self.ui.users_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
         self.ui.users_tableWidget.horizontalHeader().resizeSection(2,200)
         self.ui.users_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(3,50)
@@ -4245,75 +4256,75 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.ui.users_tableWidget.clearContents()
         self.ui.users_tableWidget.setRowCount(len(self.users)+1)
 
-        admin_username = QtGui.QTableWidgetItem("Admin")                       
+        admin_username = QtGui.QTableWidgetItem("Admin")
         admin_username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
         admin_username.setFont(self.boldFont)
         self.ui.users_tableWidget.setItem(0,0,admin_username)
 
-        admin_password = QtGui.QTableWidgetItem(self.users["Admin"][0])            
+        admin_password = QtGui.QTableWidgetItem(self.users["Admin"][0])
         self.ui.users_tableWidget.setItem(0,1,admin_password)
 
-        role = QtGui.QTableWidgetItem("admin")                       
+        role = QtGui.QTableWidgetItem("admin")
         role.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
         role.setFont(self.boldFont)
-        self.ui.users_tableWidget.setItem(0,2,role)  
-        
+        self.ui.users_tableWidget.setItem(0,2,role)
+
         users = self.users
         del users["Admin"]
 
         if users:
             for index, key in enumerate(users):
-                            
-                username = QtGui.QTableWidgetItem(key)                       
+
+                username = QtGui.QTableWidgetItem(key)
                 username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 username.setFont(self.boldFont)
                 self.ui.users_tableWidget.setItem(index+1,0,username)
-                
-                password = QtGui.QTableWidgetItem(users[key][0])            
+
+                password = QtGui.QTableWidgetItem(users[key][0])
                 self.ui.users_tableWidget.setItem(index+1,1,password)
-                
-                role = users[key][1]            
-                
+
+                role = users[key][1]
+
                 roles_combo = QtGui.QComboBox()
                 roles_combo.setEditable(False)
                 roles_combo.addItems(self.roles)
-                
-                self.ui.users_tableWidget.setCellWidget(index+1,2,roles_combo)            
+
+                self.ui.users_tableWidget.setCellWidget(index+1,2,roles_combo)
                 i = roles_combo.findText(role, QtCore.Qt.MatchFixedString)
                 if i >= 0:
                     roles_combo.setCurrentIndex(i)
-      
+
                 deleteButtonItem = QtGui.QPushButton("")
                 deleteButtonItem.setIcon(QtGui.QIcon(no_icon))
-                deleteButtonItem.setIconSize(QtCore.QSize(20,20))            
+                deleteButtonItem.setIconSize(QtCore.QSize(20,20))
                 self.ui.users_tableWidget.setCellWidget(index+1,3,deleteButtonItem)
                 deleteButtonItem.clicked.connect(self.remove_user)
-        
+
 
         empty_item1 = QtGui.QTableWidgetItem("")
         empty_item1.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
         empty_item2 = QtGui.QTableWidgetItem("")
         empty_item2.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
         empty_item3 = QtGui.QTableWidgetItem("")
-        empty_item3.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )        
+        empty_item3.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
         self.ui.users_tableWidget.setItem(len(self.users)+1,0,empty_item1)
         self.ui.users_tableWidget.setItem(len(self.users)+1,1,empty_item2)
         self.ui.users_tableWidget.setItem(len(self.users)+1,2,empty_item3)
-        
+
         newButtonItem = QtGui.QPushButton("")
         newButtonItem.setIcon(QtGui.QIcon(add_icon))
-        newButtonItem.setIconSize(QtCore.QSize(20,20))            
+        newButtonItem.setIconSize(QtCore.QSize(20,20))
         self.ui.users_tableWidget.setCellWidget(len(self.users)+1,3,newButtonItem)
         newButtonItem.clicked.connect(self.add_user)
 
     def add_user(self):
         self.set_users_dict()
-        
+
         username, ok = QtGui.QInputDialog.getText(self, 'New User', 'Enter User name:')
-        
-        if ok:        
+
+        if ok:
             if username not in self.users and username != "":
-                self.users[username] = ["",self.roles[1]]       
+                self.users[username] = ["",self.roles[1]]
                 self.updateUsersTable()
             else:
                 print "User name exists..."
@@ -4322,10 +4333,10 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         widget = self.sender()
         index = self.ui.users_tableWidget.indexAt(widget.pos())
         username = str(self.ui.users_tableWidget.item(index.row(),0).text())
-     
+
         self.set_users_dict()
 
-        del self.users[username]     
+        del self.users[username]
         self.updateUsersTable()
 
 
@@ -4335,14 +4346,14 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         rows = self.ui.users_tableWidget.rowCount() - 1
         for row in range(0,rows):
            if row == 0:
-               users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.item(row,2).text() ] 
-  
+               users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.item(row,2).text() ]
+
            else:
-               users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.cellWidget(row,2).currentText()   ] 
-        
+               users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.cellWidget(row,2).currentText()   ]
+
         self.users = users
-        
-            
+
+
 
     def create_project(self):
         # if self.ui.users_checkBox.isChecked() == True:
@@ -4357,23 +4368,23 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
 
         padding = self.ui.padding_spinBox.value()
-        
+
         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
             file_type = "ma"
         if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
-            file_type = "mb" 
-                
+            file_type = "mb"
+
         if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
             fps = 25
         if self.ui.fps_comboBox.currentText() == "Film (24fps)":
-            fps = 24            
+            fps = 24
         if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
             fps = 30
-        
-        playblast_outside = False 
+
+        playblast_outside = False
         if self.ui.playblast_sister_dir_checkBox.isChecked():
-            playblast_outside = True    
-            
+            playblast_outside = True
+
         project = dt.ProjectNode(project_name, self.pipelineUI.client ).create(path = project_path,
                                                                                 padding=padding,
                                                                                 file_type=file_type,
@@ -4383,7 +4394,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
         #self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users, playblast_outside = playblast_outside)
         #self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)
-        
+
         self.pipelineUI.projects.insertRows(0, 1, node = project)
         project.set()
 
@@ -4394,39 +4405,39 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
     def edit_project(self):
         if self.ui.users_checkBox.isChecked() == True:
             self.set_users_dict()
-            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]  
-            
-            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin")) 
+            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
+
+            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
         else:
             self.users = None
 
-        
-        
+
+
         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
             file_type = "ma"
         if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
-            file_type = "mb" 
-                
+            file_type = "mb"
+
         if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
             fps = 25
         if self.ui.fps_comboBox.currentText() == "Film (24fps)":
-            fps = 24            
+            fps = 24
         if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
             fps = 30
 
         self.project_file.project_users = self.users
         self.project_file.project_file_type = file_type
         self.project_file.project_fps = fps
-        
-        playblast_outside = False 
+
+        playblast_outside = False
         if self.ui.playblast_sister_dir_checkBox.isChecked():
-            playblast_outside = True 
-            
+            playblast_outside = True
+
         self.project_file.playblast_outside = playblast_outside
-        
+
         self.projects_window.set_project(project_key = self.project_file.project_key)
         self.close()
-             
+
     def cancel(self):
         self.close()
 

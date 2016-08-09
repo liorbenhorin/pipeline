@@ -518,7 +518,7 @@ class PipelineProjectsView(QtGui.QTableView):
         if model:
 
 
-            self._proxyModel = dtm.PipelineVersionsProxyModel()
+            self._proxyModel = dtm.PipelineProjectsProxyModel()
             self._proxyModel.setSourceModel(model)
             self.setModel(self._proxyModel)
             # size the load button column

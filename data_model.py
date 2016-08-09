@@ -2410,6 +2410,16 @@ class PipelineVersionsProxyModel(QtGui.QSortFilterProxyModel):
 
              return False
 
+class PipelineProjectsProxyModel(QtGui.QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(PipelineProjectsProxyModel, self).__init__(parent)
+
+        self.setDynamicSortFilter(True)
+        self.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.setSortRole(0)
+        self.setFilterRole(0)
+        self.setFilterKeyColumn(0)
+
 
 class PipelineMastersProxyModel(QtGui.QSortFilterProxyModel):
     def __init__(self, parent=None):
