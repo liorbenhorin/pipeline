@@ -531,7 +531,7 @@ class RootNode(Node):#, Metadata_file):
 
         c = 0
 
-        masters = {}
+        masters = []
 
         def exctract_current_file_location(file):
 
@@ -542,11 +542,11 @@ class RootNode(Node):#, Metadata_file):
         def exctract_current_path_levels(path, absoulut_path = None):
 
             relative_path = os.path.relpath(path, absoulut_path)
-
+            #return relative_path
             return files.splitall(relative_path)
 
 
-        def rec(path, root):
+        def model_rec(path, root):
 
             folders = files.list_dir_folders(path)
 
@@ -567,55 +567,33 @@ class RootNode(Node):#, Metadata_file):
                                 elements = exctract_current_file_location(file)
                                 if root.project.prefix:
                                     elements.pop(0)
-                                print "-------"
-                                print elements
-
                                 path_elements = exctract_current_path_levels(os.path.dirname(file), absoulut_path=root._path)
-                                print path_elements
                                 if elements[-2:] == path_elements[-2:]:
-                                    #masters[path_elements[0]] = {}
-                                    path_elements.reverse()
-                                    for elem in path_elements:
-                                        dic = {}
-                                        dic[elem]
-
-                                    for i in range(0,len(path_elements)):
-                                        path_elements[i]
-                                        masters[path_elements[0]] = path_elements[i]
-                                    print "MATCH!"
-                                print "-------"
-
-
-
-
-                                    # node_path = os.path.join(root._path, elements[0])
-                                    # node_parent = root
-                                    # FolderNode(elements[0], path=node_path, parent=node_parent,
-                                    #            settings=self.settings, project=self.project)
-                                    # elements.pop(0)
-                                    # for i in range(len(elements)):
-                                    #     if i == len(elements):  # ----> ITS A STAGE
-                                    #         n = StageNode(elements[i], path=node_path, parent=node_parent,
-                                    #                       settings=self.settings, project=self.project)
-                                    #     if i == len(elements) - 1:  # ----> ITS AN ASSET
-                                    #         n = AssetNode(elements[i], path=node_path, parent=node_parent,
-                                    #                       settings=self.settings, project=self.project)
-                                    #     if i < len(elements) - 1:  # ----> ITS A FOLDER
-                                    #         n = FolderNode(elements[i], path=node_path, parent=node_parent,
-                                    #                        settings=self.settings, project=self.project)
-                                    #     node_parent = n
-                                    #     node_path = os.path.join(node_path, elements[i])
+                                    masters.append(path_elements)
 
                     else:
-                        rec(p, root)
 
+                        model_rec(p, root)
 
+        model_rec(self.path, self)
 
-        rec(self.path, self)
+        from collections import defaultdict
+        def tree():
+            return defaultdict(tree)
 
-        print masters, "<<------"
+        def add(t, path):
+            for node in path:
+                t = t[node]
+        x = tree()
+        for m in masters:
+            add(x, m)
 
-        # MARGE MASTERS
+        def dicts(t):
+            return {k: dicts(t[k]) for k in t}
+
+        import json
+        print json.dumps(dicts(x), indent=4)
+
 
 
 
