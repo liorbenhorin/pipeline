@@ -482,510 +482,510 @@ class pipeline_data(object):
 
 
 
-class pipeline_project(pipeline_data):
-    def __init__(self,**kwargs):
-        #super(pipeline_project, self,).__init__()
-        pipeline_data.__init__(self, **kwargs)
-
-
-
-        self.project_file = None
-        if self.data_file:
-            self.project_file = self.data_file.read()
-
-        self.project_file_name = 'project.json'
-   
-        self.settings = None
-        for key in kwargs:
-            if key == "settings":
-                self.settings = kwargs[key] 
-   
-        
-    def create(self, 
-               project_path, 
-               name = "My_Project",
-               padding = 3,
-               file_type = "ma",
-               fps = 25,
-               users = {"Admin":(1234,"admin")},
-               playblast_outside = False):
-        
-        project_settings_file = os.path.join(project_path, self.project_file_name) 
-        
-        project_key = data.id_generator()
-        project_data = {}
-        project_data["project_name"] = name
-        project_data["project_key"] = project_key
-        project_data["padding"] = padding
-        project_data["fps"] = fps
-        project_data["defult_file_type"] = file_type
-        project_data["users"] = users
-        project_data["playblast_outside"] = playblast_outside
-                     
-        folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
-                   "sound", "clips", "renderData", "cache"]
-        
-        for folder in folders:
-            project_data[folder] = folder
-            files.create_directory(os.path.join(project_path, folder)) 
-            
-        #render folders:
-        r_folders = ["renderData", "depth", "iprimages", "shaders"]
-        for r_folder in r_folders[1:]:
-            files.create_directory(os.path.join(project_path, r_folders[0], r_folder))
-        
-        fur_folders = ["renderData", "fur", "furFiles", "furImages", "furEqualMap", "furAttrMap", "furShadowMap" ]
-        for f_folder in fur_folders[2:]:
-            files.create_directory(os.path.join(project_path, fur_folders[0], fur_folders[1], f_folder))
-         
-        #cache folders:
-        c_folders = ["cache", "particles", "nCache", "bifrost"]
-        for c_folder in c_folders[1:]:
-            files.create_directory(os.path.join(project_path, c_folders[0], c_folder))            
-
-        fl_folders = ["cache", "nCache", "fluid"]
-        for fl_folder in fl_folders[2:]:
-            files.create_directory(os.path.join(project_path, fl_folders[0], fl_folders[1], fl_folder))              
-
-        
-        self.data_file = data.jsonDict().create(project_settings_file, project_data)  
-        self.project_file = self.data_file.read()
-        
-        return self 
-
-
-
-    def project_file_key(self, key = None):
-        if self.project_file:
-            return self.project_file[key]
-        else:
-            return None
-        
-    @property
-    def project_name(self):
-        if self.project_file:
-            return self.project_file["project_name"]
-        else:
-            return None           
-
-    @property
-    def project_fps(self):
-        if self.project_file:
-            if "fps" in self.project_file.keys():
-                return self.project_file["fps"]
-            else:
-                return None  
-        else:
-            return None  
-
-
-    @project_fps.setter
-    def project_fps(self,fps):
-       
-        if self.data_file:
-            data = {}
-            data["fps"] = fps
-            self.data_file.edit(data)
-            self.project_file = self.data_file.read()
-
-
-    @property
-    def project_key(self):
-        if self.project_file:
-            return self.project_file["project_key"]
-        else:
-            return None  
-
-    @property
-    def project_padding(self):
-        if self.project_file:
-            return self.project_file["padding"]
-        else:
-            return None 
-            
-    @property
-    def project_file_type(self):
-        if self.project_file:
-            return self.project_file["defult_file_type"]
-        else:
-            return None             
-
-
-    @project_file_type.setter
-    def project_file_type(self,type):
-       
-        if self.data_file:
-            data = {}
-            data["defult_file_type"] = type
-            self.data_file.edit(data)
-            self.project_file = self.data_file.read()
-    
-    @property
-    def movie_file_type(self):
-        if self.project_file:
-            return "mov"
-        else:
-            return None    
-
-    @property
-    def project_users(self):
-        if self.project_file:
-            if "users" in self.project_file.keys():
-                return self.project_file["users"]
-            else:
-                return None    
-        else:
-            return None  
-
-    @project_users.setter
-    def project_users(self,users):
-       
-        if self.data_file:
-            data = {}
-            data["users"] = users
-            self.data_file.edit(data)
-            self.project_file = self.data_file.read()
-
-
-    @property
-    def playblast_outside(self):
-        if self.project_file:
-            if "playblast_outside" in self.project_file.keys():
-                return self.project_file["playblast_outside"]
-            else:
-                return False    
-        else:
-            return None  
-
-    @playblast_outside.setter
-    def playblast_outside(self,playblast_outside):
-        
-
-        old_path = self.playblasts_path
-                      
-        if self.data_file:
-            data = {}
-            data["playblast_outside"] = playblast_outside
-            self.data_file.edit(data)
-            self.project_file = self.data_file.read()
-
-            files.dir_move(old_path, self.playblasts_path)
-            
-        
-            
-
-
-    @property
-    def assets_dir(self):
-        if self.project_file:
-            return self.project_file_key(key = "assets")
-        else:
-            return None  
-
-
-
-
-
-    def catagories(self, project_path = None):
-        if self.project_file:
-
-            if os.path.exists(project_path):
-                if self.assets_dir:
-                    assets_catagories_path = os.path.join(project_path, self.assets_dir)
-                    return files.list_dir_folders(assets_catagories_path)
-        return None         
-
-    def assets(self, project_path = None, catagory_name = None):
-        if self.project_file:
-
-            if os.path.exists(project_path):
-                if self.assets_dir:
-                    catagory_path = os.path.join(project_path,self.assets_dir, catagory_name)
-                    if os.path.exists(catagory_path):
-                        return files.list_dir_folders(catagory_path)
-        return None  
-
-    def components(self, project_path = None, catagory_name = None, asset_name = None):
-        if self.project_file:
-
-            if os.path.exists(project_path):
-                if self.assets_dir:
-                    asset_path = os.path.join(project_path,self.assets_dir, catagory_name, asset_name)
-                    if os.path.exists(asset_path):
-                        return files.list_dir_folders(asset_path)
-        return None  
-    
-    @property
-    def scenes_path(self):
-        if self.settings:
-            path = os.path.join(self.settings.current_project_path,"scenes")
-            if os.path.exists(path):
-                return path
-        return None
-
-    @property
-    def playblasts_path(self):
-        if self.settings:
-            if self.playblast_outside:            
-                path = os.path.join(os.path.dirname(self.settings.current_project_path),"%s_playblasts"%(self.project_name))
-           
-            else:
-                path = os.path.join(self.settings.current_project_path,"playblasts")
-            
-            
-            return path
-        return None
-    
-    @property
-    def sequences(self):
-        if self.project_file:
-             
-            path = self.scenes_path
-            if os.path.exists(path):
-                folders = files.list_dir_folders(path)
-                sequences = []
-                for folder in folders:
-                    if os.path.isfile(os.path.join(path, folder, "sequence.json")):
-                        sequences.append(folder)
-                return sequences
-        return None  
-
-    def shots(self, sequence_name = None):
-        if self.project_file:
-            if sequence_name:
-                path = os.path.join(self.scenes_path, sequence_name)
-                if os.path.exists(path):
-                    return files.list_dir_folders(path)
-        
-        return None 
-
-
-
-    def create_sequence(self, sequence_name = None):
-        
-        for sequence in self.sequences:
-            if sequence_name == sequence:
-                dlg.massage("critical", "Sorry", "This sequence exsists" )
-                return False
-
-        path = os.path.join(self.scenes_path, sequence_name)    
-        if files.create_directory(path):
-            files.create_dummy(path, "sequence.json")
-            return True
-
-
-    def delete_sequence(self, sequence_name = None):
-
-        path = os.path.join(self.scenes_path,sequence_name)       
-        if files.delete(path):
-            
-            path = os.path.join(self.playblasts_path,sequence_name)   
-            if files.delete(path):
-                
-                return True
-            
-            return True
-            
-        
-        return False  
-
-    def delete_shot(self, sequence_name = None, shot_name = None):
-
-        path = os.path.join(self.scenes_path,sequence_name, shot_name)       
-        if files.delete(path):
-            
-            path = os.path.join(self.playblasts_path,sequence_name, shot_name)   
-            if files.delete(path):
-                
-                return True
-            
-            return True
-        
-        return False  
-
-    def create_shot(self, sequence_name = None, shot_name = None, create_from = None):
-        for shot in self.shots(sequence_name = sequence_name):
-            if shot_name == shot:
-                dlg.massage("critical", "Sorry", "This Shot exsists" )
-                return False
-
-        path = os.path.join(self.scenes_path,sequence_name,shot_name)       
-        if files.create_directory(path):
-            shot = pipeline_shot().create(path, sequence_name, shot_name, self, self.settings, create_from)
-            return shot
- 
-
-    def create_catagory(self, project_path = None, catagory_name = None):
-        for catagory in self.catagories(project_path = project_path):
-            if catagory_name == catagory:
-                dlg.massage("critical", "Sorry", "This Catagory exsists" )
-                return False
-
-        path = os.path.join(project_path,self.assets_dir,catagory_name)       
-        if files.create_directory(path):
-            return True
-        
-    def delete_catagory(self, project_path = None, catagory_name = None):
-
-        path = os.path.join(project_path,self.assets_dir,catagory_name)       
-        if files.delete(path):
-            return True
-        
-        return False    
-
-    def create_asset(self, project_path = None, catagory_name = None, asset_name = None):
-        for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
-            if asset_name == asset:
-                dlg.massage("critical", "Sorry", "This Asset exsists" )
-                return False
-
-        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)       
-        if files.create_directory(path):
-            return True
-            
-    def delete_asset(self, project_path = None, catagory_name = None, asset_name = None):
-
-        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)       
-        if files.delete(path):
-            return True
-        
-        return False  
-
-    def create_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None, create_from = None):
-        for component in self.components(project_path = project_path, catagory_name = catagory_name, asset_name = asset_name):
-            if component_name == component:
-                dlg.massage("critical", "Sorry", "This Component exsists" )
-                return False
-
-        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)       
-        if files.create_directory(path):
-            component = pipeline_component().create(path, catagory_name, asset_name, component_name, self, self.settings, create_from)
-            return component
-
-    def delete_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None):
-
-        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)       
-        if files.delete(path):
-            return True
-        
-        return False  
-
-
-    def rename_sequence(self, project_path = None,sequence_name = None, new_name=True):
-                
-        for shot in self.shots( sequence_name ):
-            
-            path = os.path.join(project_path,self.scenes_path,sequence_name,shot,  ("%s.%s"%(shot,"pipe")))
-            if os.path.isfile(path):
-                shot_object = pipeline_shot(path = path, project = self, settings = self.settings) 
-                shot_object.rename_sequence(new_name)
-        
-        path = os.path.join(project_path,self.scenes_path,sequence_name)       
-        path = files.file_rename(path,new_name) 
-        
-        return True  
-
-    def rename_catagory(self, project_path = None, catagory_name = None, new_name=True):
-        
-        for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
-        
-            for component in self.components(project_path, catagory_name, asset):
-                
-                path = os.path.join(project_path,self.assets_dir,catagory_name,asset, component, ("%s.%s"%(component,"pipe")))
-                if os.path.isfile(path):
-                    component_object = pipeline_component(path = path, project = self, settings = self.settings) 
-                    component_object.catagory_name = new_name
-        
-        path = os.path.join(project_path,self.assets_dir,catagory_name)       
-        path = files.file_rename(path,new_name) 
-        
-        return True  
-
-    def rename_asset(self, project_path = None, catagory_name = None, asset_name = None, new_name=True):
-                
-        for component in self.components(project_path, catagory_name, asset_name):
-            path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component, ("%s.%s"%(component,"pipe")))
-            if os.path.isfile(path):
-                component_object = pipeline_component(path = path, project = self, settings = self.settings) 
-                component_object.rename_asset(new_name)
-
-        
-        path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)       
-        path = files.file_rename(path,new_name)   
-        
-        return True
-    
-
-
-    @property
-    def masters(self):
-        if self.project_file:
-            masters = {}            
-            project_path = self.settings.current_project_path
-            
-            for catagory in self.catagories(project_path=project_path):                
-                for asset in self.assets(project_path=project_path, catagory_name = catagory):                    
-                    for component in self.components(project_path = project_path, catagory_name = catagory, asset_name = asset):                    
-                        component_object = pipeline_component                        
-                        component_file_path = os.path.join(project_path,
-                            self.assets_dir,
-                            catagory,
-                            asset,
-                            component,
-                            "%s.%s"%(component,"pipe")
-                            )
-            
-                        component_object = pipeline_component(path = component_file_path, project = self, settings = self.settings)
-                        if component_object.component_public_state:
-                            master_padded_version = set_padding(0, self.project_padding)
-                            master_file = component_object.master
-                            if master_file:
-                                masters["%s_%s"%(asset,component)] = [master_file, 
-                                                     component_object.thumbnail, 
-                                                     component_object.author("masters",master_padded_version), 
-                                                     component_object.date_created("masters",master_padded_version),
-                                                     ]
-                            
-                        del component_object
-                           
-            return masters        
-        else:            
-            return None
-
-    @property
-    def stages(self):
-        stages = {}
-        stages["asset"] = ["model","rig","clip","shading","lightning"]
-        stages["animation"] = ["layout","Shot"]   
-        return stages
-    
-    @property
-    def levels(self):
-        levels = {}
-        levels["asset"] = ["type","asset","stage","ccc"]
-        levels["animation"] = ["Ep","Seq"]
-        return levels
-                
-
-
-    def log(self):
-        
-        log.info("logging project '%s'"%(self.project_name))       
-        
-        project_path = self.settings.current_project_path
-        
-        log.info("project local path %s"%project_path)
-                
-        [ log.info("  %s"%files.reletive_path(project_path,f)) for f in files.list_all(self.settings.current_project_path) if isinstance(files.list_all(self.settings.current_project_path),list) ]
-                               
-        log.info("project data file: %s"%self.data_file_path)
-        
-        log.info(self.data_file.print_nice())
-
-        log.info("end logging project ")    
-                            
-
-                            
+# class pipeline_project(pipeline_data):
+#     def __init__(self,**kwargs):
+#         #super(pipeline_project, self,).__init__()
+#         pipeline_data.__init__(self, **kwargs)
+#
+#
+#
+#         self.project_file = None
+#         if self.data_file:
+#             self.project_file = self.data_file.read()
+#
+#         self.project_file_name = 'project.json'
+#
+#         self.settings = None
+#         for key in kwargs:
+#             if key == "settings":
+#                 self.settings = kwargs[key]
+#
+#
+#     def create(self,
+#                project_path,
+#                name = "My_Project",
+#                padding = 3,
+#                file_type = "ma",
+#                fps = 25,
+#                users = {"Admin":(1234,"admin")},
+#                playblast_outside = False):
+#
+#         project_settings_file = os.path.join(project_path, self.project_file_name)
+#
+#         project_key = data.id_generator()
+#         project_data = {}
+#         project_data["project_name"] = name
+#         project_data["project_key"] = project_key
+#         project_data["padding"] = padding
+#         project_data["fps"] = fps
+#         project_data["defult_file_type"] = file_type
+#         project_data["users"] = users
+#         project_data["playblast_outside"] = playblast_outside
+#
+#         folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
+#                    "sound", "clips", "renderData", "cache"]
+#
+#         for folder in folders:
+#             project_data[folder] = folder
+#             files.create_directory(os.path.join(project_path, folder))
+#
+#         #render folders:
+#         r_folders = ["renderData", "depth", "iprimages", "shaders"]
+#         for r_folder in r_folders[1:]:
+#             files.create_directory(os.path.join(project_path, r_folders[0], r_folder))
+#
+#         fur_folders = ["renderData", "fur", "furFiles", "furImages", "furEqualMap", "furAttrMap", "furShadowMap" ]
+#         for f_folder in fur_folders[2:]:
+#             files.create_directory(os.path.join(project_path, fur_folders[0], fur_folders[1], f_folder))
+#
+#         #cache folders:
+#         c_folders = ["cache", "particles", "nCache", "bifrost"]
+#         for c_folder in c_folders[1:]:
+#             files.create_directory(os.path.join(project_path, c_folders[0], c_folder))
+#
+#         fl_folders = ["cache", "nCache", "fluid"]
+#         for fl_folder in fl_folders[2:]:
+#             files.create_directory(os.path.join(project_path, fl_folders[0], fl_folders[1], fl_folder))
+#
+#
+#         self.data_file = data.jsonDict().create(project_settings_file, project_data)
+#         self.project_file = self.data_file.read()
+#
+#         return self
+#
+#
+#
+#     def project_file_key(self, key = None):
+#         if self.project_file:
+#             return self.project_file[key]
+#         else:
+#             return None
+#
+#     @property
+#     def project_name(self):
+#         if self.project_file:
+#             return self.project_file["project_name"]
+#         else:
+#             return None
+#
+#     @property
+#     def project_fps(self):
+#         if self.project_file:
+#             if "fps" in self.project_file.keys():
+#                 return self.project_file["fps"]
+#             else:
+#                 return None
+#         else:
+#             return None
+#
+#
+#     @project_fps.setter
+#     def project_fps(self,fps):
+#
+#         if self.data_file:
+#             data = {}
+#             data["fps"] = fps
+#             self.data_file.edit(data)
+#             self.project_file = self.data_file.read()
+#
+#
+#     @property
+#     def project_key(self):
+#         if self.project_file:
+#             return self.project_file["project_key"]
+#         else:
+#             return None
+#
+#     @property
+#     def project_padding(self):
+#         if self.project_file:
+#             return self.project_file["padding"]
+#         else:
+#             return None
+#
+#     @property
+#     def project_file_type(self):
+#         if self.project_file:
+#             return self.project_file["defult_file_type"]
+#         else:
+#             return None
+#
+#
+#     @project_file_type.setter
+#     def project_file_type(self,type):
+#
+#         if self.data_file:
+#             data = {}
+#             data["defult_file_type"] = type
+#             self.data_file.edit(data)
+#             self.project_file = self.data_file.read()
+#
+#     @property
+#     def movie_file_type(self):
+#         if self.project_file:
+#             return "mov"
+#         else:
+#             return None
+#
+#     @property
+#     def project_users(self):
+#         if self.project_file:
+#             if "users" in self.project_file.keys():
+#                 return self.project_file["users"]
+#             else:
+#                 return None
+#         else:
+#             return None
+#
+#     @project_users.setter
+#     def project_users(self,users):
+#
+#         if self.data_file:
+#             data = {}
+#             data["users"] = users
+#             self.data_file.edit(data)
+#             self.project_file = self.data_file.read()
+#
+#
+#     @property
+#     def playblast_outside(self):
+#         if self.project_file:
+#             if "playblast_outside" in self.project_file.keys():
+#                 return self.project_file["playblast_outside"]
+#             else:
+#                 return False
+#         else:
+#             return None
+#
+#     @playblast_outside.setter
+#     def playblast_outside(self,playblast_outside):
+#
+#
+#         old_path = self.playblasts_path
+#
+#         if self.data_file:
+#             data = {}
+#             data["playblast_outside"] = playblast_outside
+#             self.data_file.edit(data)
+#             self.project_file = self.data_file.read()
+#
+#             files.dir_move(old_path, self.playblasts_path)
+#
+#
+#
+#
+#
+#     @property
+#     def assets_dir(self):
+#         if self.project_file:
+#             return self.project_file_key(key = "assets")
+#         else:
+#             return None
+#
+#
+#
+#
+#
+#     def catagories(self, project_path = None):
+#         if self.project_file:
+#
+#             if os.path.exists(project_path):
+#                 if self.assets_dir:
+#                     assets_catagories_path = os.path.join(project_path, self.assets_dir)
+#                     return files.list_dir_folders(assets_catagories_path)
+#         return None
+#
+#     def assets(self, project_path = None, catagory_name = None):
+#         if self.project_file:
+#
+#             if os.path.exists(project_path):
+#                 if self.assets_dir:
+#                     catagory_path = os.path.join(project_path,self.assets_dir, catagory_name)
+#                     if os.path.exists(catagory_path):
+#                         return files.list_dir_folders(catagory_path)
+#         return None
+#
+#     def components(self, project_path = None, catagory_name = None, asset_name = None):
+#         if self.project_file:
+#
+#             if os.path.exists(project_path):
+#                 if self.assets_dir:
+#                     asset_path = os.path.join(project_path,self.assets_dir, catagory_name, asset_name)
+#                     if os.path.exists(asset_path):
+#                         return files.list_dir_folders(asset_path)
+#         return None
+#
+#     @property
+#     def scenes_path(self):
+#         if self.settings:
+#             path = os.path.join(self.settings.current_project_path,"scenes")
+#             if os.path.exists(path):
+#                 return path
+#         return None
+#
+#     @property
+#     def playblasts_path(self):
+#         if self.settings:
+#             if self.playblast_outside:
+#                 path = os.path.join(os.path.dirname(self.settings.current_project_path),"%s_playblasts"%(self.project_name))
+#
+#             else:
+#                 path = os.path.join(self.settings.current_project_path,"playblasts")
+#
+#
+#             return path
+#         return None
+#
+#     @property
+#     def sequences(self):
+#         if self.project_file:
+#
+#             path = self.scenes_path
+#             if os.path.exists(path):
+#                 folders = files.list_dir_folders(path)
+#                 sequences = []
+#                 for folder in folders:
+#                     if os.path.isfile(os.path.join(path, folder, "sequence.json")):
+#                         sequences.append(folder)
+#                 return sequences
+#         return None
+#
+#     def shots(self, sequence_name = None):
+#         if self.project_file:
+#             if sequence_name:
+#                 path = os.path.join(self.scenes_path, sequence_name)
+#                 if os.path.exists(path):
+#                     return files.list_dir_folders(path)
+#
+#         return None
+#
+#
+#
+#     def create_sequence(self, sequence_name = None):
+#
+#         for sequence in self.sequences:
+#             if sequence_name == sequence:
+#                 dlg.massage("critical", "Sorry", "This sequence exsists" )
+#                 return False
+#
+#         path = os.path.join(self.scenes_path, sequence_name)
+#         if files.create_directory(path):
+#             files.create_dummy(path, "sequence.json")
+#             return True
+#
+#
+#     def delete_sequence(self, sequence_name = None):
+#
+#         path = os.path.join(self.scenes_path,sequence_name)
+#         if files.delete(path):
+#
+#             path = os.path.join(self.playblasts_path,sequence_name)
+#             if files.delete(path):
+#
+#                 return True
+#
+#             return True
+#
+#
+#         return False
+#
+#     def delete_shot(self, sequence_name = None, shot_name = None):
+#
+#         path = os.path.join(self.scenes_path,sequence_name, shot_name)
+#         if files.delete(path):
+#
+#             path = os.path.join(self.playblasts_path,sequence_name, shot_name)
+#             if files.delete(path):
+#
+#                 return True
+#
+#             return True
+#
+#         return False
+#
+#     def create_shot(self, sequence_name = None, shot_name = None, create_from = None):
+#         for shot in self.shots(sequence_name = sequence_name):
+#             if shot_name == shot:
+#                 dlg.massage("critical", "Sorry", "This Shot exsists" )
+#                 return False
+#
+#         path = os.path.join(self.scenes_path,sequence_name,shot_name)
+#         if files.create_directory(path):
+#             shot = pipeline_shot().create(path, sequence_name, shot_name, self, self.settings, create_from)
+#             return shot
+#
+#
+#     def create_catagory(self, project_path = None, catagory_name = None):
+#         for catagory in self.catagories(project_path = project_path):
+#             if catagory_name == catagory:
+#                 dlg.massage("critical", "Sorry", "This Catagory exsists" )
+#                 return False
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name)
+#         if files.create_directory(path):
+#             return True
+#
+#     def delete_catagory(self, project_path = None, catagory_name = None):
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name)
+#         if files.delete(path):
+#             return True
+#
+#         return False
+#
+#     def create_asset(self, project_path = None, catagory_name = None, asset_name = None):
+#         for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
+#             if asset_name == asset:
+#                 dlg.massage("critical", "Sorry", "This Asset exsists" )
+#                 return False
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)
+#         if files.create_directory(path):
+#             return True
+#
+#     def delete_asset(self, project_path = None, catagory_name = None, asset_name = None):
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)
+#         if files.delete(path):
+#             return True
+#
+#         return False
+#
+#     def create_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None, create_from = None):
+#         for component in self.components(project_path = project_path, catagory_name = catagory_name, asset_name = asset_name):
+#             if component_name == component:
+#                 dlg.massage("critical", "Sorry", "This Component exsists" )
+#                 return False
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)
+#         if files.create_directory(path):
+#             component = pipeline_component().create(path, catagory_name, asset_name, component_name, self, self.settings, create_from)
+#             return component
+#
+#     def delete_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None):
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)
+#         if files.delete(path):
+#             return True
+#
+#         return False
+#
+#
+#     def rename_sequence(self, project_path = None,sequence_name = None, new_name=True):
+#
+#         for shot in self.shots( sequence_name ):
+#
+#             path = os.path.join(project_path,self.scenes_path,sequence_name,shot,  ("%s.%s"%(shot,"pipe")))
+#             if os.path.isfile(path):
+#                 shot_object = pipeline_shot(path = path, project = self, settings = self.settings)
+#                 shot_object.rename_sequence(new_name)
+#
+#         path = os.path.join(project_path,self.scenes_path,sequence_name)
+#         path = files.file_rename(path,new_name)
+#
+#         return True
+#
+#     def rename_catagory(self, project_path = None, catagory_name = None, new_name=True):
+#
+#         for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
+#
+#             for component in self.components(project_path, catagory_name, asset):
+#
+#                 path = os.path.join(project_path,self.assets_dir,catagory_name,asset, component, ("%s.%s"%(component,"pipe")))
+#                 if os.path.isfile(path):
+#                     component_object = pipeline_component(path = path, project = self, settings = self.settings)
+#                     component_object.catagory_name = new_name
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name)
+#         path = files.file_rename(path,new_name)
+#
+#         return True
+#
+#     def rename_asset(self, project_path = None, catagory_name = None, asset_name = None, new_name=True):
+#
+#         for component in self.components(project_path, catagory_name, asset_name):
+#             path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component, ("%s.%s"%(component,"pipe")))
+#             if os.path.isfile(path):
+#                 component_object = pipeline_component(path = path, project = self, settings = self.settings)
+#                 component_object.rename_asset(new_name)
+#
+#
+#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)
+#         path = files.file_rename(path,new_name)
+#
+#         return True
+#
+#
+#
+#     @property
+#     def masters(self):
+#         if self.project_file:
+#             masters = {}
+#             project_path = self.settings.current_project_path
+#
+#             for catagory in self.catagories(project_path=project_path):
+#                 for asset in self.assets(project_path=project_path, catagory_name = catagory):
+#                     for component in self.components(project_path = project_path, catagory_name = catagory, asset_name = asset):
+#                         component_object = pipeline_component
+#                         component_file_path = os.path.join(project_path,
+#                             self.assets_dir,
+#                             catagory,
+#                             asset,
+#                             component,
+#                             "%s.%s"%(component,"pipe")
+#                             )
+#
+#                         component_object = pipeline_component(path = component_file_path, project = self, settings = self.settings)
+#                         if component_object.component_public_state:
+#                             master_padded_version = set_padding(0, self.project_padding)
+#                             master_file = component_object.master
+#                             if master_file:
+#                                 masters["%s_%s"%(asset,component)] = [master_file,
+#                                                      component_object.thumbnail,
+#                                                      component_object.author("masters",master_padded_version),
+#                                                      component_object.date_created("masters",master_padded_version),
+#                                                      ]
+#
+#                         del component_object
+#
+#             return masters
+#         else:
+#             return None
+#
+#     @property
+#     def stages(self):
+#         stages = {}
+#         stages["asset"] = ["model","rig","clip","shading","lightning"]
+#         stages["animation"] = ["layout","Shot"]
+#         return stages
+#
+#     @property
+#     def levels(self):
+#         levels = {}
+#         levels["asset"] = ["type","asset","stage","ccc"]
+#         levels["animation"] = ["Ep","Seq"]
+#         return levels
+#
+#
+#
+#     def log(self):
+#
+#         log.info("logging project '%s'"%(self.project_name))
+#
+#         project_path = self.settings.current_project_path
+#
+#         log.info("project local path %s"%project_path)
+#
+#         [ log.info("  %s"%files.reletive_path(project_path,f)) for f in files.list_all(self.settings.current_project_path) if isinstance(files.list_all(self.settings.current_project_path),list) ]
+#
+#         log.info("project data file: %s"%self.data_file_path)
+#
+#         log.info(self.data_file.print_nice())
+#
+#         log.info("end logging project ")
+#
+#
+#
 
 class pipeline_settings(pipeline_data):
     def __init__(self,**kwargs):
@@ -2240,6 +2240,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.ui.projects_pushButton.setText("%s > %s" % (project.parent().name, project.name))
             self.project = project
             self.populate_navbar()
+            try:
+                self.updateVersionsTable()
+                self.updateMastersTable()
+            except:
+                pass
 
 
             role = self.project.validate_user(self.settings.user[0], self.settings.user[1])
@@ -2252,9 +2257,17 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             self.ui.projects_pushButton.setText("No Project")
             self.project = None
+            self._stageNode = None
             self.settings.project = None
             self.populate_navbar()
             self.project_ui_Enable(False)
+
+
+            try:
+                self.updateVersionsTable()
+                self.updateMastersTable()
+            except:
+                pass
 
         #self.populate_project_tree()
 
@@ -2365,142 +2378,142 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     
-
-    def verify_projects(self):
-        self.project = None
-        projects = self.settings.projects
-
-        if projects:
-            for p in projects:
-                project_file_path = os.path.join(self.settings.project_path(project_key = p),"project.json")
-
-                if os.path.isfile(project_file_path):
-                    project = pipeline_project(path = project_file_path)
-                    project_key = project.project_key
-
-                    if p == project_key:
-                        projects[p][1] = "ONLINE"
-                    else:
-                        projects[p][1] = "OFFLINE"
-
-                    del project
-
-                else:
-                    projects[p][1] = "OFFLINE"
-
-            self.settings.projects = projects
-
-            if self.settings.current_project_status == "OFFLINE":
-                self.update_current_open_project(None)
-                return False
-
-        return True
-
-    def set_project(self,**kwargs):
-        from_pm = False
-        if "from_projects_manager" in kwargs:
-            from_pm = kwargs["from_projects_manager"]
-
-
-        if self.settings.current_project:
-            self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.json"), settings = self.settings)
+    #
+    # def verify_projects(self):
+    #     self.project = None
+    #     projects = self.settings.projects
+    #
+    #     if projects:
+    #         for p in projects:
+    #             project_file_path = os.path.join(self.settings.project_path(project_key = p),"project.json")
+    #
+    #             if os.path.isfile(project_file_path):
+    #                 project = pipeline_project(path = project_file_path)
+    #                 project_key = project.project_key
+    #
+    #                 if p == project_key:
+    #                     projects[p][1] = "ONLINE"
+    #                 else:
+    #                     projects[p][1] = "OFFLINE"
+    #
+    #                 del project
+    #
+    #             else:
+    #                 projects[p][1] = "OFFLINE"
+    #
+    #         self.settings.projects = projects
+    #
+    #         if self.settings.current_project_status == "OFFLINE":
+    #             self.update_current_open_project(None)
+    #             return False
+    #
+    #     return True
+    #
+    # def set_project(self,**kwargs):
+    #     from_pm = False
+    #     if "from_projects_manager" in kwargs:
+    #         from_pm = kwargs["from_projects_manager"]
 
 
+        # if self.settings.current_project:
+        #     self.project = pipeline_project(path = os.path.join(self.settings.current_project_path,"project.json"), settings = self.settings)
+        #
+        #
+        #
+        #     self.settings.role = None
+        #     username = self.settings.user[0]
+        #     password = self.settings.user[1]
+        #
+        #     if self.project.project_users != None:
+        #         if username in self.project.project_users:
+        #             if self.project.project_users[username][0] == password:
+        #                 self.settings.role = self.project.project_users[username][1]
+        #                 self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))
+        #
+        #
+        #                 return True
+        #
+        #
+        #         if not self.settings.role:
+        #
+        #             if from_pm:
+        #
+        #                 login = dlg.Login()
+        #                 result = login.exec_()
+        #                 q_user, q_password  = login.result()
+        #                 if result == QtGui.QDialog.Accepted:
+        #                     if q_user in self.project.project_users:
+        #                         if self.project.project_users[q_user][0] == q_password:
+        #                             self.settings.user = [q_user, q_password]
+        #                             self.settings.role = self.project.project_users[q_user][1]
+        #                             self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))
+        #                             return True
+        #
+        #
+        #
+        #                         log.info("Login faild")
+        #
+        #             self.project = None
+        #             self.settings.current_project = None
+        #
+        #             if projectsWindow:
+        #                 try:
+        #                     projectsWindow.updateProjectsTable()
+        #                 except:
+        #                     pass
+        #
+        #             return False
+        #
+        #
+        #     else:
+        #         return True
+        #
+        #
+        # else:
+        #     self.settings.role = None
+        #     self.project = None
+        #     self.settings.current_project = None
+        #     return False
 
-            self.settings.role = None
-            username = self.settings.user[0]
-            password = self.settings.user[1]
-
-            if self.project.project_users != None:
-                if username in self.project.project_users:
-                    if self.project.project_users[username][0] == password:
-                        self.settings.role = self.project.project_users[username][1]
-                        self.ui.users_pushButton.setText("%s : %s"%(username,self.settings.role_name))
-
-
-                        return True
-
-
-                if not self.settings.role:
-
-                    if from_pm:
-
-                        login = dlg.Login()
-                        result = login.exec_()
-                        q_user, q_password  = login.result()
-                        if result == QtGui.QDialog.Accepted:
-                            if q_user in self.project.project_users:
-                                if self.project.project_users[q_user][0] == q_password:
-                                    self.settings.user = [q_user, q_password]
-                                    self.settings.role = self.project.project_users[q_user][1]
-                                    self.ui.users_pushButton.setText("%s : %s"%(q_user,self.settings.role_name))
-                                    return True
-
-
-
-                                log.info("Login faild")
-
-                    self.project = None
-                    self.settings.current_project = None
-
-                    if projectsWindow:
-                        try:
-                            projectsWindow.updateProjectsTable()
-                        except:
-                            pass
-
-                    return False
-
-
-            else:
-                return True
-
-
-        else:
-            self.settings.role = None
-            self.project = None
-            self.settings.current_project = None
-            return False
-
-    def update_current_open_project(self,project_key,**kwargs):
-        '''
-        thie method is used from the projects window, when a project is being set,
-        update the settings file,
-        call the set project and init project methods
-
-        '''
-
-        from_pm = False
-        if "from_projects_manager" in kwargs:
-            from_pm = kwargs["from_projects_manager"]
-
-
-        if project_key:
-
-            #if self.settings.current_project != project_key:
-
-            self.settings.current_project = project_key
-
-
-
-            if from_pm:
-                if self.set_project(from_projects_manager=True):
-                    self.init_current_project()
-
-                    return True
-            else:
-                if self.set_project():
-                    self.init_current_project()
-
-                    return True
-        else:
-
-            self.settings.current_project = None
-            self.set_project()
-            self.init_current_project()
-            #return True
-
-        return False
+    # def update_current_open_project(self,project_key,**kwargs):
+    #     '''
+    #     thie method is used from the projects window, when a project is being set,
+    #     update the settings file,
+    #     call the set project and init project methods
+    #
+    #     '''
+    #
+    #     from_pm = False
+    #     if "from_projects_manager" in kwargs:
+    #         from_pm = kwargs["from_projects_manager"]
+    #
+    #
+    #     if project_key:
+    #
+    #         #if self.settings.current_project != project_key:
+    #
+    #         self.settings.current_project = project_key
+    #
+    #
+    #
+    #         if from_pm:
+    #             if self.set_project(from_projects_manager=True):
+    #                 self.init_current_project()
+    #
+    #                 return True
+    #         else:
+    #             if self.set_project():
+    #                 self.init_current_project()
+    #
+    #                 return True
+    #     else:
+    #
+    #         self.settings.current_project = None
+    #         self.set_project()
+    #         self.init_current_project()
+    #         #return True
+    #
+    #     return False
 
     # def update_current_open_project(self,project_key,**kwargs):
     #     '''
@@ -2546,339 +2559,339 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         decode = getattr(self.ui,dlg._decode_strings()[0])
         decode2 = getattr(decode,dlg._decode_strings()[2])(dlg._decode_strings()[4])
         decode2 = getattr(decode,dlg._decode_strings()[3])(dlg._decode_strings()[5])
-
-    def unload_project(self):
-
-        #self.settings.current_project = None
-        self.set_project()
-        self.init_current_project()
-        try:
-            if projectsWindow:
-                projectsWindow.updateProjectsTable()
-        except:
-           pass
-
-
-    def init_current_project(self):
-
-        '''
-        startup of project ui:
-            reset all selections
-            write the project name to the ui
-            update the catagories table
-            update the sequences table
-            update the published masters table
-
-
-        '''
-        self.active_version = None
-        self._catagory_name = None
-        self._asset_name = None
-        self._component_name = None
-        self._component = None
-        self._catagory_version = None
-        self._master_version = None
-        self._sequence_name = None
-        self._shot_name = None
-        self._shot = None
-        self._shot_version = None
-        self._shot_playblast_version = None
-
-        #if self.settings.current_project_name:
-        if self.project:
-            self.ui.projects_pushButton.setText(self.settings.current_project_name)
-            #self.enable(self.ui.assets_selection_frame)
-            #self.enable(self.ui.shots_assets_tabWidget)
-
-
-
-            self.enable(self.ui.save_master_pushButton, level = 1)
-            self.enable(self.ui.save_version_pushButton, level = 1)
-            self.enable(self.ui.import_version_pushButton, level = 1)
-            #self.enable(self.ui.save_shot_version_pushButton, level = 2)
-            #self.enable(self.ui.import_shot_version_pushButton, level = 2)
-
-            '''
-            if self.settings.role > 1 and self.settings.role < 3:
-
-                if self.ui.scenes_main_widget.isHidden():
-                    self.asset_scenes_switch()
-                #self.ui.asset_scenes_switch_pushButton.setHidden(True)
-            else:
-                pass
-                #self.ui.asset_scenes_switch_pushButton.setHidden(False)
-               '''
-
-
-            #self.update_category()
-            #self.update_sequence()
-            #self.update_published_masters()
-
-        else:
-            self.ui.projects_pushButton.setText("No Project")
-            #self.disable(self.ui.assets_selection_frame)
-            #self.disable(self.ui.shots_assets_tabWidget)
-            #self.update_category()
-            #self.update_sequence()
-            #self.update_published_masters()
-            log.info ( "logged out")
-
-
-
-
-
-
-    def create_catagory(self):
-        catagory_name, ok = QtGui.QInputDialog.getText(self, 'New catagory', 'Enter catagory name:')
-
-        if ok:
-            result = self.project.create_catagory(project_path = self.settings.current_project_path, catagory_name = catagory_name)
-            if result:
-                self.update_category()
-
-    def delete_catagory(self):
-
-        if self.catagory_name:
-
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this catagory?" ):
-
-                result = self.project.delete_catagory(project_path = self.settings.current_project_path, catagory_name = self.catagory_name)
-                if result:
-                    self.update_category()
-
-    def create_asset(self):
-        asset_name, ok = QtGui.QInputDialog.getText(self, 'New asset', 'Enter asset name:')
-
-        if ok:
-
-            result = self.project.create_asset(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = asset_name)
-            if result:
-                self.update_asset()
-
-    def delete_asset(self):
-
-        if self.asset_name:
-
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this asset?" ):
-
-                result = self.project.delete_asset(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name)
-                if result:
-                    self.update_asset()
-
-    def _create_component(self, component_name = None, create_from = None):
-
-            self.toggle_scene_open_script()
-            result = self.project.create_component(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, component_name = component_name, create_from = create_from)
-            self.toggle_scene_open_script()
-
-            return result
-
-    def create_component(self):
-        component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
-
-        if ok:
-            result = self._create_component(component_name = component_name, create_from = None)
-
-            if result:
-
-                self.component = result
-                self.update_component()
-                self.table_selection_by_string(self.ui.components_tableWidget,component_name)
-                self.update_component_selection()
-
-    def create_component_from_current_scene(self):
-
-
-        component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
-
-        if ok:
-            result = self._create_component(component_name = component_name, create_from = "current_scene")
-
-            if result:
-
-                self.component = result
-                self.update_component()
-                self.table_selection_by_string(self.ui.components_tableWidget,component_name)
-                self.update_component_selection()
-
-    def create_component_from_current_selection(self):
-
-        dialog = dlg.Create_from_selection(self, title = "Component name")
-        result = dialog.exec_()
-        input = dialog.result()
-
-        if result == QtGui.QDialog.Accepted:
-            log.info(input)
-            temp_file = maya.new_scene_from_selection(project_path = self.settings.current_project_path, mode = input[1])
-            if temp_file:
-                result = self._create_component(component_name = input[0], create_from = "current_scene")
-                if result:
-                    files.delete_file(temp_file)
-                    self.component = result
-                    self.update_component()
-                    self.table_selection_by_string(self.ui.components_tableWidget,input[0])
-                    self.update_component_selection()
-
-
-    def create_component_from_file(self):
-
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
-        if path[0]:
-
-            component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
-
-            if ok:
-                if path[1] == "OBJ file (*.obj)":
-                    log.info("OBJ import not supported yet")
-                    return
-                else:
-                    if maya.open_scene(path[0]):
-                        result = self._create_component(component_name = component_name, create_from = "current_scene")
-                        if result:
-                            self.component = result
-                            self.update_component()
-                            self.table_selection_by_string(self.ui.components_tableWidget,component_name)
-                            self.update_component_selection()
-
-
-
-
-    def delete_component(self):
-        if self.component_name:
-
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this component?" ):
-
-                result = self.project.delete_component(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, component_name = self.component_name)
-                if result:
-                    self.update_component()
-
-
-    def create_sequence(self):
-        sequence_name, ok = QtGui.QInputDialog.getText(self, 'New sequence', 'Enter sequence name:')
-
-        if ok:
-            result = self.project.create_sequence(sequence_name = sequence_name)
-            if result:
-                self.update_sequence()
-
-
-    def delete_sequence(self):
-        if self.sequence_name:
-
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this sequence?" ):
-
-                result = self.project.delete_sequence(sequence_name = self.sequence_name)
-                if result:
-                    self.update_sequence()
-
-
-    def _create_shot(self, sequence_name = None, shot_name = None, create_from = None):
-
-            self.toggle_scene_open_script()
-            result = self.project.create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = create_from)
-            self.toggle_scene_open_script()
-
-            return result
-
-    def create_shot(self):
-
-        shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
-
-        if ok:
-
-            result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = None)
-
-            if result:
-                self.shot = result
-                self.update_shot()
-                self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
-                self.update_shot_selection()
-
-    def create_shot_from_current_scene(self):
-        shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
-
-        if ok:
-
-            result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = "current_scene")
-
-            if result:
-                self.shot = result
-                self.update_shot()
-                self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
-                self.update_shot_selection()
-
-    def create_shot_from_file(self):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
-        if path[0]:
-
-            shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
-
-            if ok:
-                if path[1] == "OBJ file (*.obj)":
-                    log.info("OBJ import not supported yet")
-                    return
-                else:
-                    if maya.open_scene(path[0]):
-                        result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = "current_scene")
-                        if result:
-                            self.shot = result
-                            self.update_shot()
-                            self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
-                            self.update_shot_selection()
-
-    def delete_shot(self):
-        if self.shot_name:
-
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
-
-                result = self.project.delete_shot(sequence_name = self.sequence_name, shot_name = self.shot_name)
-                if result:
-                    self.update_shot()
-
-
-
-    def version_note(self, event):
-
-        if self.master_version and not isinstance(self.master_version,list):
-
-            note_inpute = dlg.Note(plainText = self.component.note("masters",self.master_version))
-            note = note_inpute.exec_()
-            text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
-                self.component.note("masters",self.master_version, note=text)
-                self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
-                self.update_masters()
-
-        elif self.catagory_version and not isinstance(self.catagory_version,list):
-            note_inpute = dlg.Note(plainText = self.component.note("versions",self.catagory_version))
-            note = note_inpute.exec_()
-            text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
-
-                self.component.note("versions",self.catagory_version, note=text)
-                self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
-                self.update_versions()
-
-    def version_import(self):
-        if self.settings:
-            path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
-            if path[0]:
-
-                type, ok = QtGui.QInputDialog.getItem(self, 'Import As', 'Import file as:',["Version", "Master"], 0, False)
-                if ok:
-                    print "file path:, ", path[0]
-                    if path[1] == "OBJ file (*.obj)":
-                        print "importing obj"
-                    else:
-                        if maya.open_scene(path[0]):
-                            if type == "Version":
-                                self.component.new_version()
-                                self.update_versions()
-                            if type == "Master":
-                                self.component.new_master(from_file = path[0])
-                                self.update_masters()
-                                self.update_published_masters()
-                                self.ui.asset_component_files_tabWidget.setCurrentIndex(1)
+    #
+    # def unload_project(self):
+    #
+    #     #self.settings.current_project = None
+    #     self.set_project()
+    #     self.init_current_project()
+    #     try:
+    #         if projectsWindow:
+    #             projectsWindow.updateProjectsTable()
+    #     except:
+    #        pass
+
+    #
+    # def init_current_project(self):
+    #
+    #     '''
+    #     startup of project ui:
+    #         reset all selections
+    #         write the project name to the ui
+    #         update the catagories table
+    #         update the sequences table
+    #         update the published masters table
+    #
+    #
+    #     '''
+    #     self.active_version = None
+    #     self._catagory_name = None
+    #     self._asset_name = None
+    #     self._component_name = None
+    #     self._component = None
+    #     self._catagory_version = None
+    #     self._master_version = None
+    #     self._sequence_name = None
+    #     self._shot_name = None
+    #     self._shot = None
+    #     self._shot_version = None
+    #     self._shot_playblast_version = None
+    #
+    #     #if self.settings.current_project_name:
+    #     if self.project:
+    #         self.ui.projects_pushButton.setText(self.settings.current_project_name)
+    #         #self.enable(self.ui.assets_selection_frame)
+    #         #self.enable(self.ui.shots_assets_tabWidget)
+    #
+    #
+    #
+    #         self.enable(self.ui.save_master_pushButton, level = 1)
+    #         self.enable(self.ui.save_version_pushButton, level = 1)
+    #         self.enable(self.ui.import_version_pushButton, level = 1)
+    #         #self.enable(self.ui.save_shot_version_pushButton, level = 2)
+    #         #self.enable(self.ui.import_shot_version_pushButton, level = 2)
+    #
+    #         '''
+    #         if self.settings.role > 1 and self.settings.role < 3:
+    #
+    #             if self.ui.scenes_main_widget.isHidden():
+    #                 self.asset_scenes_switch()
+    #             #self.ui.asset_scenes_switch_pushButton.setHidden(True)
+    #         else:
+    #             pass
+    #             #self.ui.asset_scenes_switch_pushButton.setHidden(False)
+    #            '''
+    #
+    #
+    #         #self.update_category()
+    #         #self.update_sequence()
+    #         #self.update_published_masters()
+    #
+    #     else:
+    #         self.ui.projects_pushButton.setText("No Project")
+    #         #self.disable(self.ui.assets_selection_frame)
+    #         #self.disable(self.ui.shots_assets_tabWidget)
+    #         #self.update_category()
+    #         #self.update_sequence()
+    #         #self.update_published_masters()
+    #         log.info ( "logged out")
+    #
+    #
+    #
+
+
+    #
+    # def create_catagory(self):
+    #     catagory_name, ok = QtGui.QInputDialog.getText(self, 'New catagory', 'Enter catagory name:')
+    #
+    #     if ok:
+    #         result = self.project.create_catagory(project_path = self.settings.current_project_path, catagory_name = catagory_name)
+    #         if result:
+    #             self.update_category()
+    #
+    # def delete_catagory(self):
+    #
+    #     if self.catagory_name:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this catagory?" ):
+    #
+    #             result = self.project.delete_catagory(project_path = self.settings.current_project_path, catagory_name = self.catagory_name)
+    #             if result:
+    #                 self.update_category()
+    #
+    # def create_asset(self):
+    #     asset_name, ok = QtGui.QInputDialog.getText(self, 'New asset', 'Enter asset name:')
+    #
+    #     if ok:
+    #
+    #         result = self.project.create_asset(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = asset_name)
+    #         if result:
+    #             self.update_asset()
+    #
+    # def delete_asset(self):
+    #
+    #     if self.asset_name:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this asset?" ):
+    #
+    #             result = self.project.delete_asset(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name)
+    #             if result:
+    #                 self.update_asset()
+    #
+    # def _create_component(self, component_name = None, create_from = None):
+    #
+    #         self.toggle_scene_open_script()
+    #         result = self.project.create_component(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, component_name = component_name, create_from = create_from)
+    #         self.toggle_scene_open_script()
+    #
+    #         return result
+    #
+    # def create_component(self):
+    #     component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
+    #
+    #     if ok:
+    #         result = self._create_component(component_name = component_name, create_from = None)
+    #
+    #         if result:
+    #
+    #             self.component = result
+    #             self.update_component()
+    #             self.table_selection_by_string(self.ui.components_tableWidget,component_name)
+    #             self.update_component_selection()
+    #
+    # def create_component_from_current_scene(self):
+    #
+    #
+    #     component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
+    #
+    #     if ok:
+    #         result = self._create_component(component_name = component_name, create_from = "current_scene")
+    #
+    #         if result:
+    #
+    #             self.component = result
+    #             self.update_component()
+    #             self.table_selection_by_string(self.ui.components_tableWidget,component_name)
+    #             self.update_component_selection()
+    #
+    # def create_component_from_current_selection(self):
+    #
+    #     dialog = dlg.Create_from_selection(self, title = "Component name")
+    #     result = dialog.exec_()
+    #     input = dialog.result()
+    #
+    #     if result == QtGui.QDialog.Accepted:
+    #         log.info(input)
+    #         temp_file = maya.new_scene_from_selection(project_path = self.settings.current_project_path, mode = input[1])
+    #         if temp_file:
+    #             result = self._create_component(component_name = input[0], create_from = "current_scene")
+    #             if result:
+    #                 files.delete_file(temp_file)
+    #                 self.component = result
+    #                 self.update_component()
+    #                 self.table_selection_by_string(self.ui.components_tableWidget,input[0])
+    #                 self.update_component_selection()
+    #
+    #
+    # def create_component_from_file(self):
+    #
+    #     path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+    #     if path[0]:
+    #
+    #         component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
+    #
+    #         if ok:
+    #             if path[1] == "OBJ file (*.obj)":
+    #                 log.info("OBJ import not supported yet")
+    #                 return
+    #             else:
+    #                 if maya.open_scene(path[0]):
+    #                     result = self._create_component(component_name = component_name, create_from = "current_scene")
+    #                     if result:
+    #                         self.component = result
+    #                         self.update_component()
+    #                         self.table_selection_by_string(self.ui.components_tableWidget,component_name)
+    #                         self.update_component_selection()
+    #
+    #
+
+    #
+    # def delete_component(self):
+    #     if self.component_name:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this component?" ):
+    #
+    #             result = self.project.delete_component(project_path = self.settings.current_project_path, catagory_name = self.catagory_name, asset_name = self.asset_name, component_name = self.component_name)
+    #             if result:
+    #                 self.update_component()
+    #
+    #
+    # def create_sequence(self):
+    #     sequence_name, ok = QtGui.QInputDialog.getText(self, 'New sequence', 'Enter sequence name:')
+    #
+    #     if ok:
+    #         result = self.project.create_sequence(sequence_name = sequence_name)
+    #         if result:
+    #             self.update_sequence()
+    #
+    #
+    # def delete_sequence(self):
+    #     if self.sequence_name:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this sequence?" ):
+    #
+    #             result = self.project.delete_sequence(sequence_name = self.sequence_name)
+    #             if result:
+    #                 self.update_sequence()
+    #
+    #
+    # def _create_shot(self, sequence_name = None, shot_name = None, create_from = None):
+    #
+    #         self.toggle_scene_open_script()
+    #         result = self.project.create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = create_from)
+    #         self.toggle_scene_open_script()
+    #
+    #         return result
+    #
+    # def create_shot(self):
+    #
+    #     shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
+    #
+    #     if ok:
+    #
+    #         result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = None)
+    #
+    #         if result:
+    #             self.shot = result
+    #             self.update_shot()
+    #             self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
+    #             self.update_shot_selection()
+
+    # def create_shot_from_current_scene(self):
+    #     shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
+    #
+    #     if ok:
+    #
+    #         result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = "current_scene")
+    #
+    #         if result:
+    #             self.shot = result
+    #             self.update_shot()
+    #             self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
+    #             self.update_shot_selection()
+    #
+    # def create_shot_from_file(self):
+    #     path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+    #     if path[0]:
+    #
+    #         shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
+    #
+    #         if ok:
+    #             if path[1] == "OBJ file (*.obj)":
+    #                 log.info("OBJ import not supported yet")
+    #                 return
+    #             else:
+    #                 if maya.open_scene(path[0]):
+    #                     result = self._create_shot(sequence_name = self.sequence_name, shot_name = shot_name, create_from = "current_scene")
+    #                     if result:
+    #                         self.shot = result
+    #                         self.update_shot()
+    #                         self.table_selection_by_string(self.ui.shots_tableWidget,shot_name)
+    #                         self.update_shot_selection()
+    #
+    # def delete_shot(self):
+    #     if self.shot_name:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this shot?" ):
+    #
+    #             result = self.project.delete_shot(sequence_name = self.sequence_name, shot_name = self.shot_name)
+    #             if result:
+    #                 self.update_shot()
+
+
+    #
+    # def version_note(self, event):
+    #
+    #     if self.master_version and not isinstance(self.master_version,list):
+    #
+    #         note_inpute = dlg.Note(plainText = self.component.note("masters",self.master_version))
+    #         note = note_inpute.exec_()
+    #         text = note_inpute.result()
+    #         if note == QtGui.QDialog.Accepted:
+    #             self.component.note("masters",self.master_version, note=text)
+    #             self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
+    #             self.update_masters()
+    #
+    #     elif self.catagory_version and not isinstance(self.catagory_version,list):
+    #         note_inpute = dlg.Note(plainText = self.component.note("versions",self.catagory_version))
+    #         note = note_inpute.exec_()
+    #         text = note_inpute.result()
+    #         if note == QtGui.QDialog.Accepted:
+    #
+    #             self.component.note("versions",self.catagory_version, note=text)
+    #             self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
+    #             self.update_versions()
+    #
+    # def version_import(self):
+    #     if self.settings:
+    #         path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+    #         if path[0]:
+    #
+    #             type, ok = QtGui.QInputDialog.getItem(self, 'Import As', 'Import file as:',["Version", "Master"], 0, False)
+    #             if ok:
+    #                 print "file path:, ", path[0]
+    #                 if path[1] == "OBJ file (*.obj)":
+    #                     print "importing obj"
+    #                 else:
+    #                     if maya.open_scene(path[0]):
+    #                         if type == "Version":
+    #                             self.component.new_version()
+    #                             self.update_versions()
+    #                         if type == "Master":
+    #                             self.component.new_master(from_file = path[0])
+    #                             self.update_masters()
+    #                             self.update_published_masters()
+    #                             self.ui.asset_component_files_tabWidget.setCurrentIndex(1)
 
     def version_save(self):
         if self.versionsView and self._stageNode:
@@ -2886,82 +2899,82 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self._stageNode.new_version()
 
         
-    def version_open(self):
+    # def version_open(self):
+    #
+    #     widget = self.sender()
+    #     index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.component.file_path("versions",version)
+    #     self.settings.current_open_file = file
+    #     self.toggle_scene_open_script()
+    #     maya.open_scene(file)
+    #     self.toggle_scene_open_script()
+    #     self.update_versions()
+    #
+    #     '''
+    #     when opening a file, save the ui navigation selection to the settings file
+    #     '''
+    #     self.update_component_selection()
+    #
+    #     self.enable(self.ui.actionCollect_component, level = 4)
+    #
+    #
+    # def version_reference(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.component.file_path("versions",version)
+    #     maya.reference_scene(file)
+    #
+    # def version_add_import(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.component.file_path("versions",version)
+    #     maya.import_scene(file)
 
-        widget = self.sender()
-        index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-
-        file = self.component.file_path("versions",version)
-        self.settings.current_open_file = file
-        self.toggle_scene_open_script()
-        maya.open_scene(file)
-        self.toggle_scene_open_script()
-        self.update_versions()
-
-        '''
-        when opening a file, save the ui navigation selection to the settings file
-        '''
-        self.update_component_selection()
-
-        self.enable(self.ui.actionCollect_component, level = 4)
-
-
-    def version_reference(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-
-        file = self.component.file_path("versions",version)
-        maya.reference_scene(file)
-
-    def version_add_import(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-
-        file = self.component.file_path("versions",version)
-        maya.import_scene(file)
-
-    def version_delete(self):
-
-
-        if not isinstance(self.catagory_version,list):
-            widget = self.sender()
-            widget = widget.parent()
-            index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
-            version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
-
-                result = self.component.delete_version("versions", version)
-                if result:
-                    self.update_versions()
-
-        else:
-
-            if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
-
-                # make sure not to delete the active file
-                versions = self.catagory_version
-                if self.active_version in versions:
-                    versions.remove(self.active_version)
-
-                result = self.component.delete_version("versions", versions)
-                if result:
-                    self.update_versions()
-
-
-    def version_explore(self):
-        widget = self.sender()
-        widget = widget.parent()
-        index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
-        version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
-
-        file = self.component.file_path("versions",version)
-        files.explore(file)
+    # def version_delete(self):
+    #
+    #
+    #     if not isinstance(self.catagory_version,list):
+    #         widget = self.sender()
+    #         widget = widget.parent()
+    #         index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
+    #         version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
+    #
+    #             result = self.component.delete_version("versions", version)
+    #             if result:
+    #                 self.update_versions()
+    #
+    #     else:
+    #
+    #         if dlg.warning("critical", "Delete", "Are you sure you want to delete this version?" ):
+    #
+    #             # make sure not to delete the active file
+    #             versions = self.catagory_version
+    #             if self.active_version in versions:
+    #                 versions.remove(self.active_version)
+    #
+    #             result = self.component.delete_version("versions", versions)
+    #             if result:
+    #                 self.update_versions()
+    #
+    #
+    # def version_explore(self):
+    #     widget = self.sender()
+    #     widget = widget.parent()
+    #     index = self.ui.component_versions_tableWidget.indexAt(widget.pos())
+    #     version = self.ui.component_versions_tableWidget.item(index.row(),0).text()
+    #
+    #     file = self.component.file_path("versions",version)
+    #     files.explore(file)
 
     def master_save(self):
         if self.versionsView and self._stageNode:
@@ -3652,8 +3665,8 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                  
         #connect ui       
         self.ui.create_project_pushButton.clicked.connect(self.create_project)        
-        self.ui.unload_project_pushButton.clicked.connect(self.unload_project)
-        self.ui.load_project_pushButton.clicked.connect(self.load_project)
+        # self.ui.unload_project_pushButton.clicked.connect(self.unload_project)
+        # self.ui.load_project_pushButton.clicked.connect(self.load_project)
         self.ui.close_pushButton.clicked.connect(self.close_window)
 
         self.ui.unload_project_pushButton.setHidden(True)
@@ -3723,19 +3736,19 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
         return True
 
-        if self.pipeline_window.settings.rootDir and self.pipeline_window.settings.client:
-            projects_path = os.path.join(self.pipeline_window.settings.rootDir, self.pipeline_window.settings.client)
-            dirs = files.list_dir_folders(projects_path)
-            list = []
-            [list.append(dt.ProjectNode(i, pipelineUI = self.pipeline_window, path = os.path.join(projects_path, i))) for i in dirs]
-
-            if list:
-                self.pipeline_window.projects = dtm.PipelineProjectsModel(list)
-                self.projectsTableView.setModel_(self.pipeline_window.projects)
-                return True
-
-
-        self.projectsTableView.setModel(None)
+        # if self.pipeline_window.settings.rootDir and self.pipeline_window.settings.client:
+        #     projects_path = os.path.join(self.pipeline_window.settings.rootDir, self.pipeline_window.settings.client)
+        #     dirs = files.list_dir_folders(projects_path)
+        #     list = []
+        #     [list.append(dt.ProjectNode(i, pipelineUI = self.pipeline_window, path = os.path.join(projects_path, i))) for i in dirs]
+        #
+        #     if list:
+        #         self.pipeline_window.projects = dtm.PipelineProjectsModel(list)
+        #         self.projectsTableView.setModel_(self.pipeline_window.projects)
+        #         return True
+        #
+        #
+        # self.projectsTableView.setModel(None)
 
 
 
@@ -3835,612 +3848,612 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         #
         # create_edit_projectsWindow = pipeLine_create_edit_project_UI(parent = self, pipelineUI=self.pipeline_window)
         # create_edit_projectsWindow.show()
+    #
+    # def edit_project(self):
+    #     widget = self.sender()
+    #     index = self.ui.projects_tableWidget.indexAt(widget.pos())
+    #     wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
+    #
+    #     projects = self.pipeline_window.settings.projects
+    #     path = os.path.join(projects[wanted_project_key][0],"project.json")
+    #     self.create_edit_project(project_file = pipeline_project(path = path, settings = self.pipeline_window.settings))
+    #
+    # def create_edit_project(self, **kwargs):
+    #
+    #
+    #
+    #
+    #     project_file = None
+    #     for key in kwargs:
+    #         if key == "project_file":
+    #             project_file = kwargs[key]
+    #
+    #
+    #     global create_edit_projectsWindow
+    #     try:
+    #         create_edit_projectsWindow.close()
+    #     except:
+    #         pass
+    #
+    #     create_edit_projectsWindow=pipeLine_create_edit_project_UI(parent=self,pipelineUI = None, projects_window = self)#,project_file = project_file)
+    #     create_edit_projectsWindow.show()
 
-    def edit_project(self):
-        widget = self.sender()
-        index = self.ui.projects_tableWidget.indexAt(widget.pos())
-        wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
+    # def relink_project(self):
+    #     widget = self.sender()
+    #     index = self.ui.projects_tableWidget.indexAt(widget.pos())
+    #     wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
+    #
+    #     path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
+    #     if os.path.isfile(path[0]):
+    #
+    #         project_path = os.path.dirname(str(path[0]))
+    #         project_file = data.jsonDict(path=str(path[0]))
+    #         project_name = project_file.read("project_name")["project_name"]
+    #         project_key = project_file.read("project_key")["project_key"]
+    #
+    #         if wanted_project_key == project_key:
+    #
+    #             projects = self.pipeline_window.settings.projects
+    #             edited_projects = data.edit_key(dict = projects,key = project_key,value = [project_path, "ONLINE",project_name])
+    #
+    #             if edited_projects is not None:
+    #                 self.pipeline_window.settings.projects = projects
+    #                 self.updateProjectsTable()
+    #                 self.setColumnWidth_projectsTable()
+    #         else:
+    #             dlg.massage("critical", "Sorry", "The selected *.json file dose not match the selected project" )
+    #     else:
+    #         dlg.massage("critical", "Sorry", "No file selected" )
 
-        projects = self.pipeline_window.settings.projects
-        path = os.path.join(projects[wanted_project_key][0],"project.json")
-        self.create_edit_project(project_file = pipeline_project(path = path, settings = self.pipeline_window.settings))
-
-    def create_edit_project(self, **kwargs):
-
-
-
-
-        project_file = None
-        for key in kwargs:
-            if key == "project_file":
-                project_file = kwargs[key]
-
-
-        global create_edit_projectsWindow
-        try:
-            create_edit_projectsWindow.close()
-        except:
-            pass
-
-        create_edit_projectsWindow=pipeLine_create_edit_project_UI(parent=self,pipelineUI = None, projects_window = self)#,project_file = project_file)
-        create_edit_projectsWindow.show()
-
-    def relink_project(self):
-        widget = self.sender()
-        index = self.ui.projects_tableWidget.indexAt(widget.pos())
-        wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
-
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
-        if os.path.isfile(path[0]):
-
-            project_path = os.path.dirname(str(path[0]))
-            project_file = data.jsonDict(path=str(path[0]))
-            project_name = project_file.read("project_name")["project_name"]
-            project_key = project_file.read("project_key")["project_key"]
-
-            if wanted_project_key == project_key:
-
-                projects = self.pipeline_window.settings.projects
-                edited_projects = data.edit_key(dict = projects,key = project_key,value = [project_path, "ONLINE",project_name])
-
-                if edited_projects is not None:
-                    self.pipeline_window.settings.projects = projects
-                    self.updateProjectsTable()
-                    self.setColumnWidth_projectsTable()
-            else:
-                dlg.massage("critical", "Sorry", "The selected *.json file dose not match the selected project" )
-        else:
-            dlg.massage("critical", "Sorry", "No file selected" )
-
-    def unload_project(self):
-        row = self.ui.projects_tableWidget.currentRow()
-        if row != -1:
-            project_key = str(self.ui.projects_tableWidget.item(row,4).text())
-            projects = self.pipeline_window.settings.projects
-            del projects[project_key]
-
-            if project_key == self.pipeline_window.settings.current_project:
-                #self.pipeline_window.settings.current_project = None
-                self.pipeline_window.update_current_open_project(None)
-
-            self.pipeline_window.settings.projects = projects
-            self.updateProjectsTable()
-            self.setColumnWidth_projectsTable()
-
-    def load_project(self):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
-        if path[0]:
-            project_path = os.path.dirname(str(path[0]))
-            project_file = data.jsonDict(path=str(path[0]))
-            project_name = project_file.read("project_name")["project_name"]
-            project_key = project_file.read("project_key")["project_key"]
-
-            self.add_project(project_name = project_name, project_path = project_path, project_key = project_key)
-
-    def add_project(self,project_name = None,project_path = None, project_key = None):
-
-        projects = self.pipeline_window.settings.projects
-
-
-        projects[project_key] = [project_path, "ONLINE", project_name]
-        self.pipeline_window.settings.projects = projects
-
-
-        self.updateProjectsTable()
-        return True
-
-
-
-    def set_project_button(self):
-
-        widget = self.sender()
-        index = self.ui.projects_tableWidget.indexAt(widget.pos())
-        project_key = self.ui.projects_tableWidget.item(index.row(),4).text()
-
-        self.set_project(project_key = project_key)
-
-    def set_project(self,project_key = None):
-        import pymel.core as pm
-        import maya.mel as mel
-        if project_key:
-            projects = self.pipeline_window.settings.projects
-            project_path = projects[project_key][0]
-            project_Name = projects[project_key][2]
-
-            if self.pipeline_window.update_current_open_project(project_key,from_projects_manager=True):
-
-                #if self.pipeline_window.settings.current_project:
-
-                pm.workspace.open(project_path)
-                pm.workspace.chdir(project_path)
-
-                raw_project_path = project_path.replace("\\", "\\\\")
-                melCmd = "setProject \""+ raw_project_path +"\";"
-                try:
-                    mel.eval(melCmd)
-                except:
-                    pass
-
-                self.pipeline_window.ui.projects_pushButton.setText(project_Name)
-                self.updateProjectsTable()
-
-                log.info ( "project changed to: %s"%project_Name)
-
-            else:
-                log.info ( "Cannot set project")
+    # def unload_project(self):
+    #     row = self.ui.projects_tableWidget.currentRow()
+    #     if row != -1:
+    #         project_key = str(self.ui.projects_tableWidget.item(row,4).text())
+    #         projects = self.pipeline_window.settings.projects
+    #         del projects[project_key]
+    #
+    #         if project_key == self.pipeline_window.settings.current_project:
+    #             #self.pipeline_window.settings.current_project = None
+    #             self.pipeline_window.update_current_open_project(None)
+    #
+    #         self.pipeline_window.settings.projects = projects
+    #         self.updateProjectsTable()
+    #         self.setColumnWidth_projectsTable()
+    #
+    # def load_project(self):
+    #     path = QtGui.QFileDialog.getOpenFileName(self, "Select *.json file", filter = "pipe files (*.json)")
+    #     if path[0]:
+    #         project_path = os.path.dirname(str(path[0]))
+    #         project_file = data.jsonDict(path=str(path[0]))
+    #         project_name = project_file.read("project_name")["project_name"]
+    #         project_key = project_file.read("project_key")["project_key"]
+    #
+    #         self.add_project(project_name = project_name, project_path = project_path, project_key = project_key)
+    #
+    # def add_project(self,project_name = None,project_path = None, project_key = None):
+    #
+    #     projects = self.pipeline_window.settings.projects
+    #
+    #
+    #     projects[project_key] = [project_path, "ONLINE", project_name]
+    #     self.pipeline_window.settings.projects = projects
+    #
+    #
+    #     self.updateProjectsTable()
+    #     return True
 
 
-    def updateProjectsTable(self):
-        self.ui.projects_tableWidget.clearContents()
 
-        projects = self.pipeline_window.settings.projects
+    # def set_project_button(self):
+    #
+    #     widget = self.sender()
+    #     index = self.ui.projects_tableWidget.indexAt(widget.pos())
+    #     project_key = self.ui.projects_tableWidget.item(index.row(),4).text()
+    #
+    #     self.set_project(project_key = project_key)
+    #
+    # def set_project(self,project_key = None):
+    #     import pymel.core as pm
+    #     import maya.mel as mel
+    #     if project_key:
+    #         projects = self.pipeline_window.settings.projects
+    #         project_path = projects[project_key][0]
+    #         project_Name = projects[project_key][2]
+    #
+    #         if self.pipeline_window.update_current_open_project(project_key,from_projects_manager=True):
+    #
+    #             #if self.pipeline_window.settings.current_project:
+    #
+    #             pm.workspace.open(project_path)
+    #             pm.workspace.chdir(project_path)
+    #
+    #             raw_project_path = project_path.replace("\\", "\\\\")
+    #             melCmd = "setProject \""+ raw_project_path +"\";"
+    #             try:
+    #                 mel.eval(melCmd)
+    #             except:
+    #                 pass
+    #
+    #             self.pipeline_window.ui.projects_pushButton.setText(project_Name)
+    #             self.updateProjectsTable()
+    #
+    #             log.info ( "project changed to: %s"%project_Name)
+    #
+    #         else:
+    #             log.info ( "Cannot set project")
 
-
-        self.ui.projects_tableWidget.setRowCount(len(projects))
-
-        active_color = QtGui.QColor()
-        active_color.setNamedColor("green")
-
-        for index, key in enumerate(projects):
-
-            project_status = projects[key][1]
-            active_project = True if self.pipeline_window.settings.current_project == key and project_status == "ONLINE" else False
-
-
-            project_name = QtGui.QTableWidgetItem(projects[key][2])
-            project_name.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-            project_name.setFont(self.boldFont)
-            if active_project:
-                project_name.setBackground(active_color)
-
-            self.ui.projects_tableWidget.setItem(index,0,project_name)
-
-            if project_status == "OFFLINE":
-
-                offlineButtonItem = QtGui.QPushButton(project_status)
-                offlineButtonItem.setIcon(QtGui.QIcon(offline_icon))
-                offlineButtonItem.setIconSize(QtCore.QSize(20,20))
-
-                self.ui.projects_tableWidget.setCellWidget(index,1,offlineButtonItem)
-                offlineButtonItem.clicked.connect(self.relink_project)
-
-            else:
-                status = QtGui.QTableWidgetItem(project_status)
-                status.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                if active_project:
-                    status.setBackground(active_color)
-                self.ui.projects_tableWidget.setItem(index,1,status)
-
-            if project_status == "ONLINE":
-
-                editButtonItem = QtGui.QPushButton( "Edit")
-                editButtonItem.setIcon(QtGui.QIcon(edit_icon))
-                editButtonItem.setIconSize(QtCore.QSize(20,20))
-                self.ui.projects_tableWidget.setCellWidget(index,2,editButtonItem)
-                editButtonItem.clicked.connect(self.edit_project)
-                if not active_project:
-                    editButtonItem.setEnabled(False)
-                if self.pipeline_window.settings.role > 0:
-                    editButtonItem.setEnabled(False)
-
-            '''
-            if active_project:
-                active = QtGui.QTableWidgetItem("Active")
-                active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                active.setFont(self.boldFont)
-                active.setBackground(active_color)
-                self.ui.projects_tableWidget.setItem(index,3,active)
-            else:
-            '''
-            if project_status == "ONLINE":
-                setButtonItem = QtGui.QPushButton("Set Project")
-                setButtonItem.clicked.connect(self.set_project_button)
-                setButtonItem.setIcon(QtGui.QIcon(set_icon))
-                setButtonItem.setIconSize(QtCore.QSize(20,20))
-                self.ui.projects_tableWidget.setCellWidget(index,3,setButtonItem)
-
-            key = QtGui.QTableWidgetItem(key)
-            key.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-            self.ui.projects_tableWidget.setItem(index,4,key)
-
-
-    def init_projectssTable(self):
-        self.ui.projects_tableWidget.horizontalHeader().setVisible(False)
-        self.ui.projects_tableWidget.verticalHeader().setVisible(False)
-        self.ui.projects_tableWidget.setWordWrap(False)
-        self.ui.projects_tableWidget.setColumnCount(5)
-        self.ui.projects_tableWidget.setRowCount(1)
-        self.ui.projects_tableWidget.setHorizontalHeaderLabels(["Name","Status","Edit","Set"])
-        self.ui.projects_tableWidget.verticalHeader().setDefaultSectionSize(30);
-        self.ui.projects_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.ui.projects_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.ui.projects_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-
-    def setColumnWidth_projectsTable(self):
-
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
-        self.ui.projects_tableWidget.horizontalHeader().resizeSection(0,200)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.ResizeToContents )
-        self.ui.projects_tableWidget.horizontalHeader().resizeSection(1,200)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
-        self.ui.projects_tableWidget.horizontalHeader().resizeSection(2,100)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
-        self.ui.projects_tableWidget.horizontalHeader().resizeSection(3,100)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.Fixed )
-        self.ui.projects_tableWidget.horizontalHeader().resizeSection(4,0)
+    #
+    # def updateProjectsTable(self):
+    #     self.ui.projects_tableWidget.clearContents()
+    #
+    #     projects = self.pipeline_window.settings.projects
+    #
+    #
+    #     self.ui.projects_tableWidget.setRowCount(len(projects))
+    #
+    #     active_color = QtGui.QColor()
+    #     active_color.setNamedColor("green")
+    #
+    #     for index, key in enumerate(projects):
+    #
+    #         project_status = projects[key][1]
+    #         active_project = True if self.pipeline_window.settings.current_project == key and project_status == "ONLINE" else False
+    #
+    #
+    #         project_name = QtGui.QTableWidgetItem(projects[key][2])
+    #         project_name.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+    #         project_name.setFont(self.boldFont)
+    #         if active_project:
+    #             project_name.setBackground(active_color)
+    #
+    #         self.ui.projects_tableWidget.setItem(index,0,project_name)
+    #
+    #         if project_status == "OFFLINE":
+    #
+    #             offlineButtonItem = QtGui.QPushButton(project_status)
+    #             offlineButtonItem.setIcon(QtGui.QIcon(offline_icon))
+    #             offlineButtonItem.setIconSize(QtCore.QSize(20,20))
+    #
+    #             self.ui.projects_tableWidget.setCellWidget(index,1,offlineButtonItem)
+    #             offlineButtonItem.clicked.connect(self.relink_project)
+    #
+    #         else:
+    #             status = QtGui.QTableWidgetItem(project_status)
+    #             status.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+    #             if active_project:
+    #                 status.setBackground(active_color)
+    #             self.ui.projects_tableWidget.setItem(index,1,status)
+    #
+    #         if project_status == "ONLINE":
+    #
+    #             editButtonItem = QtGui.QPushButton( "Edit")
+    #             editButtonItem.setIcon(QtGui.QIcon(edit_icon))
+    #             editButtonItem.setIconSize(QtCore.QSize(20,20))
+    #             self.ui.projects_tableWidget.setCellWidget(index,2,editButtonItem)
+    #             editButtonItem.clicked.connect(self.edit_project)
+    #             if not active_project:
+    #                 editButtonItem.setEnabled(False)
+    #             if self.pipeline_window.settings.role > 0:
+    #                 editButtonItem.setEnabled(False)
+    #
+    #         '''
+    #         if active_project:
+    #             active = QtGui.QTableWidgetItem("Active")
+    #             active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+    #             active.setFont(self.boldFont)
+    #             active.setBackground(active_color)
+    #             self.ui.projects_tableWidget.setItem(index,3,active)
+    #         else:
+    #         '''
+    #         if project_status == "ONLINE":
+    #             setButtonItem = QtGui.QPushButton("Set Project")
+    #             setButtonItem.clicked.connect(self.set_project_button)
+    #             setButtonItem.setIcon(QtGui.QIcon(set_icon))
+    #             setButtonItem.setIconSize(QtCore.QSize(20,20))
+    #             self.ui.projects_tableWidget.setCellWidget(index,3,setButtonItem)
+    #
+    #         key = QtGui.QTableWidgetItem(key)
+    #         key.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+    #         self.ui.projects_tableWidget.setItem(index,4,key)
+    #
+    #
+    # def init_projectssTable(self):
+    #     self.ui.projects_tableWidget.horizontalHeader().setVisible(False)
+    #     self.ui.projects_tableWidget.verticalHeader().setVisible(False)
+    #     self.ui.projects_tableWidget.setWordWrap(False)
+    #     self.ui.projects_tableWidget.setColumnCount(5)
+    #     self.ui.projects_tableWidget.setRowCount(1)
+    #     self.ui.projects_tableWidget.setHorizontalHeaderLabels(["Name","Status","Edit","Set"])
+    #     self.ui.projects_tableWidget.verticalHeader().setDefaultSectionSize(30);
+    #     self.ui.projects_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+    #     self.ui.projects_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+    #     self.ui.projects_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
+    #
+    # def setColumnWidth_projectsTable(self):
+    #
+    #     self.ui.projects_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+    #     self.ui.projects_tableWidget.horizontalHeader().resizeSection(0,200)
+    #     self.ui.projects_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.ResizeToContents )
+    #     self.ui.projects_tableWidget.horizontalHeader().resizeSection(1,200)
+    #     self.ui.projects_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+    #     self.ui.projects_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+    #     self.ui.projects_tableWidget.horizontalHeader().resizeSection(2,100)
+    #     self.ui.projects_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
+    #     self.ui.projects_tableWidget.horizontalHeader().resizeSection(3,100)
+    #     self.ui.projects_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.Fixed )
+    #     self.ui.projects_tableWidget.horizontalHeader().resizeSection(4,0)
 
     def close_window(self):
         self.close()
 
-class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
-    def __init__(self, parent=None, pipelineUI = None, **kwargs):
-
-        super(pipeLine_create_edit_project_UI, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.Tool)
-        form_class, base_class = create_edit_project_form_class, create_edit_project_base_class
-
-        self.ui = form_class()
-        self.ui.setupUi(self)
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.setWindowTitle("Create Project")
-        self.pipelineUI = pipelineUI
-
-        self.setMaximumHeight(500)
-
-        self.ui.label_4.setHidden(True)
-        self.ui.widget.setHidden(True)
-        self.ui.widget_7.setHidden(True)
-        self.ui.widget_8.setHidden(True)
-
-        #self.project_file_name = 'project.json'
-        self.project_name = "Pipeline_Project"
-
-        self.path = None
-        self.project_file = None
-
-        for key in kwargs:
-            if key == "project_file":
-                self.project_file = kwargs[key]
-
-        #connect ui
-        self.roles = ["admin","guest","rigger","animator"]
-        self.init_usersTable()
-        self.ui.set_project_path_pushButton.clicked.connect(self.set_project_path)
-
-        if not self.project_file:
-            self.ui.create_edit_project_pushButton.setText("Create")
-            self.ui.create_edit_project_pushButton.clicked.connect(self.create_project)
-            self.init_new_project()
-        else:
-            self.ui.create_edit_project_pushButton.setText("Edit")
-            self.ui.create_edit_project_pushButton.clicked.connect(self.edit_project)
-            self.ui.static_widget.setHidden(True)
-            self.init_edit_project()
-
-            self.ui.set_project_path_pushButton.setEnabled(False)
-            self.ui.padding_spinBox.setEnabled(False)
-            self.ui.project_name_lineEdit.setEnabled(False)
-            self.ui.project_path_lineEdit.setEnabled(False)
-
-            self.ui.playblast_sister_dir_checkBox.setChecked(self.project_file.playblast_outside)
-
-
-        self.ui.cancel_pushButton.clicked.connect(self.cancel)
-
-
-        self.playblast_help_button()
-
-
-        self.boldFont=QtGui.QFont()
-        self.boldFont.setBold(True)
-        self.set_icons()
-
-
-        self.updateUsersTable()
-
-
-    def playblast_help_button(self):
-
-
-
-        self.playblast_help_label = QtGui.QLabel()
-        sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
-        sizepolicy.setHeightForWidth(self.playblast_help_label.sizePolicy().hasHeightForWidth())
-        self.playblast_help_label.setSizePolicy(sizepolicy)
-        self.playblast_help_label.setMinimumSize(QtCore.QSize(30, 30))
-
-        self.ui.horizontalLayout_3.addWidget(self.playblast_help_label)
-        self.ui.horizontalLayout_3.setContentsMargins(0,0,0,0)
-
-        layout = QtGui.QHBoxLayout(self.playblast_help_label)
-        layout.setContentsMargins(0,0,0,0)
-
-
-        self.playblast_help = alpha_button(self,help_icon)
-        self.playblast_help.set_pixmap(help_icon)
-        sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
-        sizepolicy2.setHeightForWidth(self.playblast_help.sizePolicy().hasHeightForWidth())
-        self.playblast_help.setSizePolicy(sizepolicy2)
-        self.playblast_help.setMinimumSize(QtCore.QSize(30, 30))
-        self.playblast_help.button.setAlignment(QtCore.Qt.AlignCenter)
-        layout.addWidget(self.playblast_help)
-        self.connect(self.playblast_help, QtCore.SIGNAL('clicked()'), self.playblast_help_popup)
-
-        self.spacer = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
-        self.ui.horizontalLayout_3.addItem(self.spacer)
-
-
-    def playblast_help_popup(self):
-        dlg.massage("massage","Playblasts","Playblasts can consume a lot of disk space,\nWhen working on a project on a shared disk or cloud, This can slow the syncing proccess.\nHave more control by keeping them in a sister directory.")
-
-    def set_icons(self):
-        self.ui.create_edit_project_pushButton.setIcon(QtGui.QIcon(yes_icon))
-        self.ui.create_edit_project_pushButton.setIconSize(QtCore.QSize(20,20))
-
-        self.ui.set_project_path_pushButton.setIcon(QtGui.QIcon(search_icon))
-        self.ui.set_project_path_pushButton.setIconSize(QtCore.QSize(20,20))
-
-        self.ui.cancel_pushButton.setIcon(QtGui.QIcon(no_icon))
-        self.ui.cancel_pushButton.setIconSize(QtCore.QSize(20,20))
-
-    def init_new_project(self):
-        self.ui.project_name_lineEdit.setText(self.project_name)
-        self.users = {}
-        self.users["Admin"] = ["1234", self.roles[0]]
-
-    def init_edit_project(self):
-        self.ui.project_name_lineEdit.setText(self.project_file.project_name)
-        if self.project_file.project_users != None:
-            self.users = self.project_file.project_users
-            self.ui.users_checkBox.setChecked(True)
-        else:
-            self.users = {}
-            self.users["Admin"] = ["1234", self.roles[0]]
-
-        self.ui.padding_spinBox.setValue(self.project_file.project_padding)
-
-        type = "Maya Ascii (*.ma)"
-
-        if self.project_file.project_file_type == "mb":
-            type = "Maya Binary (*.mb)"
-
-        fps = "PAL (25fps)"
-
-        if self.project_file.project_fps == 24:
-            fps = "Film (24fps)"
-        if self.project_file.project_fps == 30:
-            fps =  "NTSC (30fps)"
-
-
-        i = self.ui.file_type_comboBox.findText(type, QtCore.Qt.MatchFixedString)
-        if i >= 0:
-         self.ui.file_type_comboBox.setCurrentIndex(i)
-
-        i = self.ui.fps_comboBox.findText(fps, QtCore.Qt.MatchFixedString)
-        if i >= 0:
-         self.ui.fps_comboBox.setCurrentIndex(i)
-
-
-
-    def set_project_path(self):
-
-        path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
-        self.ui.project_path_lineEdit.setText(os.path.join(path,str(self.ui.project_name_lineEdit.text())))
-
-
-
-    def init_usersTable(self):
-        self.ui.users_tableWidget.horizontalHeader().setVisible(True)
-        self.ui.users_tableWidget.verticalHeader().setVisible(False)
-        self.ui.users_tableWidget.setWordWrap(False)
-        self.ui.users_tableWidget.setColumnCount(4)
-        self.ui.users_tableWidget.setRowCount(1)
-        self.ui.users_tableWidget.setHorizontalHeaderLabels(["Username","password","Role","Action"])
-        self.ui.users_tableWidget.verticalHeader().setDefaultSectionSize(30);
-        self.ui.users_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.ui.users_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.ui.users_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch )
-        self.ui.users_tableWidget.horizontalHeader().resizeSection(0,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Stretch )
-        self.ui.users_tableWidget.horizontalHeader().resizeSection(1,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.users_tableWidget.horizontalHeader().resizeSection(2,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
-        self.ui.users_tableWidget.horizontalHeader().resizeSection(3,50)
-
-
-
-    def updateUsersTable(self):
-        self.ui.users_tableWidget.clearContents()
-        self.ui.users_tableWidget.setRowCount(len(self.users)+1)
-
-        admin_username = QtGui.QTableWidgetItem("Admin")
-        admin_username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-        admin_username.setFont(self.boldFont)
-        self.ui.users_tableWidget.setItem(0,0,admin_username)
-
-        admin_password = QtGui.QTableWidgetItem(self.users["Admin"][0])
-        self.ui.users_tableWidget.setItem(0,1,admin_password)
-
-        role = QtGui.QTableWidgetItem("admin")
-        role.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-        role.setFont(self.boldFont)
-        self.ui.users_tableWidget.setItem(0,2,role)
-
-        users = self.users
-        del users["Admin"]
-
-        if users:
-            for index, key in enumerate(users):
-
-                username = QtGui.QTableWidgetItem(key)
-                username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                username.setFont(self.boldFont)
-                self.ui.users_tableWidget.setItem(index+1,0,username)
-
-                password = QtGui.QTableWidgetItem(users[key][0])
-                self.ui.users_tableWidget.setItem(index+1,1,password)
-
-                role = users[key][1]
-
-                roles_combo = QtGui.QComboBox()
-                roles_combo.setEditable(False)
-                roles_combo.addItems(self.roles)
-
-                self.ui.users_tableWidget.setCellWidget(index+1,2,roles_combo)
-                i = roles_combo.findText(role, QtCore.Qt.MatchFixedString)
-                if i >= 0:
-                    roles_combo.setCurrentIndex(i)
-
-                deleteButtonItem = QtGui.QPushButton("")
-                deleteButtonItem.setIcon(QtGui.QIcon(no_icon))
-                deleteButtonItem.setIconSize(QtCore.QSize(20,20))
-                self.ui.users_tableWidget.setCellWidget(index+1,3,deleteButtonItem)
-                deleteButtonItem.clicked.connect(self.remove_user)
-
-
-        empty_item1 = QtGui.QTableWidgetItem("")
-        empty_item1.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-        empty_item2 = QtGui.QTableWidgetItem("")
-        empty_item2.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-        empty_item3 = QtGui.QTableWidgetItem("")
-        empty_item3.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-        self.ui.users_tableWidget.setItem(len(self.users)+1,0,empty_item1)
-        self.ui.users_tableWidget.setItem(len(self.users)+1,1,empty_item2)
-        self.ui.users_tableWidget.setItem(len(self.users)+1,2,empty_item3)
-
-        newButtonItem = QtGui.QPushButton("")
-        newButtonItem.setIcon(QtGui.QIcon(add_icon))
-        newButtonItem.setIconSize(QtCore.QSize(20,20))
-        self.ui.users_tableWidget.setCellWidget(len(self.users)+1,3,newButtonItem)
-        newButtonItem.clicked.connect(self.add_user)
-
-    def add_user(self):
-        self.set_users_dict()
-
-        username, ok = QtGui.QInputDialog.getText(self, 'New User', 'Enter User name:')
-
-        if ok:
-            if username not in self.users and username != "":
-                self.users[username] = ["",self.roles[1]]
-                self.updateUsersTable()
-            else:
-                print "User name exists..."
-
-    def remove_user(self):
-        widget = self.sender()
-        index = self.ui.users_tableWidget.indexAt(widget.pos())
-        username = str(self.ui.users_tableWidget.item(index.row(),0).text())
-
-        self.set_users_dict()
-
-        del self.users[username]
-        self.updateUsersTable()
-
-
-
-    def set_users_dict(self):
-        users = {}
-        rows = self.ui.users_tableWidget.rowCount() - 1
-        for row in range(0,rows):
-           if row == 0:
-               users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.item(row,2).text() ]
-
-           else:
-               users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.cellWidget(row,2).currentText()   ]
-
-        self.users = users
-
-
-
-    def create_project(self):
-        # if self.ui.users_checkBox.isChecked() == True:
-        #     self.set_users_dict()
-        #     self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
-        #     self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
-        # else:
-        #     self.users = None
-
-        project_path = os.path.join( self.pipelineUI.client.path , str(self.ui.project_name_lineEdit.text()))
-        project_name = str(self.ui.project_name_lineEdit.text())
-
-
-        padding = self.ui.padding_spinBox.value()
-
-        if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
-            file_type = "ma"
-        if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
-            file_type = "mb"
-
-        if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
-            fps = 25
-        if self.ui.fps_comboBox.currentText() == "Film (24fps)":
-            fps = 24
-        if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
-            fps = 30
-
-        playblast_outside = False
-        if self.ui.playblast_sister_dir_checkBox.isChecked():
-            playblast_outside = True
-
-        project = dt.ProjectNode(project_name, self.pipelineUI.client ).create(path = project_path,
-                                                                                padding=padding,
-                                                                                file_type=file_type,
-                                                                                fps = fps,
-                                                                                users = self.users)
-
-
-        #self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users, playblast_outside = playblast_outside)
-        #self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)
-
-        self.pipelineUI.projects.insertRows(0, 1, node = project)
-        project.set()
-
-        #self.projects_window.set_project(project_key = self.project_file.project_key)
-        self.close()
-
-
-    def edit_project(self):
-        if self.ui.users_checkBox.isChecked() == True:
-            self.set_users_dict()
-            self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
-
-            self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
-        else:
-            self.users = None
-
-
-
-        if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
-            file_type = "ma"
-        if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
-            file_type = "mb"
-
-        if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
-            fps = 25
-        if self.ui.fps_comboBox.currentText() == "Film (24fps)":
-            fps = 24
-        if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
-            fps = 30
-
-        self.project_file.project_users = self.users
-        self.project_file.project_file_type = file_type
-        self.project_file.project_fps = fps
-
-        playblast_outside = False
-        if self.ui.playblast_sister_dir_checkBox.isChecked():
-            playblast_outside = True
-
-        self.project_file.playblast_outside = playblast_outside
-
-        self.projects_window.set_project(project_key = self.project_file.project_key)
-        self.close()
-
-    def cancel(self):
-        self.close()
-
+# class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
+#     def __init__(self, parent=None, pipelineUI = None, **kwargs):
+#
+#         super(pipeLine_create_edit_project_UI, self).__init__(parent)
+#         self.setWindowFlags(QtCore.Qt.Tool)
+#         form_class, base_class = create_edit_project_form_class, create_edit_project_base_class
+#
+#         self.ui = form_class()
+#         self.ui.setupUi(self)
+#         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+#         self.setWindowTitle("Create Project")
+#         self.pipelineUI = pipelineUI
+#
+#         self.setMaximumHeight(500)
+#
+#         self.ui.label_4.setHidden(True)
+#         self.ui.widget.setHidden(True)
+#         self.ui.widget_7.setHidden(True)
+#         self.ui.widget_8.setHidden(True)
+#
+#         #self.project_file_name = 'project.json'
+#         self.project_name = "Pipeline_Project"
+#
+#         self.path = None
+#         self.project_file = None
+#
+#         for key in kwargs:
+#             if key == "project_file":
+#                 self.project_file = kwargs[key]
+#
+#         #connect ui
+#         self.roles = ["admin","guest","rigger","animator"]
+#         self.init_usersTable()
+#         self.ui.set_project_path_pushButton.clicked.connect(self.set_project_path)
+#
+#         if not self.project_file:
+#             self.ui.create_edit_project_pushButton.setText("Create")
+#             self.ui.create_edit_project_pushButton.clicked.connect(self.create_project)
+#             self.init_new_project()
+#         else:
+#             self.ui.create_edit_project_pushButton.setText("Edit")
+#             self.ui.create_edit_project_pushButton.clicked.connect(self.edit_project)
+#             self.ui.static_widget.setHidden(True)
+#             self.init_edit_project()
+#
+#             self.ui.set_project_path_pushButton.setEnabled(False)
+#             self.ui.padding_spinBox.setEnabled(False)
+#             self.ui.project_name_lineEdit.setEnabled(False)
+#             self.ui.project_path_lineEdit.setEnabled(False)
+#
+#             self.ui.playblast_sister_dir_checkBox.setChecked(self.project_file.playblast_outside)
+#
+#
+#         self.ui.cancel_pushButton.clicked.connect(self.cancel)
+#
+#
+#         self.playblast_help_button()
+#
+#
+#         self.boldFont=QtGui.QFont()
+#         self.boldFont.setBold(True)
+#         self.set_icons()
+#
+#
+#         self.updateUsersTable()
+#
+#
+#     def playblast_help_button(self):
+#
+#
+#
+#         self.playblast_help_label = QtGui.QLabel()
+#         sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+#         sizepolicy.setHeightForWidth(self.playblast_help_label.sizePolicy().hasHeightForWidth())
+#         self.playblast_help_label.setSizePolicy(sizepolicy)
+#         self.playblast_help_label.setMinimumSize(QtCore.QSize(30, 30))
+#
+#         self.ui.horizontalLayout_3.addWidget(self.playblast_help_label)
+#         self.ui.horizontalLayout_3.setContentsMargins(0,0,0,0)
+#
+#         layout = QtGui.QHBoxLayout(self.playblast_help_label)
+#         layout.setContentsMargins(0,0,0,0)
+#
+#
+#         self.playblast_help = alpha_button(self,help_icon)
+#         self.playblast_help.set_pixmap(help_icon)
+#         sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+#         sizepolicy2.setHeightForWidth(self.playblast_help.sizePolicy().hasHeightForWidth())
+#         self.playblast_help.setSizePolicy(sizepolicy2)
+#         self.playblast_help.setMinimumSize(QtCore.QSize(30, 30))
+#         self.playblast_help.button.setAlignment(QtCore.Qt.AlignCenter)
+#         layout.addWidget(self.playblast_help)
+#         self.connect(self.playblast_help, QtCore.SIGNAL('clicked()'), self.playblast_help_popup)
+#
+#         self.spacer = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+#         self.ui.horizontalLayout_3.addItem(self.spacer)
+#
+#
+#     def playblast_help_popup(self):
+#         dlg.massage("massage","Playblasts","Playblasts can consume a lot of disk space,\nWhen working on a project on a shared disk or cloud, This can slow the syncing proccess.\nHave more control by keeping them in a sister directory.")
+#
+#     def set_icons(self):
+#         self.ui.create_edit_project_pushButton.setIcon(QtGui.QIcon(yes_icon))
+#         self.ui.create_edit_project_pushButton.setIconSize(QtCore.QSize(20,20))
+#
+#         self.ui.set_project_path_pushButton.setIcon(QtGui.QIcon(search_icon))
+#         self.ui.set_project_path_pushButton.setIconSize(QtCore.QSize(20,20))
+#
+#         self.ui.cancel_pushButton.setIcon(QtGui.QIcon(no_icon))
+#         self.ui.cancel_pushButton.setIconSize(QtCore.QSize(20,20))
+#
+#     def init_new_project(self):
+#         self.ui.project_name_lineEdit.setText(self.project_name)
+#         self.users = {}
+#         self.users["Admin"] = ["1234", self.roles[0]]
+#
+#     def init_edit_project(self):
+#         self.ui.project_name_lineEdit.setText(self.project_file.project_name)
+#         if self.project_file.project_users != None:
+#             self.users = self.project_file.project_users
+#             self.ui.users_checkBox.setChecked(True)
+#         else:
+#             self.users = {}
+#             self.users["Admin"] = ["1234", self.roles[0]]
+#
+#         self.ui.padding_spinBox.setValue(self.project_file.project_padding)
+#
+#         type = "Maya Ascii (*.ma)"
+#
+#         if self.project_file.project_file_type == "mb":
+#             type = "Maya Binary (*.mb)"
+#
+#         fps = "PAL (25fps)"
+#
+#         if self.project_file.project_fps == 24:
+#             fps = "Film (24fps)"
+#         if self.project_file.project_fps == 30:
+#             fps =  "NTSC (30fps)"
+#
+#
+#         i = self.ui.file_type_comboBox.findText(type, QtCore.Qt.MatchFixedString)
+#         if i >= 0:
+#          self.ui.file_type_comboBox.setCurrentIndex(i)
+#
+#         i = self.ui.fps_comboBox.findText(fps, QtCore.Qt.MatchFixedString)
+#         if i >= 0:
+#          self.ui.fps_comboBox.setCurrentIndex(i)
+#
+#
+#
+#     def set_project_path(self):
+#
+#         path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+#         self.ui.project_path_lineEdit.setText(os.path.join(path,str(self.ui.project_name_lineEdit.text())))
+#
+#
+#
+#     def init_usersTable(self):
+#         self.ui.users_tableWidget.horizontalHeader().setVisible(True)
+#         self.ui.users_tableWidget.verticalHeader().setVisible(False)
+#         self.ui.users_tableWidget.setWordWrap(False)
+#         self.ui.users_tableWidget.setColumnCount(4)
+#         self.ui.users_tableWidget.setRowCount(1)
+#         self.ui.users_tableWidget.setHorizontalHeaderLabels(["Username","password","Role","Action"])
+#         self.ui.users_tableWidget.verticalHeader().setDefaultSectionSize(30);
+#         self.ui.users_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+#         self.ui.users_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+#         self.ui.users_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
+#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch )
+#         self.ui.users_tableWidget.horizontalHeader().resizeSection(0,200)
+#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Stretch )
+#         self.ui.users_tableWidget.horizontalHeader().resizeSection(1,200)
+#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+#         self.ui.users_tableWidget.horizontalHeader().resizeSection(2,200)
+#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
+#         self.ui.users_tableWidget.horizontalHeader().resizeSection(3,50)
+#
+#
+#
+#     def updateUsersTable(self):
+#         self.ui.users_tableWidget.clearContents()
+#         self.ui.users_tableWidget.setRowCount(len(self.users)+1)
+#
+#         admin_username = QtGui.QTableWidgetItem("Admin")
+#         admin_username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+#         admin_username.setFont(self.boldFont)
+#         self.ui.users_tableWidget.setItem(0,0,admin_username)
+#
+#         admin_password = QtGui.QTableWidgetItem(self.users["Admin"][0])
+#         self.ui.users_tableWidget.setItem(0,1,admin_password)
+#
+#         role = QtGui.QTableWidgetItem("admin")
+#         role.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+#         role.setFont(self.boldFont)
+#         self.ui.users_tableWidget.setItem(0,2,role)
+#
+#         users = self.users
+#         del users["Admin"]
+#
+#         if users:
+#             for index, key in enumerate(users):
+#
+#                 username = QtGui.QTableWidgetItem(key)
+#                 username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+#                 username.setFont(self.boldFont)
+#                 self.ui.users_tableWidget.setItem(index+1,0,username)
+#
+#                 password = QtGui.QTableWidgetItem(users[key][0])
+#                 self.ui.users_tableWidget.setItem(index+1,1,password)
+#
+#                 role = users[key][1]
+#
+#                 roles_combo = QtGui.QComboBox()
+#                 roles_combo.setEditable(False)
+#                 roles_combo.addItems(self.roles)
+#
+#                 self.ui.users_tableWidget.setCellWidget(index+1,2,roles_combo)
+#                 i = roles_combo.findText(role, QtCore.Qt.MatchFixedString)
+#                 if i >= 0:
+#                     roles_combo.setCurrentIndex(i)
+#
+#                 deleteButtonItem = QtGui.QPushButton("")
+#                 deleteButtonItem.setIcon(QtGui.QIcon(no_icon))
+#                 deleteButtonItem.setIconSize(QtCore.QSize(20,20))
+#                 self.ui.users_tableWidget.setCellWidget(index+1,3,deleteButtonItem)
+#                 deleteButtonItem.clicked.connect(self.remove_user)
+#
+#
+#         empty_item1 = QtGui.QTableWidgetItem("")
+#         empty_item1.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+#         empty_item2 = QtGui.QTableWidgetItem("")
+#         empty_item2.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+#         empty_item3 = QtGui.QTableWidgetItem("")
+#         empty_item3.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+#         self.ui.users_tableWidget.setItem(len(self.users)+1,0,empty_item1)
+#         self.ui.users_tableWidget.setItem(len(self.users)+1,1,empty_item2)
+#         self.ui.users_tableWidget.setItem(len(self.users)+1,2,empty_item3)
+#
+#         newButtonItem = QtGui.QPushButton("")
+#         newButtonItem.setIcon(QtGui.QIcon(add_icon))
+#         newButtonItem.setIconSize(QtCore.QSize(20,20))
+#         self.ui.users_tableWidget.setCellWidget(len(self.users)+1,3,newButtonItem)
+#         newButtonItem.clicked.connect(self.add_user)
+#
+#     def add_user(self):
+#         self.set_users_dict()
+#
+#         username, ok = QtGui.QInputDialog.getText(self, 'New User', 'Enter User name:')
+#
+#         if ok:
+#             if username not in self.users and username != "":
+#                 self.users[username] = ["",self.roles[1]]
+#                 self.updateUsersTable()
+#             else:
+#                 print "User name exists..."
+#
+#     def remove_user(self):
+#         widget = self.sender()
+#         index = self.ui.users_tableWidget.indexAt(widget.pos())
+#         username = str(self.ui.users_tableWidget.item(index.row(),0).text())
+#
+#         self.set_users_dict()
+#
+#         del self.users[username]
+#         self.updateUsersTable()
+#
+#
+#
+#     def set_users_dict(self):
+#         users = {}
+#         rows = self.ui.users_tableWidget.rowCount() - 1
+#         for row in range(0,rows):
+#            if row == 0:
+#                users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.item(row,2).text() ]
+#
+#            else:
+#                users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.cellWidget(row,2).currentText()   ]
+#
+#         self.users = users
+#
+#
+#
+#     def create_project(self):
+#         # if self.ui.users_checkBox.isChecked() == True:
+#         #     self.set_users_dict()
+#         #     self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
+#         #     self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
+#         # else:
+#         #     self.users = None
+#
+#         project_path = os.path.join( self.pipelineUI.client.path , str(self.ui.project_name_lineEdit.text()))
+#         project_name = str(self.ui.project_name_lineEdit.text())
+#
+#
+#         padding = self.ui.padding_spinBox.value()
+#
+#         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
+#             file_type = "ma"
+#         if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
+#             file_type = "mb"
+#
+#         if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
+#             fps = 25
+#         if self.ui.fps_comboBox.currentText() == "Film (24fps)":
+#             fps = 24
+#         if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
+#             fps = 30
+#
+#         playblast_outside = False
+#         if self.ui.playblast_sister_dir_checkBox.isChecked():
+#             playblast_outside = True
+#
+#         project = dt.ProjectNode(project_name, self.pipelineUI.client ).create(path = project_path,
+#                                                                                 padding=padding,
+#                                                                                 file_type=file_type,
+#                                                                                 fps = fps,
+#                                                                                 users = self.users)
+#
+#
+#         #self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users, playblast_outside = playblast_outside)
+#         #self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)
+#
+#         self.pipelineUI.projects.insertRows(0, 1, node = project)
+#         project.set()
+#
+#         #self.projects_window.set_project(project_key = self.project_file.project_key)
+#         self.close()
+#
+#
+#     def edit_project(self):
+#         if self.ui.users_checkBox.isChecked() == True:
+#             self.set_users_dict()
+#             self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
+#
+#             self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
+#         else:
+#             self.users = None
+#
+#
+#
+#         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
+#             file_type = "ma"
+#         if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
+#             file_type = "mb"
+#
+#         if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
+#             fps = 25
+#         if self.ui.fps_comboBox.currentText() == "Film (24fps)":
+#             fps = 24
+#         if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
+#             fps = 30
+#
+#         self.project_file.project_users = self.users
+#         self.project_file.project_file_type = file_type
+#         self.project_file.project_fps = fps
+#
+#         playblast_outside = False
+#         if self.ui.playblast_sister_dir_checkBox.isChecked():
+#             playblast_outside = True
+#
+#         self.project_file.playblast_outside = playblast_outside
+#
+#         self.projects_window.set_project(project_key = self.project_file.project_key)
+#         self.close()
+#
+#     def cancel(self):
+#         self.close()
+#
 
         
 def show():
