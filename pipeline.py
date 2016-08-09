@@ -1709,6 +1709,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.populate_project_tree()
  #       self.populate_navbar()
         self.ui.publicMaster_checkBox.setHidden(True)
+        self.ui.stage_tabWidget.removeTab(2)
+        # self.ui.playblastsTab.setParent(None)
+        # self.ui.playblastsTab.deleteLater()
 
     def exctract_current_file_location(self):
         ''' THIS WILL ONLY WORK FOR STAGES THAT ARE SAVED WITH ALL DEPTH NAME,
@@ -2298,11 +2301,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def capture_thumbnail(self):
 
-        if self.versionsView and self._stageNode and self.version:
-            self.version.snapshot()
-            index = self.versionsView.model().sourceModel().indexFromNode(self.version, QtCore.QModelIndex())
+        if self.versionsView and self._stageNode:
+            self._stageNode.currently_open.snapshot()
+            index = self.versionsView.model().sourceModel().indexFromNode(self._stageNode.currently_open, QtCore.QModelIndex())
             self.versionsView.model().sourceModel().dataChanged.emit(index, index)
-            self.set_thumbnail(self.version.resource)
+            self.set_thumbnail(self._stageNode.currently_open.resource)
 
     def selectInScene(self):
         pass
@@ -2841,10 +2844,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.versionsView and self._stageNode:
             self.ui.stage_tabWidget.setCurrentIndex(0)
             self._stageNode.new_version()
-        # if self.set_component_selection():
-        #     if self.component:
-        #         self.component.new_version()
-        #         self.update_versions()
+
         
     def version_open(self):  
           
@@ -2925,9 +2925,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def master_save(self):
         if self.versionsView and self._stageNode:
-            self._stageNode.new_master(self.version)
+            self._stageNode.new_master()
             self.ui.stage_tabWidget.setCurrentIndex(1)
-            self.version = self._stageNode.masterNode
+            #self.version = self._stageNode.masterNode
         # if self.set_component_selection():
         #     if self.component:
         #         self.toggle_scene_open_script()

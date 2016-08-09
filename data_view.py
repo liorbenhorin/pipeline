@@ -33,7 +33,8 @@ global _animation_
 global _admin_
 global _super_
 global _standard_
-
+global _master_
+_master_ = "master"
 _standard_ = "standard"
 _super_ = "super"
 _admin_ = "admin"
@@ -736,6 +737,8 @@ class PipelineMastersView(QtGui.QTreeView):
 
             self.sortByColumn(1, QtCore.Qt.DescendingOrder)
 
+            self.proxyModel = self.model()
+            self.sourceModel = self.proxyModel.sourceModel()
             #self.update()
 
 
@@ -759,19 +762,67 @@ class PipelineMastersView(QtGui.QTreeView):
             self.parent.version = self.model().sourceModel().getNode(index)
             self.setCurrentIndex(self.model().mapFromSource(index))
 
+    def contextMenuEvent(self, event):
 
-    #@QtCore.Slot()
-    def deletActionClicked(self):
-        # This slot will be called when our button is clicked.
-        # self.sender() returns a refence to the QPushButton created
-        # by the delegate, not the delegate itself.
-        button = self.sender().parent()
-        index = self.indexAt(button.pos())
-        index = self.model().mapToSource(index)
-        self.model().sourceModel().getNode(index).delete_me()
+        handled = True
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()
+        node = None
+
+        if index.isValid():
+            src = self.asModelIndex(index)
+            node = self.asModelNode(src)
+
+        actions = []
+
+        if node and not node._deathrow:
+
+            if node.typeInfo() == _master_:
+
+                actions.append(QtGui.QAction("Explore...", menu,
+                                             triggered=functools.partial(self.explore, src)))
+            else:
+
+                event.accept()
+                return
+
+        else:
+            event.accept()
+            return
+
+        menu.addActions(actions)
+
+        menu.exec_(event.globalPos())
+        event.accept()
+
+        return
+
+    def explore(self, index):
+        node = self.asModelNode(index)
+        node.explore()
 
 
+    def asModelIndex(self, index):
+        return self.proxyModel.mapToSource(index)
 
+    def asModelNode(self, index):
+        return self.sourceModel.getNode(index)
+
+    @property
+    def proxyModel(self):
+        return self._proxyModel
+
+    @proxyModel.setter
+    def proxyModel(self, model):
+        self._proxyModel = model
+
+    @property
+    def sourceModel(self):
+        return self._sourceModel
+
+    @sourceModel.setter
+    def sourceModel(self, model):
+        self._sourceModel = model
 
 
 class PipelineVersionsView(QtGui.QTreeView):
@@ -817,17 +868,6 @@ class PipelineVersionsView(QtGui.QTreeView):
                 outline: 0;
             }
             ''')
-
-    # def mouseMoveEvent(self, event):
-    #     print event, "<<<"
-    #     print self.indexAt(event.pos()), "<<<"
-
-    # def mouseMoveEvent(self, e):
-    #
-    #     i = self.indexAt(e.pos())
-    #
-    #
-    #     self.setItemDelegateForRow(i.row(), rowBackgroundColorDelegate(self))
 
     def addSlider(self):
 
@@ -953,11 +993,11 @@ class PipelineVersionsView(QtGui.QTreeView):
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
         if self.model().sourceModel().getNode(index).typeInfo() == _new_:
-            parent_index = index.parent()
+            #parent_index = index.parent()
             node = self.model().sourceModel().getNode(index).parent()
-            self.model().sourceModel().removeRows(index.row(),1, parent_index)
-            version = node.initialVersion()
-            self.parent.version = self.parent._stageNode._children[0]
+            #self.model().sourceModel().removeRows(index.row(),1, parent_index)
+            node.initialVersion()
+            #self.parent.version = self.parent._stageNode._children[0]
 
         else:
             self.model().sourceModel().getNode(index).load()
@@ -2973,6 +3013,7 @@ class ComboDynamicWidget(ComboWidget):
 
                         self.parent.stageNode(stage)
                         self.parent.updateVersionsTable()
+                        self.parent.updateMastersTable()
                         return True
 
                     #self.parent.stageNode(None)
@@ -2981,6 +3022,7 @@ class ComboDynamicWidget(ComboWidget):
 
             self.parent.stageNode(None)
             self.parent.updateVersionsTable()
+            self.parent.updateMastersTable()
             return True
 
 
@@ -2993,6 +3035,7 @@ class ComboDynamicWidget(ComboWidget):
 
         self.parent.stageNode(None)
         self.parent.updateVersionsTable()
+        self.parent.updateMastersTable()
         return path
 
 

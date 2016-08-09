@@ -550,7 +550,7 @@ class RootNode(Node):#, Metadata_file):
             return files.splitall(relative_path)
 
 
-        def model_rec(path, root):
+        def rec(path, root):
 
             folders = files.list_dir_folders(path)
 
@@ -582,14 +582,13 @@ class RootNode(Node):#, Metadata_file):
                                         else:
                                             path_elements[i] = "{0}_{1}".format(_folder_, path_elements[i])
 
-
                                     masters.append(path_elements)
 
                     else:
 
-                        model_rec(p, root)
+                        rec(p, root)
 
-        model_rec(self.path, self)
+        rec(self.path, self)
 
         from collections import defaultdict
         def tree():
@@ -598,30 +597,22 @@ class RootNode(Node):#, Metadata_file):
         def add(t, path):
             for node in path:
                 t = t[node]
-        x = tree()
+
+        masters_tree = tree()
         for m in masters:
-            add(x, m)
+            add(masters_tree, m)
 
         def dicts(t):
             return {k: dicts(t[k]) for k in t}
 
-        z = dicts(x)
+        masters_dict = dicts(masters_tree)
 
-        import json
-        print json.dumps(dicts(x), indent=4)
+        # import json
+        # print json.dumps(dicts(x), indent=4)
 
-        def treeM(dict, parent, root_path):
-            # for k, v in dict.iteritems():
-            #     print "parent { ", parent, " }"
-            #     print "         bulding-->", k.split("_")[0], "--->" ,os.path.join(root_path, k.split("_")[1])
-            #     p = k
-            #     pt = os.path.join(root_path, k.split("_")[1])
-            #     treeM(v, k, pt)
+        def model_masters_tree(dict, parent, root_path):
 
             for key in dict:
-                print "parent { ", parent, " }"
-                print "         bulding-->", key.split("_")[0], "--->" ,os.path.join(root_path, key.split("_")[1])
-
                 if key.split("_")[0] == _stage_:
                     node = StageNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project, pipelineUI=self._ui)
 
@@ -633,13 +624,9 @@ class RootNode(Node):#, Metadata_file):
 
                 i = dict[key]
                 pa = os.path.join(root_path, key.split("_")[1])
-                treeM(i, node, pa)
+                model_masters_tree(i, node, pa)
 
-        treeM(z, self, self._path)
-
-
-
-
+        model_masters_tree(masters_dict, self, self._path)
 
         #self.percentage_complete.emit(0)
 
@@ -831,6 +818,7 @@ class VersionNode(Node):
 
     def load(self):
         maya.open_scene(self.path)
+        self.stage.currently_open = self
 
     def delete_me(self):
         files.delete(self.path)
@@ -847,8 +835,8 @@ class VersionNode(Node):
 
 class MasterNode(VersionNode):
 
-    def __init__(self, name ,path = None,  number = None, author = None, date = None, note = None, stage = None, origin = None, parent=None):
-        super(MasterNode, self).__init__(name, parent=parent, path=path, number=number, author= author, date=date, note=note, stage=stage)
+    def __init__(self, name ,path = None,  number = None, author = None, include = None, date = None, note = None, stage = None, origin = None, parent=None):
+        super(MasterNode, self).__init__(name, parent=parent, path=path, include = include, number=number, author= author, date=date, note=note, stage=stage)
 
         self._origin = origin
 
@@ -1050,6 +1038,7 @@ class StageNode(RootNode):
         self.pipelineUI = None
         self._masterNode = None
         #self._thumbnail = None
+        self._currently_open = None
 
         self._name_format = 2
         for key in kwargs:
@@ -1083,6 +1072,15 @@ class StageNode(RootNode):
         self.stage_file = self.data_file.read()
 
         return self
+
+
+    @property
+    def currently_open(self):
+        return self._currently_open
+
+    @currently_open.setter
+    def currently_open(self, node):
+        self._currently_open = node
 
     @property
     def name_format(self):
@@ -1125,13 +1123,14 @@ class StageNode(RootNode):
 
     def initialVersion(self):
 
+        self.clean_new_nodes()
 
         files.assure_folder_exists(self.versions_path)
 
 
-        maya.new_scene()
-        maya.set_fps(self.project.project_fps)
-        maya.rewind()
+        # maya.new_scene()
+        # maya.set_fps(self.project.project_fps)
+        # maya.rewind()
 
         version_number = self.padding(1)
 
@@ -1153,6 +1152,11 @@ class StageNode(RootNode):
         self.data_file.edit(data)
         self.stage_file = self.data_file.read()
 
+        self.currently_open = VersionNode(1, parent=self, path=scene_path,
+                                          author=first_version["author"],
+                                          number=version_number, date=first_version["date"], note=first_version["note"],
+                                          include=first_version["include"], stage=self)
+
         self.edited.emit()
 
         return
@@ -1162,27 +1166,32 @@ class StageNode(RootNode):
 
         if self.project:
             if self.data_file:
+
+                self.clean_new_nodes()
+
+
                 files.assure_folder_exists(self.masters_path)
 
                 version_number = set_padding(1, self.project.project_padding)
 
+                last_version = 0
                 if self.master:
-                    last_version = self.master._children[-1]
+                    last_version = self.master._children[0].name
 
-                    version_number = set_padding(last_version.name + 1, self.project.project_padding)
+                version_number = set_padding(last_version + 1, self.project.project_padding)
 
                 file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "p", version_number, "ma")
-                scene_path = maya.save_scene_as(path=self.masters_path, file_name=file_name)
+                master_version_file_name = maya.save_scene_as(path=self.masters_path, file_name=file_name)
 
                 file_name = "{0}.{1}".format(self.formatFileName(), "ma")
-                scene_path = maya.save_scene_as(path=self._path, file_name=file_name)
+                master_file_name = maya.save_scene_as(path=self._path, file_name=file_name)
 
 
                 new_version = {}
                 new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"), "@", time.strftime("%H:%M"))
                 new_version["author"] = self.settings.user[0]
                 new_version["note"] = None
-                new_version["origin"] = [from_node.typeInfo(), from_node.name]
+                new_version["origin"] = [self.currently_open.typeInfo(), self.currently_open.name] #[from_node.typeInfo(), from_node.name]
                 new_version["include"] = [files.reletive_path(self.project._path, path) for path in maya.reference_file_paths()]
 
 
@@ -1196,13 +1205,39 @@ class StageNode(RootNode):
                 versions = new_version
                 self.master_ = versions
 
+                for c in self._children:
+                    if c.typeInfo() == _master_:
+                        self.removeChild(c.row())
+
+                self.master = MasterNode(_master_, parent=self, path=master_file_name, author=new_version["author"],
+                                    number=0, date=new_version["date"], note=new_version["note"], include=new_version["include"], origin=new_version["origin"], stage=self)
+
+                master_version = MasterNode(last_version + 1, parent=self.master, path=master_version_file_name,
+                                                  author=new_version["author"],
+                                                  number=version_number, date=new_version["date"],
+                                                  note=new_version["note"], include=new_version["include"], origin=new_version["origin"] ,stage=self)
+
+                self.currently_open = self.master
+                self.model_masters()
                 self.edited.emit()
 
-
+    def clean_new_nodes(self):
+        if self._children:
+            for c in self._children:
+                if c.typeInfo() == _new_:
+                    self.removeChild(c.row())
 
     def new_version(self):
+        if self._children:
+            if self._children[0].typeInfo() == _new_:
+                #self.removeChild(self._children[0].row())
+                self.initialVersion()
+                #self.pipelineUI.version = self._children[0]
+                return
+
         if self.project:
             if self.data_file:
+                self.clean_new_nodes()
                 files.assure_folder_exists(self.versions_path)
 
 
@@ -1227,18 +1262,20 @@ class StageNode(RootNode):
                 versions[version_number] = new_version
                 self.versions_ = versions
 
+                self.currently_open = VersionNode(last_version.name+1, parent=self, path=scene_path, author=new_version["author"],
+                            number=version_number, date=new_version["date"], note=new_version["note"], include=new_version["include"], stage=self)
 
                 self.edited.emit()
 
-                childes = []
-                [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
-                self.pipelineUI.version = childes[-1]
+
+                #childes = [x for x in self._children if not x.typeInfo()==_master_]
+                #self.pipelineUI.version = childes[-1]
 
 
     def reference_master_to_current(self):
-        self.master
-        if self.masterNode:
-            self.masterNode.reference()
+        self.model_masters()
+        if self.master:
+            self.master.reference()
 
 
     def editVersionData(self, padded_number, key, value):
@@ -1566,7 +1603,7 @@ class StageNode(RootNode):
 
                     return True
 
-        self._newNode = NewNode("new...", parent = self)
+        NewNode("new...", parent = self)
         return None
 
     @property
@@ -1576,30 +1613,22 @@ class StageNode(RootNode):
         return dtm.PipelineVersionsModel2(self)
 
 
-    @property
-    def emptyVersions(self):
-        #, name_format = self._name_format, section = self._section
-        return [NewNode("new...", parent = self)]
-
-
-    def populate_master_versions(self, master_node):
+    def populate_master_versions(self):
         if self.project:
             if self.data_file:
                 versions = files.list_directory(self.masters_path, self.project.project_file_type)
                 if versions:
                     versions_dict = files.dict_versions(versions, self.project.project_padding)
 
-                    version_nodes = []
-
                     for key in versions_dict:
                         skip = False
-                        if master_node._children:
-                            if isinstance(master_node._children, list):
-                                for c in master_node._children:
+                        if self.master._children:
+                            if isinstance(self.master._children, list):
+                                for c in self.master._children:
                                     if c.path == versions_dict[key]:
                                         skip = True
                             else:
-                                if master_node._children.path == versions_dict[key]:
+                                if self.master._children.path == versions_dict[key]:
                                     skip = True
 
                         if not skip:
@@ -1622,12 +1651,11 @@ class StageNode(RootNode):
                                     if "origin" in thisVersion:
                                         origin = thisVersion["origin"]
 
-                            MasterNode(key, parent=master_node, path=versions_dict[key], author=author,
+                            MasterNode(key, parent=self.master, path=versions_dict[key], author=author,
                                         number=padded_number, date=date, note=note, origin = origin, stage=self)
 
                     return True
 
-        self._newNode = NewNode("new...", parent=self)
         return None
 
 
@@ -1675,26 +1703,8 @@ class StageNode(RootNode):
                 return True                                    
         else:
             return None   
-    
-    # @property
-    # def masters(self):
-    #     if self.project:
-    #         if self.data_file:
-    #             if self.settings:
-    #
-    #                 masters = files.list_directory(self.masters_path,self.project.project_file_type)
-    #
-    #                 if masters:
-    #                     masters_dict = files.dict_versions(masters,self.project.project_padding)
-    #
-    #                     sorted_masters = files.sort_version(masters_dict)
-    #                     return sorted_masters
-    #                 else:
-    #                     return None
 
-
-    @property
-    def master(self):
+    def model_masters(self):
 
         if self.project:
             if self.data_file:
@@ -1702,9 +1712,9 @@ class StageNode(RootNode):
                 master_file = os.path.join(self._path, file_name)
                 if os.path.isfile(master_file):
 
-                    if self.masterNode:
-                        self.populate_master_versions(self.masterNode)
-                        return self.masterNode
+                    if self.master:
+                        self.populate_master_versions()
+                        return True
 
                     author = "n/a"
                     note = ""
@@ -1722,36 +1732,31 @@ class StageNode(RootNode):
                         if "origin" in versions_data:
                             origin = versions_data["origin"]
 
-                    master =  MasterNode(_master_, parent=self, path=master_file, author=author,
+                    self.master =  MasterNode(_master_, parent=self, path=master_file, author=author,
                                       number=0, date=date, note=note, origin=origin, stage=self)
 
 
 
 
-                    self.populate_master_versions(master)
-                    self.masterNode = master
-                    return master
+                    self.populate_master_versions()
+
+                    return True
 
 
         return None
 
     @property
-    def masterNode(self):
+    def master(self):
         return self._masterNode
 
-    @masterNode.setter
-    def masterNode(self, node):
+    @master.setter
+    def master(self, node):
         self._masterNode = node
 
     @property
     def mastersModel(self):
-        # for node in self._children:
-        #     if node.typeInfo() == _master_:
-        #         r = node.row()
-        #         self.removeChild(r)
-        #         del r
 
-        if self.master:
+        if self.model_masters():
             return dtm.PipelineMastersModel(self)
         else:
             return None
