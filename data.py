@@ -531,6 +531,8 @@ class RootNode(Node):#, Metadata_file):
 
         c = 0
 
+        masters = {}
+
         def exctract_current_file_location(file):
 
             name = files.file_name_no_extension(files.file_name(file))
@@ -554,7 +556,6 @@ class RootNode(Node):#, Metadata_file):
 
                     p = os.path.join(path, dir)
 
-
                     if stageDir(p):
 
                         # ------>    if this is a stage folder, scan all its files that are *.ma
@@ -572,8 +573,18 @@ class RootNode(Node):#, Metadata_file):
                                 path_elements = exctract_current_path_levels(os.path.dirname(file), absoulut_path=root._path)
                                 print path_elements
                                 if elements[-2:] == path_elements[-2:]:
+                                    #masters[path_elements[0]] = {}
+                                    path_elements.reverse()
+                                    for elem in path_elements:
+                                        dic = {}
+                                        dic[elem]
+
+                                    for i in range(0,len(path_elements)):
+                                        path_elements[i]
+                                        masters[path_elements[0]] = path_elements[i]
                                     print "MATCH!"
                                 print "-------"
+
 
 
 
@@ -601,6 +612,14 @@ class RootNode(Node):#, Metadata_file):
 
 
         rec(self.path, self)
+
+        print masters, "<<------"
+
+        # MARGE MASTERS
+
+
+
+
 
         #self.percentage_complete.emit(0)
 
