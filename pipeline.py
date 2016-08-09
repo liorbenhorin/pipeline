@@ -1430,6 +1430,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.disable(self.ui.actionCollect_component)
         
         '''
+
         self.connect(self.ui.stage_tabWidget, QtCore.SIGNAL('currentChanged(int)'), self.updatgeStageTab)
 
         self.ui.updateDresser_pushButton.clicked.connect(self.populate_dresser_tree)
@@ -1707,6 +1708,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         # self.stage_ui()
         #self.populate_project_tree()
  #       self.populate_navbar()
+        self.ui.publicMaster_checkBox.setHidden(True)
 
     def exctract_current_file_location(self):
         ''' THIS WILL ONLY WORK FOR STAGES THAT ARE SAVED WITH ALL DEPTH NAME,
