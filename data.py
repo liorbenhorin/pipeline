@@ -1341,14 +1341,10 @@ class StageNode(RootNode):
 
 
     def editVersionData(self, padded_number, key, value):
-        data = {}
-        data["versions"] = self.stage_file["versions"]
-        print data
+        data = self.stage_file
         data["versions"][padded_number][key] = value
-        print data
         self.data_file.edit(data)
         self.stage_file = self.data_file.read()
-
         self.edited.emit()
 
 

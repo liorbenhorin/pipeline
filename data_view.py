@@ -2591,12 +2591,13 @@ class pipelineDresserView(QtGui.QTreeView):
         if self.pipelineUI.version and self.pipelineUI._stageNode.name:
             node = self.asModelNode(index)
             node.reference_master_to_current()
-            print self.pipelineUI.version.name, "--->", self.pipelineUI._stageNode.name
             data = self.pipelineUI.version.include
+            relative_path = files.reletive_path( self.pipelineUI.project._path, node._masterNode.path)
+
             if isinstance(data, list):
-                data.append(node._masterNode.path)
+                data.append(relative_path)
             else:
-                data = [node._masterNode.path]
+                data = [relative_path]
 
             self.pipelineUI.version.include = data
 
