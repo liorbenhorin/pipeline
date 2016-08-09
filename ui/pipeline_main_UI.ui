@@ -140,7 +140,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Stage view</string>
+        <string>Stage outline</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="leftMargin">
@@ -490,7 +490,7 @@ font: 13pt &quot;.SF NS Text&quot;;</string>
       </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
-        <string>Project view</string>
+        <string>Project outline</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="leftMargin">
