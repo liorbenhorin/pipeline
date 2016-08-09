@@ -2298,6 +2298,305 @@ class pipelineTreeView(QtGui.QTreeView):
         self.sourceModel.rootNode.commit()
         self.changed = False
 
+class pipelineDresserView(QtGui.QTreeView):
+    percentage_complete = QtCore.Signal(int)
+    update = QtCore.Signal()
+
+    def __init__(self,parent = None):
+        super(pipelineDresserView, self).__init__(parent)
+
+        global counter
+
+        # display options
+        self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.setAlternatingRowColors(True)
+        self.setSortingEnabled(True)
+        self.setDragEnabled( True )
+        self.setAcceptDrops( True )
+        self.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
+        self.setDropIndicatorShown(True)
+        self.resizeColumnToContents(True)
+
+        # self.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+
+        #local variables
+        self.pipelineUI = self.parent()
+        self._ignoreExpentions = False
+        self._expended_states = None
+        self._userSelection = None
+        self._tableView = None
+        self._proxyModel = None
+        self._sourceModel = None
+        self._tree_as_flat_list = None
+
+        #stylesheet
+        self.setStyleSheet('''
+
+                           QTreeView::item:focus {
+                           }
+                           QTreeView::item:hover {
+                                background: #101010;
+                           }
+                           QTreeView {
+                                outline: 0;
+                           }
+                           QTreeView::branch:has-siblings:!adjoins-item {
+                                border-image:url(''' + vline + ''') 0;
+                           }
+
+                           QTreeView::branch:has-siblings:adjoins-item {
+                                border-image:url(''' + branch_more + ''') 0;
+                           }
+
+                           QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+                                border-image:url(''' + branch_end + ''') 0;
+                           }
+
+                           QTreeView::branch:has-children:!has-siblings:closed,
+                           QTreeView::branch:closed:has-children:has-siblings {
+                                border-image: none;
+                                image:url(''' + branch_closed + ''') 0;
+                           }
+
+                           QTreeView::branch:open:has-children:!has-siblings,
+                           QTreeView::branch:open:has-children:has-siblings  {
+                                border-image: none;
+                                image: url(''' + branch_open + ''') 0;
+                           }''')
+
+
+        self.changed = False
+        self.update.connect(self.model_changed)
+
+    def model_changed(self):
+        if self.changed == False:
+            self.changed = True
+
+
+    def setModel(self,model):
+
+        super(pipelineDresserView, self).setModel(model)
+
+        if model:
+            self.changed = False
+
+            self.proxyModel = self.model()
+            self.sourceModel = self.proxyModel.sourceModel()
+
+            '''
+            this will expend the tree only on the first level, which should be
+            the projects name folder
+            the rest will be collapsed
+            '''
+
+            self.initialExpension()
+
+
+            '''
+            save the expended state of the tree
+            '''
+            self.saveState()
+
+
+            self.header().setStretchLastSection(False)
+
+            self.header().setResizeMode(0, QtGui.QHeaderView.Stretch)
+
+            self.header().resizeSection(1, 100)
+            self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
+
+
+
+    def initialExpension(self):
+        if self.model():
+            self.collapseAll()
+            for row in range(self.model().rowCount(self.rootIndex())):
+                x = self.model().index(row, 0, self.rootIndex())
+                self.setExpanded(x, True)
+
+    @property
+    def tableView(self):
+        return self._tableView
+
+    @tableView.setter
+    def tableView(self, view):
+        self._tableView = view
+
+    @property
+    def proxyModel(self):
+        return self._proxyModel
+
+    @proxyModel.setter
+    def proxyModel(self, model):
+        self._proxyModel = model
+
+    @property
+    def sourceModel(self):
+        return self._sourceModel
+
+    @sourceModel.setter
+    def sourceModel(self, model):
+        self._sourceModel = model
+
+
+    @property
+    def userSelection(self):
+        return self._userSelection
+
+    @userSelection.setter
+    def userSelection(self, selection):
+        self._userSelection = selection
+
+    def asProxyIndex(self,index):
+        return self.proxyModel.index(0,0,index)
+
+
+    def asModelIndex(self, index):
+        return self.proxyModel.mapToSource(index)
+
+    def fromProxyIndex(self, index):
+        return self.proxyModel.mapFromSource(index)
+
+    def asModelNode(self, index):
+        return self.sourceModel.getNode(index)
+
+
+    def modelIndexFromNode(self, node):
+        return self.sourceModel.indexFromNode(node,self.rootIndex())
+
+    def selectRoot(self):
+
+        self.setCurrentIndex(self.asProxyIndex(self.rootIndex()))
+        #self.tableView.update(self.selectionModel().selection())
+        self.saveSelection()
+
+
+    def saveSelection(self):
+
+        if len(self.selectedIndexes())>0:
+            self.userSelection = self.asModelIndex(self.selectedIndexes()[0])
+
+    def saveState(self):
+        '''
+        recursive function to save the expention state fo the tree to a dictionary
+        '''
+
+        if self._ignoreExpentions == True:
+            return
+
+        def rec( dict, mdl, index):
+
+            for row in range(mdl.rowCount(index)):
+
+
+                i = mdl.index(row,0, index)
+                node = mdl.data(i, 165)
+
+                if self.isExpanded(i):
+                    dict[node] = True
+                else:
+                    dict[node] = False
+
+                rec(dict, mdl, i)
+
+        self._expended_states = {}
+        rec(self._expended_states,self.proxyModel,self.rootIndex())
+
+
+    def restoreState(self):
+
+        '''
+        recursive function to restore the expention state fo the tree to a dictionary
+        '''
+        def rec(  mdl, index):
+
+            for row in range(mdl.rowCount(index)):
+
+
+                i = mdl.index(row,0, index)
+                node = mdl.data(i, 165)
+
+                if node in self._expended_states:
+                    if self._expended_states[node] == True:
+                        self.setExpanded(i, True)
+
+
+                rec( mdl, i)
+
+        self.collapseAll()
+        rec(self.proxyModel,self.rootIndex())
+        self.restoreSelection()
+
+    def restoreSelection(self):
+
+        index = self.fromProxyIndex(self.userSelection)
+        self.select(index)
+        self.updateTable( index)
+        #self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
+
+    def select(self, index):
+        '''
+        selects a tree branch and expand the parant branch to see the selected branch
+        '''
+        modelIndex = self.sourceModel.parent(self.asModelIndex(index))
+        proxyIndex = self.fromProxyIndex(modelIndex)
+        self.setExpanded(proxyIndex, True)
+        self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
+
+
+    def projectRootIndex(self):
+        modelRootIndex = self.asModelIndex(self.rootIndex())
+        return modelRootIndex
+        # get the first childe of the model's root
+        #return self.sourceModel.index(0,0,modelRootIndex)
+
+
+    def contextMenuEvent(self, event):
+
+        handled = True
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()
+        node = None
+
+        if index.isValid():
+            src = self.asModelIndex(index)
+            node = self.asModelNode(src)
+
+        actions = []
+
+        if node and not node._deathrow:
+
+                if node.typeInfo() == _stage_:
+
+                    actions.append(QtGui.QAction("Reference to current", menu,
+                                  triggered=functools.partial(self.reference_to_current, src)))
+                else:
+
+                    event.accept()
+                    return
+
+        else:
+            event.accept()
+            return
+
+        menu.addActions(actions)
+
+        menu.exec_(event.globalPos())
+        event.accept()
+
+        return
+
+
+    def reference_to_current(self, index):
+
+        node = self.asModelNode(index)
+        print "ref", node.name
+        node.reference_master_to_current()
+        return True
+
+
+
+
 class PipelineStagesView(QtGui.QListView):
     def __init__(self,parent = None):
         super(PipelineStagesView, self).__init__(parent)

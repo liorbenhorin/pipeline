@@ -393,6 +393,7 @@ class RootNode(Node):#, Metadata_file):
 
         self.project = None
         self._depth = None
+        self._ui = None
 
         for key in kwargs:
             if key == "path":
@@ -410,6 +411,9 @@ class RootNode(Node):#, Metadata_file):
                 self.project = kwargs[key]
             if key == "depth":
                 self._depth = kwargs[key]
+            if key == "ui":
+                self._ui = kwargs[key]
+
 
         if self.data_file_path:
             self.set_data_file(self.data_file_path)
@@ -607,22 +611,29 @@ class RootNode(Node):#, Metadata_file):
         print json.dumps(dicts(x), indent=4)
 
         def treeM(dict, parent, root_path):
+            # for k, v in dict.iteritems():
+            #     print "parent { ", parent, " }"
+            #     print "         bulding-->", k.split("_")[0], "--->" ,os.path.join(root_path, k.split("_")[1])
+            #     p = k
+            #     pt = os.path.join(root_path, k.split("_")[1])
+            #     treeM(v, k, pt)
+
             for key in dict:
                 print "parent { ", parent, " }"
                 print "         bulding-->", key.split("_")[0], "--->" ,os.path.join(root_path, key.split("_")[1])
 
                 if key.split("_")[0] == _stage_:
-                    node = StageNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project)
+                    node = StageNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project, pipelineUI=self._ui)
 
                 elif key.split("_")[0] == _asset_:
-                    node = AssetNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project)
+                    node = AssetNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project , pipelineUI=self._ui)
 
                 else:
                     node = FolderNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project)
 
                 i = dict[key]
-                root_path = os.path.join(root_path, key.split("_")[1])
-                treeM(i, node, root_path)
+                pa = os.path.join(root_path, key.split("_")[1])
+                treeM(i, node, pa)
 
         treeM(z, self, self._path)
 
@@ -761,6 +772,7 @@ class VersionNode(Node):
         files.assure_path_exists(self.thumbnail_file)
         snapshot = maya.snapshot(path=self.thumbnail_file, width=96, height=96)
         self.resource = snapshot
+        self.stage.thumbnail = snapshot
         return snapshot
 
     @property
@@ -802,7 +814,9 @@ class VersionNode(Node):
     def typeInfo(self):
         return _version_
 
-
+    def reference(self):
+        print "REF", self.path
+        maya.reference_scene(self.path)
 
     def load(self):
         maya.open_scene(self.path)
@@ -1024,6 +1038,7 @@ class StageNode(RootNode):
 
         self.pipelineUI = None
         self._masterNode = None
+        #self._thumbnail = None
 
         self._name_format = 2
         for key in kwargs:
@@ -1088,7 +1103,8 @@ class StageNode(RootNode):
         for i in range(depth):
             node = node.parent()
             if node:
-                levels.append(node.name)
+                if not node.typeInfo() == _root_:
+                    levels.append(node.name)
 
         name = self.pipelineUI.project.prefix + "_" + "_".join(reversed(levels)) if self.pipelineUI.project.prefix else "_".join(reversed(levels))
         return name
@@ -1310,6 +1326,14 @@ class StageNode(RootNode):
                 self.pipelineUI.version = childes[-1]
 
 
+    def reference_master_to_current(self):
+        self.master
+        print "mastering"
+        if self.masterNode:
+            print "master!"
+            self.masterNode.reference()
+
+
     def removeVersionData(self, padded_number):
         if padded_number in self.stage_file["versions"]:
             edit = self.stage_file["versions"]
@@ -1348,8 +1372,8 @@ class StageNode(RootNode):
     @property
     def tumbnails_path(self):
         if self.data_file:
-            if self.settings:                             
-                return os.path.join(self.stage_path, "tumbnails") 
+            if self.settings:
+                return os.path.join(self.stage_path, "thumbnails")
         else:
             return None  
 
@@ -1840,22 +1864,27 @@ class StageNode(RootNode):
     '''
     @property
     def thumbnail(self):
-        file = self.thumbnail_path
-        if file:
-            return QtGui.QPixmap(file)
+        if self.tumbnails_path:
+            file = os.path.join(self.tumbnails_path, "{0}.{1}".format(self.name, "png"))
+            if os.path.isfile(file):
+                return QtGui.QPixmap(file)
         
         return large_image_icon
 
-    @property
-    def thumbnail_path(self):
-        if self.project:
-            if self.data_file:
-                if self.settings:
-                    thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))
-                    if os.path.isfile(thumbnail_name):
-                        return thumbnail_name
-        
-        return None
+    @thumbnail.setter
+    def thumbnail(self, file):
+        dest = os.path.join(self.tumbnails_path, "{0}.{1}".format(self.name,"png"))
+        files.file_copy(file, dest)
+    # @property
+    # def thumbnail_path(self):
+    #     if self.project:
+    #         if self.data_file:
+    #             if self.settings:
+    #                 thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))
+    #                 if os.path.isfile(thumbnail_name):
+    #                     return thumbnail_name
+    #
+    #     return None
 
         
     def old_new_master(self, from_file = False):

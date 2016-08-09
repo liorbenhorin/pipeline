@@ -1654,7 +1654,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         # add to the designer ui
         self.ui.verticalLayout_18.addWidget(self.navWidget)
 
-        self.dresser_tree = dtv.pipelineTreeView(self)
+        self.dresser_tree = dtv.pipelineDresserView(self)
         self.drasserWidget = QtGui.QWidget()
         h_layout = QtGui.QVBoxLayout()
         h_layout.setContentsMargins(0, 0, 0, 0)
@@ -1672,6 +1672,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.discardTree_pushButton.clicked.connect(self.discard_tree)
         self.ui.collapseTree_pushButton.clicked.connect(self.collapseTree)
         self.ui.expendTree_pushButton.clicked.connect(self.expendTree)
+
+        self.ui.collapseDresser_pushButton.clicked.connect(self.collapseDresser)
+        self.ui.expendDresser_pushButton.clicked.connect(self.expendDresser)
 
         # if self.settings.user[0] is not None:
         #     self.ui.users_pushButton.setText(self.settings.user[0])
@@ -1869,6 +1872,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.populate_project_tree()
         self.tree_change_options()
 
+    def collapseDresser(self):
+        if self.dresser_tree:
+            self.dresser_tree.initialExpension()
+
+    def expendDresser(self):
+        if self.dresser_tree:
+            self.dresser_tree.expandAll()
+
 
     def collapseTree(self):
         if self.tree:
@@ -1887,13 +1898,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                 project=self.project)
 
             assets = dt.RootNode("assets", path=os.path.join(self.project.path, 'assets'), parent=_root,
-                                 section=_assets_, settings=self.settings, project=self.project)
+                                 section=_assets_, settings=self.settings, project=self.project, ui = self)
 
             assets.model_dresser_tree()
             # scenes = dt.RootNode("scenes", path=os.path.join(self.project.path, 'scenes'), parent=_root,
             #                      section=_animation_, settings=self.settings, project=self.project)
 
-            dresserModel = dtm.PipelineProjectModel(_root, self)
+            dresserModel = dtm.PipelineDresserModel(_root, self)
 
 
             _proxyModel = dtm.PipelineProjectProxyModel(self)
