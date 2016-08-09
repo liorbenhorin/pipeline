@@ -295,7 +295,7 @@ projects_form_class, projects_base_class = loadUiType(projects_uiFile)
 create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_create_edit_project_UI.ui')
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
 
-version = 'Snowball | 0.0.1'
+version = 'Snowball | 0.1.0'
 
 
 def set_icons():
@@ -1710,6 +1710,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
  #       self.populate_navbar()
         self.ui.publicMaster_checkBox.setHidden(True)
         self.ui.stage_tabWidget.removeTab(2)
+
+        self.ui.menuBar.setHidden(True)
         # self.ui.playblastsTab.setParent(None)
         # self.ui.playblastsTab.deleteLater()
 
