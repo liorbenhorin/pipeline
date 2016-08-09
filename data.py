@@ -610,10 +610,19 @@ class RootNode(Node):#, Metadata_file):
             for key in dict:
                 print "parent { ", parent, " }"
                 print "         bulding-->", key.split("_")[0], "--->" ,os.path.join(root_path, key.split("_")[1])
-                p = key
+
+                if key.split("_")[0] == _stage_:
+                    node = StageNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project)
+
+                elif key.split("_")[0] == _asset_:
+                    node = AssetNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project)
+
+                else:
+                    node = FolderNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project)
+
                 i = dict[key]
                 root_path = os.path.join(root_path, key.split("_")[1])
-                treeM(i, p, root_path)
+                treeM(i, node, root_path)
 
         treeM(z, self, self._path)
 
