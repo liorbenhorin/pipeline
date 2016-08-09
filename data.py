@@ -544,10 +544,7 @@ class RootNode(Node):#, Metadata_file):
             return files.splitall(relative_path)
 
 
-        def rec(path, parent):
-
-            folder = path
-            folder_node = False
+        def rec(path, root):
 
             folders = files.list_dir_folders(path)
 
@@ -557,63 +554,49 @@ class RootNode(Node):#, Metadata_file):
 
                     p = os.path.join(path, dir)
 
-                    if assetDir(p):
-                        asset = p
-                        asset_node = False
 
-                        folders = files.list_dir_folders(path)
+                    if stageDir(p):
 
-                        if folders:
-                            # ------>    scan all subfolders
-                            for dir in folders:
+                        # ------>    if this is a stage folder, scan all its files that are *.ma
+                        folder_files = files.list_directory(p, "ma")
+                        if files:
+                            # -----> found *.ma files, now see if they are real masters:
+                            for file in folder_files:
+                                # ---->  extract the file's name parts
+                                elements = exctract_current_file_location(file)
+                                if root.project.prefix:
+                                    elements.pop(0)
+                                print "-------"
+                                print elements
 
-                                p = os.path.join(path, dir)
-
-                                if stageDir(p):
-                                    stage = p
-                                    # ------>    if this is a stage folder, scan all its files that are *.ma
-                                    folder_files = files.list_directory(p, "ma")
-                                    if files:
-                                        # -----> found *.ma files, now see if they are real masters:
-                                        for file in folder_files:
-                                            # ---->  extract the file's name parts
-                                            elements = exctract_current_file_location(file)
-                                            if parent.project.prefix:
-                                                elements.pop(0)
-                                            path_elements = exctract_current_path_levels(os.path.dirname(file), absoulut_path=root._path)
-                                            if elements[-2:] == path_elements[-2:]:
-
-                                                # ----> model away!
-
-                                                if not folder_node:
-                                                    print "create folder ", folder
-
-                                                if not asset_node:
-                                                    print "create asset ", asset
-
-                                                    print "create stage ", stage
+                                path_elements = exctract_current_path_levels(os.path.dirname(file), absoulut_path=root._path)
+                                print path_elements
+                                if elements[-2:] == path_elements[-2:]:
+                                    print "MATCH!"
+                                print "-------"
 
 
-                                                # node_path = os.path.join(root._path, elements[0])
-                                                # node_parent = root
-                                                # FolderNode(elements[0], path=node_path, parent=node_parent,
-                                                #            settings=self.settings, project=self.project)
-                                                # elements.pop(0)
-                                                # for i in range(len(elements)):
-                                                #     if i == len(elements):  # ----> ITS A STAGE
-                                                #         n = StageNode(elements[i], path=node_path, parent=node_parent,
-                                                #                       settings=self.settings, project=self.project)
-                                                #     if i == len(elements) - 1:  # ----> ITS AN ASSET
-                                                #         n = AssetNode(elements[i], path=node_path, parent=node_parent,
-                                                #                       settings=self.settings, project=self.project)
-                                                #     if i < len(elements) - 1:  # ----> ITS A FOLDER
-                                                #         n = FolderNode(elements[i], path=node_path, parent=node_parent,
-                                                #                        settings=self.settings, project=self.project)
-                                                #     node_parent = n
-                                                #     node_path = os.path.join(node_path, elements[i])
+
+                                    # node_path = os.path.join(root._path, elements[0])
+                                    # node_parent = root
+                                    # FolderNode(elements[0], path=node_path, parent=node_parent,
+                                    #            settings=self.settings, project=self.project)
+                                    # elements.pop(0)
+                                    # for i in range(len(elements)):
+                                    #     if i == len(elements):  # ----> ITS A STAGE
+                                    #         n = StageNode(elements[i], path=node_path, parent=node_parent,
+                                    #                       settings=self.settings, project=self.project)
+                                    #     if i == len(elements) - 1:  # ----> ITS AN ASSET
+                                    #         n = AssetNode(elements[i], path=node_path, parent=node_parent,
+                                    #                       settings=self.settings, project=self.project)
+                                    #     if i < len(elements) - 1:  # ----> ITS A FOLDER
+                                    #         n = FolderNode(elements[i], path=node_path, parent=node_parent,
+                                    #                        settings=self.settings, project=self.project)
+                                    #     node_parent = n
+                                    #     node_path = os.path.join(node_path, elements[i])
 
                     else:
-                        rec(p, parent)
+                        rec(p, root)
 
 
 
