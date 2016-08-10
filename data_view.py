@@ -4,6 +4,9 @@ import cPickle
 import os
 import functools
 
+import config as cfg
+reload(cfg)
+
 import data as dt
 reload(dt)
 
@@ -11,207 +14,13 @@ import data_model as dtm
 reload(dtm)
 
 import modules.files as files
-reload(files)
 
 import modules.jsonData as data
 
 import dialogue as dlg
-#reload(dlg)
-import config as cfg
-reload(cfg)
 
-# global cfg._node_
-# global cfg._root_
-# global  cfg._stage_
-# global cfg._asset_
-# global cfg._folder_
-# global cfg._dummy_
-# global cfg._version_
-# global cfg._new_
-# global cfg._catagory_
-# global cfg._assets_
-# global cfg._animation_
-# global cfg._admin_
-# global cfg._super_
-# global cfg._standard_
-# global cfg.master
-# cfg.master = "master"
-# cfg._standard_ = "standard"
-# cfg._super_ = "super"
-# cfg._admin_ = "admin"
-# cfg._assets_ = "asset"
-# cfg._animation_ = "animation"
-# cfg._catagory_ = "catagory"
-# cfg._new_ = "new"
-# cfg._version_ = "version"
-# cfg._node_ = "node"
-# cfg._root_ = "root"
-# cfg._stage_ = "stage"
-# cfg._asset_ = "asset"
-# cfg._folder_ = "folder"
-# cfg._dummy_ = "dummy"
 
 global counter
-
-# def set_icons():
-#     global localIconPath
-#
-#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
-#     if not os.path.exists(localIconPath):
-#         log.info("icons folder not found: %s"%localIconPath)
-#         return
-#
-#
-#     global cfg.offline_icon
-#     global cfg.catagory_icon
-#     global cfg.asset_icon
-#     global cfg.component_icon
-#     global cfg.new_icon
-#     global cfg.delete_icon
-#     global cfg.load_icon
-#     global cfg.unload_icon
-#     global cfg.project_icon
-#     global cfg.users_icon
-#     global cfg.settings_icon
-#     global cfg.set_icon
-#     global cfg.yes_icon
-#     global cfg.no_icon
-#     global cfg.search_icon
-#     global cfg.edit_icon
-#     global cfg.delete_folder_icon
-#     global cfg.new_folder_icon
-#     global cfg.open_icon
-#     global cfg.save_icon
-#     global savecfg.mastericon
-#     global cfg.add_icon
-#     global cfg.down_arrow_icon
-#     global cfg.import_icon
-#     global cfg.export_icon
-#     global cfg.help_icon
-#     global cfg.anim_icon
-#     global cfg.asset_mode_icon
-#     global cfg.reload_icon
-#     global cfg.shutter_icon
-#     global cfg.camrea_icon
-#     global cfg.play_icon
-#     global cfg.comment_icon
-#     global cfg.large_icon
-#     global cfg.small_icon
-#
-#     global cfg.large_image_icon
-#     global cfg.large_image_icon_dark
-#     global cfg.large_image_icon_click
-#     global cfg.large_image_icon_click_dark
-#     global cfg.wide_image_icon
-#     global cfg.wide_image_icon_click
-#     global cfg.wide_image_icon_dark
-#     global cfg.wide_image_icon_click_dark
-#
-#
-#     cfg.offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
-#     cfg.catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
-#     cfg.asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
-#     cfg.component_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"component"))
-#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
-#     cfg.delete_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete"))
-#     cfg.load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"load"))
-#     cfg.unload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"unload"))
-#     cfg.project_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"project"))
-#     cfg.users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
-#     cfg.settings_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"settings"))
-#     cfg.set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"set"))
-#     cfg.yes_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"yes"))
-#     cfg.no_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"no"))
-#     cfg.search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
-#     cfg.edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
-#     cfg.delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
-#     cfg.new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
-#     cfg.open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
-#     cfg.save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
-#     savecfg.mastericon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
-#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-#     cfg.down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
-#     cfg.import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
-#     cfg.export_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"export"))
-#     cfg.help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
-#     cfg.anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
-#     cfg.asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
-#     cfg.reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
-#     cfg.shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
-#     cfg.camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
-#     cfg.play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
-#     cfg.comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
-#
-#     cfg.large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
-#     cfg.small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
-#
-#
-#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
-#     cfg.large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark"))
-#     cfg.large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click"))
-#     cfg.large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark"))
-#
-#     cfg.wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image"))
-#     cfg.wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click"))
-#     cfg.wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark"))
-#     cfg.wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark"))
-#
-#
-# # declare all the global icons  variables
-# set_icons()
-
-
-# def set_icons():
-#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
-#     if not os.path.exists(localIconPath):
-#         return
-#     global cfg.branch_more
-#     global cfg.branch_closed
-#     global cfg.branch_open
-#     global cfg.branch_end
-#     global cfg.vline
-#
-#     cfg.branch_more = os.path.join(localIconPath,"branch-more.svg")
-#     cfg.branch_closed = os.path.join(localIconPath,"branch-closed.svg")
-#     cfg.branch_open = os.path.join(localIconPath,"branch-open.svg")
-#     cfg.branch_end = os.path.join(localIconPath,"branch-end.svg")
-#     cfg.vline = os.path.join(localIconPath,"cfg.vline.svg")
-#
-#     global cfg.folder_icon
-#     global cfg.cube_icon
-#     global cfg.cube_icon_full
-#     global cfg.add_icon
-#     global cfg.large_image_icon
-#     cfg.folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
-#     cfg.cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")
-#     cfg.cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill")
-#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
-#
-#
-#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/')
-#     if not os.path.exists(localIconPath):
-#         return
-#
-#     global cfg.large_icon
-#     global cfg.small_icon
-#     global cfg.reload_icon
-#     global cfg.load_icon
-#     global cfg.open_icon
-#     global cfg.new_icon
-#     global cfg.set_icon
-#     global cfg.edit_icon
-#
-#     cfg.edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "edit"))
-#     cfg.set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "set"))
-#     cfg.reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "reload"))
-#     cfg.load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "load"))
-#     cfg.large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
-#     cfg.small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
-#     cfg.open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "openFolder"))
-#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
-#
-# set_icons()
 
 
 def setComboValue(QComboBox, String):
@@ -222,69 +31,7 @@ def setComboValue(QComboBox, String):
     return False
 
 
-# class ColorDelegate: public QItemDelegate
-# {
-# public:
-# 	ColorDelegate(QObject *parent = 0) : QItemDelegate(parent) {}
-#
-# public:
-# 	virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-# 	{
-# 		drawBackground(painter, option, index);
-# 		QItemDelegate::paint(painter, option, index);
-# 	}
-#
-# protected:
-# 	virtual void drawBackground(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-# 	{
-# 		Q_UNUSED(index);
-# 		painter->fillRect(option.rect, QColor(qrand()%255, qrand()%255, qrand()%255));
-# 	}
-# };
-#
-# class rowBackgroundColorDelegate(QtGui.QItemDelegate):
-#
-#     def __init__(self, parent):
-#         QtGui.QItemDelegate.__init__(self, parent)
-#
-#     def paint(self, painter, option, index):
-#         hoverd = False
-#         if option.state == QtGui.QStyle.State_MouseOver:
-#             hoverd = True
-#             print "Y"
-#         else:
-#             print "A"
-#             if self.parent():
-#                 print "Z"
-#                 t = self.parent()
-#                 hover = t.indexAt(t.viewport().mapToGlobal(QtGui.QCursor.pos()))
-#
-#                 if hover.row() == index.row():
-#                     print "x"
-#                     hoverd = True
-#                     t.update(hover)
-#
-#         #if hoverd:
-#         print "YY"
-#         bg = QtGui.QBrush(option.palette.highlight())
-#         bgColor = QtGui.QColor(option.palette.highlight().color())
-#         bgColor.setAlpha(100)
-#         bg.setColor(bgColor)
-#
-#         painter.fillRect(option.rect, bg)
-#         painter.setPen(option.palette.text().color())
-#
-#
-#         #self.drawBackground(painter, option, index)
-#         #QItemDelegate::paint(painter, option, index)
-#
-#     def drawBackground(self, painter, option, index):
-#
-#
-#         painter.fillRect(option.rect, QtGui.QColor(10,10,10))
-
-
-def remap( x, oMin, oMax, nMin, nMax ):
+def remap_value(x, oMin, oMax, nMin, nMax):
 
     #range check
     if oMin == oMax:
@@ -319,7 +66,6 @@ def remap( x, oMin, oMax, nMin, nMax ):
 
     return result
 
-
 class RoleComboBoxDelegate(QtGui.QItemDelegate):
 
     def __init__(self, parent):
@@ -345,8 +91,6 @@ class RoleComboBoxDelegate(QtGui.QItemDelegate):
     def setModelData(self, editor, model, index ):
         cb = editor
         model.setData(index, cb.currentText(), QtCore.Qt.EditRole)
-
-
 
 class EditProjectButtonDelegate(QtGui.QItemDelegate):
 
@@ -398,26 +142,26 @@ class SetProjectButtonDelegate(QtGui.QItemDelegate):
             button.setIcon(QtGui.QIcon(icon))
             self.parent().setIndexWidget(index, button)
 
-class PipelineLevelsView(QtGui.QTableView):
+class Project_Levels_View(QtGui.QTableView):
     def __init__(self, parent = None):
-        super(PipelineLevelsView, self).__init__(parent)
+        super(Project_Levels_View, self).__init__(parent)
 
         self.verticalHeader().setHidden(True)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
     def setModel(self, model = None):
-        super(PipelineLevelsView, self).setModel(model)
+        super(Project_Levels_View, self).setModel(model)
 
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 
-class PipelineUsersView(QtGui.QTableView):
+class Project_Users_View(QtGui.QTableView):
     def __init__(self, parent = None):
-        super(PipelineUsersView, self).__init__(parent)
+        super(Project_Users_View, self).__init__(parent)
 
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
     def setModel(self, model = None):
-        super(PipelineUsersView, self).setModel(model)
+        super(Project_Users_View, self).setModel(model)
         self.setItemDelegateForColumn(2, RoleComboBoxDelegate(self))
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 
@@ -437,7 +181,6 @@ class PipelineUsersView(QtGui.QTableView):
         menu.exec_(event.globalPos())
         event.accept()  # TELL QT IVE HANDLED THIS THING
         return
-
 
     def remove_user(self, index):
         row = index.row()
@@ -468,9 +211,9 @@ class PipelineUsersView(QtGui.QTableView):
                 self.setModel(dtm.Users_Model(users))
 
 
-class PipelineProjectsView(QtGui.QTableView):
+class Projects_View(QtGui.QTableView):
     def __init__(self, parentWidget = None, parent = None):
-        super(PipelineProjectsView, self).__init__(parent)
+        super(Projects_View, self).__init__(parent)
 
         self.parent = parent
         self.parentWidget = parentWidget
@@ -478,13 +221,8 @@ class PipelineProjectsView(QtGui.QTableView):
         self.setAlternatingRowColors(True)
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setWordWrap(True)
-        #elf.setShowGrid(False)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
-        #self.icons_size(32)
-        #self.setMinimumWidth(250)
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        #self.setSortingEnabled(True)
-        #self.horizontalHeader().setOffset(10)
         self.horizontalHeader().hide()
         self.verticalHeader().hide()
         self.setSortingEnabled(True)
@@ -501,10 +239,6 @@ class PipelineProjectsView(QtGui.QTableView):
 
     def icons_size(self, int):
         self.setIconSize(QtCore.QSize(int, int))
-        #self.horizontalHeader().setDefaultSectionSize(int)
-        #self.verticalHeader().setDefaultSectionSize(int)
-        #self.horizontalHeader().resizeSection(0, int)
-        #self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
         self.update()
 
     def clearModel(self):
@@ -605,230 +339,9 @@ class loadButtonDelegate(QtGui.QItemDelegate):
 
             self.parent().setIndexWidget(index, button)
 
-
-# class HeaderViewFilter2(QtCore.QObject):
-#     def __init__(self, parent = None,  *args):
-#         super(HeaderViewFilter2, self).__init__(parent, *args)
-#
-#     def eventFilter(self, object, event):
-#         if event.type() == QtCore.QEvent.MouseMove:
-#             print "*"
-#             logicalIndex = object.indexAt(event.pos())
-#             #print logicalIndex, "*"
-#             return True
-
-class PipelineMastersView(QtGui.QTreeView):
+class Versions_View(QtGui.QTreeView):
     def __init__(self, parentWidget = None, parent = None):
-        super(PipelineMastersView, self).__init__(parent)
-
-        self.parent = parent
-        self.parentWidget = parentWidget
-
-        self.setAlternatingRowColors(True)
-        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.setWordWrap(True)
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-
-        self.setSortingEnabled(True)
-
-        # Set the delegate for column 0 of our table
-        self._proxyModel = None
-        self.header().setHidden(True)
-        # self.setStyleSheet('''
-        #
-        #     QTreeView::item:hover {
-        #         background: #101010;
-        #     }
-        #     QTreeView {
-        #         outline: 0;
-        #     }
-        #     ''')
-        self.setStyleSheet('''
-
-            QTreeView::item:focus {
-            }
-            QTreeView::item:hover {
-                 background: #101010;
-            }
-            QTreeView {
-                 outline: 0;
-            }
-            QTreeView::branch:has-siblings:!adjoins-item {
-                 border-image:url(''' + cfg.vline + ''') 0;
-            }
-
-            QTreeView::branch:has-siblings:adjoins-item {
-                 border-image:url(''' + cfg.branch_more + ''') 0;
-            }
-
-            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                 border-image:url(''' + cfg.branch_end + ''') 0;
-            }
-
-            QTreeView::branch:has-children:!has-siblings:closed,
-            QTreeView::branch:closed:has-children:has-siblings {
-                 border-image: none;
-                 image:url(''' + cfg.branch_closed + ''') 0;
-            }
-
-            QTreeView::branch:open:has-children:!has-siblings,
-            QTreeView::branch:open:has-children:has-siblings  {
-                 border-image: none;
-                 image: url(''' + cfg.branch_open + ''') 0;
-            }''')
-
-    def addSlider(self):
-
-        self._slider = IconScaleSlider(self)
-        self.parentWidget.layout().addWidget(self._slider)
-        self._slider.listSlider.sliderMoved.connect(self.icons_size)
-        self.icons_size(32)
-
-
-    def icons_size(self, int):
-        self.setIconSize(QtCore.QSize(int, int))
-        self.header().resizeSection(0, int)
-        self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
-        try:
-            self.model().sourceModel()._rowHeight = int
-        except:
-            pass
-        self.update()
-
-    def clearModel(self):
-        self.setModel(None)
-        if self._proxyModel:
-            self._proxyModel.setSourceModel(None)
-            self._proxyModel = None
-
-
-    def setModel_(self, model = None):
-        self.clearModel()
-        if model:
-
-            model._rowHeight = self._slider.listSlider.value()
-            self._proxyModel = dtm.Masters_ProxyModel()
-            self._proxyModel.setSourceModel(model)
-            self._proxyModel.setDynamicSortFilter(True)
-            self._proxyModel.setSortRole(dtm.Masters_Model.sortRole)
-            self.setModel(self._proxyModel)
-
-            self.setIndentation(0)
-            self.expandAll()
-
-            self.header().resizeSection(0, self._slider.listSlider.value())
-            self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
-
-
-            self.header().resizeSection(1, 32)
-            self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
-
-            self.header().setStretchLastSection(False)
-
-            self.header().setResizeMode(2, QtGui.QHeaderView.Stretch)
-            self.header().setResizeMode(3, QtGui.QHeaderView.Stretch)
-            self.header().setResizeMode(4, QtGui.QHeaderView.Stretch)
-
-            self.header().resizeSection(5, 32)
-            self.header().setResizeMode(5, QtGui.QHeaderView.Fixed)
-            self.header().resizeSection(6, 32)
-            self.header().setResizeMode(6, QtGui.QHeaderView.Fixed)
-
-            self.setItemDelegateForColumn(6,  loadButtonDelegate(self))
-
-            self.sortByColumn(1, QtCore.Qt.DescendingOrder)
-
-            self.proxyModel = self.model()
-            self.sourceModel = self.proxyModel.sourceModel()
-            #self.update()
-
-
-    #@QtCore.Slot()
-    def MultiButtonClicked(self):
-        # This slot will be called when our button is clicked.
-        # self.sender() returns a refence to the QPushButton created
-        # by the delegate, not the delegate itself.
-        button = self.sender()
-        index = self.indexAt(button.pos())
-        index = self.model().mapToSource(index)
-        print index, "->", self.model().sourceModel().getNode(index).name
-        if self.model().sourceModel().getNode(index).typeInfo() == cfg._new_:
-            parent_index = index.parent()
-            node = self.model().sourceModel().getNode(index).parent()
-            self.model().sourceModel().removeRows(index.row(),1, parent_index)
-            node.initialVersion()
-        else:
-            self.model().sourceModel().getNode(index).load()
-            self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)
-            self.parent.version = self.model().sourceModel().getNode(index)
-            self.setCurrentIndex(self.model().mapFromSource(index))
-
-    def contextMenuEvent(self, event):
-
-        handled = True
-        index = self.indexAt(event.pos())
-        menu = QtGui.QMenu()
-        node = None
-
-        if index.isValid():
-            src = self.asModelIndex(index)
-            node = self.asModelNode(src)
-
-        actions = []
-
-        if node and not node._deathrow:
-
-            if node.typeInfo() == cfg.master:
-
-                actions.append(QtGui.QAction("Explore...", menu,
-                                             triggered=functools.partial(self.explore, src)))
-            else:
-
-                event.accept()
-                return
-
-        else:
-            event.accept()
-            return
-
-        menu.addActions(actions)
-
-        menu.exec_(event.globalPos())
-        event.accept()
-
-        return
-
-    def explore(self, index):
-        node = self.asModelNode(index)
-        node.explore()
-
-
-    def asModelIndex(self, index):
-        return self.proxyModel.mapToSource(index)
-
-    def asModelNode(self, index):
-        return self.sourceModel.getNode(index)
-
-    @property
-    def proxyModel(self):
-        return self._proxyModel
-
-    @proxyModel.setter
-    def proxyModel(self, model):
-        self._proxyModel = model
-
-    @property
-    def sourceModel(self):
-        return self._sourceModel
-
-    @sourceModel.setter
-    def sourceModel(self, model):
-        self._sourceModel = model
-
-
-class PipelineVersionsView(QtGui.QTreeView):
-    def __init__(self, parentWidget = None, parent = None):
-        super(PipelineVersionsView, self).__init__(parent)
+        super(Versions_View, self).__init__(parent)
 
         self.parent = parent
         self.parentWidget = parentWidget
@@ -837,25 +350,10 @@ class PipelineVersionsView(QtGui.QTreeView):
         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.setWordWrap(True)
 
-        #self.setShowGrid(False)
-
-
-        #>>>self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
-        #self.icons_size(32)       
-        #self.setMinimumWidth(250)
-
-
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
 
-
-        #self.setSortingEnabled(True)
-        #self.horizontalHeader().setOffset(10)
-        #>>>self.horizontalHeader().hide()
         self.setSortingEnabled(True)
-
         self.setMouseTracking(True)
-        #self.filter = HeaderViewFilter2(self)
-        #self.installEventFilter(self.filter)
 
         # Set the delegate for column 0 of our table
         self._proxyModel = None
@@ -880,10 +378,6 @@ class PipelineVersionsView(QtGui.QTreeView):
 
     def icons_size(self, int):
         self.setIconSize(QtCore.QSize(int, int))
-        #self.horizontalHeader().setDefaultSectionSize(int)
-        #>>>self.verticalHeader().setDefaultSectionSize(int)
-        #>>>self.horizontalHeader().resizeSection(0, int)
-        #>>>self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
         self.header().resizeSection(0, int)
         self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
         try:
@@ -908,12 +402,7 @@ class PipelineVersionsView(QtGui.QTreeView):
             self._proxyModel.setSourceModel(model)
 
             self._proxyModel.setDynamicSortFilter(True)
-            #self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
             self._proxyModel.setSortRole(dtm.Versions_Model.sortRole)
-            #self._proxyModel.setFilterRole(0)
-            #self._proxyModel.setFilterKeyColumn(2)
-
-            #self._proxyModel.invalidateFilter()
             self.setModel(self._proxyModel)
 
             self.setIndentation(0)
@@ -921,24 +410,12 @@ class PipelineVersionsView(QtGui.QTreeView):
             self.proxyModel = self.model()
             self.sourceModel = self.proxyModel.sourceModel()
 
-            #self.header().setResizeMode(QtGui.QHeaderView.Stretch)
-
-
-
-
-
-
             self.header().resizeSection(0, self._slider.listSlider.value())
             self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
-
-
             self.header().resizeSection(1, 32)
             self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
 
-
-
             self.header().setStretchLastSection(False)
-
             self.header().setResizeMode(2, QtGui.QHeaderView.Stretch)
             self.header().setResizeMode(3, QtGui.QHeaderView.Stretch)
 
@@ -946,59 +423,23 @@ class PipelineVersionsView(QtGui.QTreeView):
             self.header().setResizeMode(4, QtGui.QHeaderView.Fixed)
             self.header().resizeSection(5, 32)
             self.header().setResizeMode(5, QtGui.QHeaderView.Fixed)
-            #>>>self.horizontalHeader().resizeSection(4,40)
-            #>>>self.horizontalHeader().setResizeMode(4,QtGui.QHeaderView.Fixed)
-            # size the load button column
-            #>>>self.horizontalHeader().resizeSection(3,32)
-            #>>>self.horizontalHeader().setResizeMode(3,QtGui.QHeaderView.Fixed)
-            # size the note button column
-            #self.horizontalHeader().resizeSection(2,25)
-            #self.horizontalHeader().setResizeMode(2,QtGui.QHeaderView.Fixed)
 
-            #>>>self.horizontalHeader().resizeSection(0, self._slider.listSlider.value())
-            #>>>self.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed)
-
-            #self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)
-            #>>>self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
-            #>>>self.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Stretch)
-            
             # setup the buttons for loading and more options with delegates
             self.setItemDelegateForColumn(5,  loadButtonDelegate(self))
-            #self.setItemDelegateForColumn(4,  OptionsButtonDelegate(self))
-
-            #self.setCurrentIndex(self.model().sourceModel().index(0, 0, None))
-
             self.sortByColumn(1, QtCore.Qt.DescendingOrder)
-            #self.model().sort(0,QtCore.Qt.DescendingOrder)
 
             self.update()
 
-
-
-            #self.setCurrentIndex(self.model().index(0,0, None))
-
-    
-    '''
-    def setModel(self,model):
-        
-        super(PipelineVersionsView,self).setModel(model)
-        # size the options button column
-    '''
-
-    #@QtCore.Slot()
     def MultiButtonClicked(self):
-        # This slot will be called when our button is clicked. 
+        # This slot will be called when our button is clicked.
         # self.sender() returns a refence to the QPushButton created
         # by the delegate, not the delegate itself.
         button = self.sender()
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
         if self.model().sourceModel().getNode(index).typeInfo() == cfg._new_:
-            #parent_index = index.parent()
             node = self.model().sourceModel().getNode(index).parent()
-            #self.model().sourceModel().removeRows(index.row(),1, parent_index)
             node.initialVersion()
-            #self.parent.version = self.parent._stageNode._children[0]
 
         else:
             self.model().sourceModel().getNode(index).load()
@@ -1046,9 +487,8 @@ class PipelineVersionsView(QtGui.QTreeView):
         node.explore()
 
 
-    #@QtCore.Slot()
     def deletActionClicked(self):
-        # This slot will be called when our button is clicked. 
+        # This slot will be called when our button is clicked.
         # self.sender() returns a refence to the QPushButton created
         # by the delegate, not the delegate itself.
         button = self.sender().parent()
@@ -1078,55 +518,108 @@ class PipelineVersionsView(QtGui.QTreeView):
     @sourceModel.setter
     def sourceModel(self, model):
         self._sourceModel = model
-    # def delete(self):
-    #     # This slot will be called when our button is clicked.
-    #     # self.sender() returns a refence to the QPushButton created
-    #     # by the delegate, not the delegate itself.
-    #     button = self.sender().parent()
-    #     index = self.indexAt(button.pos())
-    #     index = self.model().mapToSource(index)
-    #     self.model().sourceModel().getNode(index).delete_me()
-    #
-    #     node = self.asModelNode(index)
-    #     parentIndex = self.sourceModel.parent(index)
-    #     self.sourceModel.removeRows(node.row(), 1, parentIndex, kill=True)
-    #     self._proxyModel.invalidate()
-    #
-    # def contextMenuEvent(self, event):
-    #
-    #     handled = True
-    #     node = None
-    #     index = self.indexAt(event.pos())
-    #     menu = QtGui.QMenu()
-    #     actions = []
-    #     append_defult_options = True
-    #
-    #     if index.isValid():
-    #
-    #         tableModelNode = self.model().getNode(index)
-    #         src = self.model().mapToSource(index)
-    #         node = self.model().sourceModel().getNode(src)
-    #
-    #     if node:
-    #
-    #
-    #         actions.append(QtGui.QAction("Explore", menu, triggered=functools.partial(self.explore, src)))
-    #         actions.append(QtGui.QAction("Delete", menu, triggered=functools.partial(self.delete, src)))
-    #
-    #
-    #
-    #     menu.addActions(actions)
-    #
-    #     # if handled:
-    #
-    #     menu.exec_(event.globalPos())
-    #     # TELL QT IVE HANDLED THIS THING
-    #
-    #     # else:
-    #     # event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
-    #
-    #     event.accept()
-    #     return
+
+
+
+class Masters_View(Versions_View):
+    def __init__(self, parentWidget = None, parent = None):
+        super(Masters_View, self).__init__(parentWidget, parent)
+
+
+    def setModel_(self, model = None):
+        self.clearModel()
+        if model:
+
+            model._rowHeight = self._slider.listSlider.value()
+            self._proxyModel = dtm.Masters_ProxyModel()
+            self._proxyModel.setSourceModel(model)
+            self._proxyModel.setDynamicSortFilter(True)
+            self._proxyModel.setSortRole(dtm.Masters_Model.sortRole)
+            self.setModel(self._proxyModel)
+
+            self.setIndentation(0)
+            self.expandAll()
+
+            self.header().resizeSection(0, self._slider.listSlider.value())
+            self.header().setResizeMode(0, QtGui.QHeaderView.Fixed)
+
+
+            self.header().resizeSection(1, 32)
+            self.header().setResizeMode(1, QtGui.QHeaderView.Fixed)
+
+            self.header().setStretchLastSection(False)
+
+            self.header().setResizeMode(2, QtGui.QHeaderView.Stretch)
+            self.header().setResizeMode(3, QtGui.QHeaderView.Stretch)
+            self.header().setResizeMode(4, QtGui.QHeaderView.Stretch)
+
+            self.header().resizeSection(5, 32)
+            self.header().setResizeMode(5, QtGui.QHeaderView.Fixed)
+            self.header().resizeSection(6, 32)
+            self.header().setResizeMode(6, QtGui.QHeaderView.Fixed)
+
+            self.setItemDelegateForColumn(6,  loadButtonDelegate(self))
+
+            self.sortByColumn(1, QtCore.Qt.DescendingOrder)
+
+            self.proxyModel = self.model()
+            self.sourceModel = self.proxyModel.sourceModel()
+            #self.update()
+
+
+    def MultiButtonClicked(self):
+        # This slot will be called when our button is clicked.
+        # self.sender() returns a refence to the QPushButton created
+        # by the delegate, not the delegate itself.
+        button = self.sender()
+        index = self.indexAt(button.pos())
+        index = self.model().mapToSource(index)
+        if self.model().sourceModel().getNode(index).typeInfo() == cfg._new_:
+            parent_index = index.parent()
+            node = self.model().sourceModel().getNode(index).parent()
+            self.model().sourceModel().removeRows(index.row(),1, parent_index)
+            node.initialVersion()
+        else:
+            self.model().sourceModel().getNode(index).load()
+            self.parent.set_thumbnail(self.model().sourceModel().getNode(index).resource)
+            self.parent.version = self.model().sourceModel().getNode(index)
+            self.setCurrentIndex(self.model().mapFromSource(index))
+
+    def contextMenuEvent(self, event):
+
+        handled = True
+        index = self.indexAt(event.pos())
+        menu = QtGui.QMenu()
+        node = None
+
+        if index.isValid():
+            src = self.asModelIndex(index)
+            node = self.asModelNode(src)
+
+        actions = []
+
+        if node and not node._deathrow:
+
+            if node.typeInfo() == cfg._master_:
+
+                actions.append(QtGui.QAction("Explore...", menu,
+                                             triggered=functools.partial(self.explore, src)))
+            else:
+
+                event.accept()
+                return
+
+        else:
+            event.accept()
+            return
+
+        menu.addActions(actions)
+
+        menu.exec_(event.globalPos())
+        event.accept()
+
+        return
+
 
 class IconScaleSlider(QtGui.QWidget):
     def __init__(self, parent):
@@ -1154,7 +647,7 @@ class IconScaleSlider(QtGui.QWidget):
         self.listSlider.setMinimum(32)
         self.listSlider.setMaximum(96)
         self.listSlider.setValue(32)
-        #self.listSlider.valueChanged.connect(self.list.icons_size)
+
 
         self.slideLayout.addWidget(self.small_lable)
         self.slideLayout.addWidget(self.listSlider)
@@ -1164,519 +657,14 @@ class IconScaleSlider(QtGui.QWidget):
         self.setLayout(self.slideLayout)
 
 
-        #h_layout.addWidget(slideWidget)
 
-
-
-
-# class PipelineContentsView(QtGui.QTableView):
-#     def __init__(self,parent = None):
-#         super(PipelineContentsView, self).__init__(parent)
 #
-#         #display options
-#
-#         self.setAlternatingRowColors(True)
-#         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-#         self.setWordWrap(True)
-#         self.setShowGrid(False)
-#         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
-#         self.icons_size(32)
-#         #self.setMinimumWidth(250)
-#         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-#         self.setSortingEnabled(True)
-#         self.horizontalHeader().setOffset(10)
-#         self.verticalHeader().hide()
-#
-#         self.setSortingEnabled(True)
-#         self.setDragEnabled( True )
-#         self.setAcceptDrops( True )
-#         self.setDragDropMode( QtGui.QAbstractItemView.DragDrop )#QtGui.QAbstractItemView.DragDrop )InternalMove
-#
-#         #local variables
-#         self._treeView = None
-#         self._treeProxyModel = None
-#         self._treeSourceModel = None
-#
-#         self._treeParent = None
-#         self._treeParentIndex = None
-#
-#         self._versionsView = None
-#
-#
-#
-#
-#     def dropEvent(self, event):
-#
-#         #super(PipelineContentsView,self).dropEvent(event)
-#         '''
-#         if not event.isAccepted():
-#             # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
-#             # by target widget, it sets accept() to true, which causes the executed
-#             # action to be reported as "move", which causes the view to remove the
-#             # source rows even though the target widget didn't like the drop.
-#             # Maybe it's better for the model to check drop-okay-ness during the
-#             # drag rather than only on drop; but the check involves not-insignificant work.
-#             event.setDropAction(QtCore.Qt.IgnoreAction)
-#         '''
-#
-#         '''
-#         this event is catching drops onto the contents view
-#
-#         '''
-#         treeModel = self.treeSourceModel
-#         i = self.indexAt(event.pos())
-#
-#         #if i.isValid():
-#
-#         if event.source().__class__.__name__ == "PipelineContentsView":
-#             '''
-#             this is intercepting drops from within this view
-#             '''
-#
-#             drop_node = self.model().getNode(i)
-#             tree_index = treeModel.indexFromNode(drop_node, QtCore.QModelIndex())
-#
-#             if tree_index.isValid():
-#
-#
-#
-#
-#                 tree_node = treeModel.getNode(tree_index)
-#                 mime = event.mimeData()
-#
-#
-#                 item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
-#                 item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
-#                 item_parent = treeModel.parent( item_index )
-#
-#
-#                 '''
-#                 ignore drops of folders into assets
-#                 '''
-#                 if tree_node.typeInfo() == cfg._asset_:
-#                     if item.typeInfo() == cfg._folder_ or item.typeInfo() == cfg._asset_:
-#
-#                         event.setDropAction(QtCore.Qt.IgnoreAction)
-#                         event.ignore()
-#                         return
-#
-#                 '''
-#                 ignore drag drop for stages
-#                 '''
-#                 if tree_node.typeInfo() == cfg._stage_:
-#
-#                         event.setDropAction(QtCore.Qt.IgnoreAction)
-#                         event.ignore()
-#                         return
-#
-#
-#
-#                 treeModel.removeRows(item_index.row(),1,item_parent)
-#                 self.treeView._proxyModel.invalidate()
-#
-#                 treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
-#
-#                 event.accept()
-#                 self.update(self.treeView.selectionModel().selection())
-#                 return
-#
-#
-#         elif event.source().__class__.__name__ == "pipelineTreeView":
-#
-#             '''
-#             this is intercepting drops from within the tree view
-#             '''
-#
-#             mime = event.mimeData()
-#             item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
-#             item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
-#             item_parent = treeModel.parent( item_index )
-#
-#             '''
-#             make sure the dropped item is not the root of the table
-#             '''
-#             HierarchyNodes = []
-#             for i in treeModel.listAncestos(self._treeParentIndex):
-#                 HierarchyNodes.append(treeModel.getNode(i).id)
-#
-#             print HierarchyNodes
-#             print item.id
-#             if item.id in HierarchyNodes:
-#
-#                 event.setDropAction(QtCore.Qt.IgnoreAction)
-#                 event.ignore()
-#                 return
-#
-#             else:
-#                 '''
-#                 the droped item is an ancestor of the the table root
-#                 '''
-#
-#                 treeModel.removeRows(item_index.row(),0,item_parent)
-#                 self.treeView._proxyModel.invalidate()
-#
-#                 treeModel.dropMimeData(mime, event.dropAction,0,0,self._treeParentIndex)
-#                 self.treeView._proxyModel.invalidate()
-#                 event.accept()
-#                 x = self.treeView.fromProxyIndex(self._treeParentIndex)
-#                 selection = QtGui.QItemSelection(x, x)
-#                 print treeModel.rowCount(self._treeParentIndex), "<-- rowcount"
-#                 self.update(selection)
-#                 self.treeView.setExpanded(x, True)
-#
-#                 return
-#
-#
-#     @property
-#     def versionsView(self):
-#         return self._versionsView
-#
-#     @versionsView.setter
-#     def versionsView(self, view):
-#         self._versionsView = view
-#
-#
-#     @property
-#     def treeView(self):
-#         return self._treeView
-#
-#     @treeView.setter
-#     def treeView(self, view):
-#         self._treeView = view
-#
-#     @property
-#     def treeProxyModel(self):
-#         if self._treeProxyModel:
-#             return self._treeProxyModel
-#
-#         return None
-#
-#     @treeProxyModel.setter
-#     def treeProxyModel(self, model):
-#         self._treeProxyModel = model
-#
-#     @property
-#     def treeSourceModel(self):
-#         if self._treeSourceModel:
-#             return self._treeSourceModel
-#
-#         return None
-#
-#     @treeSourceModel.setter
-#     def treeSourceModel(self, model):
-#         self._treeSourceModel = model
-#
-#     def init_treeView(self):
-#         self.treeProxyModel = self.treeView.model()
-#         self.treeSourceModel = self.treeProxyModel.sourceModel()
-#
-#     def asTreeIndex(self, index):
-#         node = self.getNode(index)
-#         return self.treeSourceModel.indexFromNode(node,self.treeView.rootIndex())
-#
-#     def icons_size(self, int):
-#         self.setIconSize(QtCore.QSize(int ,int)  )
-#         self.verticalHeader().setDefaultSectionSize(int )
-#
-#     def getNode(self, index):
-#         return self.model().getNode(index)
-#
-#     def asTreeModelIndex(self, index):
-#         return self.treeView.asModelIndex(index)
-#
-#
-#     def selection(self, selction, selection2):
-#         print selction, "-->", selction2
-#         print "signal"
-#         return
-#         if len(selection.indexes())>0:
-#             # using only the first selection for this task
-#             index = selection.indexes()[0]
-#
-#             if index.isValid():
-#                 node = self.getNode(index)
-#
-#                 treeIndex = self.asTreeIndex(index)
-#                 #print treeIndex, " <--- table clicked"
-#
-#                 if node.typeInfo() == cfg._stage_:
-#                     self.updateVersionsTable(node)
-#                 else:
-#                     self.updateVersionsTable()
-#
-#     '''
-#     def mouseReleaseEvent(self, event):
-#         super(PipelineContentsView, self).mouseReleaseEvent(event)
-#         index = self.indexAt(event.pos())
-#         if index.isValid():
-#             node = self.getNode(index)
-#
-#             treeIndex = self.asTreeIndex(index)
-#             #print treeIndex, " <--- table clicked"
-#
-#             if node.typeInfo() == cfg._stage_:
-#                 self.updateVersionsTable(node)
-#             else:
-#                 self.updateVersionsTable()
-#
-#             event.accept()
-#             return
-#
-#         event.ignore()
-#         return'''
-#
-#
-#     def mousePressEvent(self, event):
-#         print "CLICK>>>"
-#         super(PipelineContentsView, self).mousePressEvent(event)
-#         index = self.indexAt(event.pos())
-#         if index.isValid():
-#             node = self.getNode(index)
-#
-#             treeIndex = self.asTreeIndex(index)
-#             #print treeIndex, " <--- table clicked"
-#
-#             if node.typeInfo() == cfg._stage_:
-#                 self.updateVersionsTable(node)
-#             else:
-#                 self.updateVersionsTable()
-#
-#             event.accept()
-#             return
-#
-#         event.ignore()
-#         return
-#
-#     '''
-#     updates the table view with a new model
-#     the model is a custom table model, bulit from the childs of the selected branch in the treeview
-#
-#     index: QItemSelection
-#     '''
-#
-#     def update(self, selection):
-#         #if the selection is not empty
-#         if len(selection.indexes())>0:
-#             # using only the first selection for this task
-#             index = selection.indexes()[0]
-#
-#             if index.isValid():
-#                 '''
-#                 the index is from the tree's proxymodel
-#                 we need to convert it to the source index
-#                 '''
-#
-#                 treeModel = self.treeSourceModel
-#                 src = self.asTreeModelIndex(index)
-#                 node =  self.treeView.asModelNode(src)
-#
-#                 contenetsList = []
-#
-#                 self._treeParentIndex = src
-#                 self._treeParent = node
-#
-#                 for row in range(treeModel.rowCount(src)):
-#
-#                     item_index = treeModel.index(row,0,src)
-#                     treeNode = treeModel.getNode(item_index)
-#                     #print treeNode, "---", row
-#                     contenetsList.append(treeNode)
-#
-#                 # ----> this is the section to append 'add' buttons to the list
-#                 #
-#                 #list.append(dt.AddComponent("new"))
-#                 #if node.typeInfo() == "NODE":
-#                 #    list.append(dt.AddAsset("new"))
-#                 #    list.append(dt.AddFolder("new"))
-#
-#                 model = dtm.PipelineContentsModel(contenetsList)
-#                 self.populateTable(model)
-#                 self.updateVersionsTable()
-#
-#     def populateTable(self, model = None):
-#
-#
-#         if model:
-#             self.setModel(model)
-#
-#             # resize the table headers to the new content
-#             self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
-#             self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
-#
-#             return True
-#
-#         # in case the selection is empty, or the index was invalid, clear the table
-#         self.setModel(dtm.PipelineContentsModel([dt.DummyNode("")]))
-#         self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
-#         self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
-#         #self.clearModel()
-#         return False
-#
-#     def clearModel(self):
-#         self.setModel(None)
-#
-#
-#     def mouseDoubleClickEvent(self, event):
-#
-#
-#         index = self.indexAt(event.pos())
-#         node = None
-#         if index.isValid():
-#
-#
-#             tableModelNode = self.model().getNode(index)
-#             src = self.asTreeIndex(index)
-#             node =  self.treeSourceModel.getNode(src)
-#
-#         if node:
-#             if tableModelNode.typeInfo() != cfg._stage_:
-#                 '''
-#                 ---> double click on a folder or asset to open it
-#                 '''
-#                 treeIndex = self.treeView.fromProxyIndex(self.asTreeIndex(index))
-#                 self.setTreeViewtSelection(treeIndex)
-#                 self.treeView.saveSelection()
-#
-#                 event.accept()
-#                 return
-#             else:
-#                 '''
-#                 -----> double click on a component... what shoud we do?
-#                 '''
-#                 super(PipelineContentsView, self).mouseDoubleClickEvent(event)
-#                 event.accept()
-#                 return
-#
-#         event.accept()
-#         return
-#
-#
-#     def contextMenuEvent(self, event):
-#
-#         handled = True
-#         node = None
-#         index = self.indexAt(event.pos())
-#         menu = QtGui.QMenu()
-#         actions = []
-#         append_defult_options = True
-#
-#         if index.isValid():
-#
-#             tableModelNode = self.model().getNode(index)
-#             src = self.asTreeIndex(index)
-#             node =  self.treeSourceModel.getNode(src)
-#
-#             if tableModelNode.typeInfo() == cfg._dummy_:
-#                 append_defult_options = True
-#             else:
-#                 append_defult_options = False
-#
-#
-#         if node:
-#
-#
-#             if node.typeInfo() == cfg._folder_:
-#                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-#
-#
-#             if node.typeInfo() == cfg._asset_:
-#                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-#
-#
-#             if node.typeInfo() == cfg._stage_:
-#                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-#
-#
-#         if append_defult_options:
-#
-#             if self._treeParent.typeInfo() == cfg._asset_:
-#
-#                 actions.append(QtGui.QAction("Create new %s"%(cfg._stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
-#
-#             elif self._treeParent.typeInfo() == cfg._folder_:
-#
-#                 actions.append(QtGui.QAction("Create new %s"%(cfg._folder_), menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
-#                 actions.append(QtGui.QAction("Create new %s"%(cfg._asset_), menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
-#
-#         menu.addActions(actions)
-#
-#         #if handled:
-#
-#         menu.exec_(event.globalPos())
-#          #TELL QT IVE HANDLED THIS THING
-#
-#         #else:
-#             #event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
-#
-#         event.accept()
-#         return
-#
-#
-#     def setTreeViewtSelection(self,index):
-#
-#         self.treeView.select(index)
-#         selection = QtGui.QItemSelection(index, index)
-#         self.update(selection)
-#
-#
-#     def restoreTreeViewtSelection(self):
-#         # restore the table from the tree with up to date data
-#         # using the tree view's last selection
-#         self.treeView.restoreSelection()
-#         treeLastIndex =  self.treeView.fromProxyIndex(self.treeView.userSelection)
-#         self.setTreeViewtSelection(treeLastIndex)
-#
-#
-#
-#     def delete(self,  index):
-#         # clear the table before the action to prevent data being invalid
-#         self.clearModel()
-#         self.treeView.delete(index)
-#         self.restoreTreeViewtSelection()
-#         #i = self.asTreeIndex(index)
-#         #ii = self.treeView.fromProxyIndex(i)
-#         #self.updateTable(ii)
-#
-#     def create_new_folder(self, parent):
-#         self.clearModel()
-#         self.treeView.create_new_folder(parent)
-#         self.restoreTreeViewtSelection()
-#
-#     def create_new_asset(self, parent):
-#
-#         self.clearModel()
-#         self.treeView.create_new_asset(parent)
-#         self.restoreTreeViewtSelection()
-#
-#     def create_new_stage(self, parent):
-#
-#         self.clearModel()
-#         self.treeView.create_new_stage(parent)
-#         self.restoreTreeViewtSelection()
-#
-#     def updateTable(self, index):
-#         selection = QtGui.QItemSelection(index, index)
-#         self.update(selection)
-#
-#     def updateVersionsTable(self, node = None):
-#
-#         if self.versionsView:
-#             if node:
-#                 versionModel = dtm.PipelineVersionsModel(node._versions)
-#                 self.versionsView.setModel_(versionModel)
-#             else:
-#                 try:
-#                     del versionModel
-#                 except:
-#                     pass
-#                 self.versionsView.setModel_(None)
-#
-class pipelineTreeView(QtGui.QTreeView):
+class Project_Tree_View(QtGui.QTreeView):
     percentage_complete = QtCore.Signal(int)
     update = QtCore.Signal()
 
     def __init__(self,parent = None):
-        super(pipelineTreeView, self).__init__(parent)
+        super(Project_Tree_View, self).__init__(parent)
 
         global counter
 
@@ -1748,7 +736,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
     def setModel(self,model):
 
-        super(pipelineTreeView, self).setModel(model)
+        super(Project_Tree_View, self).setModel(model)
 
         if model:
             self.changed = False
@@ -1921,7 +909,7 @@ class pipelineTreeView(QtGui.QTreeView):
         
     def dropEvent(self, event):
 
-        super(pipelineTreeView,self).dropEvent(event)
+        super(Project_Tree_View, self).dropEvent(event)
         #QTreeView.dropEvent(self, evt)
         if not event.isAccepted():
             # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
@@ -2004,7 +992,7 @@ class pipelineTreeView(QtGui.QTreeView):
     '''  
     def dragEnterEvent(self, event):
 
-        super(pipelineTreeView,self).dragEnterEvent(event)
+        super(Project_Tree_View, self).dragEnterEvent(event)
 
         if event.source().__class__.__name__ == 'PipelineContentsView':        
             return event.setAccepted(True)
@@ -2197,8 +1185,8 @@ class pipelineTreeView(QtGui.QTreeView):
 
                     QtGui.QApplication.processEvents()
 
-                    print remap(counter, 0, total_items, 0, 100), "--->", counter, "--->", total_items
-                    self.percentage_complete.emit(remap(counter, 0, total_items, 0, 100))
+                    print remap_value(counter, 0, total_items, 0, 100), "--->", counter, "--->", total_items
+                    self.percentage_complete.emit(remap_value(counter, 0, total_items, 0, 100))
                     l = list(items[1:])
                     rec(l, node, stages, name_format)
                 else:
@@ -2219,13 +1207,6 @@ class pipelineTreeView(QtGui.QTreeView):
                 total_current_level = (total_current_level * levels[i][2])
                 total_items += total_current_level
 
-            # total_items = levels[0][2]
-            # old_total = total_items*levels[1][2]
-            # for i in range(2, len(levels)):
-            #     total_items += (old_total * levels[i][2])
-            #     old_total = levels[i-1][2]*levels[i][2]
-
-            print total_items, "<<<<<------"
             rec(levels, parent_node, res["stages"], res["name_format"])
             self.update.emit()
             self.percentage_complete.emit(0)
@@ -2251,7 +1232,7 @@ class pipelineTreeView(QtGui.QTreeView):
 
             for i in range(0,res["quantity"]):
                 QtGui.QApplication.processEvents()
-                self.percentage_complete.emit(remap(i, 0, res["quantity"], 0, 100))
+                self.percentage_complete.emit(remap_value(i, 0, res["quantity"], 0, 100))
 
                 number = files.set_padding(i, res["padding"])
                 if base_folder_name != "":
@@ -2295,7 +1276,7 @@ class pipelineTreeView(QtGui.QTreeView):
             base_folder_name = res["name"]
             for i in range(0, res["quantity"]):
                 QtGui.QApplication.processEvents()
-                self.percentage_complete.emit(remap(i, 0, res["quantity"], 0, 100))
+                self.percentage_complete.emit(remap_value(i, 0, res["quantity"], 0, 100))
                 number = files.set_padding(i, res["padding"])
                 if base_folder_name != "":
                     folder_name = "{0}{1}".format(base_folder_name, number) if res["quantity"] > 1 else base_folder_name
@@ -2400,84 +1381,79 @@ class pipelineTreeView(QtGui.QTreeView):
         self.sourceModel.rootNode.commit()
         self.changed = False
 
-class pipelineDresserView(QtGui.QTreeView):
-    percentage_complete = QtCore.Signal(int)
-    update = QtCore.Signal()
+
+class Dresser_View(Project_Tree_View):
 
     def __init__(self,parent = None):
-        super(pipelineDresserView, self).__init__(parent)
+        super(Dresser_View, self).__init__(parent)
 
-        global counter
-
-        # display options
-        self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.setAlternatingRowColors(True)
-        self.setSortingEnabled(True)
-        self.setDragEnabled( True )
-        self.setAcceptDrops( True )
-        self.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
-        self.setDropIndicatorShown(True)
-        self.resizeColumnToContents(True)
-
-        # self.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
-
-        #local variables
-        self.pipelineUI = self.parent()
-        self._ignoreExpentions = False
-        self._expended_states = None
-        self._userSelection = None
-        self._tableView = None
-        self._proxyModel = None
-        self._sourceModel = None
-        self._tree_as_flat_list = None
-
-        #stylesheet
-        self.setStyleSheet('''
-
-                           QTreeView::item:focus {
-                           }
-                           QTreeView::item:hover {
-                                background: #101010;
-                           }
-                           QTreeView {
-                                outline: 0;
-                           }
-                           QTreeView::branch:has-siblings:!adjoins-item {
-                                border-image:url(''' + cfg.vline + ''') 0;
-                           }
-
-                           QTreeView::branch:has-siblings:adjoins-item {
-                                border-image:url(''' + cfg.branch_more + ''') 0;
-                           }
-
-                           QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                                border-image:url(''' + cfg.branch_end + ''') 0;
-                           }
-
-                           QTreeView::branch:has-children:!has-siblings:closed,
-                           QTreeView::branch:closed:has-children:has-siblings {
-                                border-image: none;
-                                image:url(''' + cfg.branch_closed + ''') 0;
-                           }
-
-                           QTreeView::branch:open:has-children:!has-siblings,
-                           QTreeView::branch:open:has-children:has-siblings  {
-                                border-image: none;
-                                image: url(''' + cfg.branch_open + ''') 0;
-                           }''')
-
-
-        self.changed = False
-        self.update.connect(self.model_changed)
-
-    def model_changed(self):
-        if self.changed == False:
-            self.changed = True
+        # global counter
+        #
+        # # display options
+        # self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        # self.setAlternatingRowColors(True)
+        # self.setSortingEnabled(True)
+        # self.setDragEnabled( True )
+        # self.setAcceptDrops( True )
+        # self.setDragDropMode( QtGui.QAbstractItemView.InternalMove )
+        # self.setDropIndicatorShown(True)
+        # self.resizeColumnToContents(True)
+        #
+        # # self.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
+        #
+        # #local variables
+        # self.pipelineUI = self.parent()
+        # self._ignoreExpentions = False
+        # self._expended_states = None
+        # self._userSelection = None
+        # self._tableView = None
+        # self._proxyModel = None
+        # self._sourceModel = None
+        # self._tree_as_flat_list = None
+        #
+        # #stylesheet
+        # self.setStyleSheet('''
+        #
+        #                    QTreeView::item:focus {
+        #                    }
+        #                    QTreeView::item:hover {
+        #                         background: #101010;
+        #                    }
+        #                    QTreeView {
+        #                         outline: 0;
+        #                    }
+        #                    QTreeView::branch:has-siblings:!adjoins-item {
+        #                         border-image:url(''' + cfg.vline + ''') 0;
+        #                    }
+        #
+        #                    QTreeView::branch:has-siblings:adjoins-item {
+        #                         border-image:url(''' + cfg.branch_more + ''') 0;
+        #                    }
+        #
+        #                    QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+        #                         border-image:url(''' + cfg.branch_end + ''') 0;
+        #                    }
+        #
+        #                    QTreeView::branch:has-children:!has-siblings:closed,
+        #                    QTreeView::branch:closed:has-children:has-siblings {
+        #                         border-image: none;
+        #                         image:url(''' + cfg.branch_closed + ''') 0;
+        #                    }
+        #
+        #                    QTreeView::branch:open:has-children:!has-siblings,
+        #                    QTreeView::branch:open:has-children:has-siblings  {
+        #                         border-image: none;
+        #                         image: url(''' + cfg.branch_open + ''') 0;
+        #                    }''')
+        #
+        #
+        # self.changed = False
+        # self.update.connect(self.model_changed)
 
 
     def setModel(self,model):
 
-        super(pipelineDresserView, self).setModel(model)
+        super(Dresser_View, self).setModel(model)
 
         if model:
             self.changed = False
@@ -2490,10 +1466,7 @@ class pipelineDresserView(QtGui.QTreeView):
             the projects name folder
             the rest will be collapsed
             '''
-
             self.initialExpension()
-
-
             '''
             save the expended state of the tree
             '''
@@ -2515,142 +1488,6 @@ class pipelineDresserView(QtGui.QTreeView):
             for row in range(self.model().rowCount(self.rootIndex())):
                 x = self.model().index(row, 0, self.rootIndex())
                 self.setExpanded(x, True)
-
-    @property
-    def tableView(self):
-        return self._tableView
-
-    @tableView.setter
-    def tableView(self, view):
-        self._tableView = view
-
-    @property
-    def proxyModel(self):
-        return self._proxyModel
-
-    @proxyModel.setter
-    def proxyModel(self, model):
-        self._proxyModel = model
-
-    @property
-    def sourceModel(self):
-        return self._sourceModel
-
-    @sourceModel.setter
-    def sourceModel(self, model):
-        self._sourceModel = model
-
-
-    @property
-    def userSelection(self):
-        return self._userSelection
-
-    @userSelection.setter
-    def userSelection(self, selection):
-        self._userSelection = selection
-
-    def asProxyIndex(self,index):
-        return self.proxyModel.index(0,0,index)
-
-
-    def asModelIndex(self, index):
-        return self.proxyModel.mapToSource(index)
-
-    def fromProxyIndex(self, index):
-        return self.proxyModel.mapFromSource(index)
-
-    def asModelNode(self, index):
-        return self.sourceModel.getNode(index)
-
-
-    def modelIndexFromNode(self, node):
-        return self.sourceModel.indexFromNode(node,self.rootIndex())
-
-    def selectRoot(self):
-
-        self.setCurrentIndex(self.asProxyIndex(self.rootIndex()))
-        #self.tableView.update(self.selectionModel().selection())
-        self.saveSelection()
-
-
-    def saveSelection(self):
-
-        if len(self.selectedIndexes())>0:
-            self.userSelection = self.asModelIndex(self.selectedIndexes()[0])
-
-    def saveState(self):
-        '''
-        recursive function to save the expention state fo the tree to a dictionary
-        '''
-
-        if self._ignoreExpentions == True:
-            return
-
-        def rec( dict, mdl, index):
-
-            for row in range(mdl.rowCount(index)):
-
-
-                i = mdl.index(row,0, index)
-                node = mdl.data(i, 165)
-
-                if self.isExpanded(i):
-                    dict[node] = True
-                else:
-                    dict[node] = False
-
-                rec(dict, mdl, i)
-
-        self._expended_states = {}
-        rec(self._expended_states,self.proxyModel,self.rootIndex())
-
-
-    def restoreState(self):
-
-        '''
-        recursive function to restore the expention state fo the tree to a dictionary
-        '''
-        def rec(  mdl, index):
-
-            for row in range(mdl.rowCount(index)):
-
-
-                i = mdl.index(row,0, index)
-                node = mdl.data(i, 165)
-
-                if node in self._expended_states:
-                    if self._expended_states[node] == True:
-                        self.setExpanded(i, True)
-
-
-                rec( mdl, i)
-
-        self.collapseAll()
-        rec(self.proxyModel,self.rootIndex())
-        self.restoreSelection()
-
-    def restoreSelection(self):
-
-        index = self.fromProxyIndex(self.userSelection)
-        self.select(index)
-        self.updateTable( index)
-        #self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
-
-    def select(self, index):
-        '''
-        selects a tree branch and expand the parant branch to see the selected branch
-        '''
-        modelIndex = self.sourceModel.parent(self.asModelIndex(index))
-        proxyIndex = self.fromProxyIndex(modelIndex)
-        self.setExpanded(proxyIndex, True)
-        self.selectionModel().select(index, QtGui.QItemSelectionModel.ClearAndSelect)
-
-
-    def projectRootIndex(self):
-        modelRootIndex = self.asModelIndex(self.rootIndex())
-        return modelRootIndex
-        # get the first childe of the model's root
-        #return self.sourceModel.index(0,0,modelRootIndex)
 
 
     def contextMenuEvent(self, event):
@@ -2688,70 +1525,11 @@ class pipelineDresserView(QtGui.QTreeView):
 
         return
 
-
     def reference_to_current(self, index):
-        # if self.pipelineUI.version and self.pipelineUI._stageNode.name:
         node = self.asModelNode(index)
-        node.referencecfg.masterto_current()
-            # data = self.pipelineUI.version.include
-            # relative_path = files.reletive_path( self.pipelineUI.project._path, node._masterNode.path)
-            #
-            # if isinstance(data, list):
-            #     data.append(relative_path)
-            # else:
-            #     data = [relative_path]
-            #
-            # self.pipelineUI.version.include = data
-            #
-            # self.pipelineUI._stageNode.editVersionData(self.pipelineUI.version.number, "include", data)
-            # return True
-        # else:
-        #     print "no version or stage node, so referecing is not recomended since it can not be listed"
+        node.reference_master_to_current()
 
 
-
-
-class PipelineStagesView(QtGui.QListView):
-    def __init__(self,parent = None):
-        super(PipelineStagesView, self).__init__(parent)
-        
-        #display options
-        
-        self.setViewMode(QtGui.QListView.IconMode)
-        self.setUniformItemSizes(True)
-        self.setResizeMode(QtGui.QListView.Adjust)
-        self.setFlow(QtGui.QListView.LeftToRight)
-        self.setWrapping(True)
-        self.setTextElideMode(QtCore.Qt.ElideRight)
-        
-        w = 48
-        grid_w = w + 5
-        grid_h = w + 30
-        size = QtCore.QSize(w,w)
-        size2 = QtCore.QSize(grid_w, grid_h)
-        self.setIconSize(size)
-        self.setGridSize(size2)
-        
-        #list = []
-        #[list.append(dt.StageNode("<Stage>")) for i in range(6)]
-        #self.setModel(dtm.PipelineListModel(list))
-        
-        #self.setSpacing(5)
-        self.setWordWrap(True)
-        '''
-        self.setAlternatingRowColors(True)
-        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
-        self.setWordWrap(True)
-        self.setShowGrid(False)
-        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
-        self.icons_size(32)       
-        #self.setMinimumWidth(250)
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.setSortingEnabled(True)
-        self.horizontalHeader().setOffset(10)
-        self.verticalHeader().hide()'''
-        
-        #self.setSortingEnabled(True)
 
 class ComboWidget(QtGui.QWidget):
     def __init__(self,
@@ -2783,8 +1561,6 @@ class ComboWidget(QtGui.QWidget):
         self.deleteLater()
         self._child = None
         del self
-
-
 
 class ComboStaticWidget(ComboWidget):
     def __init__(self,
@@ -3062,61 +1838,61 @@ class ComboDynamicWidget(ComboWidget):
         self._child = None
         del self
 
-class levelsTreeView(QtGui.QTreeView):
-
-    update = QtCore.Signal()
-
-    def __init__(self, parent=None):
-        super(levelsTreeView, self).__init__(parent)
-
-        # display options
-        self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.setAlternatingRowColors(True)
-        self.setSortingEnabled(True)
-        self.header().setHidden(True)
-        # local variables
-
-        # stylesheet
-        self.setStyleSheet('''
-
-                           QTreeView::item:focus {
-                           }
-                           QTreeView::item:hover {
-                                background: #101010;
-                           }
-                           QTreeView {
-                                outline: 0;
-                           }
-                           QTreeView::branch:has-siblings:!adjoins-item {
-                                border-image:url(''' + cfg.vline + ''') 0;
-                           }
-
-                           QTreeView::branch:has-siblings:adjoins-item {
-                                border-image:url(''' + cfg.branch_more + ''') 0;
-                           }
-
-                           QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                                border-image:url(''' + cfg.branch_end + ''') 0;
-                           }
-
-                           QTreeView::branch:has-children:!has-siblings:closed,
-                           QTreeView::branch:closed:has-children:has-siblings {
-                                border-image: none;
-                                image:url(''' + cfg.branch_closed + ''') 0;
-                           }
-
-                           QTreeView::branch:open:has-children:!has-siblings,
-                           QTreeView::branch:open:has-children:has-siblings  {
-                                border-image: none;
-                                image: url(''' + cfg.branch_open + ''') 0;
-                           }''')
-
-
-
-    def setModel(self, model):
-
-        super(levelsTreeView, self).setModel(model)
-
+# class levelsTreeView(QtGui.QTreeView):
+#
+#     update = QtCore.Signal()
+#
+#     def __init__(self, parent=None):
+#         super(levelsTreeView, self).__init__(parent)
+#
+#         # display options
+#         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+#         self.setAlternatingRowColors(True)
+#         self.setSortingEnabled(True)
+#         self.header().setHidden(True)
+#         # local variables
+#
+#         # stylesheet
+#         self.setStyleSheet('''
+#
+#                            QTreeView::item:focus {
+#                            }
+#                            QTreeView::item:hover {
+#                                 background: #101010;
+#                            }
+#                            QTreeView {
+#                                 outline: 0;
+#                            }
+#                            QTreeView::branch:has-siblings:!adjoins-item {
+#                                 border-image:url(''' + cfg.vline + ''') 0;
+#                            }
+#
+#                            QTreeView::branch:has-siblings:adjoins-item {
+#                                 border-image:url(''' + cfg.branch_more + ''') 0;
+#                            }
+#
+#                            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+#                                 border-image:url(''' + cfg.branch_end + ''') 0;
+#                            }
+#
+#                            QTreeView::branch:has-children:!has-siblings:closed,
+#                            QTreeView::branch:closed:has-children:has-siblings {
+#                                 border-image: none;
+#                                 image:url(''' + cfg.branch_closed + ''') 0;
+#                            }
+#
+#                            QTreeView::branch:open:has-children:!has-siblings,
+#                            QTreeView::branch:open:has-children:has-siblings  {
+#                                 border-image: none;
+#                                 image: url(''' + cfg.branch_open + ''') 0;
+#                            }''')
+#
+#
+#
+#     def setModel(self, model):
+#
+#         super(levelsTreeView, self).setModel(model)
+#
 
 
 

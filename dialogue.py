@@ -155,8 +155,8 @@ def massage(icon, title, message ):
     
     result = reply.exec_()
  
-        
-set_icons()
+#
+# set_icons()
 
 
 class about(QtGui.QDialog):
@@ -1080,7 +1080,7 @@ class projectDialog(QtGui.QDialog):
         self.levels_widget.setMinimumHeight(200)
         self.levels_widget.setMinimumWidth(450)
         self.variable_tabs.tab_widget.addTab(self.levels_widget, "Levels")
-        self.levels_tree = dtv.PipelineLevelsView(self.levels_widget)
+        self.levels_tree = dtv.Project_Levels_View(self.levels_widget)
         self.level_layout.addWidget(self.levels_tree)
         self.levels_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -1089,7 +1089,7 @@ class projectDialog(QtGui.QDialog):
         self.stages_widget.setMinimumHeight(200)
         self.stages_widget.setMinimumWidth(450)
         self.variable_tabs.tab_widget.addTab(self.stages_widget, "Stages")
-        self.stages_tree = dtv.PipelineLevelsView(self.stages_widget)
+        self.stages_tree = dtv.Project_Levels_View(self.stages_widget)
         self.stages_layout.addWidget(self.stages_tree)
         self.stages_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
@@ -1098,7 +1098,7 @@ class projectDialog(QtGui.QDialog):
         self.users_widget.setMinimumHeight(200)
         self.users_widget.setMinimumWidth(450)
         self.variable_tabs.tab_widget.addTab(self.users_widget, "Users")
-        self.users_tree = dtv.PipelineUsersView(self.users_widget)
+        self.users_tree = dtv.Project_Users_View(self.users_widget)
         self.users_layout.addWidget(self.users_tree)
         self.users_tree.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 

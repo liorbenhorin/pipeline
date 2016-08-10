@@ -1626,7 +1626,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self._decode_users()
         self.ui.users_pushButton.setText("Not logged in")
 
-        self.tree = dtv.pipelineTreeView(self)
+        self.tree = dtv.Project_Tree_View(self)
         self.navWidget = QtGui.QWidget()
         h_layout = QtGui.QVBoxLayout()
         h_layout.setContentsMargins(0, 0, 0, 0)
@@ -1636,7 +1636,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         # add to the designer ui
         self.ui.verticalLayout_18.addWidget(self.navWidget)
 
-        self.dresser_tree = dtv.pipelineDresserView(self)
+        self.dresser_tree = dtv.Dresser_View(self)
         self.drasserWidget = QtGui.QWidget()
         h_layout = QtGui.QVBoxLayout()
         h_layout.setContentsMargins(0, 0, 0, 0)
@@ -1996,11 +1996,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
         #self.ui.stages_version_splitter.setSizes([0, 600])
 
-        self.versionsView = dtv.PipelineVersionsView(parentWidget=self.ui.versionsTab, parent=self)
+        self.versionsView = dtv.Versions_View(parentWidget=self.ui.versionsTab, parent=self)
         self.ui.versionsTabLayout.addWidget(self.versionsView)
         self.versionsView.addSlider()
 
-        self.mastersView = dtv.PipelineMastersView(parentWidget=self.ui.mastersTab, parent=self)
+        self.mastersView = dtv.Masters_View(parentWidget=self.ui.mastersTab, parent=self)
         self.ui.mastersTabLayout.addWidget(self.mastersView)
         self.mastersView.addSlider()
 
@@ -3665,7 +3665,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         #self.updateProjectsTable()
         #self.setColumnWidth_projectsTable()
 
-        self.projectsTableView = dtv.PipelineProjectsView(parent = self, parentWidget = self.ui.projectsWidget)
+        self.projectsTableView = dtv.Projects_View(parent = self, parentWidget = self.ui.projectsWidget)
 
         self.ui.projectsWidget.layout().addWidget(self.projectsTableView)
 
