@@ -1838,61 +1838,6 @@ class ComboDynamicWidget(ComboWidget):
         self._child = None
         del self
 
-# class levelsTreeView(QtGui.QTreeView):
-#
-#     update = QtCore.Signal()
-#
-#     def __init__(self, parent=None):
-#         super(levelsTreeView, self).__init__(parent)
-#
-#         # display options
-#         self.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-#         self.setAlternatingRowColors(True)
-#         self.setSortingEnabled(True)
-#         self.header().setHidden(True)
-#         # local variables
-#
-#         # stylesheet
-#         self.setStyleSheet('''
-#
-#                            QTreeView::item:focus {
-#                            }
-#                            QTreeView::item:hover {
-#                                 background: #101010;
-#                            }
-#                            QTreeView {
-#                                 outline: 0;
-#                            }
-#                            QTreeView::branch:has-siblings:!adjoins-item {
-#                                 border-image:url(''' + cfg.vline + ''') 0;
-#                            }
-#
-#                            QTreeView::branch:has-siblings:adjoins-item {
-#                                 border-image:url(''' + cfg.branch_more + ''') 0;
-#                            }
-#
-#                            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-#                                 border-image:url(''' + cfg.branch_end + ''') 0;
-#                            }
-#
-#                            QTreeView::branch:has-children:!has-siblings:closed,
-#                            QTreeView::branch:closed:has-children:has-siblings {
-#                                 border-image: none;
-#                                 image:url(''' + cfg.branch_closed + ''') 0;
-#                            }
-#
-#                            QTreeView::branch:open:has-children:!has-siblings,
-#                            QTreeView::branch:open:has-children:has-siblings  {
-#                                 border-image: none;
-#                                 image: url(''' + cfg.branch_open + ''') 0;
-#                            }''')
-#
-#
-#
-#     def setModel(self, model):
-#
-#         super(levelsTreeView, self).setModel(model)
-#
 
 
 

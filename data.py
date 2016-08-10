@@ -6,8 +6,6 @@ import time
 import data_model as dtm
 reload(dtm)
 
-#import modules.data as data
-#reload(data)
 import modules.files as files
 reload(files)
 import modules.jsonData as data
@@ -16,48 +14,6 @@ import modules.maya_warpper as maya
 reload(maya)
 import config as cfg
 reload(cfg)
-
-
-# def set_icons():
-#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
-#     if not os.path.exists(localIconPath):
-#         return
-#
-#     global cfg.folder_icon
-#     global cfg.cube_icon
-#     global cfg.add_cube_icon
-#     global cfg.dummy_icon
-#
-#     global cfg.cube_icon_full
-#     global cfg.add_icon
-#     global cfg.large_image_icon
-#     global cfg.client_icon
-#     global cfg.large_image_icon_dark
-#     global cfg.comment_icon
-#     global cfg.comment_full_icon
-#     global cfg.new_icon
-#     global cfg.creation_icon
-#     global cfg.master_icon
-#
-#     cfg.master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "save_master"))
-#     cfg.creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
-#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
-#     cfg.comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
-#     cfg.comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
-#     cfg.client_icon = os.path.join(localIconPath, "%s.svg" % "client")
-#     cfg.folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
-#     cfg.cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")
-#     cfg.add_cube_icon = os.path.join(localIconPath, "%s.svg"%"add_cube")
-#     cfg.cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill")
-#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
-#     cfg.large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "large_image_dark"))
-#     cfg.dummy_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"braces"))
-#
-#
-#
-# set_icons()
-
 
 def remap( x, oMin, oMax, nMin, nMax ):
 
@@ -116,9 +72,7 @@ class Metadata_file():
         else:
             pass
 
-
 class Node(QtCore.QObject, object):
-
 
     def __init__(self, name,  parent=None, **kwargs):
         super(Node, self).__init__()
@@ -135,10 +89,37 @@ class Node(QtCore.QObject, object):
         if parent is not None:
             parent.addChild(self)
 
-
     @property
     def children(self):
         return self._children
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+    @property
+    def resource(self):
+        return self._resource
+
+    @resource.setter
+    def resource(self, icon):
+        self._resource = icon
+
+    @property
+    def expendedState(self):
+        return self._expendedState
+
+    @expendedState.setter
+    def expendedState(self, state):
+        self._expendedState = state
+
+    @property
+    def id(self):
+        return self._id
 
     def attrs(self):
 
@@ -173,7 +154,6 @@ class Node(QtCore.QObject, object):
 
         return doc.toString(indent=4)
 
-
     def _recurseXml(self, doc, parent):
         node = doc.createElement(self.typeInfo())
         parent.appendChild(node)
@@ -186,7 +166,6 @@ class Node(QtCore.QObject, object):
         for i in self._children:
             i._recurseXml(doc, node)
 
-    
     def typeInfo(self):
         return cfg._node_
 
@@ -216,14 +195,6 @@ class Node(QtCore.QObject, object):
             return True
         else:
             return False
-            
-    @property
-    def name(self):
-        return self._name
-                
-    @name.setter
-    def name(self, value):
-        self._name = value
 
     def child(self, row):
         return self._children[row]
@@ -237,7 +208,6 @@ class Node(QtCore.QObject, object):
     def row(self):
         if self._parent is not None:
             return self._parent._children.index(self)
-
 
     def log(self, tabLevel=-1):
 
@@ -256,7 +226,6 @@ class Node(QtCore.QObject, object):
         output += "\n"
         
         return output
-      
 
     def data(self, column):
         
@@ -267,15 +236,6 @@ class Node(QtCore.QObject, object):
         #print value
         if   column is 0: pass#self.name = value
         elif column is 1: pass
-
-    @property
-    def resource(self):
-        return self._resource
-
-
-    @resource.setter
-    def resource(self, icon):
-        self._resource = icon
 
     def delete(self):
 
@@ -333,18 +293,97 @@ class Node(QtCore.QObject, object):
     def deathrow_me(self):
         self._deathrow = True
 
+class CatagoryNode(Node):
+
+    def __init__(self, name, parent=None):
+        super(CatagoryNode, self).__init__(name, parent)
+
+        self.resource = cfg.dummy_icon
+
+    def typeInfo(self):
+        return cfg._catagory_
+
+class DummyNode(Node):
+
+    def __init__(self, name, parent=None):
+        super(DummyNode, self).__init__(name, parent)
+
+        self.resource = cfg.dummy_icon
+
+    def typeInfo(self):
+        return cfg._dummy_
+
+class LevelsNode(Node):
+
+    def __init__(self, name, parent=None):
+        super(LevelsNode, self).__init__(name, parent)
+
+        self.resource = cfg.dummy_icon
+        self._levels = []
+        for i in range(6):
+            self._levels.append("")
+
+    def setLevels(self, list):
+        for index, item in enumerate(list):
+            self._levels[index] = item
+
+    def typeInfo(self):
+        return cfg._dummy_
+
+class UserNode(Node):
+
+    def __init__(self, name, password = None, role = None, parent=None):
+        super(UserNode, self).__init__(name, parent)
+
+        self.resource = cfg.dummy_icon
+        self._password = password
+        self._role = role
+
+    def setLevels(self, list):
+        for index, item in enumerate(list):
+            self._levels[index] = item
+
+    def typeInfo(self):
+        return cfg._dummy_
+
+class ClientNode(Node):
+
+    def __init__(self, name, path = None, parent=None):
+        super(ClientNode, self).__init__(name, parent)
+        self._path = path
+
+        self.resource = cfg.client_icon
 
     @property
-    def expendedState(self):
-        return self._expendedState
-    @expendedState.setter
-    def expendedState(self, state):    
-        self._expendedState = state
+    def path(self):
+        return self._path
 
-    @property
-    def id(self):
-        return self._id
+    def typeInfo(self):
+        return cfg._dummy_
 
+class AddNode(Node):
+    def __init__(self, name, parent=None):
+        super(AddNode, self).__init__(name, parent)
+
+        self.resource = cfg.add_icon
+
+    def typeInfo(self):
+        return cfg._new_
+
+class NewNode(Node):
+
+    def __init__(self, name,  parent=None):
+        super(NewNode, self).__init__(name, parent)
+        self.resource = cfg.add_icon
+
+        # for key in kwargs:
+        #     if key == "name_format":
+        #         self._name_format = kwargs[key]
+        #     if key == "section":
+        #         self._section = kwargs[key]
+
+    def typeInfo(self):
+        return cfg._new_
 
 class RootNode(Node):#, Metadata_file):
     percentage_complete = QtCore.Signal(int)
@@ -394,40 +433,13 @@ class RootNode(Node):#, Metadata_file):
         if self.data_file_path:
             self.set_data_file(self.data_file_path)
 
-
-
-    def set_data_file(self, path):
-        if os.path.isfile(path):
-            self.data_file = data.jsonDict(path=path)
-
-            return True
-        else:
-            pass
-
-            
-    def create(self, path = None):
-        if files.create_directory(path):  
-            self.path = path          
-            return self
-        else:
-            return False
-
-    @property
-    def sTypeInfo(self):
-        if self.data_file:
-            return self.data_file["typeInfo"]
-
     @property
     def path(self):
         return self._path
-                
+
     @path.setter
     def path(self, path):
-        self._path = path  
-    
-    def typeInfo(self):
-        return cfg._root_
-
+        self._path = path
 
     @property
     def section(self):
@@ -451,7 +463,6 @@ class RootNode(Node):#, Metadata_file):
                     type = cfg._asset_
                 return levelName, type
 
-
         if self.settings and self.project:
             relative_path = os.path.relpath(self._path, self.project._path)
             depth = relative_path.count(os.sep)
@@ -470,8 +481,27 @@ class RootNode(Node):#, Metadata_file):
 
         return "n/a", "n/a"
 
+    def typeInfo(self):
+        return cfg._root_
 
+    def set_data_file(self, path):
+        if os.path.isfile(path):
+            self.data_file = data.jsonDict(path=path)
 
+            return True
+        else:
+            pass
+
+    def create(self, path = None):
+        if files.create_directory(path):  
+            self.path = path          
+            return self
+        else:
+            return False
+    # @property
+    # def sTypeInfo(self):
+    #     if self.data_file:
+    #         return self.data_file["typeInfo"]
     def model_tree(self):
         import time
         '''
@@ -504,7 +534,6 @@ class RootNode(Node):#, Metadata_file):
 
         rec(self.path, self, c)
         self.percentage_complete.emit(0)
-
 
     def model_dresser_tree(self):
 
@@ -605,107 +634,6 @@ class RootNode(Node):#, Metadata_file):
         model_masters_tree(masters_dict, self, self._path)
 
         #self.percentage_complete.emit(0)
-
-
-#
-# class TreeNode(Node):
-#
-#     def __init__(self, name,  parent=None, quantity = None, padding = None):
-#         super(TreeNode, self).__init__(name, parent)
-#         self._quantity = quantity
-#         self._padding = padding
-#
-#
-
-
-class FolderNode(RootNode):
-    
-    def __init__(self, name,  parent=None, **kwargs):
-        super(FolderNode, self).__init__(name, parent, **kwargs)
-
-        self.resource = cfg.folder_icon if not self._virtual else  cfg.creation_icon
-        
-    def typeInfo(self):
-        return cfg._folder_
-
-
-
-
-class AssetNode(RootNode):
-    
-    def __init__(self, name,  parent=None, **kwargs):
-        super(AssetNode, self).__init__(name, parent, **kwargs)
-
-        self.resource = cfg.cube_icon_full if not self._virtual else  cfg.creation_icon
-
-    def create(self, path = None):
-        super(AssetNode, self).create(path)
-        #if node:
-        dict = {}
-        dict["typeInfo"] = cfg._asset_
-        dict[cfg._asset_] = self.name
-
-        path = os.path.join(path,"%s.%s"%(self.name,"json"))
-
-        self.data_file = data.jsonDict().create(path, dict)
-        self.data_file = self.data_file.read()
-        return self
-
-    @property
-    def stages(self):
-        stages = []
-
-        for dir in files.list_dir_folders(self._path):
-
-            if stageDir(os.path.join(self._path, dir)):
-                stages.append(dir)
-
-        return stages
-        
-    def typeInfo(self):
-        return cfg._asset_
-
-
-        
-
-# class StageNode(RootNode):
-#
-#     def __init__(self, name, stage = None, parent=None, **kwargs):
-#         super(StageNode, self).__init__(name, parent, **kwargs)
-#
-#         self._stage = stage
-#
-#     def create(self, stage = None, path = None):
-#         node = super(StageNode, self).create(path)
-#         if node:
-#
-#             dict = {}
-#             dict["typeInfo"] = "cfg._stage_"
-#             dict["stage"] = stage
-#
-#             self._stage = stage
-#
-#             path = os.path.join(path,"%s.%s"%("stage","json"))
-#
-#             self.data_file = data.jsonDict().create(path, dict)
-#             self.data_file = self.data_file.read()
-#             return node
-#
-#     @property
-#     def stage(self):
-#         return self._stage
-#
-#     @stage.setter
-#     def stage(self, value):
-#         self._stage = value
-#
-#     def typeInfo(self):
-#         return cfg._stage_
-#
-#
-#     def resource(self):
-#         return cfg.large_image_icon
-
 
 class VersionNode(Node):
 
@@ -808,192 +736,49 @@ class VersionNode(Node):
             return None
             #return cfg.comment_icon
 
+class FolderNode(RootNode):
+    
+    def __init__(self, name,  parent=None, **kwargs):
+        super(FolderNode, self).__init__(name, parent, **kwargs)
 
-class MasterNode(VersionNode):
+        self.resource = cfg.folder_icon if not self._virtual else  cfg.creation_icon
+        
+    def typeInfo(self):
+        return cfg._folder_
 
-    def __init__(self, name ,path = None,  number = None, author = None, include = None, date = None, note = None, stage = None, origin = None, parent=None):
-        super(MasterNode, self).__init__(name, parent=parent, path=path, include = include, number=number, author= author, date=date, note=note, stage=stage)
+class AssetNode(RootNode):
+    
+    def __init__(self, name,  parent=None, **kwargs):
+        super(AssetNode, self).__init__(name, parent, **kwargs)
 
-        self._origin = origin
+        self.resource = cfg.cube_icon_full if not self._virtual else  cfg.creation_icon
+
+    def create(self, path = None):
+        super(AssetNode, self).create(path)
+        #if node:
+        dict = {}
+        dict["typeInfo"] = cfg._asset_
+        dict[cfg._asset_] = self.name
+
+        path = os.path.join(path,"%s.%s"%(self.name,"json"))
+
+        self.data_file = data.jsonDict().create(path, dict)
+        self.data_file = self.data_file.read()
+        return self
 
     @property
-    def origin(self):
-        return self._origin
+    def stages(self):
+        stages = []
 
-    @property
-    def master_icon(self):
-        return cfg.master_icon
+        for dir in files.list_dir_folders(self._path):
 
+            if stageDir(os.path.join(self._path, dir)):
+                stages.append(dir)
+
+        return stages
+        
     def typeInfo(self):
-        return cfg._master_
-
-class CatagoryNode(Node):
-
-    def __init__(self, name, parent=None):
-        super(CatagoryNode, self).__init__(name, parent)
-
-        self.resource = cfg.dummy_icon
-
-    def typeInfo(self):
-        return cfg._catagory_
-
-
-
-class DummyNode(Node):
-
-    def __init__(self, name, parent=None):
-        super(DummyNode, self).__init__(name, parent)
-
-        self.resource = cfg.dummy_icon
-
-    def typeInfo(self):
-        return cfg._dummy_
-
-class LevelsNode(Node):
-
-    def __init__(self, name, parent=None):
-        super(LevelsNode, self).__init__(name, parent)
-
-        self.resource = cfg.dummy_icon
-        self._levels = []
-        for i in range(6):
-            self._levels.append("")
-
-    def setLevels(self, list):
-        for index, item in enumerate(list):
-            self._levels[index] = item
-
-    def typeInfo(self):
-        return cfg._dummy_
-
-class StagesNode(Node):
-
-    def __init__(self, name, parent=None):
-        super(StagesNode, self).__init__(name, parent)
-
-        self.resource = cfg.dummy_icon
-        self._levels = []
-        for i in range(6):
-            self._levels.append("")
-
-    def setLevels(self, list):
-        for index, item in enumerate(list):
-            self._levels[index] = item
-
-    def typeInfo(self):
-        return cfg._dummy_
-
-
-class UserNode(Node):
-
-    def __init__(self, name, password = None, role = None, parent=None):
-        super(UserNode, self).__init__(name, parent)
-
-        self.resource = cfg.dummy_icon
-        self._password = password
-        self._role = role
-
-    def setLevels(self, list):
-        for index, item in enumerate(list):
-            self._levels[index] = item
-
-    def typeInfo(self):
-        return cfg._dummy_
-
-class ClientNode(Node):
-
-    def __init__(self, name, path = None, parent=None):
-        super(ClientNode, self).__init__(name, parent)
-        self._path = path
-
-        self.resource = cfg.client_icon
-
-    @property
-    def path(self):
-        return self._path
-
-    def typeInfo(self):
-        return cfg._dummy_
-
-
-
-
-class AddNode(Node):
-    def __init__(self, name, parent=None):
-        super(AddNode, self).__init__(name, parent)
-
-        self.resource = cfg.add_icon
-
-    def typeInfo(self):
-        return cfg._new_
-
-
-class NewNode(Node):
-
-    def __init__(self, name,  parent=None):
-        super(NewNode, self).__init__(name, parent)
-        self.resource = cfg.add_icon
-
-        # for key in kwargs:
-        #     if key == "name_format":
-        #         self._name_format = kwargs[key]
-        #     if key == "section":
-        #         self._section = kwargs[key]
-
-    def typeInfo(self):
-        return cfg._new_
-
-
-# class project(object):
-#     def __init__(self, project_path):
-#
-#         stages = {}
-#         stages["asset"] = ["model","rig","clip","shandeing","lightning"]
-#         stages["animation"] = ["layout","Shot"]
-#
-#         levels = {}
-#         levels["asset"] = ["type","asset","stage","ccc"]
-#         levels["animation"] = ["Ep","Seq"]
-#
-#
-#         self.project = {}
-#         self.project["project_path"] = project_path
-#
-#
-#         self.project["levels"] = levels
-#         self.project["stages"] = stages
-#
-#         self.project["current_stage"] = None
-
-#
-# class Asset(Metadata_file):
-#     def __init__(self,**kwargs):
-#         Metadata_file.__init__(self, **kwargs)
-#
-#         self.project = None
-#         for key in kwargs:
-#             if key == "project":
-#                 self.project = kwargs[key]
-#
-#
-#         self.settings = None
-#         for key in kwargs:
-#             if key == "settings":
-#                 self.settings = kwargs[key]
-#
-#
-#
-#     def create(self, path, name):
-#         data = {}
-#         data["typeInfo"] = "cfg._asset_"
-#
-#         path = os.path.join(path,"%s.%s"%(name,"json"))
-#
-#         self.data_file = data.jsonDict().create(path, data)
-#         self.data_file = self.data_file.read()
-#
-#         return self
-
+        return cfg._asset_
 
 class StageNode(RootNode):
 
@@ -1005,7 +790,6 @@ class StageNode(RootNode):
 
         changed = QtCore.Signal()
 
-
         # self.settings = None
         # for key in kwargs:
         #     if key == "settings":
@@ -1013,7 +797,7 @@ class StageNode(RootNode):
 
         self.pipelineUI = None
         self._masterNode = None
-        #self._thumbnail = None
+        # self._thumbnail = None
         self._currently_open = None
 
         self._name_format = 2
@@ -1024,31 +808,12 @@ class StageNode(RootNode):
                 self.edited.connect(self.pipelineUI.updateMastersTable)
             if key == "name_format":
                 self._name_format = kwargs[key]
-            #
+                #
 
         if self.data_file:
             self.stage_file = self.data_file.read()
 
-
         self.resource = cfg.new_icon if not self._virtual else  cfg.creation_icon
-
-    def create(self,  path=None):
-        super(StageNode, self).create(path)
-        #if node:
-        dict = {}
-        dict["typeInfo"] = cfg._stage_
-        dict[cfg._stage_] = self.name
-        dict[cfg._asset_] = self.parent().name
-        dict["name_format"] = self._name_format
-        self.name_format = self._name_format
-
-        path = os.path.join(path, "%s.%s" % (self.name, "json"))
-
-        self.data_file = data.jsonDict().create(path, dict)
-        self.stage_file = self.data_file.read()
-
-        return self
-
 
     @property
     def currently_open(self):
@@ -1075,9 +840,340 @@ class StageNode(RootNode):
     def stage(self, value):
         self._stage = value
 
+    @property
+    def stage_path(self):
+        if self.data_file:
+
+            return os.path.dirname(self.data_file_path)
+
+        else:
+            return None
+
+    @property
+    def versions_path(self):
+        if self.data_file:
+            if self.settings:
+                return os.path.join(self.stage_path, "versions")
+        else:
+            return None
+
+    @property
+    def masters_path(self):
+        if self.data_file:
+            if self.settings:
+                return os.path.join(self.stage_path, "masters")
+        else:
+            return None
+
+    @property
+    def tumbnails_path(self):
+        if self.data_file:
+            if self.settings:
+                return os.path.join(self.stage_path, "thumbnails")
+        else:
+            return None
+
+    @property
+    def versions_data(self):
+        if self.stage_file:
+            if "versions" in self.stage_file:
+                return self.stage_file["versions"]
+            else:
+                return None
+
+    @versions_data.setter
+    def versions_data(self, versions):
+
+        if self.data_file:
+            data = {}
+            data["versions"] = versions
+            self.data_file.edit(data)
+            self.stage_file = self.data_file.read()
+
+    @property
+    def masters_data(self):
+        if self.stage_file:
+            if "masters" in self.stage_file:
+                return self.stage_file["masters"]
+            else:
+                return None
+
+    @masters_data.setter
+    def masters_data(self, versions):
+        if self.data_file:
+            data = {}
+            data["masters"] = versions
+            self.data_file.edit(data)
+            self.stage_file = self.data_file.read()
+
+    @property
+    def master_data(self):
+        if self.stage_file:
+            if "master" in self.stage_file:
+                return self.stage_file["master"]
+            else:
+                return None
+
+    @master_data.setter
+    def master_data(self, versions):
+        if self.data_file:
+            data = {}
+            data["master"] = versions
+            self.data_file.edit(data)
+            self.stage_file = self.data_file.read()
+
+    @property
+    def master(self):
+        return self._masterNode
+
+    @master.setter
+    def master(self, node):
+        self._masterNode = node
+
+    @property
+    def mastersModel(self):
+
+        if self.model_masters():
+            return dtm.Masters_Model(self)
+        else:
+            return None
+
+    @property
+    def versiosnModel(self):
+
+        self.versions()
+        return dtm.Versions_Model(self)
+
+    @property
+    def thumbnail(self):
+        if self.tumbnails_path:
+            file = os.path.join(self.tumbnails_path, "{0}.{1}".format(self.name, "png"))
+            if os.path.isfile(file):
+                return QtGui.QPixmap(file)
+
+        return cfg.large_image_icon
+
+    @thumbnail.setter
+    def thumbnail(self, file):
+        dest = os.path.join(self.tumbnails_path, "{0}.{1}".format(self.name, "png"))
+        files.file_copy(file, dest)
+
+    # @property
+    # def thumbnail_path(self):
+    #     if self.project:
+    #         if self.data_file:
+    #             if self.settings:
+    #                 thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))
+    #                 if os.path.isfile(thumbnail_name):
+    #                     return thumbnail_name
+    #
+    #     return None
+
+
+    # def old_new_master(self, from_file=False):
+    #     if self.project:
+    #         if self.data_file:
+    #             if self.settings:
+    #
+    #                 new_master = {}
+    #                 new_master["date_created"] = "%s %s" % (
+    #                 time.strftime("%d/%m/%Y"), time.strftime("%H:%M:%S"))
+    #                 new_master["author"] = self.settings.user[0]
+    #                 new_master["note"] = "No notes"
+    #
+    #                 if self.masters:
+    #                     # master versions existst
+    #
+    #                     masters = self.masters
+    #                     last = masters[len(masters) - 1]
+    #                     version_number = set_padding(last + 1, self.project.project_padding)
+    #
+    #                 else:
+    #
+    #                     # this will be the first master
+    #                     version_number = set_padding(1, self.project.project_padding)
+    #
+    #                 maya.clean_up_file()
+    #
+    #                 file_name = "%s_%s_%s_%s.%s" % (
+    #                 self.asset_name, self.component_name, "MASTER", version_number, "ma")
+    #                 if not from_file:
+    #                     scene_path = maya.save_scene_as(path=self.masters_path, file_name=file_name)
+    #                 else:
+    #                     scene_path = os.path.join(self.masters_path, file_name)
+    #                     files.file_copy(from_file, scene_path)
+    #
+    #                 new_master["path"] = scene_path
+    #                 masters = self.masters_data
+    #                 masters[str(set_padding(0, self.project.project_padding))] = new_master
+    #                 masters[version_number] = new_master
+    #
+    #                 self.masters_data = masters
+    #
+    #                 master_name = "%s_%s_%s.%s" % (self.asset_name, self.component_name, "MASTER", "ma")
+    #                 master_file = os.path.join(self.settings.current_project_path, self.project.assets_dir,
+    #                                            self.catagory_name, self.asset_name, self.component_name,
+    #                                            master_name)
+    #                 files.file_copy(scene_path, master_file)
+    #
+    #                 maya.open_scene(master_file)
+
+    # def make_master(self, version):
+    #
+    #     source = self.file_path("masters", version)
+    #
+    #     if source:
+    #         files.file_copy(source, self.master)
+    #
+    #         new_master = {}
+    #         new_master["date_created"] = self.date_created("masters", version)
+    #
+    #         new_master["author"] = self.author("masters", version)
+    #         new_master["note"] = self.note("masters", version)
+    #
+    #         masters = self.masters_data
+    #         masters[str(set_padding(0, self.project.project_padding))] = new_master
+    #
+    #         self.masters_data = masters
+    #
+    #         return True
+    #
+    #     return False
+
+    # def rename(self, new_name):
+    #
+    #     # asset_path = os.path.dirname(files.dir_rename(os.path.dirname(self.data_file_path),new_name))
+    #     # componentes = files.list_dir_folders(asset_path)
+    #     # if new_name in componentes:
+    #     #    dlg.massage("critical", "Sorry", "This Component exsists" )
+    #     #    return False
+    #
+    #     versions = {}
+    #     for version in self.versions:
+    #         version_number = set_padding(version, self.project.project_padding)
+    #         versions[version] = [self.file_path("versions", version_number),
+    #                              "%s_%s_%s" % (self.asset_name, new_name, version_number)]
+    #         files.file_rename(versions[version][0], versions[version][1])
+    #
+    #     if self.master:
+    #         masters = {}
+    #         for version in self.masters:
+    #             version_number = set_padding(version, self.project.project_padding)
+    #             masters[version] = [self.file_path("masters", version_number),
+    #                                 "%s_%s_%s_%s" % (self.asset_name, new_name, "MASTER", version_number)]
+    #             files.file_rename(masters[version][0], masters[version][1])
+    #
+    #         master = [self.master, "%s_%s_%s" % (self.asset_name, new_name, "MASTER")]
+    #         files.file_rename(master[0], master[1])
+    #
+    #     thumb_path = os.path.join(self.tumbnails_path, "%s.%s" % (self.component_name, "png"))
+    #     if os.path.isfile(thumb_path):
+    #         files.file_rename(thumb_path, new_name)
+    #
+    #     self.component_name = new_name
+    #     path = files.file_rename(self.data_file_path, new_name)
+    #
+    #     stage_path = files.dir_rename(os.path.dirname(self.data_file_path), new_name)
+    #
+    #     self.set_data_file(os.path.join(stage_path, "%s.%s" % (new_name, "pipe")))
+    #     self.data_file = self.data_file.read()
+    #
+    #     return True
+    #
+    # def rename_asset(self, new_name):
+    #
+    #     versions = {}
+    #     for version in self.versions:
+    #         version_number = set_padding(version, self.project.project_padding)
+    #         versions[version] = [self.file_path("versions", version_number),
+    #                              "%s_%s_%s" % (new_name, self.component_name, version_number)]
+    #         files.file_rename(versions[version][0], versions[version][1])
+    #
+    #     if self.master:
+    #         masters = {}
+    #         for version in self.masters:
+    #             version_number = set_padding(version, self.project.project_padding)
+    #             masters[version] = [self.file_path("masters", version_number),
+    #                                 "%s_%s_%s_%s" % (new_name, self.component_name, "MASTER", version_number)]
+    #             files.file_rename(masters[version][0], masters[version][1])
+    #
+    #         master = [self.master, "%s_%s_%s" % (new_name, self.component_name, "MASTER")]
+    #         files.file_rename(master[0], master[1])
+    #
+    #     self.asset_name = new_name
+    #     return True
+
+    # def get_data_file(self, path=None):
+    #
+    #     if path:
+    #         dir = os.path.dirname(path)
+    #         file = os.path.join(dir, "*.pipe")
+    #
+    #         if len(glob.glob(file)) == 1:  # if its a master
+    #             return glob.glob(file)[0]
+    #
+    #         dir = os.path.dirname(dir)
+    #         file = os.path.join(dir, "*.pipe")
+    #
+    #         if len(glob.glob(file)) == 1:  # if its a version
+    #             return glob.glob(file)[0]
+    #
+    #         return None
+    #
+    #     return None
+    #
+    # @property
+    # def type(self):
+    #
+    #     if self.component_name:
+    #         return "component"
+    #
+    #     shot = pipeline_shot(path=self.data_file_path, project=self.project, settings=self.settings)
+    #
+    #     if shot:
+    #         if shot.shot_name:
+    #             return "shot"
+    #
+    #     return None
+
+    # def log(self):
+    #
+    #     if self.settings:
+    #         self.settings.log()
+    #
+    #     log.info("logging component '%s' at asset '%s' at catagory '%s'" % (
+    #     self.component_name, self.asset_name, self.catagory_name))
+    #
+    #     log.info("component path %s" % self.stage_path)
+    #
+    #     [log.info("  %s" % f) for f in files.list_all(self.stage_path) if
+    #      isinstance(files.list_all(self.stage_path), list)]
+    #
+    #     log.info("compnnent data file: %s" % self.data_file_path)
+    #
+    #     log.info(self.data_file.print_nice())
+    #
+    #     log.info("end logging component ")
+
+    def create(self, path=None):
+        super(StageNode, self).create(path)
+        # if node:
+        dict = {}
+        dict["typeInfo"] = cfg._stage_
+        dict[cfg._stage_] = self.name
+        dict[cfg._asset_] = self.parent().name
+        dict["name_format"] = self._name_format
+        self.name_format = self._name_format
+
+        path = os.path.join(path, "%s.%s" % (self.name, "json"))
+
+        self.data_file = data.jsonDict().create(path, dict)
+        self.stage_file = self.data_file.read()
+
+        return self
+
     def typeInfo(self):
         return cfg._stage_
-
 
     def formatFileName(self):
 
@@ -1091,7 +1187,8 @@ class StageNode(RootNode):
                 if not node.typeInfo() == cfg._root_:
                     levels.append(node.name)
 
-        name = self.pipelineUI.project.prefix + "_" + "_".join(reversed(levels)) if self.pipelineUI.project.prefix else "_".join(reversed(levels))
+        name = self.pipelineUI.project.prefix + "_" + "_".join(
+            reversed(levels)) if self.pipelineUI.project.prefix else "_".join(reversed(levels))
         return name
 
     def padding(self, int):
@@ -1103,22 +1200,22 @@ class StageNode(RootNode):
 
         files.assure_folder_exists(self.versions_path)
 
-
         # maya.new_scene()
         # maya.set_fps(self.project.project_fps)
         # maya.rewind()
 
         version_number = self.padding(1)
 
-        file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "v",version_number, "ma")
+        file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "v", version_number, "ma")
 
         scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
 
         first_version = {}
-        first_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
+        first_version["date"] = "%s %s %s" % (time.strftime("%d/%m"), "@", time.strftime("%H:%M"))
         first_version["author"] = self.settings.user[0]
         first_version["note"] = None
-        first_version["include"] = [files.reletive_path(self.project._path, path) for path in maya.reference_file_paths()]
+        first_version["include"] = [files.reletive_path(self.project._path, path) for path in
+                                    maya.reference_file_paths()]
 
         versions = {}
         versions[version_number] = first_version
@@ -1130,21 +1227,73 @@ class StageNode(RootNode):
 
         self.currently_open = VersionNode(1, parent=self, path=scene_path,
                                           author=first_version["author"],
-                                          number=version_number, date=first_version["date"], note=first_version["note"],
+                                          number=version_number, date=first_version["date"],
+                                          note=first_version["note"],
                                           include=first_version["include"], stage=self)
 
         self.edited.emit()
 
         return
 
+    def clean_new_nodes(self):
+        if self._children:
+            for c in self._children:
+                if c.typeInfo() == cfg._new_:
+                    self.removeChild(c.row())
 
-    def new_master(self, from_node = None):
+    def new_version(self):
+        if self._children:
+            if self._children[0].typeInfo() == cfg._new_:
+                # self.removeChild(self._children[0].row())
+                self.initialVersion()
+                # self.pipelineUI.version = self._children[0]
+                return
+
+        if self.project:
+            if self.data_file:
+                self.clean_new_nodes()
+                files.assure_folder_exists(self.versions_path)
+
+                childes = []
+                [childes.append(x) for x in self._children if not x.typeInfo() == cfg._master_]
+
+                last_version = childes[-1]  # self._children[-1]
+
+                version_number = set_padding(last_version.name + 1, self.project.project_padding)
+
+                file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "v", version_number, "ma")
+
+                scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
+
+                new_version = {}
+                new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"), "@", time.strftime("%H:%M"))
+                new_version["author"] = self.settings.user[0]
+                new_version["note"] = None
+                new_version["include"] = [files.reletive_path(self.project._path, path) for path in
+                                          maya.reference_file_paths()]
+
+                versions = self.versions_data
+                versions[version_number] = new_version
+                self.versions_data = versions
+
+                self.currently_open = VersionNode(last_version.name + 1, parent=self, path=scene_path,
+                                                  author=new_version["author"],
+                                                  number=version_number, date=new_version["date"],
+                                                  note=new_version["note"], include=new_version["include"],
+                                                  stage=self)
+
+                self.edited.emit()
+
+
+                # childes = [x for x in self._children if not x.typeInfo()==cfg._master_]
+                # self.pipelineUI.version = childes[-1]
+
+    def new_master(self):
 
         if self.project:
             if self.data_file:
 
                 self.clean_new_nodes()
-
 
                 files.assure_folder_exists(self.masters_path)
 
@@ -1162,97 +1311,48 @@ class StageNode(RootNode):
                 file_name = "{0}.{1}".format(self.formatFileName(), "ma")
                 master_file_name = maya.save_scene_as(path=self._path, file_name=file_name)
 
-
                 new_version = {}
                 new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"), "@", time.strftime("%H:%M"))
                 new_version["author"] = self.settings.user[0]
                 new_version["note"] = None
-                new_version["origin"] = [self.currently_open.typeInfo(), self.currently_open.name] #[from_node.typeInfo(), from_node.name]
-                new_version["include"] = [files.reletive_path(self.project._path, path) for path in maya.reference_file_paths()]
+                new_version["origin"] = [self.currently_open.typeInfo(),
+                                         self.currently_open.name]  # [from_node.typeInfo(), from_node.name]
+                new_version["include"] = [files.reletive_path(self.project._path, path) for path in
+                                          maya.reference_file_paths()]
 
-
-                versions = self.masters_
+                versions = self.masters_data
                 if not versions:
                     versions = {}
                 versions[version_number] = new_version
-                self.masters_ = versions
-
+                self.masters_data = versions
 
                 versions = new_version
-                self.master_ = versions
+                self.master_data = versions
 
                 for c in self._children:
                     if c.typeInfo() == cfg._master_:
                         self.removeChild(c.row())
 
-                self.master = MasterNode(cfg._master_, parent=self, path=master_file_name, author=new_version["author"],
-                                    number=0, date=new_version["date"], note=new_version["note"], include=new_version["include"], origin=new_version["origin"], stage=self)
+                self.master = MasterNode(cfg._master_, parent=self, path=master_file_name,
+                                         author=new_version["author"],
+                                         number=0, date=new_version["date"], note=new_version["note"],
+                                         include=new_version["include"], origin=new_version["origin"],
+                                         stage=self)
 
                 master_version = MasterNode(last_version + 1, parent=self.master, path=master_version_file_name,
-                                                  author=new_version["author"],
-                                                  number=version_number, date=new_version["date"],
-                                                  note=new_version["note"], include=new_version["include"], origin=new_version["origin"] ,stage=self)
+                                            author=new_version["author"],
+                                            number=version_number, date=new_version["date"],
+                                            note=new_version["note"], include=new_version["include"],
+                                            origin=new_version["origin"], stage=self)
 
                 self.currently_open = self.master
                 self.model_masters()
                 self.edited.emit()
 
-    def clean_new_nodes(self):
-        if self._children:
-            for c in self._children:
-                if c.typeInfo() == cfg._new_:
-                    self.removeChild(c.row())
-
-    def new_version(self):
-        if self._children:
-            if self._children[0].typeInfo() == cfg._new_:
-                #self.removeChild(self._children[0].row())
-                self.initialVersion()
-                #self.pipelineUI.version = self._children[0]
-                return
-
-        if self.project:
-            if self.data_file:
-                self.clean_new_nodes()
-                files.assure_folder_exists(self.versions_path)
-
-
-                childes = []
-                [childes.append(x) for x in self._children if not x.typeInfo()==cfg._master_]
-
-                last_version = childes[-1] #self._children[-1]
-
-                version_number = set_padding(last_version.name+1, self.project.project_padding)
-
-                file_name = "{0}_{1}{2}.{3}".format(self.formatFileName(), "v", version_number, "ma")
-
-                scene_path = maya.save_scene_as(path=self.versions_path, file_name=file_name)
-
-                new_version = {}
-                new_version["date"] = "%s %s %s" % (time.strftime("%d/%m"),"@", time.strftime("%H:%M"))
-                new_version["author"] = self.settings.user[0]
-                new_version["note"] = None
-                new_version["include"] = [files.reletive_path(self.project._path, path) for path in maya.reference_file_paths()]
-
-                versions = self.versions_
-                versions[version_number] = new_version
-                self.versions_ = versions
-
-                self.currently_open = VersionNode(last_version.name+1, parent=self, path=scene_path, author=new_version["author"],
-                            number=version_number, date=new_version["date"], note=new_version["note"], include=new_version["include"], stage=self)
-
-                self.edited.emit()
-
-
-                #childes = [x for x in self._children if not x.typeInfo()==cfg._master_]
-                #self.pipelineUI.version = childes[-1]
-
-
     def reference_master_to_current(self):
         self.model_masters()
         if self.master:
             self.master.reference()
-
 
     def editVersionData(self, padded_number, key, value):
         data = self.stage_file
@@ -1260,7 +1360,6 @@ class StageNode(RootNode):
         self.data_file.edit(data)
         self.stage_file = self.data_file.read()
         self.edited.emit()
-
 
     def removeVersionData(self, padded_number):
         if padded_number in self.stage_file["versions"]:
@@ -1271,186 +1370,94 @@ class StageNode(RootNode):
 
         self.edited.emit()
 
-    @property
-    def stage_path(self):
-        if self.data_file:
-            
-            return os.path.dirname(self.data_file_path)
+    # @property
+    # def component_name(self):
+    #     if self.data_file:
+    #         try:
+    #             return self.data_file["component_name"]
+    #         except:
+    #             return None
+    #     else:
+    #         return None
 
-        else:
-            return None  
+    # @component_name.setter
+    # def component_name(self, name):
+    #     if self.data_file:
+    #         data = {}
+    #         data["component_name"] = name
+    #         self.data_file.edit(data)
+    #         self.data_file = self.data_file.read()
+    #     else:
+    #         return None
 
-    @property
-    def versions_path(self):
-        if self.data_file:
-            if self.settings:                             
-                return os.path.join(self.stage_path, "versions") 
-        else:
-            return None  
+    # @property
+    # def catagory_name(self):
+    #     if self.data_file:
+    #         return self.data_file["catagory_name"]
+    #     else:
+    #         return None
+    #
+    # @catagory_name.setter
+    # def catagory_name(self, name):
+    #     if self.data_file:
+    #         data = {}
+    #         data["catagory_name"] = name
+    #         self.data_file.edit(data)
+    #         self.data_file = self.data_file.read()
+    #     else:
+    #         return None
+    #
+    # @property
+    # def asset_name(self):
+    #     if self.data_file:
+    #         return self.data_file["asset_name"]
+    #     else:
+    #         return None
+    #
+    # @asset_name.setter
+    # def asset_name(self, name):
+    #     if self.data_file:
+    #         data = {}
+    #         data["asset_name"] = name
+    #         self.data_file.edit(data)
+    #         self.data_file = self.data_file.read()
+    #     else:
+    #         return None
 
-    @property
-    def masters_path(self):
-        if self.data_file:
-            if self.settings:                             
-                return os.path.join(self.stage_path, "masters") 
-        else:
-            return None  
-   
-
-    @property
-    def tumbnails_path(self):
-        if self.data_file:
-            if self.settings:
-                return os.path.join(self.stage_path, "thumbnails")
-        else:
-            return None  
-
-    @property  
-    def versions_(self):
-        if self.stage_file:
-            if "versions" in self.stage_file:
-                return self.stage_file["versions"]
-            else:
-                return None
-    
-    @versions_.setter
-    def versions_(self,versions):
-       
-        if self.data_file:
-            data = {}
-            data["versions"] = versions
-            self.data_file.edit(data)
-            self.stage_file = self.data_file.read()
-
-
-    @property
-    def masters_(self):
-        if self.stage_file:
-            if "masters" in self.stage_file:
-                return self.stage_file["masters"]
-            else:
-                return None
-
-
-    @masters_.setter
-    def masters_(self, versions):
-        if self.data_file:
-            data = {}
-            data["masters"] = versions
-            self.data_file.edit(data)
-            self.stage_file = self.data_file.read()
-
-
-    @property
-    def master_(self):
-        if self.stage_file:
-            if "master" in self.stage_file:
-                return self.stage_file["master"]
-            else:
-                return None
-
-
-    @master_.setter
-    def master_(self, versions):
-        if self.data_file:
-            data = {}
-            data["master"] = versions
-            self.data_file.edit(data)
-            self.stage_file = self.data_file.read()
-
-
-    @property
-    def component_name(self):
-        if self.data_file:
-            try:
-                return self.data_file["component_name"]
-            except:
-                return None
-        else:
-            return None  
-            
-    @component_name.setter
-    def component_name(self,name):
-        if self.data_file:
-            data = {}
-            data["component_name"] = name
-            self.data_file.edit(data)
-            self.data_file = self.data_file.read()
-        else:
-            return None              
-
-    @property
-    def catagory_name(self):
-        if self.data_file:
-            return self.data_file["catagory_name"]
-        else:
-            return None  
-
-    @catagory_name.setter
-    def catagory_name(self,name):
-        if self.data_file:
-            data = {}
-            data["catagory_name"] = name
-            self.data_file.edit(data)
-            self.data_file = self.data_file.read()
-        else:
-            return None 
-
-    @property
-    def asset_name(self):
-        if self.data_file:
-            return self.data_file["asset_name"]
-        else:
-            return None  
-
-
-
-    @asset_name.setter
-    def asset_name(self,name):
-        if self.data_file:
-            data = {}
-            data["asset_name"] = name
-            self.data_file.edit(data)
-            self.data_file = self.data_file.read()
-        else:
-            return None  
-
-
-    @property
-    def component_public_state(self):
-        if self.data_file:
-            if "component_public_state" in self.data_file:
-                return self.data_file["component_public_state"]
-            else:
-                # for legacy components, if no public state key exists, then the component is public
-                return True
-        else:
-            return None  
-            
-    @component_public_state.setter
-    def component_public_state(self,state):
-        if self.data_file:
-            data = {}
-            data["component_public_state"] = state
-            self.data_file.edit(data)
-            self.data_file = self.data_file.read()
-        else:
-            return None 
-
+    # @property
+    # def component_public_state(self):
+    #     if self.data_file:
+    #         if "component_public_state" in self.data_file:
+    #             return self.data_file["component_public_state"]
+    #         else:
+    #             # for legacy components, if no public state key exists, then the component is public
+    #             return True
+    #     else:
+    #         return None
+    #
+    # @component_public_state.setter
+    # def component_public_state(self, state):
+    #     if self.data_file:
+    #         data = {}
+    #         data["component_public_state"] = state
+    #         self.data_file.edit(data)
+    #         self.data_file = self.data_file.read()
+    #     else:
+    #         return None
 
     def path(self, type, version):
         if self.data_file:
-            try:                
+            try:
                 version_data = self.data_file[type][version]
                 return version_data["path"]
             except:
                 return None
-            
+
         else:
-            return None  
+            return None
 
     def author(self, type, version):
-        
+
         if self.data_file:
             try:
                 version_data = self.data_file[type][version]
@@ -1459,8 +1466,7 @@ class StageNode(RootNode):
                 return None
 
         else:
-            return None  
-
+            return None
 
     def date_created(self, type, version):
         if self.data_file:
@@ -1469,74 +1475,75 @@ class StageNode(RootNode):
                 return version_data["date_created"]
             except:
                 return None
-            
+
         else:
-            return None  
+            return None
 
     def note(self, type, version, **kwargs):
         if self.data_file:
-            
+
             note = None
             for key in kwargs:
                 if key == "note":
                     note = kwargs[key]
-            
+
             if note:
-                  
+
                 data = self.data_file.read()
-                data[type][version]["note"] = note    
+                data[type][version]["note"] = note
                 self.data_file.edit(data)
                 self.data_file = self.data_file.read()
-                
+
                 return True
-                                                
+
             else:
-                
+
                 try:
                     version_data = self.data_file[type][version]
                     return version_data["note"]
                 except:
                     return None
-            
+
         else:
-            return None  
- 
+            return None
+
     def size(self, type, version):
-        
-        if self.data_file:            
+
+        if self.data_file:
             size_mb = files.file_size_mb(self.file_path(type, version))
             if size_mb:
-                return ("{0:.1f}".format(size_mb))   
+                return ("{0:.1f}".format(size_mb))
             else:
                 # maybe this is the master file
                 size_mb = files.file_size_mb(self.master)
                 if size_mb:
-                    return ("{0:.1f}".format(size_mb))     
+                    return ("{0:.1f}".format(size_mb))
         else:
-            return None          
-        
-    def file_path(self, type, version):
-        if self.data_file:
-            if self.settings:
-                if type == "masters" and version == str(set_padding(0,self.project.project_padding)):
-                    return self.master
-                    
-                versions_path = os.path.join(self.settings.current_project_path, self.project.assets_dir,self.catagory_name,self.asset_name,self.component_name,type)
-                version_file = "%s_%s_%s.%s"%(self.asset_name,self.component_name,version,"ma") if type == "versions" else "%s_%s_%s_%s.%s"%(self.asset_name,self.component_name,"MASTER",version,"ma")                
-                return os.path.join(versions_path, version_file)  
-        else:
-            return None    
-    
-    @property
+            return None
+
+    # def file_path(self, type, version):
+    #     if self.data_file:
+    #         if self.settings:
+    #             if type == "masters" and version == str(set_padding(0, self.project.project_padding)):
+    #                 return self.master
+    #
+    #             versions_path = os.path.join(self.settings.current_project_path, self.project.assets_dir,
+    #                                          self.catagory_name, self.asset_name, self.component_name, type)
+    #             version_file = "%s_%s_%s.%s" % (self.asset_name, self.component_name, version,
+    #                                             "ma") if type == "versions" else "%s_%s_%s_%s.%s" % (
+    #             self.asset_name, self.component_name, "MASTER", version, "ma")
+    #             return os.path.join(versions_path, version_file)
+    #     else:
+    #         return None
+
     def versions(self):
         if self.project:
             if self.data_file:
-                versions = files.list_directory(self.versions_path,self.project.project_file_type)
+                versions = files.list_directory(self.versions_path, self.project.project_file_type)
                 if versions:
-                    versions_dict = files.dict_versions(versions,self.project.project_padding)
-                    
-                    version_nodes = []                 
+                    versions_dict = files.dict_versions(versions, self.project.project_padding)
 
+                    version_nodes = []
 
                     for key in versions_dict:
                         skip = False
@@ -1557,7 +1564,7 @@ class StageNode(RootNode):
                             note = ""
                             date = "n/a"
                             include = None
-                            versions_data = self.versions_
+                            versions_data = self.versions_data
                             if versions_data:
 
                                 if padded_number in versions_data:
@@ -1571,23 +1578,15 @@ class StageNode(RootNode):
                                     if "include" in thisVersion:
                                         include = thisVersion["include"]
 
-                        # version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
-
+                                        # version_nodes.append(VersionNode(key, path = versions_dict[key], author = author ,number = padded_number, date = date, note = note, stage = self))
 
                             VersionNode(key, parent=self, path=versions_dict[key], author=author,
-                                    number=padded_number, date=date, note=note, include = include, stage=self)
+                                        number=padded_number, date=date, note=note, include=include, stage=self)
 
                     return True
 
-        NewNode("new...", parent = self)
+        NewNode("new...", parent=self)
         return None
-
-    @property
-    def versiosnModel(self):
-
-        self.versions
-        return dtm.Versions_Model(self)
-
 
     def populate_master_versions(self):
         if self.project:
@@ -1613,7 +1612,7 @@ class StageNode(RootNode):
                             note = ""
                             date = "n/a"
                             origin = "n/a"
-                            versions_data = self.masters_
+                            versions_data = self.masters_data
                             if versions_data:
 
                                 if padded_number in versions_data:
@@ -1628,57 +1627,51 @@ class StageNode(RootNode):
                                         origin = thisVersion["origin"]
 
                             MasterNode(key, parent=self.master, path=versions_dict[key], author=author,
-                                        number=padded_number, date=date, note=note, origin = origin, stage=self)
+                                       number=padded_number, date=date, note=note, origin=origin, stage=self)
 
                     return True
 
         return None
 
+    # def last_version(self):
+    #     if self.project:
+    #         if self.data_file:
+    #             if self.settings:
+    #
+    #                 sorted_versions = self.versions
+    #                 if sorted_versions:
+    #                     return sorted_versions[-1]
 
-    def last_version(self):
-        if self.project:
-            if self.data_file:
-                if self.settings:
-
-                    sorted_versions = self.versions
-                    if sorted_versions:
-                            return sorted_versions[-1]
-                        
-
-                
-
-    
-    
     def delete_version(self, type, version):
         if self.data_file:
             if self.settings:
-                versions = self.versions_ if type == "versions" else self.masters_
+                versions = self.versions_data if type == "versions" else self.masters_data
                 if not isinstance(version, list):
 
                     files.delete(self.file_path(type, version))
-                                                                              
+
                     if version in versions:
                         del versions[version]
-                    if type == "versions":    
-                        self.versions_ = versions
+                    if type == "versions":
+                        self.versions_data = versions
                     else:
-                        self.masters_ = versions 
-                    
+                        self.masters_data = versions
+
                 else:
                     for v in version:
                         files.delete(self.file_path(type, v))
-                        
+
                         if v in versions:
                             del versions[v]
-                        
-                    if type == "versions":    
-                        self.versions_ = versions
+
+                    if type == "versions":
+                        self.versions_data = versions
                     else:
-                        self.masters_ = versions 
-                                        
-                return True                                    
+                        self.masters_data = versions
+
+                return True
         else:
-            return None   
+            return None
 
     def model_masters(self):
 
@@ -1696,7 +1689,7 @@ class StageNode(RootNode):
                     note = ""
                     date = "n/a"
                     origin = "n/a"
-                    versions_data = self.master_
+                    versions_data = self.master_data
 
                     if versions_data:
                         if "author" in versions_data:
@@ -1708,34 +1701,14 @@ class StageNode(RootNode):
                         if "origin" in versions_data:
                             origin = versions_data["origin"]
 
-                    self.master =  MasterNode(cfg._master_, parent=self, path=master_file, author=author,
-                                      number=0, date=date, note=note, origin=origin, stage=self)
-
-
-
+                    self.master = MasterNode(cfg._master_, parent=self, path=master_file, author=author,
+                                             number=0, date=date, note=note, origin=origin, stage=self)
 
                     self.populate_master_versions()
 
                     return True
 
-
         return None
-
-    @property
-    def master(self):
-        return self._masterNode
-
-    @master.setter
-    def master(self, node):
-        self._masterNode = node
-
-    @property
-    def mastersModel(self):
-
-        if self.model_masters():
-            return dtm.Masters_Model(self)
-        else:
-            return None
 
     # @property
     # def master(self):
@@ -1748,7 +1721,7 @@ class StageNode(RootNode):
     #                 if os.path.isfile(master_file):
     #                     return master_file
     #     return None
-        
+
     '''
     @property
     def thumbnail(self):
@@ -1758,217 +1731,29 @@ class StageNode(RootNode):
                     thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))
                     if os.path.isfile(thumbnail_name):
                         return QtGui.QPixmap(thumbnail_name)
-        
+
         return cfg.large_image_icon
     '''
-    @property
-    def thumbnail(self):
-        if self.tumbnails_path:
-            file = os.path.join(self.tumbnails_path, "{0}.{1}".format(self.name, "png"))
-            if os.path.isfile(file):
-                return QtGui.QPixmap(file)
-        
-        return cfg.large_image_icon
 
-    @thumbnail.setter
-    def thumbnail(self, file):
-        dest = os.path.join(self.tumbnails_path, "{0}.{1}".format(self.name,"png"))
-        files.file_copy(file, dest)
-    # @property
-    # def thumbnail_path(self):
-    #     if self.project:
-    #         if self.data_file:
-    #             if self.settings:
-    #                 thumbnail_name = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))
-    #                 if os.path.isfile(thumbnail_name):
-    #                     return thumbnail_name
-    #
-    #     return None
 
-        
-    def old_new_master(self, from_file = False):
-        if self.project:
-            if self.data_file:
-                if self.settings:
-                                    
-                    new_master = {}
-                    new_master["date_created"] = "%s %s"%(time.strftime("%d/%m/%Y"),time.strftime("%H:%M:%S"))
-                    new_master["author"] = self.settings.user[0]
-                    new_master["note"] = "No notes"  
-                              
-                    if self.masters:
-                        # master versions existst
-                        
-                        masters = self.masters
-                        last = masters[len(masters)-1]
-                        version_number = set_padding(last+1,self.project.project_padding)                
-                   
-                    else:
-                        
-                        # this will be the first master
-                        version_number = set_padding(1,self.project.project_padding)                
-                    
-                    maya.clean_up_file()
-                    
-                    
-                    file_name = "%s_%s_%s_%s.%s"%(self.asset_name,self.component_name,"MASTER",version_number,"ma")                                                       
-                    if not from_file:                    
-                        scene_path = maya.save_scene_as(path = self.masters_path, file_name = file_name )
-                    else:                      
-                        scene_path = os.path.join(self.masters_path,file_name)
-                        files.file_copy(from_file, scene_path )
-                        
-                    new_master["path"] = scene_path    
-                    masters = self.masters_ 
-                    masters[str(set_padding(0,self.project.project_padding))] = new_master 
-                    masters[version_number] = new_master
-                    
-                    self.masters_ = masters 
-                                    
-                    master_name = "%s_%s_%s.%s"%(self.asset_name,self.component_name,"MASTER","ma")
-                    master_file = os.path.join(self.settings.current_project_path,self.project.assets_dir,self.catagory_name,self.asset_name,self.component_name,master_name) 
-                    files.file_copy(scene_path, master_file)
 
-                    maya.open_scene(master_file)
- 
-                    
+class MasterNode(VersionNode):
 
-    def make_master(self, version):
-                
-        source = self.file_path("masters",version)
+    def __init__(self, name ,path = None,  number = None, author = None, include = None, date = None, note = None, stage = None, origin = None, parent=None):
+        super(MasterNode, self).__init__(name, parent=parent, path=path, include = include, number=number, author= author, date=date, note=note, stage=stage)
 
-        if source:
-            files.file_copy(source, self.master)
-
-            new_master = {}
-            new_master["date_created"] = self.date_created("masters",version)
-            
-            new_master["author"] =  self.author("masters",version)
-            new_master["note"] = self.note("masters",version) 
-
-            masters = self.masters_ 
-            masters[str(set_padding(0,self.project.project_padding))] = new_master 
-
-            self.masters_ = masters 
-            
-            return True
-        
-        return False
-
-    def rename(self, new_name):
-         
-        #asset_path = os.path.dirname(files.dir_rename(os.path.dirname(self.data_file_path),new_name))
-        #componentes = files.list_dir_folders(asset_path)
-        #if new_name in componentes:
-        #    dlg.massage("critical", "Sorry", "This Component exsists" )
-        #    return False
-        
-        versions = {}
-        for version in self.versions:
-            version_number = set_padding(version,self.project.project_padding) 
-            versions[version] = [self.file_path("versions",version_number), "%s_%s_%s"%(self.asset_name,new_name,version_number)] 
-            files.file_rename(versions[version][0],versions[version][1])
-
-        if self.master:
-            masters = {}
-            for version in self.masters:
-                version_number = set_padding(version,self.project.project_padding) 
-                masters[version] = [self.file_path("masters",version_number), "%s_%s_%s_%s"%(self.asset_name,new_name,"MASTER",version_number)] 
-                files.file_rename(masters[version][0],masters[version][1])
-
-                
-            master = [self.master, "%s_%s_%s"%(self.asset_name,new_name,"MASTER")]
-            files.file_rename(master[0],master[1])
-         
-        thumb_path = os.path.join(self.tumbnails_path,"%s.%s"%(self.component_name,"png"))   
-        if os.path.isfile(thumb_path):
-            files.file_rename(thumb_path,new_name) 
-
-        self.component_name = new_name
-        path = files.file_rename(self.data_file_path,new_name)        
-        
-        stage_path = files.dir_rename(os.path.dirname(self.data_file_path),new_name)  
-     
-        self.set_data_file(os.path.join(stage_path,"%s.%s"%(new_name,"pipe")))
-        self.data_file = self.data_file.read()
-        
-        return True
-        
-    def rename_asset(self, new_name):
-         
-        
-        versions = {}
-        for version in self.versions:
-            version_number = set_padding(version,self.project.project_padding) 
-            versions[version] = [self.file_path("versions",version_number), "%s_%s_%s"%(new_name,self.component_name,version_number)] 
-            files.file_rename(versions[version][0],versions[version][1])
-
-        if self.master:
-            masters = {}
-            for version in self.masters:
-                version_number = set_padding(version,self.project.project_padding) 
-                masters[version] = [self.file_path("masters",version_number), "%s_%s_%s_%s"%(new_name,self.component_name,"MASTER",version_number)] 
-                files.file_rename(masters[version][0],masters[version][1])
-
-                
-            master = [self.master, "%s_%s_%s"%(new_name,self.component_name,"MASTER")]
-            files.file_rename(master[0],master[1])
-        
-        self.asset_name = new_name       
-        return True
-                
-
-    def get_data_file(self,path = None):
-                
-        if path:
-            dir = os.path.dirname(path)
-            file = os.path.join(dir,"*.pipe")
-            
-            
-            if len(glob.glob(file)) == 1: #if its a master
-                return glob.glob(file)[0]                        
-
-            dir = os.path.dirname(dir)
-            file = os.path.join(dir,"*.pipe")
-                                       
-            if len(glob.glob(file)) == 1: #if its a version
-                return glob.glob(file)[0]  
-            
-            return None
-            
-        return None        
+        self._origin = origin
 
     @property
-    def type(self):
-        
-        if self.component_name:
-            return "component"
-        
-        
-        shot = pipeline_shot(path = self.data_file_path, project = self.project, settings = self.settings)
+    def origin(self):
+        return self._origin
 
-        if shot:
-            if shot.shot_name:
-                return "shot"
-            
-        return None    
+    @property
+    def master_icon(self):
+        return cfg.master_icon
 
-    def log(self):
-
-        if self.settings:
-            self.settings.log()
-        
-        log.info("logging component '%s' at asset '%s' at catagory '%s'"%(self.component_name,self.asset_name,self.catagory_name))       
-        
-        log.info("component path %s"%self.stage_path)
-                
-        [ log.info("  %s"%f) for f in files.list_all(self.stage_path) if isinstance(files.list_all(self.stage_path),list) ]
-                               
-        log.info("compnnent data file: %s"%self.data_file_path)
-        
-        log.info(self.data_file.print_nice())
-
-        log.info("end logging component ")
+    def typeInfo(self):
+        return cfg._master_
 
 class ProjectNode(RootNode):
 
@@ -2343,7 +2128,6 @@ def assetDir(dir):
                     return True
 
     return False
-
 
 def set_padding(int, padding):
     return str(int).zfill(padding)
