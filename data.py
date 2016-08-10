@@ -18,45 +18,45 @@ import config as cfg
 reload(cfg)
 
 
-def set_icons():
-    localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
-    if not os.path.exists(localIconPath):
-        return 
-        
-    global folder_icon
-    global cube_icon
-    global add_cube_icon
-    global dummy_icon
-    
-    global cube_icon_full
-    global add_icon
-    global large_image_icon
-    global client_icon
-    global large_image_icon_dark
-    global comment_icon
-    global comment_full_icon
-    global new_icon
-    global creation_icon
-    global master_icon
-
-    master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "save_master"))
-    creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
-    new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
-    comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
-    comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
-    client_icon = os.path.join(localIconPath, "%s.svg" % "client")
-    folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
-    cube_icon = os.path.join(localIconPath, "%s.svg"%"cube") 
-    add_cube_icon = os.path.join(localIconPath, "%s.svg"%"add_cube")     
-    cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
-    add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
-    large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "large_image_dark"))
-    dummy_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"braces"))
-
-
-
-set_icons()
+# def set_icons():
+#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
+#     if not os.path.exists(localIconPath):
+#         return
+#
+#     global cfg.folder_icon
+#     global cfg.cube_icon
+#     global cfg.add_cube_icon
+#     global cfg.dummy_icon
+#
+#     global cfg.cube_icon_full
+#     global cfg.add_icon
+#     global cfg.large_image_icon
+#     global cfg.client_icon
+#     global cfg.large_image_icon_dark
+#     global cfg.comment_icon
+#     global cfg.comment_full_icon
+#     global cfg.new_icon
+#     global cfg.creation_icon
+#     global cfg.master_icon
+#
+#     cfg.master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "save_master"))
+#     cfg.creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
+#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
+#     cfg.comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
+#     cfg.comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
+#     cfg.client_icon = os.path.join(localIconPath, "%s.svg" % "client")
+#     cfg.folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
+#     cfg.cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")
+#     cfg.add_cube_icon = os.path.join(localIconPath, "%s.svg"%"add_cube")
+#     cfg.cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill")
+#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
+#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+#     cfg.large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "large_image_dark"))
+#     cfg.dummy_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"braces"))
+#
+#
+#
+# set_icons()
 
 
 def remap( x, oMin, oMax, nMin, nMax ):
@@ -127,7 +127,7 @@ class Node(QtCore.QObject, object):
         self._children = []
         self._parent = parent
         self.expendedState = False
-        self._resource = folder_icon
+        self._resource = cfg.folder_icon
         self._id = data.id_generator()
         self._virtual = False
         self._deathrow = False
@@ -356,7 +356,7 @@ class RootNode(Node):#, Metadata_file):
 
 
         self.name = name
-        self.resource = folder_icon
+        self.resource = cfg.folder_icon
         self._section = None
 
         #Metadata_file.__init__(self, **kwargs)
@@ -623,7 +623,7 @@ class FolderNode(RootNode):
     def __init__(self, name,  parent=None, **kwargs):
         super(FolderNode, self).__init__(name, parent, **kwargs)
 
-        self.resource = folder_icon if not self._virtual else  creation_icon
+        self.resource = cfg.folder_icon if not self._virtual else  cfg.creation_icon
         
     def typeInfo(self):
         return cfg._folder_
@@ -636,7 +636,7 @@ class AssetNode(RootNode):
     def __init__(self, name,  parent=None, **kwargs):
         super(AssetNode, self).__init__(name, parent, **kwargs)
 
-        self.resource = cube_icon_full if not self._virtual else  creation_icon
+        self.resource = cfg.cube_icon_full if not self._virtual else  cfg.creation_icon
 
     def create(self, path = None):
         super(AssetNode, self).create(path)
@@ -704,7 +704,7 @@ class AssetNode(RootNode):
 #
 #
 #     def resource(self):
-#         return large_image_icon
+#         return cfg.large_image_icon
 
 
 class VersionNode(Node):
@@ -720,7 +720,7 @@ class VersionNode(Node):
         self._stage = stage
         self._include = include
 
-        self.resource = large_image_icon_dark
+        self.resource = cfg.large_image_icon_dark
 
         if os.path.isfile(self.thumbnail_file):
             self.resource = self.thumbnail_file
@@ -803,10 +803,10 @@ class VersionNode(Node):
     @property
     def note_decoration(self):
         if self._note:
-            return comment_full_icon
+            return cfg.comment_full_icon
         else:
             return None
-            #return comment_icon
+            #return cfg.comment_icon
 
 
 class MasterNode(VersionNode):
@@ -822,7 +822,7 @@ class MasterNode(VersionNode):
 
     @property
     def master_icon(self):
-        return master_icon
+        return cfg.master_icon
 
     def typeInfo(self):
         return cfg._master_
@@ -832,7 +832,7 @@ class CatagoryNode(Node):
     def __init__(self, name, parent=None):
         super(CatagoryNode, self).__init__(name, parent)
 
-        self.resource = dummy_icon
+        self.resource = cfg.dummy_icon
 
     def typeInfo(self):
         return cfg._catagory_
@@ -844,7 +844,7 @@ class DummyNode(Node):
     def __init__(self, name, parent=None):
         super(DummyNode, self).__init__(name, parent)
 
-        self.resource = dummy_icon
+        self.resource = cfg.dummy_icon
 
     def typeInfo(self):
         return cfg._dummy_
@@ -854,7 +854,7 @@ class LevelsNode(Node):
     def __init__(self, name, parent=None):
         super(LevelsNode, self).__init__(name, parent)
 
-        self.resource = dummy_icon
+        self.resource = cfg.dummy_icon
         self._levels = []
         for i in range(6):
             self._levels.append("")
@@ -871,7 +871,7 @@ class StagesNode(Node):
     def __init__(self, name, parent=None):
         super(StagesNode, self).__init__(name, parent)
 
-        self.resource = dummy_icon
+        self.resource = cfg.dummy_icon
         self._levels = []
         for i in range(6):
             self._levels.append("")
@@ -889,7 +889,7 @@ class UserNode(Node):
     def __init__(self, name, password = None, role = None, parent=None):
         super(UserNode, self).__init__(name, parent)
 
-        self.resource = dummy_icon
+        self.resource = cfg.dummy_icon
         self._password = password
         self._role = role
 
@@ -906,7 +906,7 @@ class ClientNode(Node):
         super(ClientNode, self).__init__(name, parent)
         self._path = path
 
-        self.resource = client_icon
+        self.resource = cfg.client_icon
 
     @property
     def path(self):
@@ -922,7 +922,7 @@ class AddNode(Node):
     def __init__(self, name, parent=None):
         super(AddNode, self).__init__(name, parent)
 
-        self.resource = add_icon
+        self.resource = cfg.add_icon
 
     def typeInfo(self):
         return cfg._new_
@@ -932,7 +932,7 @@ class NewNode(Node):
 
     def __init__(self, name,  parent=None):
         super(NewNode, self).__init__(name, parent)
-        self.resource = add_icon
+        self.resource = cfg.add_icon
 
         # for key in kwargs:
         #     if key == "name_format":
@@ -1030,7 +1030,7 @@ class StageNode(RootNode):
             self.stage_file = self.data_file.read()
 
 
-        self.resource = new_icon if not self._virtual else  creation_icon
+        self.resource = cfg.new_icon if not self._virtual else  cfg.creation_icon
 
     def create(self,  path=None):
         super(StageNode, self).create(path)
@@ -1759,7 +1759,7 @@ class StageNode(RootNode):
                     if os.path.isfile(thumbnail_name):
                         return QtGui.QPixmap(thumbnail_name)
         
-        return large_image_icon
+        return cfg.large_image_icon
     '''
     @property
     def thumbnail(self):
@@ -1768,7 +1768,7 @@ class StageNode(RootNode):
             if os.path.isfile(file):
                 return QtGui.QPixmap(file)
         
-        return large_image_icon
+        return cfg.large_image_icon
 
     @thumbnail.setter
     def thumbnail(self, file):

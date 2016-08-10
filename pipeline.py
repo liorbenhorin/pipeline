@@ -276,124 +276,124 @@ create_edit_project_form_class, create_edit_project_base_class = loadUiType(crea
 
 version = 'Snowball | 0.1.0'
 
-
-def set_icons():
-    global localIconPath 
-    
-    localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
-    if not os.path.exists(localIconPath):
-        log.info("icons folder not found: %s"%localIconPath)
-        return 
-    
-        
-    global offline_icon
-    global catagory_icon
-    global asset_icon
-    global component_icon
-    global new_icon
-    global delete_icon
-    global load_icon
-    global unload_icon
-    global project_icon
-    global users_icon
-    global settings_icon
-    global set_icon
-    global yes_icon
-    global no_icon
-    global search_icon
-    global edit_icon
-    global delete_folder_icon
-    global new_folder_icon
-    global open_icon
-    global save_icon
-    global save_master_icon
-    global add_icon
-    global down_arrow_icon
-    global import_icon
-    global export_icon
-    global help_icon
-    global anim_icon
-    global asset_mode_icon
-    global reload_icon
-    global shutter_icon
-    global camrea_icon
-    global play_icon
-    global comment_icon
-    global large_icon
-    global small_icon
-    
-    global large_image_icon
-    global large_image_icon_dark
-    global large_image_icon_click
-    global large_image_icon_click_dark
-    global wide_image_icon
-    global wide_image_icon_click  
-    global wide_image_icon_dark
-    global wide_image_icon_click_dark
-    global comment_icon
-    global comment_full_icon
-
-    global collapse_icon
-    global expend_icon
-    global creation_icon
-
-    creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
-    comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
-    comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
-    collapse_icon = os.path.join(localIconPath, "%s.svg" % "unfold-less")
-    expend_icon = os.path.join(localIconPath, "%s.svg" % "unfold-more")
-
-    offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
-    catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
-    asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
-    component_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"component"))
-    new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
-    delete_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete"))
-    load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"load"))
-    unload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"unload"))
-    project_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"project"))
-    users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
-    settings_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"settings"))
-    set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"set"))
-    yes_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"yes"))
-    no_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"no"))
-    search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
-    edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
-    delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
-    new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))     
-    open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))    
-    save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))  
-    save_master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))  
-    add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-    down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
-    import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
-    export_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"export"))
-    help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
-    anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
-    asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
-    reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
-    shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
-    camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
-    play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
-    comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
-    
-    large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
-    small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
-    
-    
-    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
-    large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark")) 
-    large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click")) 
-    large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark")) 
-    
-    wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image")) 
-    wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click")) 
-    wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark")) 
-    wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark")) 
+#
+# def set_icons():
+#     global localIconPath
+#
+#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
+#     if not os.path.exists(localIconPath):
+#         log.info("icons folder not found: %s"%localIconPath)
+#         return
+#
+#
+#     global cfg.offline_icon
+#     global cfg.catagory_icon
+#     global cfg.asset_icon
+#     global cfg.component_icon
+#     global cfg.new_icon
+#     global cfg.delete_icon
+#     global cfg.load_icon
+#     global cfg.unload_icon
+#     global cfg.project_icon
+#     global cfg.users_icon
+#     global cfg.settings_icon
+#     global cfg.set_icon
+#     global cfg.yes_icon
+#     global cfg.no_icon
+#     global cfg.search_icon
+#     global cfg.edit_icon
+#     global cfg.delete_folder_icon
+#     global cfg.new_folder_icon
+#     global cfg.open_icon
+#     global cfg.save_icon
+#     global cfg.save_master_icon
+#     global cfg.add_icon
+#     global cfg.down_arrow_icon
+#     global cfg.import_icon
+#     global cfg.export_icon
+#     global cfg.help_icon
+#     global cfg.anim_icon
+#     global cfg.asset_mode_icon
+#     global cfg.reload_icon
+#     global cfg.shutter_icon
+#     global cfg.camrea_icon
+#     global cfg.play_icon
+#     global cfg.comment_icon
+#     global cfg.large_icon
+#     global cfg.small_icon
+#
+#     global cfg.large_image_icon
+#     global cfg.large_image_icon_dark
+#     global cfg.large_image_icon_click
+#     global cfg.large_image_icon_click_dark
+#     global cfg.wide_image_icon
+#     global cfg.wide_image_icon_click
+#     global cfg.wide_image_icon_dark
+#     global cfg.wide_image_icon_click_dark
+#     global cfg.comment_icon
+#     global cfg.comment_full_icon
+#
+#     global cfg.collapse_icon
+#     global cfg.expend_icon
+#     global cfg.creation_icon
+#
+#     cfg.creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
+#     cfg.comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
+#     cfg.comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
+#     cfg.collapse_icon = os.path.join(localIconPath, "%s.svg" % "unfold-less")
+#     cfg.expend_icon = os.path.join(localIconPath, "%s.svg" % "unfold-more")
+#
+#     cfg.offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
+#     cfg.catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
+#     cfg.asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
+#     cfg.component_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"component"))
+#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
+#     cfg.delete_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete"))
+#     cfg.load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"load"))
+#     cfg.unload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"unload"))
+#     cfg.project_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"project"))
+#     cfg.users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
+#     cfg.settings_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"settings"))
+#     cfg.set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"set"))
+#     cfg.yes_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"yes"))
+#     cfg.no_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"no"))
+#     cfg.search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
+#     cfg.edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
+#     cfg.delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
+#     cfg.new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
+#     cfg.open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
+#     cfg.save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
+#     cfg.save_master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
+#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
+#     cfg.down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
+#     cfg.import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
+#     cfg.export_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"export"))
+#     cfg.help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
+#     cfg.anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
+#     cfg.asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
+#     cfg.reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
+#     cfg.shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
+#     cfg.camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
+#     cfg.play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
+#     cfg.comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
+#
+#     cfg.large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
+#     cfg.small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
+#
+#
+#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+#     cfg.large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark"))
+#     cfg.large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click"))
+#     cfg.large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark"))
+#
+#     cfg.wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image"))
+#     cfg.wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click"))
+#     cfg.wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark"))
+#     cfg.wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark"))
 
 
 # declare all the global icons  variables  
-set_icons()
+# set_icons()
 
 def set_padding(int, padding):
     return str(int).zfill(padding)
@@ -1447,7 +1447,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         '''
         #create menus
         self.catagories_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
-        self.catagories_menu.addAction(new_folder_icon,'New',self.create_catagory)       
+        self.catagories_menu.addAction(cfg.new_folder_icon,'New',self.create_catagory)
         self.catagories_menu.addSeparator()   
         self.rename_category_action = QtGui.QAction("Rename",self)
         self.rename_category_action.triggered.connect(self.category_rename)
@@ -1455,12 +1455,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.catagories_menu.addSeparator()                  
         self.delete_catagory_action = QtGui.QAction("Delete",self)
         self.delete_catagory_action.triggered.connect(self.delete_catagory)
-        self.delete_catagory_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_catagory_action.setIcon(QtGui.QIcon(cfg.delete_folder_icon))
         self.catagories_menu.addAction(self.delete_catagory_action)
         self.ui.catagory_pushButton.setMenu(self.catagories_menu)
 
         self.assets_menu = QtGui.QMenu(parent = self.ui.asset_pushButton)
-        self.assets_menu.addAction(new_folder_icon,'New',self.create_asset)
+        self.assets_menu.addAction(cfg.new_folder_icon,'New',self.create_asset)
         self.assets_menu.addSeparator()   
         self.rename_asset_action = QtGui.QAction("Rename",self)
         self.rename_asset_action.triggered.connect(self.asset_rename)
@@ -1468,15 +1468,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.assets_menu.addSeparator()  
         self.delete_asset_action = QtGui.QAction("Delete",self)
         self.delete_asset_action.triggered.connect(self.delete_asset)
-        self.delete_asset_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_asset_action.setIcon(QtGui.QIcon(cfg.delete_folder_icon))
         self.assets_menu.addAction(self.delete_asset_action)
         self.ui.asset_pushButton.setMenu(self.assets_menu)
 
         self.component_menu = QtGui.QMenu(parent = self.ui.component_pushButton)
-        self.component_menu.addAction(new_folder_icon,'New',self.create_component)
-        self.component_menu.addAction(new_folder_icon,'New from current scene',self.create_component_from_current_scene)
-        self.component_menu.addAction(new_folder_icon,'New from current selection',self.create_component_from_current_selection)
-        self.component_menu.addAction(new_folder_icon,'New from file',self.create_component_from_file)
+        self.component_menu.addAction(cfg.new_folder_icon,'New',self.create_component)
+        self.component_menu.addAction(cfg.new_folder_icon,'New from current scene',self.create_component_from_current_scene)
+        self.component_menu.addAction(cfg.new_folder_icon,'New from current selection',self.create_component_from_current_selection)
+        self.component_menu.addAction(cfg.new_folder_icon,'New from file',self.create_component_from_file)
         self.component_menu.addSeparator()   
         self.rename_component_action = QtGui.QAction("Rename",self)
         self.rename_component_action.triggered.connect(self.component_rename)
@@ -1484,12 +1484,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.component_menu.addSeparator()  
         self.delete_component_action = QtGui.QAction("Delete",self)
         self.delete_component_action.triggered.connect(self.delete_component)
-        self.delete_component_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_component_action.setIcon(QtGui.QIcon(cfg.delete_folder_icon))
         self.component_menu.addAction(self.delete_component_action)
         self.ui.component_pushButton.setMenu(self.component_menu)
         
         self.sequence_menu = QtGui.QMenu(parent = self.ui.sequence_pushButton)
-        self.sequence_menu.addAction(new_folder_icon,'New',self.create_sequence )
+        self.sequence_menu.addAction(cfg.new_folder_icon,'New',self.create_sequence )
         
         self.sequence_menu.addSeparator()   
         self.rename_sequence_action = QtGui.QAction("Rename",self)
@@ -1500,14 +1500,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         self.delete_sequence_action = QtGui.QAction("Delete",self)
         self.delete_sequence_action.triggered.connect(self.delete_sequence)
-        self.delete_sequence_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_sequence_action.setIcon(QtGui.QIcon(cfg.delete_folder_icon))
         self.sequence_menu.addAction(self.delete_sequence_action)
         self.ui.sequence_pushButton.setMenu(self.sequence_menu)
 
         self.shot_menu = QtGui.QMenu(parent = self.ui.shot_pushButton)
-        self.shot_menu.addAction(new_folder_icon,'New',self.create_shot)       
-        self.shot_menu.addAction(new_folder_icon,'New from current scene',self.create_shot_from_current_scene)
-        self.shot_menu.addAction(new_folder_icon,'New from file',self.create_shot_from_file)
+        self.shot_menu.addAction(cfg.new_folder_icon,'New',self.create_shot)
+        self.shot_menu.addAction(cfg.new_folder_icon,'New from current scene',self.create_shot_from_current_scene)
+        self.shot_menu.addAction(cfg.new_folder_icon,'New from file',self.create_shot_from_file)
         self.shot_menu.addSeparator()  
   
         self.rename_shot_action = QtGui.QAction("Rename",self)
@@ -1518,7 +1518,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                  
         self.delete_shot_action = QtGui.QAction("Delete",self)
         self.delete_shot_action.triggered.connect(self.delete_shot)
-        self.delete_shot_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_shot_action.setIcon(QtGui.QIcon(cfg.delete_folder_icon))
         self.shot_menu.addAction(self.delete_shot_action)
         self.ui.shot_pushButton.setMenu(self.shot_menu)
         '''
@@ -1771,15 +1771,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 if node.name == self.settings.client:
                     current = node
 
-            RemoveOption = False
-
-            if list:
-                RemoveOption = True
-
-            list.append(dt.AddNode("Add..."))
-
-            if RemoveOption:
-                list.append(dt.AddNode("Remove..."))
+            # RemoveOption = False
+            #
+            # if list:
+            #     RemoveOption = True
+            #
+            # list.append(dt.AddNode("Add..."))
+            #
+            # if RemoveOption:
+            #     list.append(dt.AddNode("Remove..."))
 
             self.clients = dtm.List_Model(list)
             if current:
@@ -2204,7 +2204,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.stage_path_label.setText("n/a")
         self.ui.stage_author_label.setText("n/a")
         self.ui.stage_note_label.setText("n/a")
-        self.set_thumbnail(large_image_icon_dark)
+        self.set_thumbnail(cfg.large_image_icon_dark)
 
         self.ui.stage_widget.setEnabled(False)
 
@@ -2278,13 +2278,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.versionTumb_label.setFrameShape(QtGui.QFrame.StyledPanel)
         self.ui.component_data_horizontalLayout.addWidget(self.versionTumb_label)
         self.ui.component_data_horizontalLayout.setContentsMargins(0, 6, 0, 0)
-        self.set_thumbnail(large_image_icon_dark)
+        self.set_thumbnail(cfg.large_image_icon_dark)
 
         layout = QtGui.QHBoxLayout(self.versionTumb_label)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        self.grab_thumnail_Button = alpha_button(self, large_image_icon_click)
-        self.grab_thumnail_Button.set_pixmap(large_image_icon_click_dark)
+        self.grab_thumnail_Button = alpha_button(self, cfg.large_image_icon_click)
+        self.grab_thumnail_Button.set_pixmap(cfg.large_image_icon_click_dark)
         sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizepolicy2.setHeightForWidth(self.grab_thumnail_Button.sizePolicy().hasHeightForWidth())
         self.grab_thumnail_Button.setSizePolicy(sizepolicy2)
@@ -2330,32 +2330,32 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             button.setIconSize(QtCore.QSize(20,20))
 
 
-        self.ui.clearDresser_pushButton.setIcon(QtGui.QIcon(creation_icon))
-        self.ui.updateDresser_pushButton.setIcon(QtGui.QIcon(reload_icon))
-        self.ui.collapseDresser_pushButton.setIcon(QtGui.QIcon(collapse_icon))
-        self.ui.expendDresser_pushButton.setIcon(QtGui.QIcon(expend_icon))
-        self.ui.clearTree_pushButton.setIcon(QtGui.QIcon(creation_icon))
-        self.ui.updateTree_pushButton.setIcon(QtGui.QIcon(reload_icon))
-        self.ui.collapseTree_pushButton.setIcon(QtGui.QIcon(collapse_icon))
-        self.ui.expendTree_pushButton.setIcon(QtGui.QIcon(expend_icon))
+        self.ui.clearDresser_pushButton.setIcon(QtGui.QIcon(cfg.creation_icon))
+        self.ui.updateDresser_pushButton.setIcon(QtGui.QIcon(cfg.reload_icon))
+        self.ui.collapseDresser_pushButton.setIcon(QtGui.QIcon(cfg.collapse_icon))
+        self.ui.expendDresser_pushButton.setIcon(QtGui.QIcon(cfg.expend_icon))
+        self.ui.clearTree_pushButton.setIcon(QtGui.QIcon(cfg.creation_icon))
+        self.ui.updateTree_pushButton.setIcon(QtGui.QIcon(cfg.reload_icon))
+        self.ui.collapseTree_pushButton.setIcon(QtGui.QIcon(cfg.collapse_icon))
+        self.ui.expendTree_pushButton.setIcon(QtGui.QIcon(cfg.expend_icon))
 
-        self.ui.projects_pushButton.setIcon(QtGui.QIcon(project_icon))
-        self.ui.users_pushButton.setIcon(QtGui.QIcon(users_icon))
-        self.ui.commitTree_pushButton.setIcon(QtGui.QIcon(yes_icon))
-        self.ui.discardTree_pushButton.setIcon(QtGui.QIcon(no_icon))
+        self.ui.projects_pushButton.setIcon(QtGui.QIcon(cfg.project_icon))
+        self.ui.users_pushButton.setIcon(QtGui.QIcon(cfg.users_icon))
+        self.ui.commitTree_pushButton.setIcon(QtGui.QIcon(cfg.yes_icon))
+        self.ui.discardTree_pushButton.setIcon(QtGui.QIcon(cfg.no_icon))
 
-        self.ui.save_version_pushButton.setIcon(QtGui.QIcon(save_icon))
-        self.ui.save_master_pushButton.setIcon(QtGui.QIcon(save_master_icon))
-        self.ui.import_version_pushButton.setIcon(QtGui.QIcon(import_icon))       
+        self.ui.save_version_pushButton.setIcon(QtGui.QIcon(cfg.save_icon))
+        self.ui.save_master_pushButton.setIcon(QtGui.QIcon(cfg.save_master_icon))
+        self.ui.import_version_pushButton.setIcon(QtGui.QIcon(cfg.import_icon))
 
-        self.ui.playblast_shot_pushButton.setIcon(QtGui.QIcon(camrea_icon))
+        self.ui.playblast_shot_pushButton.setIcon(QtGui.QIcon(cfg.camrea_icon))
                 
-        self.ui.comp_icon_label.setPixmap(new_icon)#.scaled(16,16))
-        self.ui.comp_user_label.setPixmap(users_icon)#.scaled(16,16))
-        self.ui.comp_note_label.setPixmap(comment_icon)#.scaled(16,16))
+        self.ui.comp_icon_label.setPixmap(cfg.new_icon)#.scaled(16,16))
+        self.ui.comp_user_label.setPixmap(cfg.users_icon)#.scaled(16,16))
+        self.ui.comp_note_label.setPixmap(cfg.comment_icon)#.scaled(16,16))
 
-        self.ui.searchIcon_label.setPixmap(search_icon)
-        self.ui.dresser_searchIcon_label.setPixmap(search_icon)
+        self.ui.searchIcon_label.setPixmap(cfg.search_icon)
+        self.ui.dresser_searchIcon_label.setPixmap(cfg.search_icon)
 
         
 
@@ -3634,12 +3634,12 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.setWindowFlags(QtCore.Qt.Tool)                
         form_class, base_class = projects_form_class, projects_base_class
         
-        global offline_icon
-        global load_icon
-        global unload_icon 
-        global edit_icon
-        global set_icon 
-                     
+        # global cfg.offline_icon
+        # global cfg.load_icon
+        # global cfg.unload_icon
+        # global cfg.edit_icon
+        # global cfg.set_icon
+        #
         self.ui = form_class()
         self.ui.setupUi(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -3697,15 +3697,15 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
             [list.append(dt.ClientNode(i, path = os.path.join(path, i))) for i in dirs]
 
-            RemoveOption = False
+            # RemoveOption = False
 
-            if list:
-                RemoveOption = True
-
-            list.append(dt.AddNode("Add..."))
-
-            if RemoveOption:
-                list.append(dt.AddNode("Remove..."))
+            # if list:
+            #     RemoveOption = True
+            #
+            # list.append(dt.AddNode("Add..."))
+            #
+            # if RemoveOption:
+            #     list.append(dt.AddNode("Remove..."))
 
             self._model = dtm.List_Model(list)
             self.ui.clients_comboBox.setModel(self._model)
@@ -3768,13 +3768,13 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             self.populate_projects()
 
     def set_icons(self):
-        self.ui.create_project_pushButton.setIcon(QtGui.QIcon(new_icon))
+        self.ui.create_project_pushButton.setIcon(QtGui.QIcon(cfg.new_icon))
         self.ui.create_project_pushButton.setIconSize(QtCore.QSize(20,20))
-        self.ui.load_project_pushButton.setIcon(QtGui.QIcon(load_icon))
+        self.ui.load_project_pushButton.setIcon(QtGui.QIcon(cfg.load_icon))
         self.ui.load_project_pushButton.setIconSize(QtCore.QSize(20,20))        
-        self.ui.unload_project_pushButton.setIcon(QtGui.QIcon(unload_icon))
+        self.ui.unload_project_pushButton.setIcon(QtGui.QIcon(cfg.unload_icon))
         self.ui.unload_project_pushButton.setIconSize(QtCore.QSize(20,20))            
-        self.ui.close_pushButton.setIcon(QtGui.QIcon(no_icon))
+        self.ui.close_pushButton.setIcon(QtGui.QIcon(cfg.no_icon))
         self.ui.close_pushButton.setIconSize(QtCore.QSize(20,20))    
 
     def create_project(self):
@@ -3994,7 +3994,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
     #         if project_status == "OFFLINE":
     #
     #             offlineButtonItem = QtGui.QPushButton(project_status)
-    #             offlineButtonItem.setIcon(QtGui.QIcon(offline_icon))
+    #             offlineButtonItem.setIcon(QtGui.QIcon(cfg.offline_icon))
     #             offlineButtonItem.setIconSize(QtCore.QSize(20,20))
     #
     #             self.ui.projects_tableWidget.setCellWidget(index,1,offlineButtonItem)
@@ -4010,7 +4010,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
     #         if project_status == "ONLINE":
     #
     #             editButtonItem = QtGui.QPushButton( "Edit")
-    #             editButtonItem.setIcon(QtGui.QIcon(edit_icon))
+    #             editButtonItem.setIcon(QtGui.QIcon(cfg.edit_icon))
     #             editButtonItem.setIconSize(QtCore.QSize(20,20))
     #             self.ui.projects_tableWidget.setCellWidget(index,2,editButtonItem)
     #             editButtonItem.clicked.connect(self.edit_project)
@@ -4031,7 +4031,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
     #         if project_status == "ONLINE":
     #             setButtonItem = QtGui.QPushButton("Set Project")
     #             setButtonItem.clicked.connect(self.set_project_button)
-    #             setButtonItem.setIcon(QtGui.QIcon(set_icon))
+    #             setButtonItem.setIcon(QtGui.QIcon(cfg.set_icon))
     #             setButtonItem.setIconSize(QtCore.QSize(20,20))
     #             self.ui.projects_tableWidget.setCellWidget(index,3,setButtonItem)
     #
@@ -4153,8 +4153,8 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 #         layout.setContentsMargins(0,0,0,0)
 #
 #
-#         self.playblast_help = alpha_button(self,help_icon)
-#         self.playblast_help.set_pixmap(help_icon)
+#         self.playblast_help = alpha_button(self,cfg.help_icon)
+#         self.playblast_help.set_pixmap(cfg.help_icon)
 #         sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
 #         sizepolicy2.setHeightForWidth(self.playblast_help.sizePolicy().hasHeightForWidth())
 #         self.playblast_help.setSizePolicy(sizepolicy2)
@@ -4171,13 +4171,13 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 #         dlg.massage("massage","Playblasts","Playblasts can consume a lot of disk space,\nWhen working on a project on a shared disk or cloud, This can slow the syncing proccess.\nHave more control by keeping them in a sister directory.")
 #
 #     def set_icons(self):
-#         self.ui.create_edit_project_pushButton.setIcon(QtGui.QIcon(yes_icon))
+#         self.ui.create_edit_project_pushButton.setIcon(QtGui.QIcon(cfg.yes_icon))
 #         self.ui.create_edit_project_pushButton.setIconSize(QtCore.QSize(20,20))
 #
-#         self.ui.set_project_path_pushButton.setIcon(QtGui.QIcon(search_icon))
+#         self.ui.set_project_path_pushButton.setIcon(QtGui.QIcon(cfg.search_icon))
 #         self.ui.set_project_path_pushButton.setIconSize(QtCore.QSize(20,20))
 #
-#         self.ui.cancel_pushButton.setIcon(QtGui.QIcon(no_icon))
+#         self.ui.cancel_pushButton.setIcon(QtGui.QIcon(cfg.no_icon))
 #         self.ui.cancel_pushButton.setIconSize(QtCore.QSize(20,20))
 #
 #     def init_new_project(self):
@@ -4291,7 +4291,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 #                     roles_combo.setCurrentIndex(i)
 #
 #                 deleteButtonItem = QtGui.QPushButton("")
-#                 deleteButtonItem.setIcon(QtGui.QIcon(no_icon))
+#                 deleteButtonItem.setIcon(QtGui.QIcon(cfg.no_icon))
 #                 deleteButtonItem.setIconSize(QtCore.QSize(20,20))
 #                 self.ui.users_tableWidget.setCellWidget(index+1,3,deleteButtonItem)
 #                 deleteButtonItem.clicked.connect(self.remove_user)
@@ -4308,7 +4308,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 #         self.ui.users_tableWidget.setItem(len(self.users)+1,2,empty_item3)
 #
 #         newButtonItem = QtGui.QPushButton("")
-#         newButtonItem.setIcon(QtGui.QIcon(add_icon))
+#         newButtonItem.setIcon(QtGui.QIcon(cfg.add_icon))
 #         newButtonItem.setIconSize(QtCore.QSize(20,20))
 #         self.ui.users_tableWidget.setCellWidget(len(self.users)+1,3,newButtonItem)
 #         newButtonItem.clicked.connect(self.add_user)

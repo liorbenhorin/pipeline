@@ -172,7 +172,7 @@ class Project_Model(QtCore.QAbstractItemModel):
                     resource = node.resource
                     return QtGui.QIcon(QtGui.QPixmap(resource))
                 else:
-                    return QtGui.QIcon(QtGui.QPixmap(cfg.delete_folder_icon))
+                    return QtGui.QIcon(QtGui.QPixmap(cfg.cfg.delete_folder_icon))
 
 
         if role == Project_Model.sortRole:
@@ -218,7 +218,7 @@ class Project_Model(QtCore.QAbstractItemModel):
         # if role == QtCore.Qt.DecorationRole:
         #
         #     if section == 0:
-        #         icon = QtGui.QIcon(cube_icon_full)
+        #         icon = QtGui.QIcon(cfg.cube_icon_full)
         #
         #         return icon
 
@@ -531,7 +531,7 @@ class Dresser_Model(Project_Model):
                     return QtGui.QIcon(QtGui.QPixmap(resource))
 
                 else:
-                    return QtGui.QIcon(QtGui.QPixmap(cfg.delete_folder_icon))
+                    return QtGui.QIcon(QtGui.QPixmap(cfg.cfg.delete_folder_icon))
 
 
         if role == Project_Model.sortRole:

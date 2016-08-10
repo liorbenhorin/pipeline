@@ -62,156 +62,156 @@ global counter
 #         return
 #
 #
-#     global offline_icon
-#     global catagory_icon
-#     global asset_icon
-#     global component_icon
-#     global new_icon
-#     global delete_icon
-#     global load_icon
-#     global unload_icon
-#     global project_icon
-#     global users_icon
-#     global settings_icon
-#     global set_icon
-#     global yes_icon
-#     global no_icon
-#     global search_icon
-#     global edit_icon
-#     global delete_folder_icon
-#     global new_folder_icon
-#     global open_icon
-#     global save_icon
+#     global cfg.offline_icon
+#     global cfg.catagory_icon
+#     global cfg.asset_icon
+#     global cfg.component_icon
+#     global cfg.new_icon
+#     global cfg.delete_icon
+#     global cfg.load_icon
+#     global cfg.unload_icon
+#     global cfg.project_icon
+#     global cfg.users_icon
+#     global cfg.settings_icon
+#     global cfg.set_icon
+#     global cfg.yes_icon
+#     global cfg.no_icon
+#     global cfg.search_icon
+#     global cfg.edit_icon
+#     global cfg.delete_folder_icon
+#     global cfg.new_folder_icon
+#     global cfg.open_icon
+#     global cfg.save_icon
 #     global savecfg.mastericon
-#     global add_icon
-#     global down_arrow_icon
-#     global import_icon
-#     global export_icon
-#     global help_icon
-#     global anim_icon
-#     global asset_mode_icon
-#     global reload_icon
-#     global shutter_icon
-#     global camrea_icon
-#     global play_icon
-#     global comment_icon
-#     global large_icon
-#     global small_icon
+#     global cfg.add_icon
+#     global cfg.down_arrow_icon
+#     global cfg.import_icon
+#     global cfg.export_icon
+#     global cfg.help_icon
+#     global cfg.anim_icon
+#     global cfg.asset_mode_icon
+#     global cfg.reload_icon
+#     global cfg.shutter_icon
+#     global cfg.camrea_icon
+#     global cfg.play_icon
+#     global cfg.comment_icon
+#     global cfg.large_icon
+#     global cfg.small_icon
 #
-#     global large_image_icon
-#     global large_image_icon_dark
-#     global large_image_icon_click
-#     global large_image_icon_click_dark
-#     global wide_image_icon
-#     global wide_image_icon_click
-#     global wide_image_icon_dark
-#     global wide_image_icon_click_dark
+#     global cfg.large_image_icon
+#     global cfg.large_image_icon_dark
+#     global cfg.large_image_icon_click
+#     global cfg.large_image_icon_click_dark
+#     global cfg.wide_image_icon
+#     global cfg.wide_image_icon_click
+#     global cfg.wide_image_icon_dark
+#     global cfg.wide_image_icon_click_dark
 #
 #
-#     offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
-#     catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
-#     asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
-#     component_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"component"))
-#     new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
-#     delete_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete"))
-#     load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"load"))
-#     unload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"unload"))
-#     project_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"project"))
-#     users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
-#     settings_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"settings"))
-#     set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"set"))
-#     yes_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"yes"))
-#     no_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"no"))
-#     search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
-#     edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
-#     delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
-#     new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
-#     open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
-#     save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
+#     cfg.offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
+#     cfg.catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
+#     cfg.asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
+#     cfg.component_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"component"))
+#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
+#     cfg.delete_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete"))
+#     cfg.load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"load"))
+#     cfg.unload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"unload"))
+#     cfg.project_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"project"))
+#     cfg.users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
+#     cfg.settings_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"settings"))
+#     cfg.set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"set"))
+#     cfg.yes_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"yes"))
+#     cfg.no_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"no"))
+#     cfg.search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
+#     cfg.edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
+#     cfg.delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
+#     cfg.new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
+#     cfg.open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
+#     cfg.save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
 #     savecfg.mastericon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
-#     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-#     down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
-#     import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
-#     export_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"export"))
-#     help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
-#     anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
-#     asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
-#     reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
-#     shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
-#     camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
-#     play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
-#     comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
+#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
+#     cfg.down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
+#     cfg.import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
+#     cfg.export_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"export"))
+#     cfg.help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
+#     cfg.anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
+#     cfg.asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
+#     cfg.reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
+#     cfg.shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
+#     cfg.camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
+#     cfg.play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
+#     cfg.comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
 #
-#     large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
-#     small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
+#     cfg.large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
+#     cfg.small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
 #
 #
-#     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
-#     large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark"))
-#     large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click"))
-#     large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark"))
+#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+#     cfg.large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark"))
+#     cfg.large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click"))
+#     cfg.large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark"))
 #
-#     wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image"))
-#     wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click"))
-#     wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark"))
-#     wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark"))
+#     cfg.wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image"))
+#     cfg.wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click"))
+#     cfg.wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark"))
+#     cfg.wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark"))
 #
 #
 # # declare all the global icons  variables
 # set_icons()
 
 
-def set_icons():
-    localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
-    if not os.path.exists(localIconPath):
-        return 
-    global branch_more
-    global branch_closed
-    global branch_open
-    global branch_end
-    global vline
-    
-    branch_more = os.path.join(localIconPath,"branch-more.svg")
-    branch_closed = os.path.join(localIconPath,"branch-closed.svg")
-    branch_open = os.path.join(localIconPath,"branch-open.svg")
-    branch_end = os.path.join(localIconPath,"branch-end.svg")
-    vline = os.path.join(localIconPath,"vline.svg")
-
-    global folder_icon
-    global cube_icon
-    global cube_icon_full
-    global add_icon
-    global large_image_icon
-    folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
-    cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")    
-    cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill") 
-    add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
-
-
-    localIconPath = os.path.join(os.path.dirname(__file__), 'icons/')
-    if not os.path.exists(localIconPath):
-        return
-
-    global large_icon
-    global small_icon
-    global reload_icon
-    global load_icon
-    global open_icon
-    global new_icon
-    global set_icon
-    global edit_icon
-
-    edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "edit"))
-    set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "set"))
-    reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "reload"))
-    load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "load"))
-    large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
-    small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
-    open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "openFolder"))
-    new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
-    
-set_icons()
+# def set_icons():
+#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
+#     if not os.path.exists(localIconPath):
+#         return
+#     global cfg.branch_more
+#     global cfg.branch_closed
+#     global cfg.branch_open
+#     global cfg.branch_end
+#     global cfg.vline
+#
+#     cfg.branch_more = os.path.join(localIconPath,"branch-more.svg")
+#     cfg.branch_closed = os.path.join(localIconPath,"branch-closed.svg")
+#     cfg.branch_open = os.path.join(localIconPath,"branch-open.svg")
+#     cfg.branch_end = os.path.join(localIconPath,"branch-end.svg")
+#     cfg.vline = os.path.join(localIconPath,"cfg.vline.svg")
+#
+#     global cfg.folder_icon
+#     global cfg.cube_icon
+#     global cfg.cube_icon_full
+#     global cfg.add_icon
+#     global cfg.large_image_icon
+#     cfg.folder_icon = os.path.join(localIconPath, "%s.svg"%"folder")
+#     cfg.cube_icon = os.path.join(localIconPath, "%s.svg"%"cube")
+#     cfg.cube_icon_full = os.path.join(localIconPath, "%s.svg"%"cube-fill")
+#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
+#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+#
+#
+#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons/')
+#     if not os.path.exists(localIconPath):
+#         return
+#
+#     global cfg.large_icon
+#     global cfg.small_icon
+#     global cfg.reload_icon
+#     global cfg.load_icon
+#     global cfg.open_icon
+#     global cfg.new_icon
+#     global cfg.set_icon
+#     global cfg.edit_icon
+#
+#     cfg.edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "edit"))
+#     cfg.set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "set"))
+#     cfg.reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "reload"))
+#     cfg.load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "load"))
+#     cfg.large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
+#     cfg.small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
+#     cfg.open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "openFolder"))
+#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "new"))
+#
+# set_icons()
 
 
 def setComboValue(QComboBox, String):
@@ -359,7 +359,7 @@ class EditProjectButtonDelegate(QtGui.QItemDelegate):
 
 
             label = "Edit"
-            icon = edit_icon
+            icon = cfg.edit_icon
 
 
             button = QtGui.QPushButton(
@@ -384,7 +384,7 @@ class SetProjectButtonDelegate(QtGui.QItemDelegate):
 
 
             label = "Set project"
-            icon = set_icon
+            icon = cfg.set_icon
 
 
             button = QtGui.QPushButton(
@@ -588,10 +588,10 @@ class loadButtonDelegate(QtGui.QItemDelegate):
             soure_index = self.parent().model().mapToSource(index)
             if self.parent().model().sourceModel().getNode(soure_index).typeInfo() == cfg._new_:
                 label = ""
-                icon = new_icon
+                icon = cfg.new_icon
             else:
                 label = ""
-                icon = open_icon
+                icon = cfg.open_icon
 
             button = QtGui.QPushButton(
                 label,
@@ -654,27 +654,27 @@ class PipelineMastersView(QtGui.QTreeView):
                  outline: 0;
             }
             QTreeView::branch:has-siblings:!adjoins-item {
-                 border-image:url(''' + vline + ''') 0;
+                 border-image:url(''' + cfg.vline + ''') 0;
             }
 
             QTreeView::branch:has-siblings:adjoins-item {
-                 border-image:url(''' + branch_more + ''') 0;
+                 border-image:url(''' + cfg.branch_more + ''') 0;
             }
 
             QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                 border-image:url(''' + branch_end + ''') 0;
+                 border-image:url(''' + cfg.branch_end + ''') 0;
             }
 
             QTreeView::branch:has-children:!has-siblings:closed,
             QTreeView::branch:closed:has-children:has-siblings {
                  border-image: none;
-                 image:url(''' + branch_closed + ''') 0;
+                 image:url(''' + cfg.branch_closed + ''') 0;
             }
 
             QTreeView::branch:open:has-children:!has-siblings,
             QTreeView::branch:open:has-children:has-siblings  {
                  border-image: none;
-                 image: url(''' + branch_open + ''') 0;
+                 image: url(''' + cfg.branch_open + ''') 0;
             }''')
 
     def addSlider(self):
@@ -1135,10 +1135,10 @@ class IconScaleSlider(QtGui.QWidget):
 
         self.large_lable = QtGui.QLabel()
         self.large_lable.setMaximumSize(QtCore.QSize(16, 16))
-        self.large_lable.setPixmap(large_icon)
+        self.large_lable.setPixmap(cfg.large_icon)
         self.small_lable = QtGui.QLabel()
         self.small_lable.setMaximumSize(QtCore.QSize(16, 16))
-        self.small_lable.setPixmap(small_icon)
+        self.small_lable.setPixmap(cfg.small_icon)
         self.slideWidget = QtGui.QWidget()
         self.slideWidget.setMaximumHeight(20)
         self.slideLayout = QtGui.QHBoxLayout()
@@ -1714,27 +1714,27 @@ class pipelineTreeView(QtGui.QTreeView):
                                 outline: 0;
                            }
                            QTreeView::branch:has-siblings:!adjoins-item {
-                                border-image:url(''' + vline + ''') 0;
+                                border-image:url(''' + cfg.vline + ''') 0;
                            }
                            
                            QTreeView::branch:has-siblings:adjoins-item {
-                                border-image:url(''' + branch_more + ''') 0;
+                                border-image:url(''' + cfg.branch_more + ''') 0;
                            }
                            
                            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                                border-image:url(''' + branch_end + ''') 0;
+                                border-image:url(''' + cfg.branch_end + ''') 0;
                            }
 
                            QTreeView::branch:has-children:!has-siblings:closed,
                            QTreeView::branch:closed:has-children:has-siblings {
                                 border-image: none;
-                                image:url(''' + branch_closed + ''') 0;
+                                image:url(''' + cfg.branch_closed + ''') 0;
                            }
 
                            QTreeView::branch:open:has-children:!has-siblings,
                            QTreeView::branch:open:has-children:has-siblings  {
                                 border-image: none;
-                                image: url(''' + branch_open + ''') 0;
+                                image: url(''' + cfg.branch_open + ''') 0;
                            }''')
     
 
@@ -2443,27 +2443,27 @@ class pipelineDresserView(QtGui.QTreeView):
                                 outline: 0;
                            }
                            QTreeView::branch:has-siblings:!adjoins-item {
-                                border-image:url(''' + vline + ''') 0;
+                                border-image:url(''' + cfg.vline + ''') 0;
                            }
 
                            QTreeView::branch:has-siblings:adjoins-item {
-                                border-image:url(''' + branch_more + ''') 0;
+                                border-image:url(''' + cfg.branch_more + ''') 0;
                            }
 
                            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                                border-image:url(''' + branch_end + ''') 0;
+                                border-image:url(''' + cfg.branch_end + ''') 0;
                            }
 
                            QTreeView::branch:has-children:!has-siblings:closed,
                            QTreeView::branch:closed:has-children:has-siblings {
                                 border-image: none;
-                                image:url(''' + branch_closed + ''') 0;
+                                image:url(''' + cfg.branch_closed + ''') 0;
                            }
 
                            QTreeView::branch:open:has-children:!has-siblings,
                            QTreeView::branch:open:has-children:has-siblings  {
                                 border-image: none;
-                                image: url(''' + branch_open + ''') 0;
+                                image: url(''' + cfg.branch_open + ''') 0;
                            }''')
 
 
@@ -3088,27 +3088,27 @@ class levelsTreeView(QtGui.QTreeView):
                                 outline: 0;
                            }
                            QTreeView::branch:has-siblings:!adjoins-item {
-                                border-image:url(''' + vline + ''') 0;
+                                border-image:url(''' + cfg.vline + ''') 0;
                            }
 
                            QTreeView::branch:has-siblings:adjoins-item {
-                                border-image:url(''' + branch_more + ''') 0;
+                                border-image:url(''' + cfg.branch_more + ''') 0;
                            }
 
                            QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-                                border-image:url(''' + branch_end + ''') 0;
+                                border-image:url(''' + cfg.branch_end + ''') 0;
                            }
 
                            QTreeView::branch:has-children:!has-siblings:closed,
                            QTreeView::branch:closed:has-children:has-siblings {
                                 border-image: none;
-                                image:url(''' + branch_closed + ''') 0;
+                                image:url(''' + cfg.branch_closed + ''') 0;
                            }
 
                            QTreeView::branch:open:has-children:!has-siblings,
                            QTreeView::branch:open:has-children:has-siblings  {
                                 border-image: none;
-                                image: url(''' + branch_open + ''') 0;
+                                image: url(''' + cfg.branch_open + ''') 0;
                            }''')
 
 

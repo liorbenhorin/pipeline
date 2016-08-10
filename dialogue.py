@@ -74,52 +74,52 @@ import data as dt
 
 
 # reload(dt)
-def set_icons():
-    localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
-    if not os.path.exists(localIconPath):
-        return 
-    
-    global warning_icon
-    global simple_warning_icon
-    global massage_icon
-    global users_icon
-    global archive_icon
-    global new_icon
-    global edit_icon
-    global logo
-    global comment_icon
-    
-    warning_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"critical")) 
-    simple_warning_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"warning"))
-    massage_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"massage"))
-    users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
-    archive_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"archive"))
-    new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
-    logo = QtGui.QPixmap(os.path.join(localIconPath, "%s.png"%"pipeline_logo"))
-    edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
-    comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
-
-
-    global buffer_icon
-    global counter_icon
-    global text_icon
-    global time_icon
-
-    time_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "time"))
-
-    buffer_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "buffer"))
-    counter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "counter"))
-    text_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "cursor-text"))
-
-        
+# def set_icons():
+#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
+#     if not os.path.exists(localIconPath):
+#         return
+#
+#     global cfg.warning_icon
+#     global cfg.simple_warning_icon
+#     global cfg.massage_icon
+#     global cfg.users_icon
+#     global cfg.archive_icon
+#     global cfg.new_icon
+#     global cfg.edit_icon
+#     global cfg.logo
+#     global cfg.comment_icon
+#
+#     cfg.warning_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"critical"))
+#     cfg.simple_warning_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"warning"))
+#     cfg.massage_icon =  QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"massage"))
+#     cfg.users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
+#     cfg.archive_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"archive"))
+#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
+#     cfg.logo = QtGui.QPixmap(os.path.join(localIconPath, "%s.png"%"pipeline_logo"))
+#     cfg.edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
+#     cfg.comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
+#
+#
+#     global cfg.buffer_icon
+#     global cfg.counter_icon
+#     global cfg.text_icon
+#     global cfg.time_icon
+#
+#     cfg.time_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "time"))
+#
+#     cfg.buffer_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "buffer"))
+#     cfg.counter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "counter"))
+#     cfg.text_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "cursor-text"))
+#
+#
 def warning(icon, title, message ):
     
     if icon == "critical":
-        dlg_icon = warning_icon
+        dlg_icon = cfg.warning_icon
     elif icon == "warning":
-        dlg_icon = simple_warning_icon
+        dlg_icon = cfg.simple_warning_icon
     else:
-        dlg_icon = warning_icon            
+        dlg_icon = cfg.warning_icon
     
     reply = QtGui.QMessageBox()
     reply.setIconPixmap(dlg_icon)
@@ -141,13 +141,13 @@ def massage(icon, title, message ):
     reply = QtGui.QMessageBox()
     
     if icon == "critical":
-        reply.setIconPixmap(warning_icon)
+        reply.setIconPixmap(cfg.warning_icon)
 
     elif icon == "warning":
-        reply.setIconPixmap(simple_warning_icon)
+        reply.setIconPixmap(cfg.simple_warning_icon)
 
     elif icon == "massage":
-        reply.setIconPixmap(massage_icon)
+        reply.setIconPixmap(cfg.massage_icon)
    
     reply.setText(message)
     reply.setWindowTitle(title)
@@ -170,7 +170,7 @@ class about(QtGui.QDialog):
         layout = QtGui.QVBoxLayout(self)
 
         self.logo_label = QtGui.QLabel()
-        self.logo_label.setPixmap(logo.scaled(250,56))         
+        self.logo_label.setPixmap(cfg.logo.scaled(250,56))
         self.logo_label.setAlignment(QtCore.Qt.AlignCenter)
 
         self.version_label = QtGui.QLabel("<b>V 1.0</b>")
@@ -209,7 +209,7 @@ class Create_from_selection(QtGui.QDialog):
         self.setMaximumHeight(50) 
 
         self.label = QtGui.QLabel()
-        self.label.setPixmap(new_icon)
+        self.label.setPixmap(cfg.new_icon)
 
         layout = QtGui.QVBoxLayout(self)
         self.item_name = QtGui.QLabel(title)
@@ -252,7 +252,7 @@ class collect_component_options(QtGui.QDialog):
         self.setMaximumHeight(50) 
 
         #self.label = QtGui.QLabel()
-        #self.label.setPixmap(archive_icon)
+        #self.label.setPixmap(cfg.archive_icon)
 
         layout = QtGui.QVBoxLayout(self)
         self.item_name = QtGui.QLabel(title)
@@ -304,7 +304,7 @@ class Login(QtGui.QDialog):
         self.setMaximumHeight(50) 
         
         self.label = QtGui.QLabel()
-        self.label.setPixmap(users_icon)
+        self.label.setPixmap(cfg.users_icon)
         
         self.label_user = QtGui.QLabel("Username:")
         self.label_password = QtGui.QLabel("Password:")
@@ -354,7 +354,7 @@ class Note(QtGui.QDialog):
         self.setMaximumHeight(200) 
         
         self.label = QtGui.QLabel()
-        self.label.setPixmap(edit_icon)
+        self.label.setPixmap(cfg.edit_icon)
         
         self.label_Note = QtGui.QLabel("Take note:")       
         self.textNote = QtGui.QTextEdit(self)
@@ -396,7 +396,7 @@ class ErrorReport(QtGui.QDialog):
         self.setMaximumHeight(800) 
         
         self.label = QtGui.QLabel()
-        self.label.setPixmap(warning_icon)
+        self.label.setPixmap(cfg.warning_icon)
         
         self.label_Note = QtGui.QLabel("Somthing is wrong here.<br>Considre sending this bug report for inspection.")
         self.textNote = QtGui.QTextEdit(self)
@@ -645,7 +645,7 @@ class newNodeDialog(QtGui.QDialog):
         self.input_widget = QtGui.QWidget(self)
         self.input_layout = QtGui.QVBoxLayout(self.input_widget)
 
-        self.name_widget = groupInput(self, label=name_label_string, inputWidget=QtGui.QLineEdit(self),  ic=text_icon)
+        self.name_widget = groupInput(self, label=name_label_string, inputWidget=QtGui.QLineEdit(self),  ic=cfg.text_icon)
 
         self.name_input = self.name_widget.input
         self.name_input.setText(string)
@@ -676,7 +676,7 @@ class newFolderDialog(newNodeDialog):
 
 
 
-        self.input_quantity_widget = groupInput(self, label = "Quantity", inputWidget=QtGui.QSpinBox(self), ic= buffer_icon)
+        self.input_quantity_widget = groupInput(self, label = "Quantity", inputWidget=QtGui.QSpinBox(self), ic= cfg.buffer_icon)
 
         self.quantity_slider = self.input_quantity_widget.input
         self.quantity_slider.setMinimum(1)
@@ -684,7 +684,7 @@ class newFolderDialog(newNodeDialog):
         self.quantity_slider.setValue(1)
 
 
-        self.input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
+        self.input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self), ic=cfg.counter_icon)
 
         self.padding_slider = self.input_padding_widget.input
         self.padding_slider.setMinimum(0)
@@ -809,7 +809,7 @@ class newTreeDialog(newFolderDialog):
 
         for level in names:
             name_widget = groupInput(self, label=level, inputWidget=QtGui.QLineEdit(self),
-                                          ic=text_icon)
+                                          ic=cfg.text_icon)
             name_widget.label.setText("{} name".format(level))
             create_title = Title(self, label=level)
             name_input = name_widget.input
@@ -818,7 +818,7 @@ class newTreeDialog(newFolderDialog):
             self.input_layout.addWidget(name_widget)
 
             input_quantity_widget = groupInput(self, label="Quantity", inputWidget=QtGui.QSpinBox(self),
-                                                    ic=buffer_icon)
+                                                    ic=cfg.buffer_icon)
 
             quantity_slider = input_quantity_widget.input
             quantity_slider.setMinimum(1)
@@ -826,7 +826,7 @@ class newTreeDialog(newFolderDialog):
             quantity_slider.setValue(1)
             self.input_layout.addWidget(input_quantity_widget)
             input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self),
-                                                   ic=counter_icon)
+                                                   ic=cfg.counter_icon)
 
             padding_slider = input_padding_widget.input
             padding_slider.setMinimum(0)
@@ -912,7 +912,7 @@ class NameFormatWidget(QtGui.QWidget):
         self.file_name_title = Title(self, label="File name format:")
         self.layout.addWidget(self.file_name_title)
 
-        self.input_format_widget = groupInput(self, label="Format Depth", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
+        self.input_format_widget = groupInput(self, label="Format Depth", inputWidget=QtGui.QSpinBox(self), ic=cfg.counter_icon)
 
         self.depth_slider = self.input_format_widget.input
         self.depth_slider.setMinimum(0)
@@ -1035,12 +1035,12 @@ class projectDialog(QtGui.QDialog):
         self.input_layout.addWidget(self.title)
 
 
-        self.name_widget = groupInput(self, label="Project name", inputWidget=QtGui.QLineEdit(self), ic=text_icon)
+        self.name_widget = groupInput(self, label="Project name", inputWidget=QtGui.QLineEdit(self), ic=cfg.text_icon)
         self.name_input = self.name_widget.input
         self.input_layout.addWidget(self.name_widget)
 
 
-        self.input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self), ic=counter_icon)
+        self.input_padding_widget = groupInput(self, label="Padding", inputWidget=QtGui.QSpinBox(self), ic=cfg.counter_icon)
 
         self.padding_slider = self.input_padding_widget.input
         self.padding_slider.setMinimum(0)
@@ -1049,7 +1049,7 @@ class projectDialog(QtGui.QDialog):
         self.input_layout.addWidget(self.input_padding_widget)
 
 
-        self.input_fps_widget = groupInput(self, label="Default fps", inputWidget=QtGui.QComboBox(self), ic=time_icon)
+        self.input_fps_widget = groupInput(self, label="Default fps", inputWidget=QtGui.QComboBox(self), ic=cfg.time_icon)
         self.fps_input = self.input_fps_widget.input
         self.fps_input.setEditable(False)
         rates = ["PAL (25fps)", "Film (24fps)", "NTSC (30fps)"]
@@ -1060,11 +1060,11 @@ class projectDialog(QtGui.QDialog):
             self.fps_input.setCurrentIndex(i)
 
 
-        self.prefix_widget = groupInput(self, label="Project prefix", inputWidget=QtGui.QLineEdit(self), ic=text_icon)
+        self.prefix_widget = groupInput(self, label="Project prefix", inputWidget=QtGui.QLineEdit(self), ic=cfg.text_icon)
         self.prefix_input = self.prefix_widget.input
         self.input_layout.addWidget(self.prefix_widget)
 
-        self.suffix_widget = groupInput(self, label="Project suffix", inputWidget=QtGui.QLineEdit(self), ic=text_icon)
+        self.suffix_widget = groupInput(self, label="Project suffix", inputWidget=QtGui.QLineEdit(self), ic=cfg.text_icon)
         self.suffix_input = self.suffix_widget.input
         self.input_layout.addWidget(self.suffix_widget)
 

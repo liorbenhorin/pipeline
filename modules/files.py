@@ -76,8 +76,6 @@ def dir_move(dir_fullpath, new_dir_fullpath):
         return new_dir_fullpath
     return None
 
-        
-             
 def file_rename(fullpath, new_name):
     '''
     input: string, fullpath of the file to rename
