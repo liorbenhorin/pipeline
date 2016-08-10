@@ -440,6 +440,7 @@ class Versions_View(QtGui.QTreeView):
         if self.model().sourceModel().getNode(index).typeInfo() == cfg._new_:
             node = self.model().sourceModel().getNode(index).parent()
             node.initialVersion()
+            self._proxyModel.invalidate()
 
         else:
             self.model().sourceModel().getNode(index).load()

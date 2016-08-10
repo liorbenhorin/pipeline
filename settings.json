@@ -1,5 +1,5 @@
 {
-    "_project": "puppies", 
+    "_project": "puppies2", 
     "client": "Client_a", 
     "current_open_file": null, 
     "current_project": null, 
@@ -13,7 +13,7 @@
         "sequence": null, 
         "shot": null
     }, 
-    "stage": "model", 
+    "stage": "layout", 
     "user": [
         "root", 
         "1234"

@@ -250,472 +250,6 @@ create_edit_project_form_class, create_edit_project_base_class = loadUiType(crea
 
 version = 'Snowball | 0.1.0'
 
-def set_padding(int, padding):
-    return str(int).zfill(padding)
-
-class QLabelButton(QtGui.QLabel):
-    '''
-        custom QLbael the can send clicked signal
-    '''
-    def __init(self, parent):
-        QtGui.QLabel.__init__(self, parent)
-
-    def mouseReleaseEvent(self, ev):
-        click = ev.pos()
-        if self.mask().contains(click):
-            self.emit(QtCore.SIGNAL('clicked()'))
-
-class alpha_button(QtGui.QWidget):
-    '''
-        custom QLbael the can send clicked signal, only from the pixmap are that has 100% alpha
-        used for the thumbnail transperent icon button
-    '''
-       
-    def __init__(self, parent, alpha):
-        super(alpha_button, self).__init__(parent)     
-        self.pixmap = alpha
-
-        self.button = QLabelButton(self)
-        self.button.setPixmap(self.pixmap)
-        self.button.setScaledContents(True)
-        self.button.setMask(self.pixmap.mask())
-        self.connect(self.button, QtCore.SIGNAL('clicked()'), self.onClick)
-
-    def onClick(self):
-        self.emit(QtCore.SIGNAL('clicked()'))
-
-    def set_pixmap(self, pixmap):
-        self.button.setPixmap(pixmap)
-        self.button.setScaledContents(True)
-        self.button.setMask(pixmap.mask())
-
-class pipeline_data(object):
-    def __init__(self,**kwargs):
-        self.data_file = None
-        self.data_file_path = None
-        
-        
-        for key in kwargs:
-            if key == "path":
-                self.data_file_path = kwargs[key]
-                
-        if self.data_file_path:        
-            self.set_data_file(self.data_file_path)
-
-
-    def set_data_file(self,path): 
-        if os.path.isfile(path):          
-            self.data_file = data.jsonDict(path = path) 
-            return True
-        else:
-            log.debug ("Invalid path to data file")
-
-class pipeline_settings(pipeline_data):
-    def __init__(self,**kwargs):
-        pipeline_data.__init__(self, **kwargs)
- 
-        self.settings_file = None
-        if self.data_file:
-            self.settings_file = self.data_file.read()
-        
-       
-    def create(self, path):
-        
-        projects = {}
-                               
-        settings_data = {}
-        settings_data["user"] = [None,None]
-        settings_data["project_premissions"] = None
-        settings_data["current_project"] = None
-        settings_data["projects"] = projects
-        settings_data["current_open_file"] = None
-        
-        selection = {}
-        selection["catagory"] = None
-        selection["asset"] = None
-        selection["component"] = None
-        selection["sequence"] = None
-        selection["shot"] = None
-        
-        settings_data["selection"] = selection
-                     
-        
-        self.data_file = data.jsonDict().create(path, settings_data)  
-        self.settings_file = self.data_file.read()
-        
-        return self 
-
-    def project_path(self, project_key = None):
-
-        if self.settings_file:
-            return self.projects[project_key][0]
-
-
-    @property  
-    def projects(self):
-        
-        if self.settings_file:
-            return self.settings_file["projects"]
-    
-    @projects.setter
-    def projects(self,projects):
-       
-        if self.data_file:
-            data = {}
-            data["projects"] = projects
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-    @property
-    def current_project_path(self):
-
-        if self.settings_file:
-            projects_dict = self.settings_file["projects"]
-            if self.current_project in projects_dict:
-                return projects_dict[self.current_project][0]
-            else:
-                warnings.warn("No active project")
-                return None
-
-    @property
-    def current_project_status(self):
-
-        if self.settings_file:
-            projects_dict = self.settings_file["projects"]
-            if self.current_project:
-                return projects_dict[self.current_project][1]
-            else:
-                warnings.warn("No active project")
-                return None
-                
-    @property
-    def current_project_name(self):
-
-        if self.settings_file:
-            projects_dict = self.settings_file["projects"]
-            if self.current_project:
-                return projects_dict[self.current_project][2]
-            else:
-                warnings.warn("No active project")
-                return None
-    @property
-    def current_open_file(self):
-
-        if self.settings_file:
-            return self.settings_file["current_open_file"]
- 
-    @current_open_file.setter
-    def current_open_file(self,file):
-
-        if self.data_file:
-            data = {}
-            data["current_open_file"] = file
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-    @property
-    def selection(self):
-
-        if self.settings_file:
-            return self.settings_file["selection"]
- 
-    @selection.setter
-    def selection(self,selection):
-
-        if self.data_file:
-            data = {}
-            data["selection"] = selection
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-    @property
-    def catagory_selection(self):
-        data = self.selection
-        return data["catagory"]
-
-    @catagory_selection.setter
-    def catagory_selection(self,selection):
-        data = self.selection
-        data["catagory"] = selection
-        self.selection = data
-
-    @property
-    def asset_selection(self):
-        data = self.selection
-        return data["asset"]
-
-    @asset_selection.setter
-    def asset_selection(self,selection):
-        data = self.selection
-        data["asset"] = selection
-        self.selection = data
-
-    @property
-    def component_selection(self):
-        data = self.selection
-        return data["component"]
-
-    @component_selection.setter
-    def component_selection(self,selection):
-        data = self.selection
-        data["component"] = selection
-        self.selection = data
-
-    @property
-    def sequence_selection(self):
-        data = self.selection
-        return data["sequence"]
-
-    @sequence_selection.setter
-    def sequence_selection(self,selection):
-        data = self.selection
-        data["sequence"] = selection
-        self.selection = data
-        
-
-    @property
-    def shot_selection(self):
-        data = self.selection
-        return data["shot"]
-
-    @shot_selection.setter
-    def shot_selection(self,selection):
-        data = self.selection
-        data["shot"] = selection
-        self.selection = data
-
-    @property  
-    def user(self):
-        
-        if self.settings_file:
-            return self.settings_file["user"]
-
-    @user.setter
-    def user(self,user):
-
-        if self.data_file:
-            data = {}
-            data["user"] = user
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-    @property  
-    def role(self):
-                
-        if self.settings_file:
-            role = self.settings_file["project_premissions"]
-            if role == "admin":
-                return 0
-            if role == "rigger":
-                return 1
-            if role == "animator":
-                return 2
-            if role == "guest":
-                return 3           
-            
-    @role.setter
-    def role(self,premissions):
-
-        if self.data_file:
-            data = {}
-            data["project_premissions"] = premissions
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-    
-    @property 
-    def role_name(self):        
-        if self.settings_file:
-            return self.settings_file["project_premissions"]
-
-    @property
-    def playblast_format(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["playblast_format"]
-            except:
-                return "movie"
-
-    @playblast_format.setter
-    def playblast_format(self,format):
-        if self.data_file:
-            data = {}
-            data["playblast_format"] = format
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-        
-
-    @property
-    def playblast_compression(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["playblast_compression"]
-            except:
-                return "H.264"
-
-    @playblast_compression.setter
-    def playblast_compression(self,type):
-        if self.data_file:
-            data = {}
-            data["playblast_compression"] = type
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()        
-
-
-    @property
-    def playblast_hud(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["playblast_hud"]
-            except:
-                return True
-
-    @playblast_hud.setter
-    def playblast_hud(self,type):
-        if self.data_file:
-            data = {}
-            data["playblast_hud"] = type
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-    @property
-    def playblast_offscreen(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["playblast_offscreen"]
-            except:
-                return False
-
-    @playblast_offscreen.setter
-    def playblast_offscreen(self,type):
-        if self.data_file:
-            data = {}
-            data["playblast_offscreen"] = type
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-
-    @property
-    def playblast_scale(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["playblast_scale"]
-            except:
-                return 50
-
-    @playblast_scale.setter
-    def playblast_scale(self,int):
-        if self.data_file:
-            data = {}
-            data["playblast_scale"] = int
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-
-    @property
-    def bug_reports(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["bug_reports"]
-            except:
-                return True
-        else:
-            return True
-
-    @bug_reports.setter
-    def bug_reports(self,bool):
-        if self.data_file:
-            data = {}
-            data["bug_reports"] = bool
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-
-    @property
-    def stage(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["stage"]
-            except:
-                return None
-        else:
-            return None
-
-    @stage.setter
-    def stage(self,value):
-        if self.data_file:
-            data = {}
-            data["stage"] = value
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-
-    @property
-    def rootDir(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["rootDir"]
-            except:
-                return None
-        else:
-            return None
-
-    @rootDir.setter
-    def rootDir(self, value):
-        if self.data_file:
-            data = {}
-            data["rootDir"] = value
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-
-    @property
-    def client(self):
-        if self.settings_file:
-            try:
-                return self.settings_file["client"]
-            except:
-                return None
-        else:
-            return None
-
-
-    @client.setter
-    def client(self, value):
-        if self.data_file:
-            data = {}
-            data["client"] = value
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-
-    @property
-    def project(self):
-        if self.settings_file:
-            if self.settings_file:
-                try:
-                    return self.settings_file["_project"]
-                except:
-                    return None
-            else:
-                return None
-
-
-    @project.setter
-    def project(self, project_key):
-        if self.data_file:
-            data = {}
-            data["_project"] = project_key
-            self.data_file.edit(data)
-            self.settings_file = self.data_file.read()
-
-
-    def log(self):
-        log.info("logging settings")
-        log.info("settings data file: %s"%self.data_file_path)        
-        log.info(self.data_file.print_nice())        
-        log.info("end logging settings")
-
-
 class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def __init__(self, parent=None):
         
@@ -2967,7 +2501,6 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.setMinimumWidth(350)
         self.setMaximumWidth(900)
 
-   
 class pipeLine_projects_UI(QtGui.QMainWindow):
     def __init__(self, parent=None, pipeline_window=None):
         
@@ -3410,376 +2943,416 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
     def close_window(self):
         self.close()
 
-# class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
-#     def __init__(self, parent=None, pipelineUI = None, **kwargs):
-#
-#         super(pipeLine_create_edit_project_UI, self).__init__(parent)
-#         self.setWindowFlags(QtCore.Qt.Tool)
-#         form_class, base_class = create_edit_project_form_class, create_edit_project_base_class
-#
-#         self.ui = form_class()
-#         self.ui.setupUi(self)
-#         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-#         self.setWindowTitle("Create Project")
-#         self.pipelineUI = pipelineUI
-#
-#         self.setMaximumHeight(500)
-#
-#         self.ui.label_4.setHidden(True)
-#         self.ui.widget.setHidden(True)
-#         self.ui.widget_7.setHidden(True)
-#         self.ui.widget_8.setHidden(True)
-#
-#         #self.project_file_name = 'project.json'
-#         self.project_name = "Pipeline_Project"
-#
-#         self.path = None
-#         self.project_file = None
-#
-#         for key in kwargs:
-#             if key == "project_file":
-#                 self.project_file = kwargs[key]
-#
-#         #connect ui
-#         self.roles = ["admin","guest","rigger","animator"]
-#         self.init_usersTable()
-#         self.ui.set_project_path_pushButton.clicked.connect(self.set_project_path)
-#
-#         if not self.project_file:
-#             self.ui.create_edit_project_pushButton.setText("Create")
-#             self.ui.create_edit_project_pushButton.clicked.connect(self.create_project)
-#             self.init_new_project()
-#         else:
-#             self.ui.create_edit_project_pushButton.setText("Edit")
-#             self.ui.create_edit_project_pushButton.clicked.connect(self.edit_project)
-#             self.ui.static_widget.setHidden(True)
-#             self.init_edit_project()
-#
-#             self.ui.set_project_path_pushButton.setEnabled(False)
-#             self.ui.padding_spinBox.setEnabled(False)
-#             self.ui.project_name_lineEdit.setEnabled(False)
-#             self.ui.project_path_lineEdit.setEnabled(False)
-#
-#             self.ui.playblast_sister_dir_checkBox.setChecked(self.project_file.playblast_outside)
-#
-#
-#         self.ui.cancel_pushButton.clicked.connect(self.cancel)
-#
-#
-#         self.playblast_help_button()
-#
-#
-#         self.boldFont=QtGui.QFont()
-#         self.boldFont.setBold(True)
-#         self.set_icons()
-#
-#
-#         self.updateUsersTable()
-#
-#
-#     def playblast_help_button(self):
-#
-#
-#
-#         self.playblast_help_label = QtGui.QLabel()
-#         sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
-#         sizepolicy.setHeightForWidth(self.playblast_help_label.sizePolicy().hasHeightForWidth())
-#         self.playblast_help_label.setSizePolicy(sizepolicy)
-#         self.playblast_help_label.setMinimumSize(QtCore.QSize(30, 30))
-#
-#         self.ui.horizontalLayout_3.addWidget(self.playblast_help_label)
-#         self.ui.horizontalLayout_3.setContentsMargins(0,0,0,0)
-#
-#         layout = QtGui.QHBoxLayout(self.playblast_help_label)
-#         layout.setContentsMargins(0,0,0,0)
-#
-#
-#         self.playblast_help = alpha_button(self,cfg.help_icon)
-#         self.playblast_help.set_pixmap(cfg.help_icon)
-#         sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
-#         sizepolicy2.setHeightForWidth(self.playblast_help.sizePolicy().hasHeightForWidth())
-#         self.playblast_help.setSizePolicy(sizepolicy2)
-#         self.playblast_help.setMinimumSize(QtCore.QSize(30, 30))
-#         self.playblast_help.button.setAlignment(QtCore.Qt.AlignCenter)
-#         layout.addWidget(self.playblast_help)
-#         self.connect(self.playblast_help, QtCore.SIGNAL('clicked()'), self.playblast_help_popup)
-#
-#         self.spacer = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
-#         self.ui.horizontalLayout_3.addItem(self.spacer)
-#
-#
-#     def playblast_help_popup(self):
-#         dlg.massage("massage","Playblasts","Playblasts can consume a lot of disk space,\nWhen working on a project on a shared disk or cloud, This can slow the syncing proccess.\nHave more control by keeping them in a sister directory.")
-#
-#     def set_icons(self):
-#         self.ui.create_edit_project_pushButton.setIcon(QtGui.QIcon(cfg.yes_icon))
-#         self.ui.create_edit_project_pushButton.setIconSize(QtCore.QSize(20,20))
-#
-#         self.ui.set_project_path_pushButton.setIcon(QtGui.QIcon(cfg.search_icon))
-#         self.ui.set_project_path_pushButton.setIconSize(QtCore.QSize(20,20))
-#
-#         self.ui.cancel_pushButton.setIcon(QtGui.QIcon(cfg.no_icon))
-#         self.ui.cancel_pushButton.setIconSize(QtCore.QSize(20,20))
-#
-#     def init_new_project(self):
-#         self.ui.project_name_lineEdit.setText(self.project_name)
-#         self.users = {}
-#         self.users["Admin"] = ["1234", self.roles[0]]
-#
-#     def init_edit_project(self):
-#         self.ui.project_name_lineEdit.setText(self.project_file.project_name)
-#         if self.project_file.project_users != None:
-#             self.users = self.project_file.project_users
-#             self.ui.users_checkBox.setChecked(True)
-#         else:
-#             self.users = {}
-#             self.users["Admin"] = ["1234", self.roles[0]]
-#
-#         self.ui.padding_spinBox.setValue(self.project_file.project_padding)
-#
-#         type = "Maya Ascii (*.ma)"
-#
-#         if self.project_file.project_file_type == "mb":
-#             type = "Maya Binary (*.mb)"
-#
-#         fps = "PAL (25fps)"
-#
-#         if self.project_file.project_fps == 24:
-#             fps = "Film (24fps)"
-#         if self.project_file.project_fps == 30:
-#             fps =  "NTSC (30fps)"
-#
-#
-#         i = self.ui.file_type_comboBox.findText(type, QtCore.Qt.MatchFixedString)
-#         if i >= 0:
-#          self.ui.file_type_comboBox.setCurrentIndex(i)
-#
-#         i = self.ui.fps_comboBox.findText(fps, QtCore.Qt.MatchFixedString)
-#         if i >= 0:
-#          self.ui.fps_comboBox.setCurrentIndex(i)
-#
-#
-#
-#     def set_project_path(self):
-#
-#         path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
-#         self.ui.project_path_lineEdit.setText(os.path.join(path,str(self.ui.project_name_lineEdit.text())))
-#
-#
-#
-#     def init_usersTable(self):
-#         self.ui.users_tableWidget.horizontalHeader().setVisible(True)
-#         self.ui.users_tableWidget.verticalHeader().setVisible(False)
-#         self.ui.users_tableWidget.setWordWrap(False)
-#         self.ui.users_tableWidget.setColumnCount(4)
-#         self.ui.users_tableWidget.setRowCount(1)
-#         self.ui.users_tableWidget.setHorizontalHeaderLabels(["Username","password","Role","Action"])
-#         self.ui.users_tableWidget.verticalHeader().setDefaultSectionSize(30);
-#         self.ui.users_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-#         self.ui.users_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-#         self.ui.users_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch )
-#         self.ui.users_tableWidget.horizontalHeader().resizeSection(0,200)
-#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Stretch )
-#         self.ui.users_tableWidget.horizontalHeader().resizeSection(1,200)
-#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-#         self.ui.users_tableWidget.horizontalHeader().resizeSection(2,200)
-#         self.ui.users_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
-#         self.ui.users_tableWidget.horizontalHeader().resizeSection(3,50)
-#
-#
-#
-#     def updateUsersTable(self):
-#         self.ui.users_tableWidget.clearContents()
-#         self.ui.users_tableWidget.setRowCount(len(self.users)+1)
-#
-#         admin_username = QtGui.QTableWidgetItem("Admin")
-#         admin_username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-#         admin_username.setFont(self.boldFont)
-#         self.ui.users_tableWidget.setItem(0,0,admin_username)
-#
-#         admin_password = QtGui.QTableWidgetItem(self.users["Admin"][0])
-#         self.ui.users_tableWidget.setItem(0,1,admin_password)
-#
-#         role = QtGui.QTableWidgetItem("admin")
-#         role.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-#         role.setFont(self.boldFont)
-#         self.ui.users_tableWidget.setItem(0,2,role)
-#
-#         users = self.users
-#         del users["Admin"]
-#
-#         if users:
-#             for index, key in enumerate(users):
-#
-#                 username = QtGui.QTableWidgetItem(key)
-#                 username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-#                 username.setFont(self.boldFont)
-#                 self.ui.users_tableWidget.setItem(index+1,0,username)
-#
-#                 password = QtGui.QTableWidgetItem(users[key][0])
-#                 self.ui.users_tableWidget.setItem(index+1,1,password)
-#
-#                 role = users[key][1]
-#
-#                 roles_combo = QtGui.QComboBox()
-#                 roles_combo.setEditable(False)
-#                 roles_combo.addItems(self.roles)
-#
-#                 self.ui.users_tableWidget.setCellWidget(index+1,2,roles_combo)
-#                 i = roles_combo.findText(role, QtCore.Qt.MatchFixedString)
-#                 if i >= 0:
-#                     roles_combo.setCurrentIndex(i)
-#
-#                 deleteButtonItem = QtGui.QPushButton("")
-#                 deleteButtonItem.setIcon(QtGui.QIcon(cfg.no_icon))
-#                 deleteButtonItem.setIconSize(QtCore.QSize(20,20))
-#                 self.ui.users_tableWidget.setCellWidget(index+1,3,deleteButtonItem)
-#                 deleteButtonItem.clicked.connect(self.remove_user)
-#
-#
-#         empty_item1 = QtGui.QTableWidgetItem("")
-#         empty_item1.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-#         empty_item2 = QtGui.QTableWidgetItem("")
-#         empty_item2.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-#         empty_item3 = QtGui.QTableWidgetItem("")
-#         empty_item3.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-#         self.ui.users_tableWidget.setItem(len(self.users)+1,0,empty_item1)
-#         self.ui.users_tableWidget.setItem(len(self.users)+1,1,empty_item2)
-#         self.ui.users_tableWidget.setItem(len(self.users)+1,2,empty_item3)
-#
-#         newButtonItem = QtGui.QPushButton("")
-#         newButtonItem.setIcon(QtGui.QIcon(cfg.add_icon))
-#         newButtonItem.setIconSize(QtCore.QSize(20,20))
-#         self.ui.users_tableWidget.setCellWidget(len(self.users)+1,3,newButtonItem)
-#         newButtonItem.clicked.connect(self.add_user)
-#
-#     def add_user(self):
-#         self.set_users_dict()
-#
-#         username, ok = QtGui.QInputDialog.getText(self, 'New User', 'Enter User name:')
-#
-#         if ok:
-#             if username not in self.users and username != "":
-#                 self.users[username] = ["",self.roles[1]]
-#                 self.updateUsersTable()
-#             else:
-#                 print "User name exists..."
-#
-#     def remove_user(self):
-#         widget = self.sender()
-#         index = self.ui.users_tableWidget.indexAt(widget.pos())
-#         username = str(self.ui.users_tableWidget.item(index.row(),0).text())
-#
-#         self.set_users_dict()
-#
-#         del self.users[username]
-#         self.updateUsersTable()
-#
-#
-#
-#     def set_users_dict(self):
-#         users = {}
-#         rows = self.ui.users_tableWidget.rowCount() - 1
-#         for row in range(0,rows):
-#            if row == 0:
-#                users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.item(row,2).text() ]
-#
-#            else:
-#                users[self.ui.users_tableWidget.item(row,0).text()] = [self.ui.users_tableWidget.item(row,1).text() , self.ui.users_tableWidget.cellWidget(row,2).currentText()   ]
-#
-#         self.users = users
-#
-#
-#
-#     def create_project(self):
-#         # if self.ui.users_checkBox.isChecked() == True:
-#         #     self.set_users_dict()
-#         #     self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
-#         #     self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
-#         # else:
-#         #     self.users = None
-#
-#         project_path = os.path.join( self.pipelineUI.client.path , str(self.ui.project_name_lineEdit.text()))
-#         project_name = str(self.ui.project_name_lineEdit.text())
-#
-#
-#         padding = self.ui.padding_spinBox.value()
-#
-#         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
-#             file_type = "ma"
-#         if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
-#             file_type = "mb"
-#
-#         if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
-#             fps = 25
-#         if self.ui.fps_comboBox.currentText() == "Film (24fps)":
-#             fps = 24
-#         if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
-#             fps = 30
-#
-#         playblast_outside = False
-#         if self.ui.playblast_sister_dir_checkBox.isChecked():
-#             playblast_outside = True
-#
-#         project = dt.ProjectNode(project_name, self.pipelineUI.client ).create(path = project_path,
-#                                                                                 padding=padding,
-#                                                                                 file_type=file_type,
-#                                                                                 fps = fps,
-#                                                                                 users = self.users)
-#
-#
-#         #self.project_file = pipeline_project().create(project_path, name = project_name, padding = padding, file_type = file_type, fps = fps, users = self.users, playblast_outside = playblast_outside)
-#         #self.projects_window.add_project(project_name = project_name, project_path = project_path, project_key = self.project_file.project_key)
-#
-#         self.pipelineUI.projects.insertRows(0, 1, node = project)
-#         project.set()
-#
-#         #self.projects_window.set_project(project_key = self.project_file.project_key)
-#         self.close()
-#
-#
-#     def edit_project(self):
-#         if self.ui.users_checkBox.isChecked() == True:
-#             self.set_users_dict()
-#             self.projects_window.pipeline_window.settings.user = ["Admin", self.users["Admin"][0]]
-#
-#             self.projects_window.pipeline_window.ui.users_pushButton.setText("%s : %s"%("Admin","admin"))
-#         else:
-#             self.users = None
-#
-#
-#
-#         if self.ui.file_type_comboBox.currentText() == "Maya Ascii (*.ma)":
-#             file_type = "ma"
-#         if self.ui.file_type_comboBox.currentText() == "Maya Binary (*.mb)":
-#             file_type = "mb"
-#
-#         if self.ui.fps_comboBox.currentText() == "PAL (25fps)":
-#             fps = 25
-#         if self.ui.fps_comboBox.currentText() == "Film (24fps)":
-#             fps = 24
-#         if self.ui.fps_comboBox.currentText() == "NTSC (30fps)":
-#             fps = 30
-#
-#         self.project_file.project_users = self.users
-#         self.project_file.project_file_type = file_type
-#         self.project_file.project_fps = fps
-#
-#         playblast_outside = False
-#         if self.ui.playblast_sister_dir_checkBox.isChecked():
-#             playblast_outside = True
-#
-#         self.project_file.playblast_outside = playblast_outside
-#
-#         self.projects_window.set_project(project_key = self.project_file.project_key)
-#         self.close()
-#
-#     def cancel(self):
-#         self.close()
-#
+class pipeline_data(object):
+    def __init__(self, **kwargs):
+        self.data_file = None
+        self.data_file_path = None
 
-        
+        for key in kwargs:
+            if key == "path":
+                self.data_file_path = kwargs[key]
+
+        if self.data_file_path:
+            self.set_data_file(self.data_file_path)
+
+    def set_data_file(self, path):
+        if os.path.isfile(path):
+            self.data_file = data.jsonDict(path=path)
+            return True
+        else:
+            log.debug("Invalid path to data file")
+
+class pipeline_settings(pipeline_data):
+    def __init__(self, **kwargs):
+        pipeline_data.__init__(self, **kwargs)
+
+        self.settings_file = None
+        if self.data_file:
+            self.settings_file = self.data_file.read()
+
+    def create(self, path):
+
+        projects = {}
+
+        settings_data = {}
+        settings_data["user"] = [None, None]
+        settings_data["project_premissions"] = None
+        settings_data["current_project"] = None
+        settings_data["projects"] = projects
+        settings_data["current_open_file"] = None
+
+        selection = {}
+        selection["catagory"] = None
+        selection["asset"] = None
+        selection["component"] = None
+        selection["sequence"] = None
+        selection["shot"] = None
+
+        settings_data["selection"] = selection
+
+        self.data_file = data.jsonDict().create(path, settings_data)
+        self.settings_file = self.data_file.read()
+
+        return self
+
+    def project_path(self, project_key=None):
+
+        if self.settings_file:
+            return self.projects[project_key][0]
+
+    @property
+    def projects(self):
+
+        if self.settings_file:
+            return self.settings_file["projects"]
+
+    @projects.setter
+    def projects(self, projects):
+
+        if self.data_file:
+            data = {}
+            data["projects"] = projects
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def current_project_path(self):
+
+        if self.settings_file:
+            projects_dict = self.settings_file["projects"]
+            if self.current_project in projects_dict:
+                return projects_dict[self.current_project][0]
+            else:
+                warnings.warn("No active project")
+                return None
+
+    @property
+    def current_project_status(self):
+
+        if self.settings_file:
+            projects_dict = self.settings_file["projects"]
+            if self.current_project:
+                return projects_dict[self.current_project][1]
+            else:
+                warnings.warn("No active project")
+                return None
+
+    @property
+    def current_project_name(self):
+
+        if self.settings_file:
+            projects_dict = self.settings_file["projects"]
+            if self.current_project:
+                return projects_dict[self.current_project][2]
+            else:
+                warnings.warn("No active project")
+                return None
+
+    @property
+    def current_open_file(self):
+
+        if self.settings_file:
+            return self.settings_file["current_open_file"]
+
+    @current_open_file.setter
+    def current_open_file(self, file):
+
+        if self.data_file:
+            data = {}
+            data["current_open_file"] = file
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def selection(self):
+
+        if self.settings_file:
+            return self.settings_file["selection"]
+
+    @selection.setter
+    def selection(self, selection):
+
+        if self.data_file:
+            data = {}
+            data["selection"] = selection
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def catagory_selection(self):
+        data = self.selection
+        return data["catagory"]
+
+    @catagory_selection.setter
+    def catagory_selection(self, selection):
+        data = self.selection
+        data["catagory"] = selection
+        self.selection = data
+
+    @property
+    def asset_selection(self):
+        data = self.selection
+        return data["asset"]
+
+    @asset_selection.setter
+    def asset_selection(self, selection):
+        data = self.selection
+        data["asset"] = selection
+        self.selection = data
+
+    @property
+    def component_selection(self):
+        data = self.selection
+        return data["component"]
+
+    @component_selection.setter
+    def component_selection(self, selection):
+        data = self.selection
+        data["component"] = selection
+        self.selection = data
+
+    @property
+    def sequence_selection(self):
+        data = self.selection
+        return data["sequence"]
+
+    @sequence_selection.setter
+    def sequence_selection(self, selection):
+        data = self.selection
+        data["sequence"] = selection
+        self.selection = data
+
+    @property
+    def shot_selection(self):
+        data = self.selection
+        return data["shot"]
+
+    @shot_selection.setter
+    def shot_selection(self, selection):
+        data = self.selection
+        data["shot"] = selection
+        self.selection = data
+
+    @property
+    def user(self):
+
+        if self.settings_file:
+            return self.settings_file["user"]
+
+    @user.setter
+    def user(self, user):
+
+        if self.data_file:
+            data = {}
+            data["user"] = user
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def role(self):
+
+        if self.settings_file:
+            role = self.settings_file["project_premissions"]
+            if role == "admin":
+                return 0
+            if role == "rigger":
+                return 1
+            if role == "animator":
+                return 2
+            if role == "guest":
+                return 3
+
+    @role.setter
+    def role(self, premissions):
+
+        if self.data_file:
+            data = {}
+            data["project_premissions"] = premissions
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def role_name(self):
+        if self.settings_file:
+            return self.settings_file["project_premissions"]
+
+    @property
+    def playblast_format(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_format"]
+            except:
+                return "movie"
+
+    @playblast_format.setter
+    def playblast_format(self, format):
+        if self.data_file:
+            data = {}
+            data["playblast_format"] = format
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def playblast_compression(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_compression"]
+            except:
+                return "H.264"
+
+    @playblast_compression.setter
+    def playblast_compression(self, type):
+        if self.data_file:
+            data = {}
+            data["playblast_compression"] = type
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def playblast_hud(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_hud"]
+            except:
+                return True
+
+    @playblast_hud.setter
+    def playblast_hud(self, type):
+        if self.data_file:
+            data = {}
+            data["playblast_hud"] = type
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def playblast_offscreen(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_offscreen"]
+            except:
+                return False
+
+    @playblast_offscreen.setter
+    def playblast_offscreen(self, type):
+        if self.data_file:
+            data = {}
+            data["playblast_offscreen"] = type
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def playblast_scale(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["playblast_scale"]
+            except:
+                return 50
+
+    @playblast_scale.setter
+    def playblast_scale(self, int):
+        if self.data_file:
+            data = {}
+            data["playblast_scale"] = int
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def bug_reports(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["bug_reports"]
+            except:
+                return True
+        else:
+            return True
+
+    @bug_reports.setter
+    def bug_reports(self, bool):
+        if self.data_file:
+            data = {}
+            data["bug_reports"] = bool
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def stage(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["stage"]
+            except:
+                return None
+        else:
+            return None
+
+    @stage.setter
+    def stage(self, value):
+        if self.data_file:
+            data = {}
+            data["stage"] = value
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def rootDir(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["rootDir"]
+            except:
+                return None
+        else:
+            return None
+
+    @rootDir.setter
+    def rootDir(self, value):
+        if self.data_file:
+            data = {}
+            data["rootDir"] = value
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def client(self):
+        if self.settings_file:
+            try:
+                return self.settings_file["client"]
+            except:
+                return None
+        else:
+            return None
+
+    @client.setter
+    def client(self, value):
+        if self.data_file:
+            data = {}
+            data["client"] = value
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    @property
+    def project(self):
+        if self.settings_file:
+            if self.settings_file:
+                try:
+                    return self.settings_file["_project"]
+                except:
+                    return None
+            else:
+                return None
+
+    @project.setter
+    def project(self, project_key):
+        if self.data_file:
+            data = {}
+            data["_project"] = project_key
+            self.data_file.edit(data)
+            self.settings_file = self.data_file.read()
+
+    def log(self):
+        log.info("logging settings")
+        log.info("settings data file: %s" % self.data_file_path)
+        log.info(self.data_file.print_nice())
+        log.info("end logging settings")
+
 def show():
 
     try:
@@ -3797,3 +3370,42 @@ def show():
     UiWindow.run()
     
     return UiWindow
+
+def set_padding(int, padding):
+    return str(int).zfill(padding)
+
+class QLabelButton(QtGui.QLabel):
+    '''
+        custom QLbael the can send clicked signal
+    '''
+    def __init(self, parent):
+        QtGui.QLabel.__init__(self, parent)
+
+    def mouseReleaseEvent(self, ev):
+        click = ev.pos()
+        if self.mask().contains(click):
+            self.emit(QtCore.SIGNAL('clicked()'))
+
+class alpha_button(QtGui.QWidget):
+    '''
+        custom QLbael the can send clicked signal, only from the pixmap are that has 100% alpha
+        used for the thumbnail transperent icon button
+    '''
+
+    def __init__(self, parent, alpha):
+        super(alpha_button, self).__init__(parent)
+        self.pixmap = alpha
+
+        self.button = QLabelButton(self)
+        self.button.setPixmap(self.pixmap)
+        self.button.setScaledContents(True)
+        self.button.setMask(self.pixmap.mask())
+        self.connect(self.button, QtCore.SIGNAL('clicked()'), self.onClick)
+
+    def onClick(self):
+        self.emit(QtCore.SIGNAL('clicked()'))
+
+    def set_pixmap(self, pixmap):
+        self.button.setPixmap(pixmap)
+        self.button.setScaledContents(True)
+        self.button.setMask(pixmap.mask())

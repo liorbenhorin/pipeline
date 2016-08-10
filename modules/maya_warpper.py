@@ -61,7 +61,7 @@ import pipeline.modules.files as files
 
 def new_scene():
     checkState()
-    return cmds.file(new=True, f=True)
+    return os.path.normpath(cmds.file(new=True, f=True))
 
 def rewind():
     cmds.currentTime(1)    
@@ -73,16 +73,16 @@ def save_scene_as(path = None, file_name = None):
         if file_name:
             fullpath = os.path.join(path,file_name)
             cmds.file(rename = fullpath)
-            return cmds.file(s=True, type="mayaAscii")    
+            return os.path.normpath(cmds.file(s=True, type="mayaAscii"))
             
             
 def open_scene(path = None):
     if os.path.exists(path):
         checkState()
-        return cmds.file(path, o = True, f = True, esn = False)
+        return os.path.normpath(cmds.file(path, o = True, f = True, esn = False))
 
 def current_open_file():
-    return cmds.file(q=True,sn=True)              
+    return os.path.normpath(cmds.file(q=True,sn=True))
 
 
 def checkState():
@@ -105,16 +105,16 @@ def checkState():
 def reference_scene(path = None):      
     if os.path.exists(path):
         namesspace = files.file_name_no_extension(files.file_name(path))
-        return cmds.file(path, r = True, f = True, ns = namesspace, esn = False)    
+        return os.path.normpath(cmds.file(path, r = True, f = True, ns = namesspace, esn = False) )
         
 def import_scene(path = None):      
     if os.path.exists(path):
         namesspace = files.file_name_no_extension(files.file_name(path))
-        return cmds.file(path, i = True, f = True, ns = namesspace, esn = False)    
+        return os.path.normpath(cmds.file(path, i = True, f = True, ns = namesspace, esn = False)  )
         
 def reference_file_paths():
 
-    return [cmds.referenceQuery(ref, filename = True) for ref in cmds.ls(rf=True)]
+    return [os.path.normpath(cmds.referenceQuery(ref, filename = True)) for ref in cmds.ls(rf=True)]
 
 
 def list_referenced_files():
@@ -288,9 +288,9 @@ def new_scene_from_selection(project_path = None, mode = "include"):
     sel = cmds.ls(sl=True)
     if len(sel)>0:
         if mode == "include":
-            saved_file = cmds.file(temp_file, type='mayaAscii', exportSelected=True, expressions=True, constraints=True, channels=True, constructionHistory=True, shader=True)    
+            saved_file = os.path.normpath(cmds.file(temp_file, type='mayaAscii', exportSelected=True, expressions=True, constraints=True, channels=True, constructionHistory=True, shader=True) )
         if mode == "exclude":
-            saved_file = cmds.file(temp_file, type='mayaAscii', exportSelected=True, expressions=False, constraints=False, channels=False, constructionHistory=False, shader=True)
+            saved_file = os.path.normpath(cmds.file(temp_file, type='mayaAscii', exportSelected=True, expressions=False, constraints=False, channels=False, constructionHistory=False, shader=True))
         
         if saved_file:
             open_scene(saved_file)

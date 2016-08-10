@@ -1284,7 +1284,6 @@ class StageNode(RootNode):
 
                 self.edited.emit()
 
-
                 # childes = [x for x in self._children if not x.typeInfo()==cfg._master_]
                 # self.pipelineUI.version = childes[-1]
 
