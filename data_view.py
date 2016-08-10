@@ -464,7 +464,7 @@ class PipelineUsersView(QtGui.QTableView):
                 users.append(dt.UserNode(key, users_file[key][0], users_file[key][1]))
 
             if users:
-                self.setModel(dtm.PipelineUsersModel(users))
+                self.setModel(dtm.Users_Model(users))
 
 
 class PipelineProjectsView(QtGui.QTableView):
@@ -518,7 +518,7 @@ class PipelineProjectsView(QtGui.QTableView):
         if model:
 
 
-            self._proxyModel = dtm.PipelineProjectsProxyModel()
+            self._proxyModel = dtm.Projects_ProxyModel()
             self._proxyModel.setSourceModel(model)
             self.setModel(self._proxyModel)
             # size the load button column
@@ -706,10 +706,10 @@ class PipelineMastersView(QtGui.QTreeView):
         if model:
 
             model._rowHeight = self._slider.listSlider.value()
-            self._proxyModel = dtm.PipelineMastersProxyModel()
+            self._proxyModel = dtm.Masters_ProxyModel()
             self._proxyModel.setSourceModel(model)
             self._proxyModel.setDynamicSortFilter(True)
-            self._proxyModel.setSortRole(dtm.PipelineMastersModel.sortRole)
+            self._proxyModel.setSortRole(dtm.Masters_Model.sortRole)
             self.setModel(self._proxyModel)
 
             self.setIndentation(0)
@@ -903,12 +903,12 @@ class PipelineVersionsView(QtGui.QTreeView):
         if model:
 
             model._rowHeight = self._slider.listSlider.value()
-            self._proxyModel = dtm.PipelineVersionsProxyModel()
+            self._proxyModel = dtm.Versions_ProxyModel()
             self._proxyModel.setSourceModel(model)
 
             self._proxyModel.setDynamicSortFilter(True)
             #self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-            self._proxyModel.setSortRole(dtm.PipelineVersionsModel2.sortRole)
+            self._proxyModel.setSortRole(dtm.Versions_Model.sortRole)
             #self._proxyModel.setFilterRole(0)
             #self._proxyModel.setFilterKeyColumn(2)
 
@@ -2817,7 +2817,7 @@ class ComboStaticWidget(ComboWidget):
         # if RemoveOption:
         #     list.append(dt.AddNode("Remove..."))
         
-        self._model = dtm.PipelineListModel(list) 
+        self._model = dtm.List_Model(list)
         self.comboBox.setModel(self._model)  
         
         self.comboBox.currentIndexChanged.connect(self.update)
@@ -2940,7 +2940,7 @@ class ComboDynamicWidget(ComboWidget):
         # if RemoveOption:
         #     list.append(dt.AddNode("Remove..."))
         
-        self._model = dtm.PipelineListModel(list) 
+        self._model = dtm.List_Model(list)
         self.comboBox.setModel(self._model)    
 
       

@@ -1131,7 +1131,7 @@ class projectDialog(QtGui.QDialog):
         level2 = dt.LevelsNode("asset")
         level2.setLevels(["ep","type","asset","stage"])
 
-        self.levels_model = dtm.PipelineLevelsModel([level1,level2])
+        self.levels_model = dtm.Levels_Model([level1, level2])
         self.levels_tree.setModel(self.levels_model)
 
 
@@ -1140,12 +1140,12 @@ class projectDialog(QtGui.QDialog):
         stages2 = dt.LevelsNode("asset")
         stages2.setLevels(["model", "rig", "clip","shading"])
 
-        self.stages_model = dtm.PipelineStagesModel([stages1, stages2])
+        self.stages_model = dtm.Stages_Model([stages1, stages2])
         self.stages_tree.setModel(self.stages_model)
 
 
         user1 = dt.UserNode("root", "1234", _admin_)
-        self.users_model = dtm.PipelineUsersModel([user1])
+        self.users_model = dtm.Users_Model([user1])
         self.users_tree.setModel(self.users_model)
 
 

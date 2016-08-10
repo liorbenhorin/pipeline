@@ -1610,7 +1610,7 @@ class StageNode(RootNode):
     def versiosnModel(self):
 
         self.versions
-        return dtm.PipelineVersionsModel2(self)
+        return dtm.Versions_Model(self)
 
 
     def populate_master_versions(self):
@@ -1757,7 +1757,7 @@ class StageNode(RootNode):
     def mastersModel(self):
 
         if self.model_masters():
-            return dtm.PipelineMastersModel(self)
+            return dtm.Masters_Model(self)
         else:
             return None
 

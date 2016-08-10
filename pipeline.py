@@ -100,28 +100,7 @@ reload(dtm)
 import data_view as dtv
 reload(dtv)
 
-global _node_
-global _root_
-global _stage_
-global _asset_
-global _folder_
-global _dummy_
-global _new_
-global _catagory_
-global _assets_
-global _animation_
-global _admin_
-_admin_ = "admin"
-_assets_ = "asset"
-_animation_ = "animation"
-_catagory_ = "catagory"
-_new_ = "new"
-_node_ = "node"
-_root_ = "root"
-_stage_ = "stage"
-_asset_ = "asset"
-_folder_ = "folder"
-_dummy_ = "dummy"
+import config as cfg
 
 
 '''
@@ -1802,7 +1781,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if RemoveOption:
                 list.append(dt.AddNode("Remove..."))
 
-            self.clients = dtm.PipelineListModel(list)
+            self.clients = dtm.List_Model(list)
             if current:
                 self.client = current
 
@@ -1907,16 +1886,16 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                                 project=self.project)
 
             assets = dt.RootNode("assets", path=os.path.join(self.project.path, 'assets'), parent=_root,
-                                 section=_assets_, settings=self.settings, project=self.project, ui = self)
+                                 section=cfg._assets_, settings=self.settings, project=self.project, ui = self)
 
             assets.model_dresser_tree()
             # scenes = dt.RootNode("scenes", path=os.path.join(self.project.path, 'scenes'), parent=_root,
-            #                      section=_animation_, settings=self.settings, project=self.project)
+            #                      section=cfg._animation_, settings=self.settings, project=self.project)
 
             dresserModel = dtm.Dresser_Model(_root, self)
 
 
-            _proxyModel = dtm.PipelineProjectProxyModel(self)
+            _proxyModel = dtm.Project_ProxyModel(self)
             _proxyModel.setSourceModel(dresserModel)
             _proxyModel.setDynamicSortFilter(True)
             _proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
@@ -1937,12 +1916,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             _root = dt.RootNode("root", path = self.project.path, parent = self.project, settings = self.settings, project = self.project)
 
-            assets = dt.RootNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = _assets_, settings = self.settings, project = self.project)
+            assets = dt.RootNode("assets", path = os.path.join(self.project.path, 'assets'), parent = _root, section = cfg._assets_, settings = self.settings, project = self.project)
             assets.percentage_complete.connect(self.ui.tree_progressBar.setValue)
             assets.model_tree()
             assets.percentage_complete.disconnect()
 
-            scenes = dt.RootNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = _animation_, settings = self.settings, project = self.project)
+            scenes = dt.RootNode("scenes", path = os.path.join(self.project.path, 'scenes'), parent = _root, section = cfg._animation_, settings = self.settings, project = self.project)
             scenes.percentage_complete.connect(self.ui.tree_progressBar.setValue)
             scenes.model_tree()
             scenes.percentage_complete.disconnect()
@@ -1965,7 +1944,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
             '''
 
-            self._proxyModel = dtm.PipelineProjectProxyModel()
+            self._proxyModel = dtm.Project_ProxyModel()
             self._proxyModel.setSourceModel(treeModel)
             self._proxyModel.setDynamicSortFilter(True)
             self._proxyModel.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
@@ -3728,7 +3707,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             if RemoveOption:
                 list.append(dt.AddNode("Remove..."))
 
-            self._model = dtm.PipelineListModel(list)
+            self._model = dtm.List_Model(list)
             self.ui.clients_comboBox.setModel(self._model)
 
             self.ui.clients_comboBox.currentIndexChanged.connect(self.setClient)
@@ -3763,8 +3742,8 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
 
         index = self.ui.clients_comboBox.currentIndex()
 
-        if self.ui.clients_comboBox.model().items[index].typeInfo() != _new_ and self.ui.clients_comboBox.model().items[
-            index].typeInfo() != _catagory_:
+        if self.ui.clients_comboBox.model().items[index].typeInfo() != cfg._new_ and self.ui.clients_comboBox.model().items[
+            index].typeInfo() != cfg._catagory_:
             self.pipeline_window.settings.client = self.ui.clients_comboBox.currentText()
             self.pipeline_window.client = self.ui.clients_comboBox.model().items[index]
             self.ui.create_project_pushButton.setEnabled(True)
