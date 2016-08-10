@@ -1913,7 +1913,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             # scenes = dt.RootNode("scenes", path=os.path.join(self.project.path, 'scenes'), parent=_root,
             #                      section=_animation_, settings=self.settings, project=self.project)
 
-            dresserModel = dtm.PipelineDresserModel(_root, self)
+            dresserModel = dtm.Dresser_Model(_root, self)
 
 
             _proxyModel = dtm.PipelineProjectProxyModel(self)
@@ -1957,7 +1957,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             it's the main tree model object, its global so it is deleted every restart of Pipeline
             '''
 
-            treeModel = dtm.PipelineProjectModel(_root, self)
+            treeModel = dtm.Projects_Model(_root, self)
 
 
             '''

@@ -605,16 +605,16 @@ class loadButtonDelegate(QtGui.QItemDelegate):
             self.parent().setIndexWidget(index, button)
 
 
-class HeaderViewFilter2(QtCore.QObject):
-    def __init__(self, parent = None,  *args):
-        super(HeaderViewFilter2, self).__init__(parent, *args)
-
-    def eventFilter(self, object, event):
-        if event.type() == QtCore.QEvent.MouseMove:
-            print "*"
-            logicalIndex = object.indexAt(event.pos())
-            #print logicalIndex, "*"
-            return True
+# class HeaderViewFilter2(QtCore.QObject):
+#     def __init__(self, parent = None,  *args):
+#         super(HeaderViewFilter2, self).__init__(parent, *args)
+#
+#     def eventFilter(self, object, event):
+#         if event.type() == QtCore.QEvent.MouseMove:
+#             print "*"
+#             logicalIndex = object.indexAt(event.pos())
+#             #print logicalIndex, "*"
+#             return True
 
 class PipelineMastersView(QtGui.QTreeView):
     def __init__(self, parentWidget = None, parent = None):
@@ -1168,508 +1168,508 @@ class IconScaleSlider(QtGui.QWidget):
 
 
 
-class PipelineContentsView(QtGui.QTableView):
-    def __init__(self,parent = None):
-        super(PipelineContentsView, self).__init__(parent)
-        
-        #display options
-        
-        self.setAlternatingRowColors(True)
-        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
-        self.setWordWrap(True)
-        self.setShowGrid(False)
-        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)        
-        self.icons_size(32)       
-        #self.setMinimumWidth(250)
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.setSortingEnabled(True)
-        self.horizontalHeader().setOffset(10)
-        self.verticalHeader().hide()
-        
-        self.setSortingEnabled(True)
-        self.setDragEnabled( True )
-        self.setAcceptDrops( True )
-        self.setDragDropMode( QtGui.QAbstractItemView.DragDrop )#QtGui.QAbstractItemView.DragDrop )InternalMove
-
-        #local variables
-        self._treeView = None        
-        self._treeProxyModel = None
-        self._treeSourceModel = None
-        
-        self._treeParent = None
-        self._treeParentIndex = None
-
-        self._versionsView = None
-
-
-
-
-    def dropEvent(self, event):
-
-        #super(PipelineContentsView,self).dropEvent(event)
-        '''
-        if not event.isAccepted():
-            # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
-            # by target widget, it sets accept() to true, which causes the executed
-            # action to be reported as "move", which causes the view to remove the
-            # source rows even though the target widget didn't like the drop.
-            # Maybe it's better for the model to check drop-okay-ness during the
-            # drag rather than only on drop; but the check involves not-insignificant work.
-            event.setDropAction(QtCore.Qt.IgnoreAction)
-        '''
-        
-        '''
-        this event is catching drops onto the contents view
-        
-        '''     
-        treeModel = self.treeSourceModel
-        i = self.indexAt(event.pos())
-
-        #if i.isValid():
-            
-        if event.source().__class__.__name__ == "PipelineContentsView":
-            '''
-            this is intercepting drops from within this view
-            '''    
- 
-            drop_node = self.model().getNode(i)
-            tree_index = treeModel.indexFromNode(drop_node, QtCore.QModelIndex())
-            
-            if tree_index.isValid():
-                
-                
-
-                
-                tree_node = treeModel.getNode(tree_index)
-                mime = event.mimeData()
-                
-                
-                item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
-                item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
-                item_parent = treeModel.parent( item_index )
-                
-                
-                '''
-                ignore drops of folders into assets
-                '''
-                if tree_node.typeInfo() == _asset_:
-                    if item.typeInfo() == _folder_ or item.typeInfo() == _asset_:
-                        
-                        event.setDropAction(QtCore.Qt.IgnoreAction)
-                        event.ignore()
-                        return 
-
-                '''
-                ignore drag drop for stages
-                '''
-                if tree_node.typeInfo() == _stage_:
-
-                        event.setDropAction(QtCore.Qt.IgnoreAction)
-                        event.ignore()
-                        return 
-
-                         
-                
-                treeModel.removeRows(item_index.row(),1,item_parent)            
-                self.treeView._proxyModel.invalidate()
-
-                treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
-                 
-                event.accept() 
-                self.update(self.treeView.selectionModel().selection())    
-                return
-    
-        
-        elif event.source().__class__.__name__ == "pipelineTreeView":
-            
-            '''
-            this is intercepting drops from within the tree view
-            '''  
-                        
-            mime = event.mimeData()
-            item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
-            item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
-            item_parent = treeModel.parent( item_index )            
-            
-            '''
-            make sure the dropped item is not the root of the table
-            '''
-            HierarchyNodes = []
-            for i in treeModel.listAncestos(self._treeParentIndex):
-                HierarchyNodes.append(treeModel.getNode(i).id)
-            
-            print HierarchyNodes
-            print item.id
-            if item.id in HierarchyNodes:
-                
-                event.setDropAction(QtCore.Qt.IgnoreAction)
-                event.ignore()
-                return
-                
-            else:    
-                '''
-                the droped item is an ancestor of the the table root
-                '''
-                
-                treeModel.removeRows(item_index.row(),0,item_parent)            
-                self.treeView._proxyModel.invalidate()
-
-                treeModel.dropMimeData(mime, event.dropAction,0,0,self._treeParentIndex)                
-                self.treeView._proxyModel.invalidate()
-                event.accept()
-                x = self.treeView.fromProxyIndex(self._treeParentIndex)
-                selection = QtGui.QItemSelection(x, x)        
-                print treeModel.rowCount(self._treeParentIndex), "<-- rowcount"
-                self.update(selection)
-                self.treeView.setExpanded(x, True)
-                
-                return
-        
-
-    @property
-    def versionsView(self):
-        return self._versionsView
-    
-    @versionsView.setter
-    def versionsView(self, view):
-        self._versionsView = view
-
-
-    @property
-    def treeView(self):
-        return self._treeView
-    
-    @treeView.setter
-    def treeView(self, view):
-        self._treeView = view
-
-    @property
-    def treeProxyModel(self):
-        if self._treeProxyModel:
-            return self._treeProxyModel
-        
-        return None
-    
-    @treeProxyModel.setter
-    def treeProxyModel(self, model):
-        self._treeProxyModel = model        
-
-    @property
-    def treeSourceModel(self):
-        if self._treeSourceModel:
-            return self._treeSourceModel
-            
-        return None
-    
-    @treeSourceModel.setter
-    def treeSourceModel(self, model):
-        self._treeSourceModel = model   
-
-    def init_treeView(self):
-        self.treeProxyModel = self.treeView.model()
-        self.treeSourceModel = self.treeProxyModel.sourceModel()        
-
-    def asTreeIndex(self, index):
-        node = self.getNode(index)
-        return self.treeSourceModel.indexFromNode(node,self.treeView.rootIndex())
-
-    def icons_size(self, int):
-        self.setIconSize(QtCore.QSize(int ,int)  )       
-        self.verticalHeader().setDefaultSectionSize(int )
-               
-    def getNode(self, index):
-        return self.model().getNode(index)
-
-    def asTreeModelIndex(self, index):
-        return self.treeView.asModelIndex(index)  
-
-
-    def selection(self, selction, selection2):
-        print selction, "-->", selction2
-        print "signal"
-        return
-        if len(selection.indexes())>0:
-            # using only the first selection for this task
-            index = selection.indexes()[0]
-             
-            if index.isValid():
-                node = self.getNode(index)
-                
-                treeIndex = self.asTreeIndex(index)
-                #print treeIndex, " <--- table clicked"
-                
-                if node.typeInfo() == _stage_:
-                    self.updateVersionsTable(node)
-                else:
-                    self.updateVersionsTable()  
-                          
-    '''
-    def mouseReleaseEvent(self, event):
-        super(PipelineContentsView, self).mouseReleaseEvent(event)
-        index = self.indexAt(event.pos())
-        if index.isValid():
-            node = self.getNode(index)
-            
-            treeIndex = self.asTreeIndex(index)
-            #print treeIndex, " <--- table clicked"
-            
-            if node.typeInfo() == _stage_:
-                self.updateVersionsTable(node)
-            else:
-                self.updateVersionsTable()
-                
-            event.accept()
-            return
-                
-        event.ignore()
-        return'''
-
-    
-    def mousePressEvent(self, event):
-        print "CLICK>>>"
-        super(PipelineContentsView, self).mousePressEvent(event)
-        index = self.indexAt(event.pos())
-        if index.isValid():
-            node = self.getNode(index)
-            
-            treeIndex = self.asTreeIndex(index)
-            #print treeIndex, " <--- table clicked"
-           
-            if node.typeInfo() == _stage_:
-                self.updateVersionsTable(node)
-            else:
-                self.updateVersionsTable()
-                
-            event.accept()
-            return
-                
-        event.ignore()
-        return
-    
-    '''
-    updates the table view with a new model
-    the model is a custom table model, bulit from the childs of the selected branch in the treeview
-    
-    index: QItemSelection
-    '''
-      
-    def update(self, selection):
-        #if the selection is not empty
-        if len(selection.indexes())>0:
-            # using only the first selection for this task
-            index = selection.indexes()[0]
-             
-            if index.isValid():
-                '''
-                the index is from the tree's proxymodel
-                we need to convert it to the source index
-                '''
-                
-                treeModel = self.treeSourceModel
-                src = self.asTreeModelIndex(index) 
-                node =  self.treeView.asModelNode(src)
-
-                contenetsList = []
-    
-                self._treeParentIndex = src
-                self._treeParent = node
-                                
-                for row in range(treeModel.rowCount(src)):
-
-                    item_index = treeModel.index(row,0,src)
-                    treeNode = treeModel.getNode(item_index) 
-                    #print treeNode, "---", row
-                    contenetsList.append(treeNode)
-
-                # ----> this is the section to append 'add' buttons to the list
-                #
-                #list.append(dt.AddComponent("new"))  
-                #if node.typeInfo() == "NODE":                   
-                #    list.append(dt.AddAsset("new")) 
-                #    list.append(dt.AddFolder("new"))  
-                    
-                model = dtm.PipelineContentsModel(contenetsList)
-                self.populateTable(model)
-                self.updateVersionsTable()
-
-    def populateTable(self, model = None):
-               
-         
-        if model:         
-            self.setModel(model)
-
-            # resize the table headers to the new content
-            self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
-            self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
-        
-            return True
-                           
-        # in case the selection is empty, or the index was invalid, clear the table            
-        self.setModel(dtm.PipelineContentsModel([dt.DummyNode("")]))  
-        self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
-        self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)      
-        #self.clearModel()        
-        return False
-    
-    def clearModel(self):
-        self.setModel(None)
-
-    
-    def mouseDoubleClickEvent(self, event):
-        
-        
-        index = self.indexAt(event.pos())
-        node = None
-        if index.isValid():
-
-            
-            tableModelNode = self.model().getNode(index)  
-            src = self.asTreeIndex(index)
-            node =  self.treeSourceModel.getNode(src)
-            
-        if node:
-            if tableModelNode.typeInfo() != _stage_:   
-                '''
-                ---> double click on a folder or asset to open it
-                '''
-                treeIndex = self.treeView.fromProxyIndex(self.asTreeIndex(index))       
-                self.setTreeViewtSelection(treeIndex)  
-                self.treeView.saveSelection()
-                
-                event.accept()
-                return 
-            else:
-                '''
-                -----> double click on a component... what shoud we do?
-                '''
-                super(PipelineContentsView, self).mouseDoubleClickEvent(event)
-                event.accept()
-                return
-        
-        event.accept()
-        return
-
-            
-    def contextMenuEvent(self, event):
-     
-        handled = True
-        node = None
-        index = self.indexAt(event.pos())
-        menu = QtGui.QMenu()            
-        actions = []
-        append_defult_options = True
-        
-        if index.isValid():
-            
-            tableModelNode = self.model().getNode(index)                
-            src = self.asTreeIndex(index)                 
-            node =  self.treeSourceModel.getNode(src)
-            
-            if tableModelNode.typeInfo() == _dummy_:
-                append_defult_options = True
-            else:
-                append_defult_options = False    
-            
-                   
-        if node:
-            
-               
-            if node.typeInfo() == _folder_: 
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-
-                
-            if node.typeInfo() == _asset_:
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-
-                
-            if node.typeInfo() == _stage_:
-                actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
-                        
-        
-        if append_defult_options:
-            
-            if self._treeParent.typeInfo() == _asset_:
-                           
-                actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
-            
-            elif self._treeParent.typeInfo() == _folder_:
-            
-                actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
-                actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
-   
-        menu.addActions(actions)      
-       
-        #if handled:
-            
-        menu.exec_(event.globalPos())
-         #TELL QT IVE HANDLED THIS THING
-            
-        #else:
-            #event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
-        
-        event.accept()           
-        return
-
-
-    def setTreeViewtSelection(self,index):
-        
-        self.treeView.select(index)
-        selection = QtGui.QItemSelection(index, index)        
-        self.update(selection)    
-
-
-    def restoreTreeViewtSelection(self):
-        # restore the table from the tree with up to date data
-        # using the tree view's last selection
-        self.treeView.restoreSelection()
-        treeLastIndex =  self.treeView.fromProxyIndex(self.treeView.userSelection)       
-        self.setTreeViewtSelection(treeLastIndex)
-        
-      
-
-    def delete(self,  index):
-        # clear the table before the action to prevent data being invalid
-        self.clearModel()
-        self.treeView.delete(index)        
-        self.restoreTreeViewtSelection()
-        #i = self.asTreeIndex(index)
-        #ii = self.treeView.fromProxyIndex(i)
-        #self.updateTable(ii)
-
-    def create_new_folder(self, parent):
-        self.clearModel()             
-        self.treeView.create_new_folder(parent)               
-        self.restoreTreeViewtSelection()        
-
-    def create_new_asset(self, parent):
-        
-        self.clearModel()             
-        self.treeView.create_new_asset(parent)              
-        self.restoreTreeViewtSelection()
-               
-    def create_new_stage(self, parent):
-        
-        self.clearModel()             
-        self.treeView.create_new_stage(parent)              
-        self.restoreTreeViewtSelection()
-        
-    def updateTable(self, index):
-        selection = QtGui.QItemSelection(index, index)        
-        self.update(selection)
-
-    def updateVersionsTable(self, node = None):
-        
-        if self.versionsView:
-            if node:
-                versionModel = dtm.PipelineVersionsModel(node._versions)
-                self.versionsView.setModel_(versionModel)
-            else:
-                try:
-                    del versionModel
-                except:
-                    pass
-                self.versionsView.setModel_(None)
-                   
+# class PipelineContentsView(QtGui.QTableView):
+#     def __init__(self,parent = None):
+#         super(PipelineContentsView, self).__init__(parent)
+#
+#         #display options
+#
+#         self.setAlternatingRowColors(True)
+#         self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+#         self.setWordWrap(True)
+#         self.setShowGrid(False)
+#         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+#         self.icons_size(32)
+#         #self.setMinimumWidth(250)
+#         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+#         self.setSortingEnabled(True)
+#         self.horizontalHeader().setOffset(10)
+#         self.verticalHeader().hide()
+#
+#         self.setSortingEnabled(True)
+#         self.setDragEnabled( True )
+#         self.setAcceptDrops( True )
+#         self.setDragDropMode( QtGui.QAbstractItemView.DragDrop )#QtGui.QAbstractItemView.DragDrop )InternalMove
+#
+#         #local variables
+#         self._treeView = None
+#         self._treeProxyModel = None
+#         self._treeSourceModel = None
+#
+#         self._treeParent = None
+#         self._treeParentIndex = None
+#
+#         self._versionsView = None
+#
+#
+#
+#
+#     def dropEvent(self, event):
+#
+#         #super(PipelineContentsView,self).dropEvent(event)
+#         '''
+#         if not event.isAccepted():
+#             # qdnd_win.cpp has weird behavior -- even if the event isn't accepted
+#             # by target widget, it sets accept() to true, which causes the executed
+#             # action to be reported as "move", which causes the view to remove the
+#             # source rows even though the target widget didn't like the drop.
+#             # Maybe it's better for the model to check drop-okay-ness during the
+#             # drag rather than only on drop; but the check involves not-insignificant work.
+#             event.setDropAction(QtCore.Qt.IgnoreAction)
+#         '''
+#
+#         '''
+#         this event is catching drops onto the contents view
+#
+#         '''
+#         treeModel = self.treeSourceModel
+#         i = self.indexAt(event.pos())
+#
+#         #if i.isValid():
+#
+#         if event.source().__class__.__name__ == "PipelineContentsView":
+#             '''
+#             this is intercepting drops from within this view
+#             '''
+#
+#             drop_node = self.model().getNode(i)
+#             tree_index = treeModel.indexFromNode(drop_node, QtCore.QModelIndex())
+#
+#             if tree_index.isValid():
+#
+#
+#
+#
+#                 tree_node = treeModel.getNode(tree_index)
+#                 mime = event.mimeData()
+#
+#
+#                 item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+#                 item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
+#                 item_parent = treeModel.parent( item_index )
+#
+#
+#                 '''
+#                 ignore drops of folders into assets
+#                 '''
+#                 if tree_node.typeInfo() == _asset_:
+#                     if item.typeInfo() == _folder_ or item.typeInfo() == _asset_:
+#
+#                         event.setDropAction(QtCore.Qt.IgnoreAction)
+#                         event.ignore()
+#                         return
+#
+#                 '''
+#                 ignore drag drop for stages
+#                 '''
+#                 if tree_node.typeInfo() == _stage_:
+#
+#                         event.setDropAction(QtCore.Qt.IgnoreAction)
+#                         event.ignore()
+#                         return
+#
+#
+#
+#                 treeModel.removeRows(item_index.row(),1,item_parent)
+#                 self.treeView._proxyModel.invalidate()
+#
+#                 treeModel.dropMimeData(mime, event.dropAction,0,0,tree_index)
+#
+#                 event.accept()
+#                 self.update(self.treeView.selectionModel().selection())
+#                 return
+#
+#
+#         elif event.source().__class__.__name__ == "pipelineTreeView":
+#
+#             '''
+#             this is intercepting drops from within the tree view
+#             '''
+#
+#             mime = event.mimeData()
+#             item = cPickle.loads( str( mime.data( 'application/x-qabstractitemmodeldatalist' ) ) )
+#             item_index = treeModel.indexFromNode( item , QtCore.QModelIndex())
+#             item_parent = treeModel.parent( item_index )
+#
+#             '''
+#             make sure the dropped item is not the root of the table
+#             '''
+#             HierarchyNodes = []
+#             for i in treeModel.listAncestos(self._treeParentIndex):
+#                 HierarchyNodes.append(treeModel.getNode(i).id)
+#
+#             print HierarchyNodes
+#             print item.id
+#             if item.id in HierarchyNodes:
+#
+#                 event.setDropAction(QtCore.Qt.IgnoreAction)
+#                 event.ignore()
+#                 return
+#
+#             else:
+#                 '''
+#                 the droped item is an ancestor of the the table root
+#                 '''
+#
+#                 treeModel.removeRows(item_index.row(),0,item_parent)
+#                 self.treeView._proxyModel.invalidate()
+#
+#                 treeModel.dropMimeData(mime, event.dropAction,0,0,self._treeParentIndex)
+#                 self.treeView._proxyModel.invalidate()
+#                 event.accept()
+#                 x = self.treeView.fromProxyIndex(self._treeParentIndex)
+#                 selection = QtGui.QItemSelection(x, x)
+#                 print treeModel.rowCount(self._treeParentIndex), "<-- rowcount"
+#                 self.update(selection)
+#                 self.treeView.setExpanded(x, True)
+#
+#                 return
+#
+#
+#     @property
+#     def versionsView(self):
+#         return self._versionsView
+#
+#     @versionsView.setter
+#     def versionsView(self, view):
+#         self._versionsView = view
+#
+#
+#     @property
+#     def treeView(self):
+#         return self._treeView
+#
+#     @treeView.setter
+#     def treeView(self, view):
+#         self._treeView = view
+#
+#     @property
+#     def treeProxyModel(self):
+#         if self._treeProxyModel:
+#             return self._treeProxyModel
+#
+#         return None
+#
+#     @treeProxyModel.setter
+#     def treeProxyModel(self, model):
+#         self._treeProxyModel = model
+#
+#     @property
+#     def treeSourceModel(self):
+#         if self._treeSourceModel:
+#             return self._treeSourceModel
+#
+#         return None
+#
+#     @treeSourceModel.setter
+#     def treeSourceModel(self, model):
+#         self._treeSourceModel = model
+#
+#     def init_treeView(self):
+#         self.treeProxyModel = self.treeView.model()
+#         self.treeSourceModel = self.treeProxyModel.sourceModel()
+#
+#     def asTreeIndex(self, index):
+#         node = self.getNode(index)
+#         return self.treeSourceModel.indexFromNode(node,self.treeView.rootIndex())
+#
+#     def icons_size(self, int):
+#         self.setIconSize(QtCore.QSize(int ,int)  )
+#         self.verticalHeader().setDefaultSectionSize(int )
+#
+#     def getNode(self, index):
+#         return self.model().getNode(index)
+#
+#     def asTreeModelIndex(self, index):
+#         return self.treeView.asModelIndex(index)
+#
+#
+#     def selection(self, selction, selection2):
+#         print selction, "-->", selction2
+#         print "signal"
+#         return
+#         if len(selection.indexes())>0:
+#             # using only the first selection for this task
+#             index = selection.indexes()[0]
+#
+#             if index.isValid():
+#                 node = self.getNode(index)
+#
+#                 treeIndex = self.asTreeIndex(index)
+#                 #print treeIndex, " <--- table clicked"
+#
+#                 if node.typeInfo() == _stage_:
+#                     self.updateVersionsTable(node)
+#                 else:
+#                     self.updateVersionsTable()
+#
+#     '''
+#     def mouseReleaseEvent(self, event):
+#         super(PipelineContentsView, self).mouseReleaseEvent(event)
+#         index = self.indexAt(event.pos())
+#         if index.isValid():
+#             node = self.getNode(index)
+#
+#             treeIndex = self.asTreeIndex(index)
+#             #print treeIndex, " <--- table clicked"
+#
+#             if node.typeInfo() == _stage_:
+#                 self.updateVersionsTable(node)
+#             else:
+#                 self.updateVersionsTable()
+#
+#             event.accept()
+#             return
+#
+#         event.ignore()
+#         return'''
+#
+#
+#     def mousePressEvent(self, event):
+#         print "CLICK>>>"
+#         super(PipelineContentsView, self).mousePressEvent(event)
+#         index = self.indexAt(event.pos())
+#         if index.isValid():
+#             node = self.getNode(index)
+#
+#             treeIndex = self.asTreeIndex(index)
+#             #print treeIndex, " <--- table clicked"
+#
+#             if node.typeInfo() == _stage_:
+#                 self.updateVersionsTable(node)
+#             else:
+#                 self.updateVersionsTable()
+#
+#             event.accept()
+#             return
+#
+#         event.ignore()
+#         return
+#
+#     '''
+#     updates the table view with a new model
+#     the model is a custom table model, bulit from the childs of the selected branch in the treeview
+#
+#     index: QItemSelection
+#     '''
+#
+#     def update(self, selection):
+#         #if the selection is not empty
+#         if len(selection.indexes())>0:
+#             # using only the first selection for this task
+#             index = selection.indexes()[0]
+#
+#             if index.isValid():
+#                 '''
+#                 the index is from the tree's proxymodel
+#                 we need to convert it to the source index
+#                 '''
+#
+#                 treeModel = self.treeSourceModel
+#                 src = self.asTreeModelIndex(index)
+#                 node =  self.treeView.asModelNode(src)
+#
+#                 contenetsList = []
+#
+#                 self._treeParentIndex = src
+#                 self._treeParent = node
+#
+#                 for row in range(treeModel.rowCount(src)):
+#
+#                     item_index = treeModel.index(row,0,src)
+#                     treeNode = treeModel.getNode(item_index)
+#                     #print treeNode, "---", row
+#                     contenetsList.append(treeNode)
+#
+#                 # ----> this is the section to append 'add' buttons to the list
+#                 #
+#                 #list.append(dt.AddComponent("new"))
+#                 #if node.typeInfo() == "NODE":
+#                 #    list.append(dt.AddAsset("new"))
+#                 #    list.append(dt.AddFolder("new"))
+#
+#                 model = dtm.PipelineContentsModel(contenetsList)
+#                 self.populateTable(model)
+#                 self.updateVersionsTable()
+#
+#     def populateTable(self, model = None):
+#
+#
+#         if model:
+#             self.setModel(model)
+#
+#             # resize the table headers to the new content
+#             self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+#             self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
+#
+#             return True
+#
+#         # in case the selection is empty, or the index was invalid, clear the table
+#         self.setModel(dtm.PipelineContentsModel([dt.DummyNode("")]))
+#         self.horizontalHeader().setResizeMode(0,QtGui.QHeaderView.Stretch)#ResizeToContents)
+#         self.horizontalHeader().setResizeMode(1,QtGui.QHeaderView.Stretch)
+#         #self.clearModel()
+#         return False
+#
+#     def clearModel(self):
+#         self.setModel(None)
+#
+#
+#     def mouseDoubleClickEvent(self, event):
+#
+#
+#         index = self.indexAt(event.pos())
+#         node = None
+#         if index.isValid():
+#
+#
+#             tableModelNode = self.model().getNode(index)
+#             src = self.asTreeIndex(index)
+#             node =  self.treeSourceModel.getNode(src)
+#
+#         if node:
+#             if tableModelNode.typeInfo() != _stage_:
+#                 '''
+#                 ---> double click on a folder or asset to open it
+#                 '''
+#                 treeIndex = self.treeView.fromProxyIndex(self.asTreeIndex(index))
+#                 self.setTreeViewtSelection(treeIndex)
+#                 self.treeView.saveSelection()
+#
+#                 event.accept()
+#                 return
+#             else:
+#                 '''
+#                 -----> double click on a component... what shoud we do?
+#                 '''
+#                 super(PipelineContentsView, self).mouseDoubleClickEvent(event)
+#                 event.accept()
+#                 return
+#
+#         event.accept()
+#         return
+#
+#
+#     def contextMenuEvent(self, event):
+#
+#         handled = True
+#         node = None
+#         index = self.indexAt(event.pos())
+#         menu = QtGui.QMenu()
+#         actions = []
+#         append_defult_options = True
+#
+#         if index.isValid():
+#
+#             tableModelNode = self.model().getNode(index)
+#             src = self.asTreeIndex(index)
+#             node =  self.treeSourceModel.getNode(src)
+#
+#             if tableModelNode.typeInfo() == _dummy_:
+#                 append_defult_options = True
+#             else:
+#                 append_defult_options = False
+#
+#
+#         if node:
+#
+#
+#             if node.typeInfo() == _folder_:
+#                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+#
+#
+#             if node.typeInfo() == _asset_:
+#                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+#
+#
+#             if node.typeInfo() == _stage_:
+#                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
+#
+#
+#         if append_defult_options:
+#
+#             if self._treeParent.typeInfo() == _asset_:
+#
+#                 actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
+#
+#             elif self._treeParent.typeInfo() == _folder_:
+#
+#                 actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
+#                 actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
+#
+#         menu.addActions(actions)
+#
+#         #if handled:
+#
+#         menu.exec_(event.globalPos())
+#          #TELL QT IVE HANDLED THIS THING
+#
+#         #else:
+#             #event.ignore() #GIVE SOMEONE ELSE A CHANCE TO HANDLE IT
+#
+#         event.accept()
+#         return
+#
+#
+#     def setTreeViewtSelection(self,index):
+#
+#         self.treeView.select(index)
+#         selection = QtGui.QItemSelection(index, index)
+#         self.update(selection)
+#
+#
+#     def restoreTreeViewtSelection(self):
+#         # restore the table from the tree with up to date data
+#         # using the tree view's last selection
+#         self.treeView.restoreSelection()
+#         treeLastIndex =  self.treeView.fromProxyIndex(self.treeView.userSelection)
+#         self.setTreeViewtSelection(treeLastIndex)
+#
+#
+#
+#     def delete(self,  index):
+#         # clear the table before the action to prevent data being invalid
+#         self.clearModel()
+#         self.treeView.delete(index)
+#         self.restoreTreeViewtSelection()
+#         #i = self.asTreeIndex(index)
+#         #ii = self.treeView.fromProxyIndex(i)
+#         #self.updateTable(ii)
+#
+#     def create_new_folder(self, parent):
+#         self.clearModel()
+#         self.treeView.create_new_folder(parent)
+#         self.restoreTreeViewtSelection()
+#
+#     def create_new_asset(self, parent):
+#
+#         self.clearModel()
+#         self.treeView.create_new_asset(parent)
+#         self.restoreTreeViewtSelection()
+#
+#     def create_new_stage(self, parent):
+#
+#         self.clearModel()
+#         self.treeView.create_new_stage(parent)
+#         self.restoreTreeViewtSelection()
+#
+#     def updateTable(self, index):
+#         selection = QtGui.QItemSelection(index, index)
+#         self.update(selection)
+#
+#     def updateVersionsTable(self, node = None):
+#
+#         if self.versionsView:
+#             if node:
+#                 versionModel = dtm.PipelineVersionsModel(node._versions)
+#                 self.versionsView.setModel_(versionModel)
+#             else:
+#                 try:
+#                     del versionModel
+#                 except:
+#                     pass
+#                 self.versionsView.setModel_(None)
+#
 class pipelineTreeView(QtGui.QTreeView):
     percentage_complete = QtCore.Signal(int)
     update = QtCore.Signal()
