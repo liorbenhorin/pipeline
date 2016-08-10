@@ -1830,7 +1830,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 list.append(node)
 
             if list:
-                self.projects = dtm.PipelineProjectsModel(list)
+                self.projects = dtm.Projects_Model(list)
                 #self.setProject(current)
                 if current:
                     self.setProject(current)
@@ -1936,7 +1936,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             it's the main tree model object, its global so it is deleted every restart of Pipeline
             '''
 
-            treeModel = dtm.Projects_Model(_root, self)
+            treeModel = dtm.Project_Model(_root, self)
 
 
             '''
