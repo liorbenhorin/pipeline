@@ -55,6 +55,8 @@ reload(data)
 # reload(dtm)
 # #
 
+import config as cfg
+reload(cfg)
 
 global preset
 preset = {}
@@ -62,9 +64,9 @@ preset["project_name"] = "puppies"
 preset["prefix"] = "pdt"
 preset["padding"] = 2
 
-
-global _admin_
-_admin_ = "admin"
+#
+# global cfg._admin_
+# cfg._admin_ = "admin"
 
 import data_view as dtv
 import data_model as dtm
@@ -1144,7 +1146,7 @@ class projectDialog(QtGui.QDialog):
         self.stages_tree.setModel(self.stages_model)
 
 
-        user1 = dt.UserNode("root", "1234", _admin_)
+        user1 = dt.UserNode("root", "1234", cfg._admin_)
         self.users_model = dtm.Users_Model([user1])
         self.users_tree.setModel(self.users_model)
 

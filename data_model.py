@@ -253,7 +253,7 @@ class Project_Model(QtCore.QAbstractItemModel):
             if node.typeInfo() == cfg._root_:
                 return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
 
-            #if node.typeInfo() == _stage_:
+            #if node.typeInfo() == cfg._stage_:
             #    return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable# | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |
@@ -678,7 +678,7 @@ class Versions_Model(Project_Model):
             if node.typeInfo() == cfg._root_:
                 return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
 
-            #if node.typeInfo() == _stage_:
+            #if node.typeInfo() == cfg._stage_:
             #    return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable# | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |
@@ -809,7 +809,7 @@ class Masters_Model(Project_Model):
             if node.typeInfo() == cfg._root_:
                 return  QtCore.Qt.ItemIsEnabled |QtCore.Qt.ItemIsSelectable
 
-            #if node.typeInfo() == _stage_:
+            #if node.typeInfo() == cfg._stage_:
             #    return  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
 
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable# | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |
@@ -1195,7 +1195,7 @@ class Project_ProxyModel(QtGui.QSortFilterProxyModel):
         if super(Project_ProxyModel, self).filterAcceptsRow(sourceRow, sourceParent):
 
 
-            #if self.sourceModel().getNode(id).typeInfo() == _stage_:
+            #if self.sourceModel().getNode(id).typeInfo() == cfg._stage_:
             #    return False
 
             return True

@@ -14,32 +14,8 @@ import modules.jsonData as data
 reload(data)
 import modules.maya_warpper as maya
 reload(maya)
-
-global _node_
-global _root_
-global  _stage_
-global _asset_
-global _folder_
-global _dummy_
-global _new_
-global _catagory_
-global _assets_
-global _animation_
-global _admin_
-global _master_
-_master_ = "master"
-_admin_ = "admin"
-_assets_ = "asset"
-_animation_ = "animation"
-_catagory_ = "catagory"
-_new_ = "new"
-_node_ = "node"
-_root_ = "root"
-_stage_ = "stage"
-_asset_ = "asset"
-_folder_ = "folder" 
-_dummy_ = "dummy"
-_version_ = "version"
+import config as cfg
+reload(cfg)
 
 
 def set_icons():
@@ -212,7 +188,7 @@ class Node(QtCore.QObject, object):
 
     
     def typeInfo(self):
-        return _node_
+        return cfg._node_
 
     def addChild(self, child):
         self._children.append(child)
@@ -450,7 +426,7 @@ class RootNode(Node):#, Metadata_file):
         self._path = path  
     
     def typeInfo(self):
-        return _root_
+        return cfg._root_
 
 
     @property
@@ -465,30 +441,30 @@ class RootNode(Node):#, Metadata_file):
     def level_options(self):
         if self._depth and self.project:
             depth = self._depth
-            type = _folder_
+            type = cfg._folder_
             if self.section in self.project.levels:
                 level = self.project.levels[self.section]
                 levelName = level[depth]
                 if levelName == level[-1]:
-                    type = _stage_
+                    type = cfg._stage_
                 elif levelName == level[-2]:
-                    type = _asset_
+                    type = cfg._asset_
                 return levelName, type
 
 
         if self.settings and self.project:
             relative_path = os.path.relpath(self._path, self.project._path)
             depth = relative_path.count(os.sep)
-            type = _folder_
+            type = cfg._folder_
             if self.section in self.project.levels:
                 level = self.project.levels[self.section]
 
                 levelName = level[depth]
 
                 if levelName == level[-1]:
-                    type = _stage_
+                    type = cfg._stage_
                 elif levelName == level[-2]:
-                    type = _asset_
+                    type = cfg._asset_
 
                 return levelName, type
 
@@ -576,11 +552,11 @@ class RootNode(Node):#, Metadata_file):
 
                                     for i in range(len(path_elements)):
                                         if i == len(path_elements)-1:  # stage
-                                            path_elements[i] = "{0}_{1}".format(_stage_ ,path_elements[i])
+                                            path_elements[i] = "{0}_{1}".format(cfg._stage_ ,path_elements[i])
                                         elif i == len(path_elements)-2: #asset
-                                            path_elements[i] = "{0}_{1}".format(_asset_, path_elements[i])
+                                            path_elements[i] = "{0}_{1}".format(cfg._asset_, path_elements[i])
                                         else:
-                                            path_elements[i] = "{0}_{1}".format(_folder_, path_elements[i])
+                                            path_elements[i] = "{0}_{1}".format(cfg._folder_, path_elements[i])
 
                                     masters.append(path_elements)
 
@@ -613,10 +589,10 @@ class RootNode(Node):#, Metadata_file):
         def model_masters_tree(dict, parent, root_path):
 
             for key in dict:
-                if key.split("_")[0] == _stage_:
+                if key.split("_")[0] == cfg._stage_:
                     node = StageNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project, pipelineUI=self._ui)
 
-                elif key.split("_")[0] == _asset_:
+                elif key.split("_")[0] == cfg._asset_:
                     node = AssetNode(key.split("_")[1], path=os.path.join(root_path, key.split("_")[1]), parent=parent, section=self.section, settings=self.settings, project=self.project , pipelineUI=self._ui)
 
                 else:
@@ -650,7 +626,7 @@ class FolderNode(RootNode):
         self.resource = folder_icon if not self._virtual else  creation_icon
         
     def typeInfo(self):
-        return _folder_
+        return cfg._folder_
 
 
 
@@ -666,8 +642,8 @@ class AssetNode(RootNode):
         super(AssetNode, self).create(path)
         #if node:
         dict = {}
-        dict["typeInfo"] = _asset_
-        dict[_asset_] = self.name
+        dict["typeInfo"] = cfg._asset_
+        dict[cfg._asset_] = self.name
 
         path = os.path.join(path,"%s.%s"%(self.name,"json"))
 
@@ -687,7 +663,7 @@ class AssetNode(RootNode):
         return stages
         
     def typeInfo(self):
-        return _asset_
+        return cfg._asset_
 
 
         
@@ -704,7 +680,7 @@ class AssetNode(RootNode):
 #         if node:
 #
 #             dict = {}
-#             dict["typeInfo"] = "_stage_"
+#             dict["typeInfo"] = "cfg._stage_"
 #             dict["stage"] = stage
 #
 #             self._stage = stage
@@ -724,7 +700,7 @@ class AssetNode(RootNode):
 #         self._stage = value
 #
 #     def typeInfo(self):
-#         return _stage_
+#         return cfg._stage_
 #
 #
 #     def resource(self):
@@ -808,7 +784,7 @@ class VersionNode(Node):
         return "%s > %s : %s %s"%(self.stage.parent().name, self.stage.name, "Version",self.number)
 
     def typeInfo(self):
-        return _version_
+        return cfg._version_
 
     def explore(self):
         files.explore(self.path)
@@ -849,7 +825,7 @@ class MasterNode(VersionNode):
         return master_icon
 
     def typeInfo(self):
-        return _master_
+        return cfg._master_
 
 class CatagoryNode(Node):
 
@@ -859,7 +835,7 @@ class CatagoryNode(Node):
         self.resource = dummy_icon
 
     def typeInfo(self):
-        return _catagory_
+        return cfg._catagory_
 
 
 
@@ -871,7 +847,7 @@ class DummyNode(Node):
         self.resource = dummy_icon
 
     def typeInfo(self):
-        return _dummy_
+        return cfg._dummy_
 
 class LevelsNode(Node):
 
@@ -888,7 +864,7 @@ class LevelsNode(Node):
             self._levels[index] = item
 
     def typeInfo(self):
-        return _dummy_
+        return cfg._dummy_
 
 class StagesNode(Node):
 
@@ -905,7 +881,7 @@ class StagesNode(Node):
             self._levels[index] = item
 
     def typeInfo(self):
-        return _dummy_
+        return cfg._dummy_
 
 
 class UserNode(Node):
@@ -922,7 +898,7 @@ class UserNode(Node):
             self._levels[index] = item
 
     def typeInfo(self):
-        return _dummy_
+        return cfg._dummy_
 
 class ClientNode(Node):
 
@@ -937,7 +913,7 @@ class ClientNode(Node):
         return self._path
 
     def typeInfo(self):
-        return _dummy_
+        return cfg._dummy_
 
 
 
@@ -949,7 +925,7 @@ class AddNode(Node):
         self.resource = add_icon
 
     def typeInfo(self):
-        return _new_
+        return cfg._new_
 
 
 class NewNode(Node):
@@ -965,7 +941,7 @@ class NewNode(Node):
         #         self._section = kwargs[key]
 
     def typeInfo(self):
-        return _new_
+        return cfg._new_
 
 
 # class project(object):
@@ -1009,7 +985,7 @@ class NewNode(Node):
 #
 #     def create(self, path, name):
 #         data = {}
-#         data["typeInfo"] = "_asset_"
+#         data["typeInfo"] = "cfg._asset_"
 #
 #         path = os.path.join(path,"%s.%s"%(name,"json"))
 #
@@ -1060,9 +1036,9 @@ class StageNode(RootNode):
         super(StageNode, self).create(path)
         #if node:
         dict = {}
-        dict["typeInfo"] = _stage_
-        dict[_stage_] = self.name
-        dict[_asset_] = self.parent().name
+        dict["typeInfo"] = cfg._stage_
+        dict[cfg._stage_] = self.name
+        dict[cfg._asset_] = self.parent().name
         dict["name_format"] = self._name_format
         self.name_format = self._name_format
 
@@ -1100,7 +1076,7 @@ class StageNode(RootNode):
         self._stage = value
 
     def typeInfo(self):
-        return _stage_
+        return cfg._stage_
 
 
     def formatFileName(self):
@@ -1112,7 +1088,7 @@ class StageNode(RootNode):
         for i in range(depth):
             node = node.parent()
             if node:
-                if not node.typeInfo() == _root_:
+                if not node.typeInfo() == cfg._root_:
                     levels.append(node.name)
 
         name = self.pipelineUI.project.prefix + "_" + "_".join(reversed(levels)) if self.pipelineUI.project.prefix else "_".join(reversed(levels))
@@ -1206,10 +1182,10 @@ class StageNode(RootNode):
                 self.master_ = versions
 
                 for c in self._children:
-                    if c.typeInfo() == _master_:
+                    if c.typeInfo() == cfg._master_:
                         self.removeChild(c.row())
 
-                self.master = MasterNode(_master_, parent=self, path=master_file_name, author=new_version["author"],
+                self.master = MasterNode(cfg._master_, parent=self, path=master_file_name, author=new_version["author"],
                                     number=0, date=new_version["date"], note=new_version["note"], include=new_version["include"], origin=new_version["origin"], stage=self)
 
                 master_version = MasterNode(last_version + 1, parent=self.master, path=master_version_file_name,
@@ -1224,12 +1200,12 @@ class StageNode(RootNode):
     def clean_new_nodes(self):
         if self._children:
             for c in self._children:
-                if c.typeInfo() == _new_:
+                if c.typeInfo() == cfg._new_:
                     self.removeChild(c.row())
 
     def new_version(self):
         if self._children:
-            if self._children[0].typeInfo() == _new_:
+            if self._children[0].typeInfo() == cfg._new_:
                 #self.removeChild(self._children[0].row())
                 self.initialVersion()
                 #self.pipelineUI.version = self._children[0]
@@ -1242,7 +1218,7 @@ class StageNode(RootNode):
 
 
                 childes = []
-                [childes.append(x) for x in self._children if not x.typeInfo()==_master_]
+                [childes.append(x) for x in self._children if not x.typeInfo()==cfg._master_]
 
                 last_version = childes[-1] #self._children[-1]
 
@@ -1268,7 +1244,7 @@ class StageNode(RootNode):
                 self.edited.emit()
 
 
-                #childes = [x for x in self._children if not x.typeInfo()==_master_]
+                #childes = [x for x in self._children if not x.typeInfo()==cfg._master_]
                 #self.pipelineUI.version = childes[-1]
 
 
@@ -1567,11 +1543,11 @@ class StageNode(RootNode):
                         if self._children:
                             if isinstance(self._children, list):
                                 for c in self._children:
-                                    if not c.typeInfo() == _master_:
+                                    if not c.typeInfo() == cfg._master_:
                                         if c.path == versions_dict[key]:
                                             skip = True
                             else:
-                                if not c.typeInfo() == _master_:
+                                if not c.typeInfo() == cfg._master_:
                                     if self._children.path == versions_dict[key]:
                                         skip = True
 
@@ -1732,7 +1708,7 @@ class StageNode(RootNode):
                         if "origin" in versions_data:
                             origin = versions_data["origin"]
 
-                    self.master =  MasterNode(_master_, parent=self, path=master_file, author=author,
+                    self.master =  MasterNode(cfg._master_, parent=self, path=master_file, author=author,
                                       number=0, date=date, note=note, origin=origin, stage=self)
 
 
@@ -2346,7 +2322,7 @@ def stageDir(dir):
             info = j.data_file.read()
             if info:
                 typeInfo = info["typeInfo"]
-                if typeInfo == _stage_:
+                if typeInfo == cfg._stage_:
                     return True
 
     return False
@@ -2362,7 +2338,7 @@ def assetDir(dir):
             info = j.data_file.read()
             if info:
                 typeInfo = info["typeInfo"]
-                if typeInfo == _asset_:
+                if typeInfo == cfg._asset_:
 
                     return True
 

@@ -17,38 +17,39 @@ import modules.jsonData as data
 
 import dialogue as dlg
 #reload(dlg)
+import config as cfg
+reload(cfg)
 
-
-global _node_
-global _root_
-global  _stage_
-global _asset_
-global _folder_
-global _dummy_
-global _version_
-global _new_
-global _catagory_
-global _assets_
-global _animation_
-global _admin_
-global _super_
-global _standard_
-global _master_
-_master_ = "master"
-_standard_ = "standard"
-_super_ = "super"
-_admin_ = "admin"
-_assets_ = "asset"
-_animation_ = "animation"
-_catagory_ = "catagory"
-_new_ = "new"
-_version_ = "version"
-_node_ = "node"
-_root_ = "root"
-_stage_ = "stage"
-_asset_ = "asset"
-_folder_ = "folder" 
-_dummy_ = "dummy"
+# global cfg._node_
+# global cfg._root_
+# global  cfg._stage_
+# global cfg._asset_
+# global cfg._folder_
+# global cfg._dummy_
+# global cfg._version_
+# global cfg._new_
+# global cfg._catagory_
+# global cfg._assets_
+# global cfg._animation_
+# global cfg._admin_
+# global cfg._super_
+# global cfg._standard_
+# global cfg.master
+# cfg.master = "master"
+# cfg._standard_ = "standard"
+# cfg._super_ = "super"
+# cfg._admin_ = "admin"
+# cfg._assets_ = "asset"
+# cfg._animation_ = "animation"
+# cfg._catagory_ = "catagory"
+# cfg._new_ = "new"
+# cfg._version_ = "version"
+# cfg._node_ = "node"
+# cfg._root_ = "root"
+# cfg._stage_ = "stage"
+# cfg._asset_ = "asset"
+# cfg._folder_ = "folder"
+# cfg._dummy_ = "dummy"
 
 global counter
 
@@ -81,7 +82,7 @@ global counter
 #     global new_folder_icon
 #     global open_icon
 #     global save_icon
-#     global save_master_icon
+#     global savecfg.mastericon
 #     global add_icon
 #     global down_arrow_icon
 #     global import_icon
@@ -127,7 +128,7 @@ global counter
 #     new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
 #     open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
 #     save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
-#     save_master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
+#     savecfg.mastericon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
 #     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
 #     down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
 #     import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
@@ -328,7 +329,7 @@ class RoleComboBoxDelegate(QtGui.QItemDelegate):
     def createEditor(self, parent, option, index):
 
         cb = QtGui.QComboBox(parent)
-        roles = [_admin_,_super_,_standard_]
+        roles = [cfg._admin_,cfg._super_,cfg._standard_]
         cb.addItems(roles)
         return cb
 
@@ -444,7 +445,7 @@ class PipelineUsersView(QtGui.QTableView):
         self.model().removeRows(row, 1, parent)
 
     def new_user(self, index):
-        user = dt.UserNode("New user", "1234", _admin_)
+        user = dt.UserNode("New user", "1234", cfg._admin_)
         if index.isValid():
             row = index.row()
         else:
@@ -547,7 +548,7 @@ class PipelineProjectsView(QtGui.QTableView):
         button = self.sender()
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
-        if self.model().sourceModel().items[0].typeInfo() == _new_:
+        if self.model().sourceModel().items[0].typeInfo() == cfg._new_:
             self.model().sourceModel().items[0].parent().initialVersion()
         else:
             self.model().sourceModel().getNode(index).edit()
@@ -558,7 +559,7 @@ class PipelineProjectsView(QtGui.QTableView):
         button = self.sender()
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
-        if self.model().sourceModel().items[0].typeInfo() == _new_:
+        if self.model().sourceModel().items[0].typeInfo() == cfg._new_:
             self.model().sourceModel().items[0].parent().initialVersion()
         else:
             self.model().sourceModel().getNode(index).set()
@@ -585,7 +586,7 @@ class loadButtonDelegate(QtGui.QItemDelegate):
         # we are notified when its used and can do something. 
         if not self.parent().indexWidget(index):
             soure_index = self.parent().model().mapToSource(index)
-            if self.parent().model().sourceModel().getNode(soure_index).typeInfo() == _new_:
+            if self.parent().model().sourceModel().getNode(soure_index).typeInfo() == cfg._new_:
                 label = ""
                 icon = new_icon
             else:
@@ -751,7 +752,7 @@ class PipelineMastersView(QtGui.QTreeView):
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
         print index, "->", self.model().sourceModel().getNode(index).name
-        if self.model().sourceModel().getNode(index).typeInfo() == _new_:
+        if self.model().sourceModel().getNode(index).typeInfo() == cfg._new_:
             parent_index = index.parent()
             node = self.model().sourceModel().getNode(index).parent()
             self.model().sourceModel().removeRows(index.row(),1, parent_index)
@@ -777,7 +778,7 @@ class PipelineMastersView(QtGui.QTreeView):
 
         if node and not node._deathrow:
 
-            if node.typeInfo() == _master_:
+            if node.typeInfo() == cfg.master:
 
                 actions.append(QtGui.QAction("Explore...", menu,
                                              triggered=functools.partial(self.explore, src)))
@@ -992,7 +993,7 @@ class PipelineVersionsView(QtGui.QTreeView):
         button = self.sender()
         index = self.indexAt(button.pos())
         index = self.model().mapToSource(index)
-        if self.model().sourceModel().getNode(index).typeInfo() == _new_:
+        if self.model().sourceModel().getNode(index).typeInfo() == cfg._new_:
             #parent_index = index.parent()
             node = self.model().sourceModel().getNode(index).parent()
             #self.model().sourceModel().removeRows(index.row(),1, parent_index)
@@ -1020,7 +1021,7 @@ class PipelineVersionsView(QtGui.QTreeView):
 
         if node and not node._deathrow:
 
-            if node.typeInfo() == _version_:
+            if node.typeInfo() == cfg._version_:
 
                 actions.append(QtGui.QAction("Explore...", menu,
                                              triggered=functools.partial(self.explore, src)))
@@ -1252,8 +1253,8 @@ class IconScaleSlider(QtGui.QWidget):
 #                 '''
 #                 ignore drops of folders into assets
 #                 '''
-#                 if tree_node.typeInfo() == _asset_:
-#                     if item.typeInfo() == _folder_ or item.typeInfo() == _asset_:
+#                 if tree_node.typeInfo() == cfg._asset_:
+#                     if item.typeInfo() == cfg._folder_ or item.typeInfo() == cfg._asset_:
 #
 #                         event.setDropAction(QtCore.Qt.IgnoreAction)
 #                         event.ignore()
@@ -1262,7 +1263,7 @@ class IconScaleSlider(QtGui.QWidget):
 #                 '''
 #                 ignore drag drop for stages
 #                 '''
-#                 if tree_node.typeInfo() == _stage_:
+#                 if tree_node.typeInfo() == cfg._stage_:
 #
 #                         event.setDropAction(QtCore.Qt.IgnoreAction)
 #                         event.ignore()
@@ -1398,7 +1399,7 @@ class IconScaleSlider(QtGui.QWidget):
 #                 treeIndex = self.asTreeIndex(index)
 #                 #print treeIndex, " <--- table clicked"
 #
-#                 if node.typeInfo() == _stage_:
+#                 if node.typeInfo() == cfg._stage_:
 #                     self.updateVersionsTable(node)
 #                 else:
 #                     self.updateVersionsTable()
@@ -1413,7 +1414,7 @@ class IconScaleSlider(QtGui.QWidget):
 #             treeIndex = self.asTreeIndex(index)
 #             #print treeIndex, " <--- table clicked"
 #
-#             if node.typeInfo() == _stage_:
+#             if node.typeInfo() == cfg._stage_:
 #                 self.updateVersionsTable(node)
 #             else:
 #                 self.updateVersionsTable()
@@ -1435,7 +1436,7 @@ class IconScaleSlider(QtGui.QWidget):
 #             treeIndex = self.asTreeIndex(index)
 #             #print treeIndex, " <--- table clicked"
 #
-#             if node.typeInfo() == _stage_:
+#             if node.typeInfo() == cfg._stage_:
 #                 self.updateVersionsTable(node)
 #             else:
 #                 self.updateVersionsTable()
@@ -1528,7 +1529,7 @@ class IconScaleSlider(QtGui.QWidget):
 #             node =  self.treeSourceModel.getNode(src)
 #
 #         if node:
-#             if tableModelNode.typeInfo() != _stage_:
+#             if tableModelNode.typeInfo() != cfg._stage_:
 #                 '''
 #                 ---> double click on a folder or asset to open it
 #                 '''
@@ -1565,7 +1566,7 @@ class IconScaleSlider(QtGui.QWidget):
 #             src = self.asTreeIndex(index)
 #             node =  self.treeSourceModel.getNode(src)
 #
-#             if tableModelNode.typeInfo() == _dummy_:
+#             if tableModelNode.typeInfo() == cfg._dummy_:
 #                 append_defult_options = True
 #             else:
 #                 append_defult_options = False
@@ -1574,28 +1575,28 @@ class IconScaleSlider(QtGui.QWidget):
 #         if node:
 #
 #
-#             if node.typeInfo() == _folder_:
+#             if node.typeInfo() == cfg._folder_:
 #                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 #
 #
-#             if node.typeInfo() == _asset_:
+#             if node.typeInfo() == cfg._asset_:
 #                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 #
 #
-#             if node.typeInfo() == _stage_:
+#             if node.typeInfo() == cfg._stage_:
 #                 actions.append(QtGui.QAction("Delete", menu, triggered = functools.partial(self.delete, src) ))
 #
 #
 #         if append_defult_options:
 #
-#             if self._treeParent.typeInfo() == _asset_:
+#             if self._treeParent.typeInfo() == cfg._asset_:
 #
-#                 actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
+#                 actions.append(QtGui.QAction("Create new %s"%(cfg._stage_), menu, triggered = functools.partial(self.create_new_stage,self._treeParentIndex) ))
 #
-#             elif self._treeParent.typeInfo() == _folder_:
+#             elif self._treeParent.typeInfo() == cfg._folder_:
 #
-#                 actions.append(QtGui.QAction("Create new %s"%(_folder_), menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
-#                 actions.append(QtGui.QAction("Create new %s"%(_asset_), menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
+#                 actions.append(QtGui.QAction("Create new %s"%(cfg._folder_), menu, triggered = functools.partial(self.create_new_folder, self._treeParentIndex) ))
+#                 actions.append(QtGui.QAction("Create new %s"%(cfg._asset_), menu, triggered = functools.partial(self.create_new_asset,self._treeParentIndex) ))
 #
 #         menu.addActions(actions)
 #
@@ -1958,8 +1959,8 @@ class pipelineTreeView(QtGui.QTreeView):
                 '''
                 ignore drops of folders into assets
                 '''
-                if model_node.typeInfo() == _asset_:
-                    if item.typeInfo() == _folder_ or item.typeInfo() == _asset_:
+                if model_node.typeInfo() == cfg._asset_:
+                    if item.typeInfo() == cfg._folder_ or item.typeInfo() == cfg._asset_:
                         
                         event.setDropAction(QtCore.Qt.IgnoreAction)
                         event.ignore()
@@ -2046,33 +2047,33 @@ class pipelineTreeView(QtGui.QTreeView):
           
         if node and not node._deathrow:
 
-            if node.typeInfo() != _stage_:
+            if node.typeInfo() != cfg._stage_:
 
                 level_name, level_type = node.level_options
 
-                if node.typeInfo() == _root_:
+                if node.typeInfo() == cfg._root_:
 
                     actions.append(QtGui.QAction("Create tree...", menu,
                                   triggered=functools.partial(self.create_new_tree, src)))
 
-                if level_type == _folder_:
+                if level_type == cfg._folder_:
                     actions.append(
                         QtGui.QAction("Create new {0}".format(level_name), menu,
                                       triggered=functools.partial(self.create_new_folder, src,level_name )))
 
-                elif level_type == _asset_:
+                elif level_type == cfg._asset_:
                     actions.append(QtGui.QAction("Create new {0}".format(level_name), menu,
                                                  triggered=functools.partial(self.create_new_asset, src, level_name)))
 
-                elif level_type == _stage_:
+                elif level_type == cfg._stage_:
                     actions.append(QtGui.QAction("Create new {0}".format(level_name), menu,
                                                  triggered=functools.partial(self.create_new_stage, src)))
 
-                elif node.typeInfo() == _asset_:
-                    actions.append(QtGui.QAction("Create new %s"%(_stage_), menu, triggered = functools.partial(self.create_new_stage, src) ))
+                elif node.typeInfo() == cfg._asset_:
+                    actions.append(QtGui.QAction("Create new %s"%(cfg._stage_), menu, triggered = functools.partial(self.create_new_stage, src) ))
 
 
-            if not node.typeInfo() == _root_:
+            if not node.typeInfo() == cfg._root_:
                 actions.append(QtGui.QAction("Delete", menu, triggered=functools.partial(self.delete, src)))
 
         else:
@@ -2667,7 +2668,7 @@ class pipelineDresserView(QtGui.QTreeView):
 
         if node and not node._deathrow:
 
-                if node.typeInfo() == _stage_:
+                if node.typeInfo() == cfg._stage_:
 
                     actions.append(QtGui.QAction("Reference to current", menu,
                                   triggered=functools.partial(self.reference_to_current, src)))
@@ -2691,7 +2692,7 @@ class pipelineDresserView(QtGui.QTreeView):
     def reference_to_current(self, index):
         # if self.pipelineUI.version and self.pipelineUI._stageNode.name:
         node = self.asModelNode(index)
-        node.reference_master_to_current()
+        node.referencecfg.masterto_current()
             # data = self.pipelineUI.version.include
             # relative_path = files.reletive_path( self.pipelineUI.project._path, node._masterNode.path)
             #
@@ -2904,7 +2905,7 @@ class ComboDynamicWidget(ComboWidget):
             
             if self._stage in self._project.stages["asset"]:
                 options = self._project.levels["asset"]
-                self.section = _assets_
+                self.section = cfg._assets_
                 if len(options) >  depth:
                     self._level = options[depth]
 
@@ -2914,7 +2915,7 @@ class ComboDynamicWidget(ComboWidget):
                 options = self._project.levels["animation"]
                 if len(options) > depth:
                     self._level = options[depth]
-                    self.section = _animation_
+                    self.section = cfg._animation_
                     return
           
         self._level = "n/a"

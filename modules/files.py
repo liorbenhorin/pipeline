@@ -56,24 +56,9 @@ import glob
 import logging
 import re
 
+import pipeline.config as cfg
+reload(cfg)
 
-
-global _node_
-global _root_
-global  _stage_
-global _asset_
-global _folder_
-global _dummy_
-global _new_
-
-_new_ = "new"
-_node_ = "node"
-_root_ = "root"
-_stage_ = "stage"
-_asset_ = "asset"
-_folder_ = "folder"
-_dummy_ = "dummy"
-_version_ = "version"
 
 def set_padding(int, padding):
     return str(int).zfill(padding)

@@ -15,6 +15,9 @@ _asset_ = "asset"
 _folder_ = "folder"
 _dummy_ = "dummy"
 _version_ = "version"
+_standard_ = "standard"
+_super_ = "super"
+
 
 localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
 if os.path.exists(localIconPath):
@@ -35,3 +38,4 @@ if os.path.exists(localIconPath):
     comment_full_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "comment_full"))
     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "add"))
     large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "large_image"))
+
