@@ -1735,8 +1735,6 @@ class StageNode(RootNode):
         return cfg.large_image_icon
     '''
 
-
-
 class MasterNode(VersionNode):
 
     def __init__(self, name ,path = None,  number = None, author = None, include = None, date = None, note = None, stage = None, origin = None, parent=None):

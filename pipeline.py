@@ -47,28 +47,15 @@ Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License:
 from PySide import QtCore, QtGui
 from shiboken import wrapInstance
 import maya.OpenMayaUI as omui
-import maya.OpenMaya as OpenMaya
-#import maya.cmds as cmds
 import os
 import pysideuic
 import xml.etree.ElementTree as xml
 from cStringIO import StringIO
-#import pymel.core as pm
-#import maya.mel as mel
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
-from maya.app.general.mayaMixin import MayaQDockWidget
-from maya.OpenMayaUI import MQtUtil
-#import operator
 import warnings
-import time
 from timeit import default_timer as timer
-#import collections
 import logging
-#import webbrowser
-#import glob
 import sys
-#import inspect
-#import functools
 
 
 global start_time
@@ -80,7 +67,6 @@ reload(maya)
 
 import modules.jsonData as data
 reload(data)
-
 
 import data as dt
 reload(dt)
@@ -102,16 +88,8 @@ reload(dtv)
 
 import config as cfg
 
-
-'''
-import modules.maya_warpper as maya
-reload(maya)
-import modules.track as track
-reload(track)
-'''
 import dialogue as dlg
 reload(dlg)
-
 
 global treeModel
 global dresserModel
@@ -125,113 +103,113 @@ hdlr.setFormatter(formatter)
 log.handlers[:] = [hdlr]
 log.setLevel(logging.DEBUG)
 log.info(os.path.realpath(__file__))
-'''
-             
-def standard_error_report_handler():
-    
-    py_file_dir = os.path.dirname(__file__)                       
-    log_file = os.path.join(py_file_dir, 'error_reports','ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))           
-    files.assure_path_exists(log_file)            
-    exp_hdlr = logging.StreamHandler(stream=sys.stdout)
-    exp_hdlr = logging.FileHandler(log_file, mode = 'w')
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    exp_hdlr.setFormatter(formatter)            
-    log.addHandler(exp_hdlr)  
-    log.info('ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))          
-    log.info('Platform - %s'%(files.os_qeury()))
-    log.info('Maya version - %s'%maya.maya_version())
-    log.info('Pipeline version - %s'%version)
-    py_file = os.path.realpath(__file__)           
-    log.info('pipeline.py path - %s'%py_file)
-    return exp_hdlr, log_file
-    
-
-def exception_report(file=None,settings_file=None):
-    if file:
-        string = files.read(file)
-        errorDlg = dlg.ErrorReport(plainText = string)
-        note = errorDlg.exec_()
-        text, usertext, dont_ask = errorDlg.result()
-        try:
-            if dont_ask:
-                UiWindow.ui.actionBug_reports.setChecked(False)                
-            else:
-                UiWindow.ui.actionBug_reports.setChecked(True)    
-        except:
-            log.info("ui is not loaded - 'don't show this again' settings is not saved")
-                
-        if note == QtGui.QDialog.Accepted:
-            import modules.email as email
-            body = usertext + '\n\n\n' + text
-            email.mailto('liorbenhorin@gmail.com', subject='Pipeline error report - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")), body=body)
-
-def try_execpt(fn):
-
-    def wrapped(self,*args,**kwargs):
-        try:
-            return fn(self,*args,**kwargs)
-            
-        except StandardError:
-            exc_info = sys.exc_info()
-            exp_hdlr, log_file = standard_error_report_handler()
-
-            if 'UiWindow' in globals():
-                try:
-                    UiWindow.log_settings()
-                except:
-                    log.info("unable to log the settings")
-            else:
-                log.info("cannot log anything - ui is not loaded")
-                    
-            try:
-                
-                self.log()
-                log.info("exception at %s.%s"%(self.__class__.__name__, fn.__name__), exc_info=True)
-                log.removeHandler(exp_hdlr) 
-            except:
-                log.info("exception at %s - faild to log more information"%(fn.__name__), exc_info=True)
-                log.removeHandler(exp_hdlr) 
-            
-            try:
-                if UiWindow.ui.actionBug_reports.isChecked():
-                    exception_report(log_file)
-            except:
-                exception_report(log_file)
-
-            raise StopIteration
-                        
-    return wrapped
-    
-  
-def exceptions_handler(decorator):
-    def decorate(cls):
-        for name, fn in inspect.getmembers(cls, inspect.ismethod):
-            if name is not 'log':
-                setattr(cls, name, decorator(fn))
-               
-        return cls
-    return decorate    
-
-def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
-        
-    if issubclass(exc_type, KeyboardInterrupt):
-        sys.__excepthook__(exc_type, exc_value, exc_traceback)
-        return
-        
-    # this will prevent for loop error from getting printed to screen    
-    if issubclass(exc_type, StopIteration):
-        log.info("quitting iteration")
-        return        
-    
-    exp_hdlr, log_file = standard_error_report_handler()
-    general_log()
-    log.info("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))    
-    log.removeHandler(exp_hdlr) 
-    exception_report(log_file)
-
-
-sys.excepthook = handle_uncaught_exception
-'''
+# '''
+#
+# def standard_error_report_handler():
+#
+#     py_file_dir = os.path.dirname(__file__)
+#     log_file = os.path.join(py_file_dir, 'error_reports','ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))
+#     files.assure_path_exists(log_file)
+#     exp_hdlr = logging.StreamHandler(stream=sys.stdout)
+#     exp_hdlr = logging.FileHandler(log_file, mode = 'w')
+#     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+#     exp_hdlr.setFormatter(formatter)
+#     log.addHandler(exp_hdlr)
+#     log.info('ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))
+#     log.info('Platform - %s'%(files.os_qeury()))
+#     log.info('Maya version - %s'%maya.maya_version())
+#     log.info('Pipeline version - %s'%version)
+#     py_file = os.path.realpath(__file__)
+#     log.info('pipeline.py path - %s'%py_file)
+#     return exp_hdlr, log_file
+#
+#
+# def exception_report(file=None,settings_file=None):
+#     if file:
+#         string = files.read(file)
+#         errorDlg = dlg.ErrorReport(plainText = string)
+#         note = errorDlg.exec_()
+#         text, usertext, dont_ask = errorDlg.result()
+#         try:
+#             if dont_ask:
+#                 UiWindow.ui.actionBug_reports.setChecked(False)
+#             else:
+#                 UiWindow.ui.actionBug_reports.setChecked(True)
+#         except:
+#             log.info("ui is not loaded - 'don't show this again' settings is not saved")
+#
+#         if note == QtGui.QDialog.Accepted:
+#             import modules.email as email
+#             body = usertext + '\n\n\n' + text
+#             email.mailto('liorbenhorin@gmail.com', subject='Pipeline error report - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")), body=body)
+#
+# def try_execpt(fn):
+#
+#     def wrapped(self,*args,**kwargs):
+#         try:
+#             return fn(self,*args,**kwargs)
+#
+#         except StandardError:
+#             exc_info = sys.exc_info()
+#             exp_hdlr, log_file = standard_error_report_handler()
+#
+#             if 'UiWindow' in globals():
+#                 try:
+#                     UiWindow.log_settings()
+#                 except:
+#                     log.info("unable to log the settings")
+#             else:
+#                 log.info("cannot log anything - ui is not loaded")
+#
+#             try:
+#
+#                 self.log()
+#                 log.info("exception at %s.%s"%(self.__class__.__name__, fn.__name__), exc_info=True)
+#                 log.removeHandler(exp_hdlr)
+#             except:
+#                 log.info("exception at %s - faild to log more information"%(fn.__name__), exc_info=True)
+#                 log.removeHandler(exp_hdlr)
+#
+#             try:
+#                 if UiWindow.ui.actionBug_reports.isChecked():
+#                     exception_report(log_file)
+#             except:
+#                 exception_report(log_file)
+#
+#             raise StopIteration
+#
+#     return wrapped
+#
+#
+# def exceptions_handler(decorator):
+#     def decorate(cls):
+#         for name, fn in inspect.getmembers(cls, inspect.ismethod):
+#             if name is not 'log':
+#                 setattr(cls, name, decorator(fn))
+#
+#         return cls
+#     return decorate
+#
+# def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
+#
+#     if issubclass(exc_type, KeyboardInterrupt):
+#         sys.__excepthook__(exc_type, exc_value, exc_traceback)
+#         return
+#
+#     # this will prevent for loop error from getting printed to screen
+#     if issubclass(exc_type, StopIteration):
+#         log.info("quitting iteration")
+#         return
+#
+#     exp_hdlr, log_file = standard_error_report_handler()
+#     general_log()
+#     log.info("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+#     log.removeHandler(exp_hdlr)
+#     exception_report(log_file)
+#
+#
+# sys.excepthook = handle_uncaught_exception
+# '''
 
 def loadUiType(uiFile):
     """
@@ -256,15 +234,11 @@ def loadUiType(uiFile):
         base_class = getattr(QtGui, widget_class)
     return form_class, base_class
 
- 
 def maya_main_window():
     main_window_ptr = omui.MQtUtil.mainWindow()
     return wrapInstance(long(main_window_ptr), QtGui.QWidget)
-           
 
-'''
-global variables setup
-'''
+''' UI VARIABLES SETUP '''
 main_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_main_UI.ui')
 main_form_class, main_base_class = loadUiType(main_uiFile)
  
@@ -276,128 +250,8 @@ create_edit_project_form_class, create_edit_project_base_class = loadUiType(crea
 
 version = 'Snowball | 0.1.0'
 
-#
-# def set_icons():
-#     global localIconPath
-#
-#     localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
-#     if not os.path.exists(localIconPath):
-#         log.info("icons folder not found: %s"%localIconPath)
-#         return
-#
-#
-#     global cfg.offline_icon
-#     global cfg.catagory_icon
-#     global cfg.asset_icon
-#     global cfg.component_icon
-#     global cfg.new_icon
-#     global cfg.delete_icon
-#     global cfg.load_icon
-#     global cfg.unload_icon
-#     global cfg.project_icon
-#     global cfg.users_icon
-#     global cfg.settings_icon
-#     global cfg.set_icon
-#     global cfg.yes_icon
-#     global cfg.no_icon
-#     global cfg.search_icon
-#     global cfg.edit_icon
-#     global cfg.delete_folder_icon
-#     global cfg.new_folder_icon
-#     global cfg.open_icon
-#     global cfg.save_icon
-#     global cfg.save_master_icon
-#     global cfg.add_icon
-#     global cfg.down_arrow_icon
-#     global cfg.import_icon
-#     global cfg.export_icon
-#     global cfg.help_icon
-#     global cfg.anim_icon
-#     global cfg.asset_mode_icon
-#     global cfg.reload_icon
-#     global cfg.shutter_icon
-#     global cfg.camrea_icon
-#     global cfg.play_icon
-#     global cfg.comment_icon
-#     global cfg.large_icon
-#     global cfg.small_icon
-#
-#     global cfg.large_image_icon
-#     global cfg.large_image_icon_dark
-#     global cfg.large_image_icon_click
-#     global cfg.large_image_icon_click_dark
-#     global cfg.wide_image_icon
-#     global cfg.wide_image_icon_click
-#     global cfg.wide_image_icon_dark
-#     global cfg.wide_image_icon_click_dark
-#     global cfg.comment_icon
-#     global cfg.comment_full_icon
-#
-#     global cfg.collapse_icon
-#     global cfg.expend_icon
-#     global cfg.creation_icon
-#
-#     cfg.creation_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg" % "creation"))
-#     cfg.comment_icon = os.path.join(localIconPath, "%s.svg" % "comment")
-#     cfg.comment_full_icon = os.path.join(localIconPath, "%s.svg" % "comment_full")
-#     cfg.collapse_icon = os.path.join(localIconPath, "%s.svg" % "unfold-less")
-#     cfg.expend_icon = os.path.join(localIconPath, "%s.svg" % "unfold-more")
-#
-#     cfg.offline_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"offline"))
-#     cfg.catagory_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"catagory"))
-#     cfg.asset_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset"))
-#     cfg.component_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"component"))
-#     cfg.new_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new"))
-#     cfg.delete_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete"))
-#     cfg.load_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"load"))
-#     cfg.unload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"unload"))
-#     cfg.project_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"project"))
-#     cfg.users_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"users"))
-#     cfg.settings_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"settings"))
-#     cfg.set_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"set"))
-#     cfg.yes_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"yes"))
-#     cfg.no_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"no"))
-#     cfg.search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
-#     cfg.edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
-#     cfg.delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
-#     cfg.new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
-#     cfg.open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
-#     cfg.save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
-#     cfg.save_master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
-#     cfg.add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
-#     cfg.down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
-#     cfg.import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
-#     cfg.export_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"export"))
-#     cfg.help_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"help"))
-#     cfg.anim_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"anim"))
-#     cfg.asset_mode_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"asset_mode"))
-#     cfg.reload_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"reload"))
-#     cfg.shutter_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"shutter"))
-#     cfg.camrea_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"camera"))
-#     cfg.play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
-#     cfg.comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
-#
-#     cfg.large_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large"))
-#     cfg.small_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"small"))
-#
-#
-#     cfg.large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
-#     cfg.large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark"))
-#     cfg.large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click"))
-#     cfg.large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark"))
-#
-#     cfg.wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image"))
-#     cfg.wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click"))
-#     cfg.wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark"))
-#     cfg.wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark"))
-
-
-# declare all the global icons  variables  
-# set_icons()
-
 def set_padding(int, padding):
     return str(int).zfill(padding)
-
 
 class QLabelButton(QtGui.QLabel):
     '''
@@ -410,7 +264,6 @@ class QLabelButton(QtGui.QLabel):
         click = ev.pos()
         if self.mask().contains(click):
             self.emit(QtCore.SIGNAL('clicked()'))
-
 
 class alpha_button(QtGui.QWidget):
     '''
@@ -435,8 +288,7 @@ class alpha_button(QtGui.QWidget):
         self.button.setPixmap(pixmap)
         self.button.setScaledContents(True)
         self.button.setMask(pixmap.mask())
-        
-        
+
 class pipeline_data(object):
     def __init__(self,**kwargs):
         self.data_file = None
@@ -457,514 +309,6 @@ class pipeline_data(object):
             return True
         else:
             log.debug ("Invalid path to data file")
-
-
-
-
-# class pipeline_project(pipeline_data):
-#     def __init__(self,**kwargs):
-#         #super(pipeline_project, self,).__init__()
-#         pipeline_data.__init__(self, **kwargs)
-#
-#
-#
-#         self.project_file = None
-#         if self.data_file:
-#             self.project_file = self.data_file.read()
-#
-#         self.project_file_name = 'project.json'
-#
-#         self.settings = None
-#         for key in kwargs:
-#             if key == "settings":
-#                 self.settings = kwargs[key]
-#
-#
-#     def create(self,
-#                project_path,
-#                name = "My_Project",
-#                padding = 3,
-#                file_type = "ma",
-#                fps = 25,
-#                users = {"Admin":(1234,"admin")},
-#                playblast_outside = False):
-#
-#         project_settings_file = os.path.join(project_path, self.project_file_name)
-#
-#         project_key = data.id_generator()
-#         project_data = {}
-#         project_data["project_name"] = name
-#         project_data["project_key"] = project_key
-#         project_data["padding"] = padding
-#         project_data["fps"] = fps
-#         project_data["defult_file_type"] = file_type
-#         project_data["users"] = users
-#         project_data["playblast_outside"] = playblast_outside
-#
-#         folders = ["assets","images","scenes","sourceimages","data","movies","autosave","movies","scripts",
-#                    "sound", "clips", "renderData", "cache"]
-#
-#         for folder in folders:
-#             project_data[folder] = folder
-#             files.create_directory(os.path.join(project_path, folder))
-#
-#         #render folders:
-#         r_folders = ["renderData", "depth", "iprimages", "shaders"]
-#         for r_folder in r_folders[1:]:
-#             files.create_directory(os.path.join(project_path, r_folders[0], r_folder))
-#
-#         fur_folders = ["renderData", "fur", "furFiles", "furImages", "furEqualMap", "furAttrMap", "furShadowMap" ]
-#         for f_folder in fur_folders[2:]:
-#             files.create_directory(os.path.join(project_path, fur_folders[0], fur_folders[1], f_folder))
-#
-#         #cache folders:
-#         c_folders = ["cache", "particles", "nCache", "bifrost"]
-#         for c_folder in c_folders[1:]:
-#             files.create_directory(os.path.join(project_path, c_folders[0], c_folder))
-#
-#         fl_folders = ["cache", "nCache", "fluid"]
-#         for fl_folder in fl_folders[2:]:
-#             files.create_directory(os.path.join(project_path, fl_folders[0], fl_folders[1], fl_folder))
-#
-#
-#         self.data_file = data.jsonDict().create(project_settings_file, project_data)
-#         self.project_file = self.data_file.read()
-#
-#         return self
-#
-#
-#
-#     def project_file_key(self, key = None):
-#         if self.project_file:
-#             return self.project_file[key]
-#         else:
-#             return None
-#
-#     @property
-#     def project_name(self):
-#         if self.project_file:
-#             return self.project_file["project_name"]
-#         else:
-#             return None
-#
-#     @property
-#     def project_fps(self):
-#         if self.project_file:
-#             if "fps" in self.project_file.keys():
-#                 return self.project_file["fps"]
-#             else:
-#                 return None
-#         else:
-#             return None
-#
-#
-#     @project_fps.setter
-#     def project_fps(self,fps):
-#
-#         if self.data_file:
-#             data = {}
-#             data["fps"] = fps
-#             self.data_file.edit(data)
-#             self.project_file = self.data_file.read()
-#
-#
-#     @property
-#     def project_key(self):
-#         if self.project_file:
-#             return self.project_file["project_key"]
-#         else:
-#             return None
-#
-#     @property
-#     def project_padding(self):
-#         if self.project_file:
-#             return self.project_file["padding"]
-#         else:
-#             return None
-#
-#     @property
-#     def project_file_type(self):
-#         if self.project_file:
-#             return self.project_file["defult_file_type"]
-#         else:
-#             return None
-#
-#
-#     @project_file_type.setter
-#     def project_file_type(self,type):
-#
-#         if self.data_file:
-#             data = {}
-#             data["defult_file_type"] = type
-#             self.data_file.edit(data)
-#             self.project_file = self.data_file.read()
-#
-#     @property
-#     def movie_file_type(self):
-#         if self.project_file:
-#             return "mov"
-#         else:
-#             return None
-#
-#     @property
-#     def project_users(self):
-#         if self.project_file:
-#             if "users" in self.project_file.keys():
-#                 return self.project_file["users"]
-#             else:
-#                 return None
-#         else:
-#             return None
-#
-#     @project_users.setter
-#     def project_users(self,users):
-#
-#         if self.data_file:
-#             data = {}
-#             data["users"] = users
-#             self.data_file.edit(data)
-#             self.project_file = self.data_file.read()
-#
-#
-#     @property
-#     def playblast_outside(self):
-#         if self.project_file:
-#             if "playblast_outside" in self.project_file.keys():
-#                 return self.project_file["playblast_outside"]
-#             else:
-#                 return False
-#         else:
-#             return None
-#
-#     @playblast_outside.setter
-#     def playblast_outside(self,playblast_outside):
-#
-#
-#         old_path = self.playblasts_path
-#
-#         if self.data_file:
-#             data = {}
-#             data["playblast_outside"] = playblast_outside
-#             self.data_file.edit(data)
-#             self.project_file = self.data_file.read()
-#
-#             files.dir_move(old_path, self.playblasts_path)
-#
-#
-#
-#
-#
-#     @property
-#     def assets_dir(self):
-#         if self.project_file:
-#             return self.project_file_key(key = "assets")
-#         else:
-#             return None
-#
-#
-#
-#
-#
-#     def catagories(self, project_path = None):
-#         if self.project_file:
-#
-#             if os.path.exists(project_path):
-#                 if self.assets_dir:
-#                     assets_catagories_path = os.path.join(project_path, self.assets_dir)
-#                     return files.list_dir_folders(assets_catagories_path)
-#         return None
-#
-#     def assets(self, project_path = None, catagory_name = None):
-#         if self.project_file:
-#
-#             if os.path.exists(project_path):
-#                 if self.assets_dir:
-#                     catagory_path = os.path.join(project_path,self.assets_dir, catagory_name)
-#                     if os.path.exists(catagory_path):
-#                         return files.list_dir_folders(catagory_path)
-#         return None
-#
-#     def components(self, project_path = None, catagory_name = None, asset_name = None):
-#         if self.project_file:
-#
-#             if os.path.exists(project_path):
-#                 if self.assets_dir:
-#                     asset_path = os.path.join(project_path,self.assets_dir, catagory_name, asset_name)
-#                     if os.path.exists(asset_path):
-#                         return files.list_dir_folders(asset_path)
-#         return None
-#
-#     @property
-#     def scenes_path(self):
-#         if self.settings:
-#             path = os.path.join(self.settings.current_project_path,"scenes")
-#             if os.path.exists(path):
-#                 return path
-#         return None
-#
-#     @property
-#     def playblasts_path(self):
-#         if self.settings:
-#             if self.playblast_outside:
-#                 path = os.path.join(os.path.dirname(self.settings.current_project_path),"%s_playblasts"%(self.project_name))
-#
-#             else:
-#                 path = os.path.join(self.settings.current_project_path,"playblasts")
-#
-#
-#             return path
-#         return None
-#
-#     @property
-#     def sequences(self):
-#         if self.project_file:
-#
-#             path = self.scenes_path
-#             if os.path.exists(path):
-#                 folders = files.list_dir_folders(path)
-#                 sequences = []
-#                 for folder in folders:
-#                     if os.path.isfile(os.path.join(path, folder, "sequence.json")):
-#                         sequences.append(folder)
-#                 return sequences
-#         return None
-#
-#     def shots(self, sequence_name = None):
-#         if self.project_file:
-#             if sequence_name:
-#                 path = os.path.join(self.scenes_path, sequence_name)
-#                 if os.path.exists(path):
-#                     return files.list_dir_folders(path)
-#
-#         return None
-#
-#
-#
-#     def create_sequence(self, sequence_name = None):
-#
-#         for sequence in self.sequences:
-#             if sequence_name == sequence:
-#                 dlg.massage("critical", "Sorry", "This sequence exsists" )
-#                 return False
-#
-#         path = os.path.join(self.scenes_path, sequence_name)
-#         if files.create_directory(path):
-#             files.create_dummy(path, "sequence.json")
-#             return True
-#
-#
-#     def delete_sequence(self, sequence_name = None):
-#
-#         path = os.path.join(self.scenes_path,sequence_name)
-#         if files.delete(path):
-#
-#             path = os.path.join(self.playblasts_path,sequence_name)
-#             if files.delete(path):
-#
-#                 return True
-#
-#             return True
-#
-#
-#         return False
-#
-#     def delete_shot(self, sequence_name = None, shot_name = None):
-#
-#         path = os.path.join(self.scenes_path,sequence_name, shot_name)
-#         if files.delete(path):
-#
-#             path = os.path.join(self.playblasts_path,sequence_name, shot_name)
-#             if files.delete(path):
-#
-#                 return True
-#
-#             return True
-#
-#         return False
-#
-#     def create_shot(self, sequence_name = None, shot_name = None, create_from = None):
-#         for shot in self.shots(sequence_name = sequence_name):
-#             if shot_name == shot:
-#                 dlg.massage("critical", "Sorry", "This Shot exsists" )
-#                 return False
-#
-#         path = os.path.join(self.scenes_path,sequence_name,shot_name)
-#         if files.create_directory(path):
-#             shot = pipeline_shot().create(path, sequence_name, shot_name, self, self.settings, create_from)
-#             return shot
-#
-#
-#     def create_catagory(self, project_path = None, catagory_name = None):
-#         for catagory in self.catagories(project_path = project_path):
-#             if catagory_name == catagory:
-#                 dlg.massage("critical", "Sorry", "This Catagory exsists" )
-#                 return False
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name)
-#         if files.create_directory(path):
-#             return True
-#
-#     def delete_catagory(self, project_path = None, catagory_name = None):
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name)
-#         if files.delete(path):
-#             return True
-#
-#         return False
-#
-#     def create_asset(self, project_path = None, catagory_name = None, asset_name = None):
-#         for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
-#             if asset_name == asset:
-#                 dlg.massage("critical", "Sorry", "This Asset exsists" )
-#                 return False
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)
-#         if files.create_directory(path):
-#             return True
-#
-#     def delete_asset(self, project_path = None, catagory_name = None, asset_name = None):
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)
-#         if files.delete(path):
-#             return True
-#
-#         return False
-#
-#     def create_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None, create_from = None):
-#         for component in self.components(project_path = project_path, catagory_name = catagory_name, asset_name = asset_name):
-#             if component_name == component:
-#                 dlg.massage("critical", "Sorry", "This Component exsists" )
-#                 return False
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)
-#         if files.create_directory(path):
-#             component = pipeline_component().create(path, catagory_name, asset_name, component_name, self, self.settings, create_from)
-#             return component
-#
-#     def delete_component(self, project_path = None, catagory_name = None, asset_name = None, component_name = None):
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component_name)
-#         if files.delete(path):
-#             return True
-#
-#         return False
-#
-#
-#     def rename_sequence(self, project_path = None,sequence_name = None, new_name=True):
-#
-#         for shot in self.shots( sequence_name ):
-#
-#             path = os.path.join(project_path,self.scenes_path,sequence_name,shot,  ("%s.%s"%(shot,"pipe")))
-#             if os.path.isfile(path):
-#                 shot_object = pipeline_shot(path = path, project = self, settings = self.settings)
-#                 shot_object.rename_sequence(new_name)
-#
-#         path = os.path.join(project_path,self.scenes_path,sequence_name)
-#         path = files.file_rename(path,new_name)
-#
-#         return True
-#
-#     def rename_catagory(self, project_path = None, catagory_name = None, new_name=True):
-#
-#         for asset in self.assets(project_path = project_path, catagory_name = catagory_name):
-#
-#             for component in self.components(project_path, catagory_name, asset):
-#
-#                 path = os.path.join(project_path,self.assets_dir,catagory_name,asset, component, ("%s.%s"%(component,"pipe")))
-#                 if os.path.isfile(path):
-#                     component_object = pipeline_component(path = path, project = self, settings = self.settings)
-#                     component_object.catagory_name = new_name
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name)
-#         path = files.file_rename(path,new_name)
-#
-#         return True
-#
-#     def rename_asset(self, project_path = None, catagory_name = None, asset_name = None, new_name=True):
-#
-#         for component in self.components(project_path, catagory_name, asset_name):
-#             path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name, component, ("%s.%s"%(component,"pipe")))
-#             if os.path.isfile(path):
-#                 component_object = pipeline_component(path = path, project = self, settings = self.settings)
-#                 component_object.rename_asset(new_name)
-#
-#
-#         path = os.path.join(project_path,self.assets_dir,catagory_name,asset_name)
-#         path = files.file_rename(path,new_name)
-#
-#         return True
-#
-#
-#
-#     @property
-#     def masters(self):
-#         if self.project_file:
-#             masters = {}
-#             project_path = self.settings.current_project_path
-#
-#             for catagory in self.catagories(project_path=project_path):
-#                 for asset in self.assets(project_path=project_path, catagory_name = catagory):
-#                     for component in self.components(project_path = project_path, catagory_name = catagory, asset_name = asset):
-#                         component_object = pipeline_component
-#                         component_file_path = os.path.join(project_path,
-#                             self.assets_dir,
-#                             catagory,
-#                             asset,
-#                             component,
-#                             "%s.%s"%(component,"pipe")
-#                             )
-#
-#                         component_object = pipeline_component(path = component_file_path, project = self, settings = self.settings)
-#                         if component_object.component_public_state:
-#                             master_padded_version = set_padding(0, self.project_padding)
-#                             master_file = component_object.master
-#                             if master_file:
-#                                 masters["%s_%s"%(asset,component)] = [master_file,
-#                                                      component_object.thumbnail,
-#                                                      component_object.author("masters",master_padded_version),
-#                                                      component_object.date_created("masters",master_padded_version),
-#                                                      ]
-#
-#                         del component_object
-#
-#             return masters
-#         else:
-#             return None
-#
-#     @property
-#     def stages(self):
-#         stages = {}
-#         stages["asset"] = ["model","rig","clip","shading","lightning"]
-#         stages["animation"] = ["layout","Shot"]
-#         return stages
-#
-#     @property
-#     def levels(self):
-#         levels = {}
-#         levels["asset"] = ["type","asset","stage","ccc"]
-#         levels["animation"] = ["Ep","Seq"]
-#         return levels
-#
-#
-#
-#     def log(self):
-#
-#         log.info("logging project '%s'"%(self.project_name))
-#
-#         project_path = self.settings.current_project_path
-#
-#         log.info("project local path %s"%project_path)
-#
-#         [ log.info("  %s"%files.reletive_path(project_path,f)) for f in files.list_all(self.settings.current_project_path) if isinstance(files.list_all(self.settings.current_project_path),list) ]
-#
-#         log.info("project data file: %s"%self.data_file_path)
-#
-#         log.info(self.data_file.print_nice())
-#
-#         log.info("end logging project ")
-#
-#
-#
 
 class pipeline_settings(pipeline_data):
     def __init__(self,**kwargs):
@@ -1000,7 +344,13 @@ class pipeline_settings(pipeline_data):
         self.settings_file = self.data_file.read()
         
         return self 
-    
+
+    def project_path(self, project_key = None):
+
+        if self.settings_file:
+            return self.projects[project_key][0]
+
+
     @property  
     def projects(self):
         
@@ -1015,16 +365,7 @@ class pipeline_settings(pipeline_data):
             data["projects"] = projects
             self.data_file.edit(data)
             self.settings_file = self.data_file.read()
-    
-    def project_path(self, project_key = None):
-        
-        if self.settings_file:
-            return self.projects[project_key][0]
-            
 
-
-
-    
     @property
     def current_project_path(self):
 
