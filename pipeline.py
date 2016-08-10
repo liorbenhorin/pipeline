@@ -920,7 +920,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if index != -1:
                 self.stageCombo.comboBox.setCurrentIndex(index)
             else:
-                self.stageCombo.comboBox.setCurrentIndex(QtCore.QModelIndex())
+                self.stageCombo.comboBox.setCurrentIndex(0)
 
             dir = os.path.join(self.project.path, self.stageTypeName()) if self.stageTypeName() else None
 

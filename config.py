@@ -19,7 +19,7 @@ _standard_ = "standard"
 _super_ = "super"
 
 
-localIconPath = os.path.join(os.path.dirname(__file__), 'icons/treeview/')
+localIconPath = os.path.join(os.path.dirname(__file__), 'icons', 'treeview')
 # if os.path.exists(localIconPath):
 
 branch_more = os.path.join(localIconPath, "branch-more.svg")
@@ -28,7 +28,7 @@ branch_open = os.path.join(localIconPath, "branch-open.svg")
 branch_end = os.path.join(localIconPath, "branch-end.svg")
 vline = os.path.join(localIconPath, "vline.svg")
 
-localIconPath = os.path.join(os.path.dirname(__file__), 'icons/')
+localIconPath = os.path.join(os.path.dirname(__file__), 'icons')
 
 
 folder_icon = os.path.join(localIconPath, "%s.svg" % "folder")
