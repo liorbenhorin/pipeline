@@ -110,110 +110,110 @@ def general_log():
     else:
         log.info("cannot log anything - ui is not loaded")
              
-def standard_error_report_handler():
-    
-    py_file_dir = os.path.dirname(__file__)                       
-    log_file = os.path.join(py_file_dir, 'error_reports','ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))           
-    files.assure_path_exists(log_file)            
-    exp_hdlr = logging.StreamHandler(stream=sys.stdout)
-    exp_hdlr = logging.FileHandler(log_file, mode = 'w')
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    exp_hdlr.setFormatter(formatter)            
-    log.addHandler(exp_hdlr)  
-    log.info('ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))          
-    log.info('Platform - %s'%(files.os_qeury()))
-    log.info('Maya version - %s'%maya.maya_version())
-    log.info('Pipeline version - %s'%version)
-    py_file = os.path.realpath(__file__)           
-    log.info('pipeline.py path - %s'%py_file)
-    return exp_hdlr, log_file
-    
-
-def exception_report(file=None,settings_file=None):
-    if file:
-        string = files.read(file)
-        errorDlg = dlg.ErrorReport(plainText = string)
-        note = errorDlg.exec_()
-        text, usertext, dont_ask = errorDlg.result()
-        try:
-            if dont_ask:
-                UiWindow.ui.actionBug_reports.setChecked(False)                
-            else:
-                UiWindow.ui.actionBug_reports.setChecked(True)    
-        except:
-            log.info("ui is not loaded - 'don't show this again' settings is not saved")
-                
-        if note == QtGui.QDialog.Accepted:
-            import modules.email as email
-            body = usertext + '\n\n\n' + text
-            email.mailto('liorbenhorin@gmail.com', subject='Pipeline error report - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")), body=body)
-
-def try_execpt(fn):
-
-    def wrapped(self,*args,**kwargs):
-        try:
-            return fn(self,*args,**kwargs)
-            
-        except StandardError:
-            exc_info = sys.exc_info()
-            exp_hdlr, log_file = standard_error_report_handler()
-
-            if 'UiWindow' in globals():
-                try:
-                    UiWindow.log_settings()
-                except:
-                    log.info("unable to log the settings")
-            else:
-                log.info("cannot log anything - ui is not loaded")
-                    
-            try:
-                
-                self.log()
-                log.info("exception at %s.%s"%(self.__class__.__name__, fn.__name__), exc_info=True)
-                log.removeHandler(exp_hdlr) 
-            except:
-                log.info("exception at %s - faild to log more information"%(fn.__name__), exc_info=True)
-                log.removeHandler(exp_hdlr) 
-            
-            try:
-                if UiWindow.ui.actionBug_reports.isChecked():
-                    exception_report(log_file)
-            except:
-                exception_report(log_file)
-
-            raise StopIteration
-                        
-    return wrapped
-    
-  
-def exceptions_handler(decorator):
-    def decorate(cls):
-        for name, fn in inspect.getmembers(cls, inspect.ismethod):
-            if name is not 'log':
-                setattr(cls, name, decorator(fn))
-               
-        return cls
-    return decorate    
-
-def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
-        
-    if issubclass(exc_type, KeyboardInterrupt):
-        sys.__excepthook__(exc_type, exc_value, exc_traceback)
-        return
-        
-    # this will prevent for loop error from getting printed to screen    
-    if issubclass(exc_type, StopIteration):
-        log.info("quitting iteration")
-        return        
-    
-    exp_hdlr, log_file = standard_error_report_handler()
-    general_log()
-    log.info("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))    
-    log.removeHandler(exp_hdlr) 
-    exception_report(log_file)
-
-
-sys.excepthook = handle_uncaught_exception
+# def standard_error_report_handler():
+#
+#     py_file_dir = os.path.dirname(__file__)
+#     log_file = os.path.join(py_file_dir, 'error_reports','ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))
+#     files.assure_path_exists(log_file)
+#     exp_hdlr = logging.StreamHandler(stream=sys.stdout)
+#     exp_hdlr = logging.FileHandler(log_file, mode = 'w')
+#     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+#     exp_hdlr.setFormatter(formatter)
+#     log.addHandler(exp_hdlr)
+#     log.info('ERROR REPORT - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")))
+#     log.info('Platform - %s'%(files.os_qeury()))
+#     log.info('Maya version - %s'%maya.maya_version())
+#     log.info('Pipeline version - %s'%version)
+#     py_file = os.path.realpath(__file__)
+#     log.info('pipeline.py path - %s'%py_file)
+#     return exp_hdlr, log_file
+#
+#
+# def exception_report(file=None,settings_file=None):
+#     if file:
+#         string = files.read(file)
+#         errorDlg = dlg.ErrorReport(plainText = string)
+#         note = errorDlg.exec_()
+#         text, usertext, dont_ask = errorDlg.result()
+#         try:
+#             if dont_ask:
+#                 UiWindow.ui.actionBug_reports.setChecked(False)
+#             else:
+#                 UiWindow.ui.actionBug_reports.setChecked(True)
+#         except:
+#             log.info("ui is not loaded - 'don't show this again' settings is not saved")
+#
+#         if note == QtGui.QDialog.Accepted:
+#             import modules.email as email
+#             body = usertext + '\n\n\n' + text
+#             email.mailto('liorbenhorin@gmail.com', subject='Pipeline error report - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")), body=body)
+#
+# def try_execpt(fn):
+#
+#     def wrapped(self,*args,**kwargs):
+#         try:
+#             return fn(self,*args,**kwargs)
+#
+#         except StandardError:
+#             exc_info = sys.exc_info()
+#             exp_hdlr, log_file = standard_error_report_handler()
+#
+#             if 'UiWindow' in globals():
+#                 try:
+#                     UiWindow.log_settings()
+#                 except:
+#                     log.info("unable to log the settings")
+#             else:
+#                 log.info("cannot log anything - ui is not loaded")
+#
+#             try:
+#
+#                 self.log()
+#                 log.info("exception at %s.%s"%(self.__class__.__name__, fn.__name__), exc_info=True)
+#                 log.removeHandler(exp_hdlr)
+#             except:
+#                 log.info("exception at %s - faild to log more information"%(fn.__name__), exc_info=True)
+#                 log.removeHandler(exp_hdlr)
+#
+#             try:
+#                 if UiWindow.ui.actionBug_reports.isChecked():
+#                     exception_report(log_file)
+#             except:
+#                 exception_report(log_file)
+#
+#             raise StopIteration
+#
+#     return wrapped
+#
+#
+# def exceptions_handler(decorator):
+#     def decorate(cls):
+#         for name, fn in inspect.getmembers(cls, inspect.ismethod):
+#             if name is not 'log':
+#                 setattr(cls, name, decorator(fn))
+#
+#         return cls
+#     return decorate
+#
+# def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
+#
+#     if issubclass(exc_type, KeyboardInterrupt):
+#         sys.__excepthook__(exc_type, exc_value, exc_traceback)
+#         return
+#
+#     # this will prevent for loop error from getting printed to screen
+#     if issubclass(exc_type, StopIteration):
+#         log.info("quitting iteration")
+#         return
+#
+#     exp_hdlr, log_file = standard_error_report_handler()
+#     general_log()
+#     log.info("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+#     log.removeHandler(exp_hdlr)
+#     exception_report(log_file)
+#
+#
+# sys.excepthook = handle_uncaught_exception
 
 def loadUiType(uiFile):
     """
@@ -256,7 +256,7 @@ projects_form_class, projects_base_class = loadUiType(projects_uiFile)
 create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_create_edit_project_UI.ui')
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
 
-version = '1.0.10-NFR'
+version = '1.0.2'
 
 
 def set_icons():
@@ -426,7 +426,7 @@ class pipeline_data(object):
 
 
 
-@exceptions_handler(try_execpt)   
+# @exceptions_handler(try_execpt)
 class pipeline_component(pipeline_data):
     def __init__(self,**kwargs):
         pipeline_data.__init__(self, **kwargs)
@@ -1055,7 +1055,7 @@ class pipeline_component(pipeline_data):
         log.info("end logging component ")    
 
 
-@exceptions_handler(try_execpt)      
+# @exceptions_handler(try_execpt)
 class pipeline_shot(pipeline_component):
     def __init__(self, **kwargs):       
         pipeline_component.__init__(self, **kwargs)
@@ -1544,7 +1544,7 @@ class pipeline_shot(pipeline_component):
         log.info("end logging shot ")    
 
 
-@exceptions_handler(try_execpt) 
+# @exceptions_handler(try_execpt)
 class pipeline_project(pipeline_data):
     def __init__(self,**kwargs):
         #super(pipeline_project, self,).__init__()
@@ -2032,8 +2032,8 @@ class pipeline_project(pipeline_data):
 
         log.info("end logging project ")    
                             
-
-@exceptions_handler(try_execpt) 
+#
+# @exceptions_handler(try_execpt)
 class pipeline_settings(pipeline_data):
     def __init__(self,**kwargs):
         #super(pipeline_settings, self).__init__()
@@ -2572,7 +2572,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             if there is no user logged in then make sure no project is loaded            
         '''
         self.init_settings()  
-        self._decode_users()
+        # self._decode_users()
         
         if self.settings.user[0] is not None:
             self.ui.users_pushButton.setText(self.settings.user[0])
@@ -2607,8 +2607,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.toggle_scene_open_script()  
               
         end_time = timer()    
-        log.info( "loaded in: %s"%(round((end_time - start_time),2)) )                 
-        track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
+        log.info( "loaded in: %s"%(round((end_time - start_time),2)) )
+        self.ui.projects_tooltip_label.setHidden(True)
+        # track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         
     def set_icons(self):
         
@@ -2662,8 +2663,8 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def init_settings(self):
   
         
-        self.settings_file_name = 'settings.pipe'                 
-        file = os.path.join(os.path.dirname(__file__), self.settings_file_name)
+        self.settings_file_name = 'pipeline_settings.pipe'
+        file = os.path.join(maya.userPrefDir(), self.settings_file_name)
         
         if os.path.isfile(file):                       
             self.settings = pipeline_settings(path = file)                                         

@@ -138,7 +138,7 @@ class about(QtGui.QDialog):
         self.logo_label.setPixmap(logo.scaled(250,56))         
         self.logo_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.version_label = QtGui.QLabel("<b>V 1.0</b>")
+        self.version_label = QtGui.QLabel("<b>V 1.0.2</b>")
         self.version_label.setAlignment(QtCore.Qt.AlignCenter)
         
         self.title_label = QtGui.QLabel("<b>A SIMPLE PROJECTS MANAGER FOR MAYA</b>")
