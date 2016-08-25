@@ -38,9 +38,10 @@ Manage all you projects without leaving Maya.
 * Rename anything (catagories, assets, components, sequences and shots).
 * Toggle component masters from showing in the assets bank in the scenes mode (helps keep things clean).
 * Record playblasts from shots, and Pipeline orgenise them in versions, too.
-* Store playblasts inside the project folder or in a sister directory (useful when sharing projects to not slow down sync times)
-* Improved notes module
-* file open is now writeing to maya's recently opened
+* Store playblasts inside the project folder or in a sister directory (useful when sharing projects to not slow down sync times).
+* Improved notes module.
+* file open is now writeing to maya's recently opened.
+* the pipeline settings file is now stored inside the maya prefs directory.
 
 *Fixed the following issues*
 
