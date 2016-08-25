@@ -2280,7 +2280,11 @@ class pipeline_settings(pipeline_data):
             try:
                 return self.settings_file["playblast_format"]
             except:
-                return "movie"
+                if files.os_qeury() == "win32":
+                    return "qt"
+                else:
+                    return "movie"
+
 
     @playblast_format.setter
     def playblast_format(self,format):
