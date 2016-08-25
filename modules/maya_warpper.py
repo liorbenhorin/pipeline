@@ -73,13 +73,20 @@ def save_scene_as(path = None, file_name = None):
         if file_name:
             fullpath = os.path.join(path,file_name)
             cmds.file(rename = fullpath)
-            return cmds.file(s=True, type="mayaAscii")    
-            
-            
+            return cmds.file(s=True, type="mayaAscii")
+
+def userPrefDir():
+    return cmds.internalVar(userPrefDir=True)
+
 def open_scene(path = None):
     if os.path.exists(path):
         checkState()
-        return cmds.file(path, o = True, f = True, esn = False)
+        insert_recent_file(path)
+        return cmds.file(path, o = True, f = True, esn = True)
+
+def insert_recent_file(path):
+    cmds.optionVar(stringValueAppend=('RecentFilesList', path))
+
 
 def current_open_file():
     return cmds.file(q=True,sn=True)              
