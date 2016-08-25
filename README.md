@@ -31,6 +31,8 @@ Manage all you projects without leaving Maya.
 
 **TBA - 1.0.0 - First stable version**
 
+**Version - 1.0.2 - Beta**
+
 *New features*
 
 * Rename anything (catagories, assets, components, sequences and shots).
@@ -38,16 +40,17 @@ Manage all you projects without leaving Maya.
 * Record playblasts from shots, and Pipeline orgenise them in versions, too.
 * Store playblasts inside the project folder or in a sister directory (useful when sharing projects to not slow down sync times)
 * Improved notes module
-* Pipeline now have a batter bug reports system to help in fixing more bugs.
+* file open is now writeing to maya's recently opened
 
-*Bugfixes*
+*Fixed the following issues*
 
-* Bug when project is not being right set after creation, on some cases.
-* Bug when you cannot load a project, and need to restart Pipeline.
-* Bug that was causing many function to fail when setting a version padding numbr other then 3.
-* Bug that was showing an empty column when no users set to project
-* Bug that was not setting the project correctly in some cases on a windows machines.
-* Random ui bugs
+* Frame range and settings are not being loaded on file open.
+* Project is not being right set after creation, on some cases.
+* You cannot load a project, and need to restart Pipeline.
+* Many function to fail when setting a version padding numbr other then 3.
+* Showing an empty column when no users set to project
+* Not setting the project correctly in some cases on a windows machines.
+
 
 **8.6.16 - 1.0.0 - BETA - Free for educational and non commercial use!**
 
