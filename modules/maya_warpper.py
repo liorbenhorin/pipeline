@@ -82,7 +82,9 @@ def open_scene(path = None):
     if os.path.exists(path):
         checkState()
         insert_recent_file(path)
-        return cmds.file(path, o = True, f = True, esn = True)
+        opend = cmds.file(path, o = True, f = True, esn = True)
+        logging.info("{}".format(opend))
+        return opend
 
 def insert_recent_file(path):
     cmds.optionVar(stringValueAppend=('RecentFilesList', path))
