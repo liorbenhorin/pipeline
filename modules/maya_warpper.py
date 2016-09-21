@@ -274,10 +274,12 @@ def scene_resolution():
 
 def create_scriptjob(parent = None, event = None, script = None):
     if event and script:
+        return
         return cmds.scriptJob(e=[event,script], ro=False, p = parent)
         
 def kill_scriptjob(job = None):
     if job:
+        return
         return cmds.scriptJob(kill = job, f = True)       
 
 def new_scene_script(parent = None, script = None):

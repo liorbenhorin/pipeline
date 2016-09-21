@@ -44,13 +44,19 @@ Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License:
 
 '''
 
-from PySide import QtCore, QtGui
-from shiboken import wrapInstance
+# from PySide import QtCore, QtGui
+# from shiboken import wrapInstance
 import maya.OpenMayaUI as omui
 import maya.OpenMaya as OpenMaya
 import maya.cmds as cmds
 import os
-import pysideuic
+# import pysideuic
+import pyside2uic as pysideuic
+from PySide2 import QtGui, QtWidgets, QtCore
+# from PySide2.QtGui import *
+# from PySide2.QtWidgets import *
+from shiboken2 import wrapInstance
+
 import xml.etree.ElementTree as xml
 from cStringIO import StringIO
 import pymel.core as pm
@@ -143,7 +149,7 @@ def general_log():
 #         except:
 #             log.info("ui is not loaded - 'don't show this again' settings is not saved")
 #
-#         if note == QtGui.QDialog.Accepted:
+#         if note == QtWidgets.QDialog.Accepted:
 #             import modules.email as email
 #             body = usertext + '\n\n\n' + text
 #             email.mailto('liorbenhorin@gmail.com', subject='Pipeline error report - %s.txt'%(time.strftime("%Y-%m-%d %H-%M-%S")), body=body)
@@ -235,14 +241,19 @@ def loadUiType(uiFile):
             
         #Fetch the base_class and form class based on their type in the xml from designer
         form_class = frame['Ui_%s'%form_class]
-        base_class = getattr(QtGui, widget_class)
+        base_class = getattr(QtWidgets, widget_class)
     return form_class, base_class
 
  
 def maya_main_window():
     main_window_ptr = omui.MQtUtil.mainWindow()
-    return wrapInstance(long(main_window_ptr), QtGui.QWidget)
-           
+    return wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
+
+# def maya_main_window():
+#     for widget in QtWidgets.QApplication.topLevelWidgets():
+#         if widget.objectName() == 'MayaWindow':
+#             return widget
+
 
 '''
 global variables setup
@@ -329,10 +340,10 @@ def set_icons():
     search_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"search"))
     edit_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"edit"))
     delete_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"delete_folder"))
-    new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))     
-    open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))    
-    save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))  
-    save_master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))  
+    new_folder_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"new_folder"))
+    open_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"open"))
+    save_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save"))
+    save_master_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"save_master"))
     add_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"add"))
     down_arrow_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"down_arrow"))
     import_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"import"))
@@ -346,15 +357,15 @@ def set_icons():
     play_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"play"))
     comment_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"comment"))
     
-    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image")) 
-    large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark")) 
-    large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click")) 
-    large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark")) 
+    large_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image"))
+    large_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_dark"))
+    large_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click"))
+    large_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"large_image_click_dark"))
     
-    wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image")) 
-    wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click")) 
-    wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark")) 
-    wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark")) 
+    wide_image_icon = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image"))
+    wide_image_icon_click = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click"))
+    wide_image_icon_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_dark"))
+    wide_image_icon_click_dark = QtGui.QPixmap(os.path.join(localIconPath, "%s.svg"%"wide_image_click_dark"))
 
 
 # declare all the global icons  variables  
@@ -364,12 +375,12 @@ def set_padding(int, padding):
     return str(int).zfill(padding)
 
 
-class QLabelButton(QtGui.QLabel):
+class QLabelButton(QtWidgets.QLabel):
     '''
         custom QLbael the can send clicked signal
     '''
     def __init(self, parent):
-        QtGui.QLabel.__init__(self, parent)
+        QtWidgets.QLabel.__init__(self, parent)
 
     def mouseReleaseEvent(self, ev):
         click = ev.pos()
@@ -377,7 +388,7 @@ class QLabelButton(QtGui.QLabel):
             self.emit(QtCore.SIGNAL('clicked()'))
 
 
-class alpha_button(QtGui.QWidget):
+class alpha_button(QtWidgets.QWidget):
     '''
         custom QLbael the can send clicked signal, only from the pixmap are that has 100% alpha
         used for the thumbnail transperent icon button
@@ -2388,12 +2399,14 @@ class pipeline_settings(pipeline_data):
         log.info("end logging settings")
 
 #@exceptions_handler(try_execpt) 
-class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
+class pipeLineUI(MayaQWidgetDockableMixin, QtWidgets.QMainWindow): #
     def __init__(self, parent=None):
         
         self.deleteInstances()
         
-        super(pipeLineUI, self).__init__(parent)      
+        super(pipeLineUI, self).__init__(parent)
+
+
         self.setWindowFlags(QtCore.Qt.Tool)                
         form_class, base_class = main_form_class, main_base_class
         
@@ -2436,12 +2449,12 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.asset_scenes_switch_pushButton.clicked.connect(self.asset_scenes_switch)
         self.ui.publicMaster_checkBox.clicked.connect(self.public_master_toggle)
         
-        self.playblast_menu = QtGui.QMenu(parent = self.ui.playblast_shot_pushButton)
-        self.playblast_shot = QtGui.QAction("Record Playblast",self)
+        self.playblast_menu = QtWidgets.QMenu(parent = self.ui.playblast_shot_pushButton)
+        self.playblast_shot = QtWidgets.QAction("Record Playblast",self)
         self.playblast_shot.triggered.connect(self.shot_record_playblast)
         self.playblast_menu.addAction(self.playblast_shot)  
         self.playblast_menu.addSeparator() 
-        self.playblast_shot_options = QtGui.QAction("Playblast options",self)
+        self.playblast_shot_options = QtWidgets.QAction("Playblast options",self)
         self.playblast_shot_options.triggered.connect(self.shot_record_playblast_options)
         self.playblast_menu.addAction(self.playblast_shot_options)   
         self.ui.playblast_shot_pushButton.setMenu(self.playblast_menu)     
@@ -2449,79 +2462,79 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #self.ui.playblast_shot_options.triggered.connect(self.shot_record_playblast_options)
         
         #create menus
-        self.catagories_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
+        self.catagories_menu = QtWidgets.QMenu(parent = self.ui.catagory_pushButton)
         self.catagories_menu.addAction(new_folder_icon,'New',self.create_catagory)       
         self.catagories_menu.addSeparator()   
-        self.rename_category_action = QtGui.QAction("Rename",self)
+        self.rename_category_action = QtWidgets.QAction("Rename",self)
         self.rename_category_action.triggered.connect(self.category_rename)
         self.catagories_menu.addAction(self.rename_category_action)
         self.catagories_menu.addSeparator()                  
-        self.delete_catagory_action = QtGui.QAction("Delete",self)
+        self.delete_catagory_action = QtWidgets.QAction("Delete",self)
         self.delete_catagory_action.triggered.connect(self.delete_catagory)
-        self.delete_catagory_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_catagory_action.setIcon(QtGui.QIcon(delete_folder_icon))
         self.catagories_menu.addAction(self.delete_catagory_action)
         self.ui.catagory_pushButton.setMenu(self.catagories_menu)
 
-        self.assets_menu = QtGui.QMenu(parent = self.ui.asset_pushButton)
+        self.assets_menu = QtWidgets.QMenu(parent = self.ui.asset_pushButton)
         self.assets_menu.addAction(new_folder_icon,'New',self.create_asset)
         self.assets_menu.addSeparator()   
-        self.rename_asset_action = QtGui.QAction("Rename",self)
+        self.rename_asset_action = QtWidgets.QAction("Rename",self)
         self.rename_asset_action.triggered.connect(self.asset_rename)
         self.assets_menu.addAction(self.rename_asset_action)
         self.assets_menu.addSeparator()  
-        self.delete_asset_action = QtGui.QAction("Delete",self)
+        self.delete_asset_action = QtWidgets.QAction("Delete",self)
         self.delete_asset_action.triggered.connect(self.delete_asset)
-        self.delete_asset_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_asset_action.setIcon(QtGui.QIcon(delete_folder_icon))
         self.assets_menu.addAction(self.delete_asset_action)
         self.ui.asset_pushButton.setMenu(self.assets_menu)
 
-        self.component_menu = QtGui.QMenu(parent = self.ui.component_pushButton)
+        self.component_menu = QtWidgets.QMenu(parent = self.ui.component_pushButton)
         self.component_menu.addAction(new_folder_icon,'New',self.create_component)
         self.component_menu.addAction(new_folder_icon,'New from current scene',self.create_component_from_current_scene)
         self.component_menu.addAction(new_folder_icon,'New from current selection',self.create_component_from_current_selection)
         self.component_menu.addAction(new_folder_icon,'New from file',self.create_component_from_file)
         self.component_menu.addSeparator()   
-        self.rename_component_action = QtGui.QAction("Rename",self)
+        self.rename_component_action = QtWidgets.QAction("Rename",self)
         self.rename_component_action.triggered.connect(self.component_rename)
         self.component_menu.addAction(self.rename_component_action)
         self.component_menu.addSeparator()  
-        self.delete_component_action = QtGui.QAction("Delete",self)
+        self.delete_component_action = QtWidgets.QAction("Delete",self)
         self.delete_component_action.triggered.connect(self.delete_component)
-        self.delete_component_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_component_action.setIcon(QtGui.QIcon(delete_folder_icon))
         self.component_menu.addAction(self.delete_component_action)
         self.ui.component_pushButton.setMenu(self.component_menu)
         
-        self.sequence_menu = QtGui.QMenu(parent = self.ui.sequence_pushButton)
+        self.sequence_menu = QtWidgets.QMenu(parent = self.ui.sequence_pushButton)
         self.sequence_menu.addAction(new_folder_icon,'New',self.create_sequence )
         
         self.sequence_menu.addSeparator()   
-        self.rename_sequence_action = QtGui.QAction("Rename",self)
+        self.rename_sequence_action = QtWidgets.QAction("Rename",self)
         self.rename_sequence_action.triggered.connect(self.sequence_rename)
         self.sequence_menu.addAction(self.rename_sequence_action)
         self.sequence_menu.addSeparator()  
         
         
-        self.delete_sequence_action = QtGui.QAction("Delete",self)
+        self.delete_sequence_action = QtWidgets.QAction("Delete",self)
         self.delete_sequence_action.triggered.connect(self.delete_sequence)
-        self.delete_sequence_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_sequence_action.setIcon(QtGui.QIcon(delete_folder_icon))
         self.sequence_menu.addAction(self.delete_sequence_action)
         self.ui.sequence_pushButton.setMenu(self.sequence_menu)
 
-        self.shot_menu = QtGui.QMenu(parent = self.ui.shot_pushButton)
+        self.shot_menu = QtWidgets.QMenu(parent = self.ui.shot_pushButton)
         self.shot_menu.addAction(new_folder_icon,'New',self.create_shot)       
         self.shot_menu.addAction(new_folder_icon,'New from current scene',self.create_shot_from_current_scene)
         self.shot_menu.addAction(new_folder_icon,'New from file',self.create_shot_from_file)
         self.shot_menu.addSeparator()  
   
-        self.rename_shot_action = QtGui.QAction("Rename",self)
+        self.rename_shot_action = QtWidgets.QAction("Rename",self)
         self.rename_shot_action.triggered.connect(self.shot_rename)
         self.shot_menu.addAction(self.rename_shot_action)
         self.shot_menu.addSeparator()  
         
                  
-        self.delete_shot_action = QtGui.QAction("Delete",self)
+        self.delete_shot_action = QtWidgets.QAction("Delete",self)
         self.delete_shot_action.triggered.connect(self.delete_shot)
-        self.delete_shot_action.setIcon(QtGui.QIcon(delete_folder_icon)) 
+        self.delete_shot_action.setIcon(QtGui.QIcon(delete_folder_icon))
         self.shot_menu.addAction(self.delete_shot_action)
         self.ui.shot_pushButton.setMenu(self.shot_menu)
         
@@ -2606,7 +2619,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             the correct component
         '''     
         self.init_assets_selection()  
-        self.setObjectName("pipeline_beta")
+        # self.setObjectName("pipeline_beta")
         self.open_scene_script = None
         self.toggle_scene_open_script()  
               
@@ -2637,7 +2650,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             
             button.setIconSize(QtCore.QSize(20,20)) 
         
-        self.ui.catagory_pushButton.setIcon(QtGui.QIcon(catagory_icon))            
+        self.ui.catagory_pushButton.setIcon(QtGui.QIcon(catagory_icon))
         self.ui.asset_pushButton.setIcon(QtGui.QIcon(asset_icon))
         self.ui.component_pushButton.setIcon(QtGui.QIcon(component_icon))
         self.ui.projects_pushButton.setIcon(QtGui.QIcon(project_icon))
@@ -2645,9 +2658,9 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.asset_scenes_switch_pushButton.setIcon(QtGui.QIcon(anim_icon))
         self.ui.save_version_pushButton.setIcon(QtGui.QIcon(save_icon))
         self.ui.save_master_pushButton.setIcon(QtGui.QIcon(save_master_icon))
-        self.ui.import_version_pushButton.setIcon(QtGui.QIcon(import_icon))       
+        self.ui.import_version_pushButton.setIcon(QtGui.QIcon(import_icon))
         self.ui.sequence_pushButton.setIcon(QtGui.QIcon(asset_icon))
-        self.ui.shot_pushButton.setIcon(QtGui.QIcon(component_icon))        
+        self.ui.shot_pushButton.setIcon(QtGui.QIcon(component_icon))
         self.ui.save_shot_version_pushButton.setIcon(QtGui.QIcon(save_icon))
         self.ui.import_shot_version_pushButton.setIcon(QtGui.QIcon(import_icon))
         self.ui.export_shot_pushButton.setIcon(QtGui.QIcon(export_icon))
@@ -2739,7 +2752,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                         login = dlg.Login()
                         result = login.exec_()
                         q_user, q_password  = login.result()
-                        if result == QtGui.QDialog.Accepted:
+                        if result == QtWidgets.QDialog.Accepted:
                             if q_user in self.project.project_users:
                                 if self.project.project_users[q_user][0] == q_password:
                                     self.settings.user = [q_user, q_password]
@@ -2995,22 +3008,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
         # version thumbnail (square 1:1 96x96)
         
-        self.versionTumb_label = QtGui.QLabel()
-        sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        self.versionTumb_label = QtWidgets.QLabel()
+        sizepolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
         sizepolicy.setHeightForWidth(self.versionTumb_label.sizePolicy().hasHeightForWidth())
         self.versionTumb_label.setSizePolicy(sizepolicy)
         self.versionTumb_label.setMinimumSize(QtCore.QSize(96, 96)) 
-        self.versionTumb_label.setFrameShape(QtGui.QFrame.StyledPanel)         
+        self.versionTumb_label.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.ui.component_data_horizontalLayout.addWidget(self.versionTumb_label)
         self.ui.component_data_horizontalLayout.setContentsMargins(0,0,0,0)               
         self.set_component_thumbnail(large_image_icon_dark)
                         
-        layout = QtGui.QHBoxLayout(self.versionTumb_label)
+        layout = QtWidgets.QHBoxLayout(self.versionTumb_label)
         layout.setContentsMargins(0,0,0,0)
         
         self.grab_thumnail_Button = alpha_button(self,large_image_icon_click)  
         self.grab_thumnail_Button.set_pixmap(large_image_icon_click_dark)      
-        sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizepolicy2 = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
         sizepolicy2.setHeightForWidth(self.grab_thumnail_Button.sizePolicy().hasHeightForWidth())
         self.grab_thumnail_Button.setSizePolicy(sizepolicy2)
         self.grab_thumnail_Button.setMinimumSize(QtCore.QSize(96, 96))          
@@ -3020,22 +3033,22 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     
         # version thumbnail (rectabgle 16:9 171x96)
         
-        self.shotTumb_label = QtGui.QLabel()
-        sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        self.shotTumb_label = QtWidgets.QLabel()
+        sizepolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
         sizepolicy.setHeightForWidth(self.shotTumb_label.sizePolicy().hasHeightForWidth())
         self.shotTumb_label.setSizePolicy(sizepolicy)
         self.shotTumb_label.setMinimumSize(QtCore.QSize(171, 96))   
-        self.shotTumb_label.setFrameShape(QtGui.QFrame.StyledPanel)        
+        self.shotTumb_label.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.ui.shot_data_horizontalLayout.addWidget(self.shotTumb_label)
         self.ui.shot_data_horizontalLayout.setContentsMargins(6,6,6,6)               
         self.set_shot_thumbnail(wide_image_icon_dark)
                         
-        layout = QtGui.QHBoxLayout(self.shotTumb_label)
+        layout = QtWidgets.QHBoxLayout(self.shotTumb_label)
         layout.setContentsMargins(0,0,0,0)
 
         self.grab_shot_thumnail_Button = alpha_button(self,wide_image_icon_click_dark)  
         self.grab_shot_thumnail_Button.set_pixmap(wide_image_icon_click_dark)      
-        sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizepolicy2 = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
         sizepolicy2.setHeightForWidth(self.grab_shot_thumnail_Button.sizePolicy().hasHeightForWidth())
         self.grab_shot_thumnail_Button.setSizePolicy(sizepolicy2)
         self.grab_shot_thumnail_Button.setMinimumSize(QtCore.QSize(171, 96))          
@@ -3053,7 +3066,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def capture_shot_thumbnail(self):
         path = os.path.join(self.shot.tumbnails_path,"%s.%s"%(self.shot.shot_name,"png"))   
         snapshot = maya.snapshot(path = path, width = 171, height = 96)
-        self.set_shot_thumbnail(QtGui.QPixmap(snapshot))       
+        self.set_shot_thumbnail(QtGui.QPixmap(snapshot))
 
     def set_component_thumbnail(self,Qpixmap):
         self.versionTumb_label.setPixmap(Qpixmap)
@@ -3074,15 +3087,15 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.category_tableWidget.verticalHeader().setVisible(False)
         self.ui.category_tableWidget.setColumnCount(1)
         self.ui.category_tableWidget.setRowCount(1)
-        self.ui.category_tableWidget.setHorizontalHeaderLabels(["Category"]) 
-        self.ui.category_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.ui.category_tableWidget.setHorizontalHeaderLabels(["Category"])
+        self.ui.category_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.ui.category_tableWidget.resizeRowsToContents() 
-        self.ui.category_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows) 
+        self.ui.category_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.category_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.ui.category_tableWidget.clearContents()
         self.ui.category_tableWidget.setRowCount(0)
         self.ui.category_tableWidget.itemSelectionChanged.connect(self.catagory_selection)        
-        self.ui.category_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.ui.category_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 
 
     def init_assetsTable(self):        
@@ -3091,14 +3104,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.assets_tableWidget.setColumnCount(1)
         self.ui.assets_tableWidget.setRowCount(1)
         self.ui.assets_tableWidget.setHorizontalHeaderLabels(["Asset"]) 
-        self.ui.assets_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.ui.assets_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.ui.assets_tableWidget.resizeRowsToContents() 
-        self.ui.assets_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows) 
+        self.ui.assets_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.assets_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.ui.assets_tableWidget.clearContents()
         self.ui.assets_tableWidget.setRowCount(0)
         self.ui.assets_tableWidget.itemSelectionChanged.connect(self.asset_selection)
-        self.ui.assets_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.ui.assets_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 
 
     def init_componentsTable(self):        
@@ -3107,14 +3120,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.components_tableWidget.setColumnCount(1)
         self.ui.components_tableWidget.setRowCount(1)
         self.ui.components_tableWidget.setHorizontalHeaderLabels(["Component"]) 
-        self.ui.components_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.ui.components_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.ui.components_tableWidget.resizeRowsToContents() 
-        self.ui.components_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows) 
+        self.ui.components_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.components_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.ui.components_tableWidget.clearContents()
         self.ui.components_tableWidget.setRowCount(0)
         self.ui.components_tableWidget.itemSelectionChanged.connect(self.component_selection)
-        self.ui.components_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.ui.components_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 
 
     def init_component_versionsTable(self):        
@@ -3126,21 +3139,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.component_versions_tableWidget.setHorizontalHeaderLabels(["Version","Note","Creator","Date Saved","Size","Open","Action"])
         self.ui.component_versions_tableWidget.resizeRowsToContents()
         self.ui.component_versions_tableWidget.verticalHeader().setDefaultSectionSize(30);
-        self.ui.component_versions_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)       
+        self.ui.component_versions_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.component_versions_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
        
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+        self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(0,25)
         
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(1,25)
         
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
+        self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(5,60)
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.component_versions_tableWidget.clearContents()
@@ -3157,21 +3170,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.component_masters_tableWidget.setHorizontalHeaderLabels(["Version","Note","Creator","Date Saved","Size","Open","Action"])
         self.ui.component_masters_tableWidget.resizeRowsToContents()
         self.ui.component_masters_tableWidget.verticalHeader().setDefaultSectionSize(30);
-        self.ui.component_masters_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)      
+        self.ui.component_masters_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.component_masters_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
        
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+        self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(0,25)
         
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(1,25)
         
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
+        self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(5,60)
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.component_masters_tableWidget.clearContents()
@@ -3185,14 +3198,14 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.sequences_tableWidget.setColumnCount(1)
         self.ui.sequences_tableWidget.setRowCount(1)
         self.ui.sequences_tableWidget.setHorizontalHeaderLabels(["sequence"]) 
-        self.ui.sequences_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.ui.sequences_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.ui.sequences_tableWidget.resizeRowsToContents() 
-        self.ui.sequences_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows) 
+        self.ui.sequences_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.sequences_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.ui.sequences_tableWidget.clearContents()
         self.ui.sequences_tableWidget.setRowCount(0)
         self.ui.sequences_tableWidget.itemSelectionChanged.connect(self.sequence_selection)        
-        self.ui.sequences_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.ui.sequences_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 
     def init_shotsTable(self):        
         self.ui.shots_tableWidget.horizontalHeader().setVisible(False)
@@ -3200,13 +3213,13 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_tableWidget.setColumnCount(1)
         self.ui.shots_tableWidget.setRowCount(1)
         self.ui.shots_tableWidget.setHorizontalHeaderLabels(["shots"]) 
-        self.ui.shots_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.ui.shots_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.ui.shots_tableWidget.resizeRowsToContents() 
-        self.ui.shots_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows) 
+        self.ui.shots_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.shots_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.ui.shots_tableWidget.clearContents()
         self.ui.shots_tableWidget.setRowCount(0)       
-        self.ui.shots_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
+        self.ui.shots_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ui.shots_tableWidget.itemSelectionChanged.connect(self.shot_selection)
 
 
@@ -3220,18 +3233,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.published_assets_tableWidget.setHorizontalHeaderLabels(["Thumbnail","Asset","Creator","Date Saved","Add"])
         self.ui.published_assets_tableWidget.resizeRowsToContents()
         self.ui.published_assets_tableWidget.verticalHeader().setDefaultSectionSize(48);
-        self.ui.published_assets_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.ui.published_assets_tableWidget.setSelectionMode(QtGui.QAbstractItemView.NoSelection)       
+        self.ui.published_assets_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.ui.published_assets_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.ui.published_assets_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+        self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed )
         self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(0,0)
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Fixed )
         self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(1,48)
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Stretch )
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Stretch )
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
+        self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch )
+        self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Stretch )
+        self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed )
         self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(5,30)
 
         self.ui.published_assets_tableWidget.clearContents()
@@ -3247,21 +3260,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_versions_tableWidget.setHorizontalHeaderLabels(["Version","Note","Creator","Date Saved","Size","Open","Action"])
         self.ui.shots_versions_tableWidget.resizeRowsToContents()
         self.ui.shots_versions_tableWidget.verticalHeader().setDefaultSectionSize(30);
-        self.ui.shots_versions_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)      
+        self.ui.shots_versions_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.shots_versions_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
        
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+        self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(0,25)
         
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(1,25)
         
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
+        self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(5,60)
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.shots_versions_tableWidget.clearContents()
@@ -3279,24 +3292,24 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         self.ui.shots_playblasts_tableWidget.setHorizontalHeaderLabels(["Version","Thumb","Creator","Date Saved","Size","Open","Action"])
         self.ui.shots_playblasts_tableWidget.resizeRowsToContents()
         self.ui.shots_playblasts_tableWidget.verticalHeader().setDefaultSectionSize(54);
-        self.ui.shots_playblasts_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)      
+        self.ui.shots_playblasts_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.shots_playblasts_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
        
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(0,25)
         
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(1,96)
 
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(2,25)
         
-        #self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.ResizeToContents )        
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(5, QtGui.QHeaderView.Fixed )
+        #self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(5,25)
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(6, QtGui.QHeaderView.Fixed )
+        self.ui.shots_playblasts_tableWidget.horizontalHeader().setSectionResizeMode(6, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.shots_playblasts_tableWidget.clearContents()
@@ -3469,7 +3482,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 
                 for i,r in enumerate(sorted(catagories)):
 
-                    item = QtGui.QTableWidgetItem(r)
+                    item = QtWidgets.QTableWidgetItem(r)
                     item.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.category_tableWidget.setItem(i,0,item)
                     
@@ -3488,7 +3501,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     for i,r in enumerate(sorted(assets)):
 
-                        item = QtGui.QTableWidgetItem(r)
+                        item = QtWidgets.QTableWidgetItem(r)
                         item.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                         self.ui.assets_tableWidget.setItem(i,0,item)
                         
@@ -3512,7 +3525,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     for i,r in enumerate(sorted(componentes)):
                         
-                        item = QtGui.QTableWidgetItem(r)
+                        item = QtWidgets.QTableWidgetItem(r)
                         item.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                         self.ui.components_tableWidget.setItem(i,0,item)
                         if self.component:
@@ -3526,10 +3539,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.project:
             #remove users column if no users in project
             if self.project.project_users == None:
-                    self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                    self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed )
                     self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(2,0)
             else:
-                self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+                self.ui.component_versions_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
             
             
         self.active_version = None
@@ -3558,57 +3571,57 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.active_version = padded_version 
                 
                 
-                version_number = QtGui.QTableWidgetItem(padded_version)            
+                version_number = QtWidgets.QTableWidgetItem(padded_version)
                 version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.component_versions_tableWidget.setItem(index,0,version_number)
                 
 
                 
-                user = QtGui.QTableWidgetItem(self.component.author("versions", padded_version))
+                user = QtWidgets.QTableWidgetItem(self.component.author("versions", padded_version))
                 user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.component_versions_tableWidget.setItem(index,2,user)
                 
 
 
-                note_indicator = QtGui.QLabel()
+                note_indicator = QtWidgets.QLabel()
                 if self.component.note("versions", padded_version) != "No notes":
                     note_indicator.setContentsMargins(2,0,0,0)
                     note_indicator.setPixmap(comment_icon)                
                 self.ui.component_versions_tableWidget.setCellWidget(index,1,note_indicator)
                     
-                date_time = QtGui.QTableWidgetItem(self.component.date_created("versions", padded_version))
+                date_time = QtWidgets.QTableWidgetItem(self.component.date_created("versions", padded_version))
                 date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.component_versions_tableWidget.setItem(index,3,date_time)            
                 
                                                          
-                size = QtGui.QTableWidgetItem("%s %s"%(self.component.size("versions", padded_version), "MB"))
+                size = QtWidgets.QTableWidgetItem("%s %s"%(self.component.size("versions", padded_version), "MB"))
                 size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.component_versions_tableWidget.setItem(index,4,size)
                 
                 
-                actionButtonItem = QtGui.QPushButton()
+                actionButtonItem = QtWidgets.QPushButton()
                 actionButtonItem.setIcon(QtGui.QIcon(add_icon))
                 actionButtonItem.setIconSize(QtCore.QSize(20,20)) 
-                actions_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
+                actions_menu = QtWidgets.QMenu(parent = self.ui.catagory_pushButton)
                 
-                reference_action = QtGui.QAction("Reference",actionButtonItem)
+                reference_action = QtWidgets.QAction("Reference",actionButtonItem)
                 reference_action.triggered.connect(self.version_reference)    
                 self.enable(reference_action, level = 2)
                             
-                import_action = QtGui.QAction("Import",actionButtonItem)  
+                import_action = QtWidgets.QAction("Import",actionButtonItem)
                 import_action.triggered.connect(self.version_add_import)                                               
                 self.enable(import_action, level = 2)
                                                               
-                delete_action = QtGui.QAction("Delete",actionButtonItem)
+                delete_action = QtWidgets.QAction("Delete",actionButtonItem)
                 delete_action.triggered.connect(self.version_delete)                 
                 self.enable(delete_action, level = 1)
                 
                                 
-                explore_action = QtGui.QAction("Explore",actionButtonItem)
+                explore_action = QtWidgets.QAction("Explore",actionButtonItem)
                 explore_action.triggered.connect(self.version_explore)  
 
 
-                openButtonItem = QtGui.QPushButton()
+                openButtonItem = QtWidgets.QPushButton()
                 openButtonItem.clicked.connect(self.version_open)
                 openButtonItem.setIcon(QtGui.QIcon(open_icon))
                 openButtonItem.setIconSize(QtCore.QSize(20,20))              
@@ -3655,10 +3668,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.project:    
         #remove users column if no users in project
             if self.project.project_users == None:
-                    self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                    self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed )
                     self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(2,0)
             else:
-                self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+                self.ui.component_masters_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
             
         
         self.active_version = None
@@ -3700,18 +3713,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                         self.active_version = padded_version 
                    
                    
-                    version_number = QtGui.QTableWidgetItem(padded_version)            
+                    version_number = QtWidgets.QTableWidgetItem(padded_version)
                     version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.component_masters_tableWidget.setItem(index,0,version_number)
 
 
-                    user = QtGui.QTableWidgetItem(self.component.author("masters", padded_version))
+                    user = QtWidgets.QTableWidgetItem(self.component.author("masters", padded_version))
                     user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.component_masters_tableWidget.setItem(index,2,user)
                     
 
 
-                    note_indicator = QtGui.QLabel()
+                    note_indicator = QtWidgets.QLabel()
                     if self.component.note("masters", padded_version) != "No notes":
                         note_indicator.setContentsMargins(2,0,0,0)
                         note_indicator.setPixmap(comment_icon)                
@@ -3719,46 +3732,46 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
                     '''
-                    user = QtGui.QTableWidgetItem(self.component.author("masters", padded_version))
+                    user = QtWidgets.QTableWidgetItem(self.component.author("masters", padded_version))
                     user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.component_masters_tableWidget.setItem(index,1,user) 
                     '''
-                    date_time = QtGui.QTableWidgetItem(self.component.date_created("masters", padded_version))
+                    date_time = QtWidgets.QTableWidgetItem(self.component.date_created("masters", padded_version))
                     date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.component_masters_tableWidget.setItem(index,3,date_time)            
                     
                                                              
-                    size = QtGui.QTableWidgetItem("%s %s"%(self.component.size("masters", padded_version), "MB"))
+                    size = QtWidgets.QTableWidgetItem("%s %s"%(self.component.size("masters", padded_version), "MB"))
                     size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.component_masters_tableWidget.setItem(index,4,size)
 
 
-                    actionButtonItem = QtGui.QPushButton()
+                    actionButtonItem = QtWidgets.QPushButton()
                     actionButtonItem.setIcon(QtGui.QIcon(add_icon))
                     actionButtonItem.setIconSize(QtCore.QSize(20,20)) 
-                    actions_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
+                    actions_menu = QtWidgets.QMenu(parent = self.ui.catagory_pushButton)
 
 
-                    make_master_action = QtGui.QAction("Make master",actionButtonItem)
+                    make_master_action = QtWidgets.QAction("Make master",actionButtonItem)
                     make_master_action.triggered.connect(self.master_make_master) 
                     self.enable(make_master_action, level = 1)
                     
-                    reference_action = QtGui.QAction("Reference",actionButtonItem)
+                    reference_action = QtWidgets.QAction("Reference",actionButtonItem)
                     reference_action.triggered.connect(self.master_reference) 
                                    
-                    import_action = QtGui.QAction("Import",actionButtonItem)  
+                    import_action = QtWidgets.QAction("Import",actionButtonItem)
                     import_action.triggered.connect(self.master_add_import) 
                                                                  
-                    delete_action = QtGui.QAction("Delete",actionButtonItem)
+                    delete_action = QtWidgets.QAction("Delete",actionButtonItem)
                     delete_action.triggered.connect(self.master_delete)                 
                     self.enable(delete_action, level = 1)
                     
                                     
-                    explore_action = QtGui.QAction("Explore",actionButtonItem)
+                    explore_action = QtWidgets.QAction("Explore",actionButtonItem)
                     explore_action.triggered.connect(self.master_explore)
 
 
-                    openButtonItem = QtGui.QPushButton()
+                    openButtonItem = QtWidgets.QPushButton()
                     openButtonItem.clicked.connect(self.master_open)
                     openButtonItem.setIcon(QtGui.QIcon(open_icon))
                     openButtonItem.setIconSize(QtCore.QSize(20,20))              
@@ -3834,7 +3847,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 
                 for i,r in enumerate(sorted(sequences)):
 
-                    item = QtGui.QTableWidgetItem(r)
+                    item = QtWidgets.QTableWidgetItem(r)
                     item.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.sequences_tableWidget.setItem(i,0,item)
                     
@@ -3863,7 +3876,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     for i,r in enumerate(sorted(shots)):
                         
-                        item = QtGui.QTableWidgetItem(r)
+                        item = QtWidgets.QTableWidgetItem(r)
                         item.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                         self.ui.shots_tableWidget.setItem(i,0,item)
                         if self.shot:
@@ -3888,10 +3901,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         if self.project: 
 
             if self.project.project_users == None:
-                    self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
+                    self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Fixed )
                     self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(3,0)
             else:
-                self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.ResizeToContents )
+                self.ui.published_assets_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents )
             
             
             
@@ -3902,11 +3915,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
                 for index, key in enumerate(keys):
 
-                    path = QtGui.QTableWidgetItem(masters[key][0])
+                    path = QtWidgets.QTableWidgetItem(masters[key][0])
                     path.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.published_assets_tableWidget.setItem(index,0,path) 
                    
-                    master_thumb = QtGui.QLabel()
+                    master_thumb = QtWidgets.QLabel()
                     #master_thumb.setPixmap(masters[key][1].scaled(48,48))
                     
                     master_thumb.setPixmap(masters[key][1].scaled(48,48,QtCore.Qt.KeepAspectRatio))      
@@ -3916,21 +3929,21 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.ui.published_assets_tableWidget.setCellWidget(index,1,master_thumb)
                     
                     
-                    master_name = QtGui.QTableWidgetItem(key)            
+                    master_name = QtWidgets.QTableWidgetItem(key)
                     master_name.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     master_name.setFont(boldFont)
                     self.ui.published_assets_tableWidget.setItem(index,2,master_name)
 
-                    user = QtGui.QTableWidgetItem(masters[key][2])
+                    user = QtWidgets.QTableWidgetItem(masters[key][2])
                     user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.published_assets_tableWidget.setItem(index,3,user) 
                     
-                    date_time = QtGui.QTableWidgetItem(masters[key][3])
+                    date_time = QtWidgets.QTableWidgetItem(masters[key][3])
                     date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     self.ui.published_assets_tableWidget.setItem(index,4,date_time)            
 
 
-                    addButtonItem = QtGui.QPushButton()
+                    addButtonItem = QtWidgets.QPushButton()
                     addButtonItem.clicked.connect(self.master_add)
                     addButtonItem.setIcon(QtGui.QIcon(load_icon))
                     addButtonItem.setIconSize(QtCore.QSize(20,20))              
@@ -3944,10 +3957,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         #remove users column if no users in project
         if self.project:
             if self.project.project_users == None:
-                    self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )
+                    self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed )
                     self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(2,0)
             else:
-                self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.ResizeToContents )
+                self.ui.shots_versions_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
             
             
         
@@ -3978,54 +3991,54 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.active_version = padded_version 
                 
                 
-                version_number = QtGui.QTableWidgetItem(padded_version)            
+                version_number = QtWidgets.QTableWidgetItem(padded_version)
                 version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.shots_versions_tableWidget.setItem(index,0,version_number)
 
 
-                note_indicator = QtGui.QLabel()
+                note_indicator = QtWidgets.QLabel()
                 if self.shot.note("versions", padded_version) != "No notes":
                     note_indicator.setContentsMargins(2,0,0,0)
                     note_indicator.setPixmap(comment_icon)                
                 self.ui.shots_versions_tableWidget.setCellWidget(index,1,note_indicator)
 
-                user = QtGui.QTableWidgetItem(self.shot.author("versions", padded_version))
+                user = QtWidgets.QTableWidgetItem(self.shot.author("versions", padded_version))
                 user.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.shots_versions_tableWidget.setItem(index,2,user) 
 
-                date_time = QtGui.QTableWidgetItem(self.shot.date_created("versions", padded_version))
+                date_time = QtWidgets.QTableWidgetItem(self.shot.date_created("versions", padded_version))
                 date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.shots_versions_tableWidget.setItem(index,3,date_time)            
                 
                                                          
-                size = QtGui.QTableWidgetItem("%s %s"%(self.shot.size("versions", padded_version), "MB"))
+                size = QtWidgets.QTableWidgetItem("%s %s"%(self.shot.size("versions", padded_version), "MB"))
                 size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 self.ui.shots_versions_tableWidget.setItem(index,4,size)
                 
                 
-                actionButtonItem = QtGui.QPushButton()
+                actionButtonItem = QtWidgets.QPushButton()
                 actionButtonItem.setIcon(QtGui.QIcon(add_icon))
                 actionButtonItem.setIconSize(QtCore.QSize(20,20)) 
-                actions_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
+                actions_menu = QtWidgets.QMenu(parent = self.ui.catagory_pushButton)
                 
-                reference_action = QtGui.QAction("Reference",actionButtonItem)
+                reference_action = QtWidgets.QAction("Reference",actionButtonItem)
                 reference_action.triggered.connect(self.shot_reference)                
                 self.enable(reference_action, level = 2)
                 
-                import_action = QtGui.QAction("Import",actionButtonItem) 
+                import_action = QtWidgets.QAction("Import",actionButtonItem)
                 import_action.triggered.connect(self.shot_add_import) 
                 self.enable(import_action, level = 2)
                                                               
-                delete_action = QtGui.QAction("Delete",actionButtonItem)
+                delete_action = QtWidgets.QAction("Delete",actionButtonItem)
                 delete_action.triggered.connect(self.shot_delete)                 
                 self.enable(delete_action, level = 2)
                 
                                 
-                explore_action = QtGui.QAction("Explore",actionButtonItem)
+                explore_action = QtWidgets.QAction("Explore",actionButtonItem)
                 explore_action.triggered.connect(self.shot_explore)  
 
 
-                openButtonItem = QtGui.QPushButton()
+                openButtonItem = QtWidgets.QPushButton()
                 openButtonItem.clicked.connect(self.shot_version_open)
                 openButtonItem.setIcon(QtGui.QIcon(open_icon))
                 openButtonItem.setIconSize(QtCore.QSize(20,20))              
@@ -4042,7 +4055,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     
                     openButtonItem.setIcon(QtGui.QIcon(reload_icon))
                     
-                    #active = QtGui.QTableWidgetItem("Active")
+                    #active = QtWidgets.QTableWidgetItem("Active")
                     #active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     #self.ui.shots_versions_tableWidget.setItem(index,4,active) 
                     #active.setBackground(active_color) 
@@ -4088,18 +4101,18 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 for index, version in enumerate(versions):
                     padded_version = set_padding(version, self.project.project_padding)
                         
-                    version_number = QtGui.QTableWidgetItem(padded_version)            
+                    version_number = QtWidgets.QTableWidgetItem(padded_version)
                     version_number.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     version_number.setTextAlignment(QtCore.Qt.AlignTop)
                     self.ui.shots_playblasts_tableWidget.setItem(index,0,version_number)
                
-                    note_indicator = QtGui.QLabel()
+                    note_indicator = QtWidgets.QLabel()
                     if self.shot.playblast_note(padded_version) != "No notes":
                         note_indicator.setContentsMargins(2,0,0,0)
                         note_indicator.setPixmap(comment_icon)                
                     self.ui.shots_playblasts_tableWidget.setCellWidget(index,2,note_indicator)    
                                 
-                    thumb = QtGui.QLabel()
+                    thumb = QtWidgets.QLabel()
                     w = self.ui.shots_playblasts_tableWidget.columnWidth(1)
                     h = self.ui.shots_playblasts_tableWidget.rowHeight(index)
                     
@@ -4118,33 +4131,33 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                             text =  author + " @ " + text
                             
                     
-                    date_time = QtGui.QTableWidgetItem(text)
+                    date_time = QtWidgets.QTableWidgetItem(text)
                     date_time.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     date_time.setTextAlignment(QtCore.Qt.AlignTop)
                     self.ui.shots_playblasts_tableWidget.setItem(index,3,date_time)            
                     
                                                              
-                    size = QtGui.QTableWidgetItem("%s %s"%(self.shot.playblast_size( padded_version), "MB"))
+                    size = QtWidgets.QTableWidgetItem("%s %s"%(self.shot.playblast_size( padded_version), "MB"))
                     size.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                     size.setTextAlignment(QtCore.Qt.AlignTop)
                     self.ui.shots_playblasts_tableWidget.setItem(index,4,size)
                     
                     
-                    actionButtonItem = QtGui.QPushButton()
+                    actionButtonItem = QtWidgets.QPushButton()
                     actionButtonItem.setIcon(QtGui.QIcon(add_icon))
                     actionButtonItem.setIconSize(QtCore.QSize(20,20)) 
-                    actions_menu = QtGui.QMenu(parent = self.ui.catagory_pushButton)
+                    actions_menu = QtWidgets.QMenu(parent = self.ui.catagory_pushButton)
                                                                                  
-                    delete_action = QtGui.QAction("Delete",actionButtonItem)
+                    delete_action = QtWidgets.QAction("Delete",actionButtonItem)
                     delete_action.triggered.connect(self.shot_playblast_delete)                 
                     self.enable(delete_action, level = 2)
 
-                    explore_action = QtGui.QAction("Explore",actionButtonItem)
+                    explore_action = QtWidgets.QAction("Explore",actionButtonItem)
                     explore_action.triggered.connect(self.shot_playblast_explore)  
                     actions_menu.addAction(delete_action)
                     actions_menu.addAction(explore_action)
                     
-                    openButtonItem = QtGui.QPushButton()
+                    openButtonItem = QtWidgets.QPushButton()
                     openButtonItem.clicked.connect(self.shot_playblast_open)
                     openButtonItem.setIcon(QtGui.QIcon(play_icon))
                     openButtonItem.setIconSize(QtCore.QSize(20,20))              
@@ -4180,7 +4193,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             self.settings.shot_selection = self.shot_name  
             
     def create_catagory(self):
-        catagory_name, ok = QtGui.QInputDialog.getText(self, 'New catagory', 'Enter catagory name:')
+        catagory_name, ok = QtWidgets.QInputDialog.getText(self, 'New catagory', 'Enter catagory name:')
         
         if ok:
             result = self.project.create_catagory(project_path = self.settings.current_project_path, catagory_name = catagory_name)
@@ -4198,7 +4211,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     self.update_category()
 
     def create_asset(self):
-        asset_name, ok = QtGui.QInputDialog.getText(self, 'New asset', 'Enter asset name:')
+        asset_name, ok = QtWidgets.QInputDialog.getText(self, 'New asset', 'Enter asset name:')
         
         if ok:
             
@@ -4225,7 +4238,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             return result
      
     def create_component(self):
-        component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
+        component_name, ok = QtWidgets.QInputDialog.getText(self, 'New component', 'Enter component name:')
         
         if ok:
             result = self._create_component(component_name = component_name, create_from = None)
@@ -4240,7 +4253,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def create_component_from_current_scene(self):
 
         
-        component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
+        component_name, ok = QtWidgets.QInputDialog.getText(self, 'New component', 'Enter component name:')
         
         if ok:
             result = self._create_component(component_name = component_name, create_from = "current_scene")
@@ -4258,7 +4271,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         result = dialog.exec_()
         input = dialog.result()
 
-        if result == QtGui.QDialog.Accepted:
+        if result == QtWidgets.QDialog.Accepted:
             log.info(input)
             temp_file = maya.new_scene_from_selection(project_path = self.settings.current_project_path, mode = input[1])
             if temp_file:                
@@ -4273,10 +4286,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def create_component_from_file(self):
         
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+        path = QtWidgets.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
         if path[0]:
             
-            component_name, ok = QtGui.QInputDialog.getText(self, 'New component', 'Enter component name:')
+            component_name, ok = QtWidgets.QInputDialog.getText(self, 'New component', 'Enter component name:')
 
             if ok:
                 if path[1] == "OBJ file (*.obj)":
@@ -4305,7 +4318,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
 
     def create_sequence(self):
-        sequence_name, ok = QtGui.QInputDialog.getText(self, 'New sequence', 'Enter sequence name:')
+        sequence_name, ok = QtWidgets.QInputDialog.getText(self, 'New sequence', 'Enter sequence name:')
         
         if ok:
             result = self.project.create_sequence(sequence_name = sequence_name)
@@ -4333,7 +4346,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def create_shot(self):
 
-        shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
+        shot_name, ok = QtWidgets.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
         
         if ok:
 
@@ -4346,7 +4359,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 self.update_shot_selection()
 
     def create_shot_from_current_scene(self):
-        shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
+        shot_name, ok = QtWidgets.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
         
         if ok:
 
@@ -4359,10 +4372,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                 self.update_shot_selection()
     
     def create_shot_from_file(self):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+        path = QtWidgets.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
         if path[0]:
             
-            shot_name, ok = QtGui.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
+            shot_name, ok = QtWidgets.QInputDialog.getText(self, 'New shot', 'Enter shot name:')
 
             if ok:
                 if path[1] == "OBJ file (*.obj)":
@@ -4676,7 +4689,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             note_inpute = dlg.Note(plainText = self.component.note("masters",self.master_version))
             note = note_inpute.exec_()
             text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
+            if note == QtWidgets.QDialog.Accepted:
                 self.component.note("masters",self.master_version, note=text)
                 self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
                 self.update_masters()
@@ -4685,7 +4698,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             note_inpute = dlg.Note(plainText = self.component.note("versions",self.catagory_version))
             note = note_inpute.exec_()
             text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
+            if note == QtWidgets.QDialog.Accepted:
                 
                 self.component.note("versions",self.catagory_version, note=text)
                 self.ui.component_note_label.setText(dlg.crop_text(text,3," (...)"))
@@ -4693,10 +4706,10 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def version_import(self):
         if self.settings:
-            path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+            path = QtWidgets.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
             if path[0]:
                 
-                type, ok = QtGui.QInputDialog.getItem(self, 'Import As', 'Import file as:',["Version", "Master"], 0, False)
+                type, ok = QtWidgets.QInputDialog.getItem(self, 'Import As', 'Import file as:',["Version", "Master"], 0, False)
                 if ok:
                     print "file path:, ", path[0]
                     if path[1] == "OBJ file (*.obj)":
@@ -4932,7 +4945,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             note_inpute = dlg.Note(plainText = self.shot.note("versions",self.shot_version))
             note = note_inpute.exec_()
             text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
+            if note == QtWidgets.QDialog.Accepted:
                 self.shot.note("versions",self.shot_version, note=text)
                 self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
                 self.update_shots()
@@ -4941,7 +4954,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
             note_inpute = dlg.Note(plainText = self.shot.playblast_note(self.shot_playblast_version))
             note = note_inpute.exec_()
             text = note_inpute.result()
-            if note == QtGui.QDialog.Accepted:
+            if note == QtWidgets.QDialog.Accepted:
                 self.shot.playblast_note(self.shot_playblast_version, note=text)
                 self.ui.shot_notes_label.setText(dlg.crop_text(text,3," (...)"))
                 self.update_shot_playblasts() 
@@ -5027,7 +5040,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
     def shot_import(self):
         if self.settings:
-            path = QtGui.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
+            path = QtWidgets.QFileDialog.getOpenFileName(self, "Select file to import", self.settings.current_project_path ,filter = "Maya ascii (*.ma);; Maya binary (*.mb);; OBJ file (*.obj)")
             if path[0]:
                 
                 # ask if this should be a version or a master?"
@@ -5122,7 +5135,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         result = dialog.exec_()
         input = dialog.result()
         
-        if result == QtGui.QDialog.Accepted:
+        if result == QtWidgets.QDialog.Accepted:
             self.settings.playblast_format = input["format"]
             self.settings.playblast_compression = input["compression"]
             self.settings.playblast_hud = input["hud"]
@@ -5140,7 +5153,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
            '''     
 
     def sequence_rename(self):
-        sequence_name, ok = QtGui.QInputDialog.getText(self, 'Rename sequence', 'Enter sequence name:')
+        sequence_name, ok = QtWidgets.QInputDialog.getText(self, 'Rename sequence', 'Enter sequence name:')
         
         if ok:
             
@@ -5160,7 +5173,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
                     #self.set_sequence_selection() 
         
     def shot_rename(self):
-        shot_name, ok = QtGui.QInputDialog.getText(self, 'Rename shot', 'Enter shot name:')
+        shot_name, ok = QtWidgets.QInputDialog.getText(self, 'Rename shot', 'Enter shot name:')
         
         if ok:
             if shot_name == self.shot.shot_name:
@@ -5180,7 +5193,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
 
                       
     def category_rename(self):
-        category_name, ok = QtGui.QInputDialog.getText(self, 'Rename category', 'Enter category name:')
+        category_name, ok = QtWidgets.QInputDialog.getText(self, 'Rename category', 'Enter category name:')
         
         if ok:
             
@@ -5201,7 +5214,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     
     def asset_rename(self):
 
-        asset_name, ok = QtGui.QInputDialog.getText(self, 'Rename asset', 'Enter asset name:')
+        asset_name, ok = QtWidgets.QInputDialog.getText(self, 'Rename asset', 'Enter asset name:')
         
         if ok:
             
@@ -5222,7 +5235,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         
     def component_rename(self):
         
-        component_name, ok = QtGui.QInputDialog.getText(self, 'Rename component', 'Enter component name:')
+        component_name, ok = QtWidgets.QInputDialog.getText(self, 'Rename component', 'Enter component name:')
         
         if ok:
             if component_name == self.component.component_name:
@@ -5248,11 +5261,11 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         result = dialog.exec_()
         input = dialog.result()
 
-        if result == QtGui.QDialog.Accepted:
+        if result == QtWidgets.QDialog.Accepted:
 
             # where to collect the files        
             
-            collect_path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+            collect_path = str(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
             if collect_path:
                                                    
                 log.info(input)
@@ -5412,7 +5425,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         login = dlg.Login()
         result = login.exec_()
         user, password  = login.result()
-        if result == QtGui.QDialog.Accepted:
+        if result == QtWidgets.QDialog.Accepted:
             if user != "":
                 self.settings.user = [user, password]
                 self.ui.users_pushButton.setText(user)
@@ -5452,27 +5465,36 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
     def deleteInstances(self):
 
         # Go through main window's children to find any previous instances
-        for obj in maya_main_window().children():
 
-            if str(type( obj )) == "<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":
-               
-                if obj.widget().__class__.__name__ == "pipeLineUI": # Compare object names
+        for obj in maya_main_window().children():
+            print obj, str(type( obj )), obj.__class__.__name__,  "<<"
+            if str(type( obj )) == "<class 'pipeline.pipeline.pipeLineUI'>":#""<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":
+
+                # if obj.widget().__class__.__name__ == "pipeline_betaWorkspaceControl":
+
+                if obj.__class__.__name__ == "pipeLineUI":# Compare object names
                     # If they share the same name then remove it
                     print 'Deleting instance {0}'.format(obj)
                     #maya_main_window().removeDockWidget(obj) # This will remove from right-click menu, but won't actually delete it! ( still under mainWindow.children() )
                     # Delete it for good
                     obj.setParent(None)
-                    obj.deleteLater() 
+                    obj.deleteLater()
                           
     # Show window with docking ability
     def run(self):
-              
-        self.show(dockable=True, area='right', floating=False)
-        self.raise_()
-        self.setDockableParameters(width=420)
-        self.setSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred )
+
+
+        # self.show(dockable=True, area='right', floating=False)
+        # self.raise_()
+        # self.setDockableParameters(width=420)
+        # self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred )
+
+        self.show()
+
         self.setMinimumWidth(420)
         self.setMaximumWidth(600)
+
+
 
     def about(self):
         about = dlg.about()#(None,"About",
@@ -5530,7 +5552,7 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtGui.QMainWindow):
         else:
             log.info("No settings found in UiWindow") 
         
-class pipeLine_settings_UI(QtGui.QMainWindow):
+class pipeLine_settings_UI(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         
         super(pipeLine_settings_UI, self).__init__(parent)      
@@ -5546,7 +5568,7 @@ class pipeLine_settings_UI(QtGui.QMainWindow):
         boldFont=QtGui.QFont()
         boldFont.setBold(True)               
    
-class pipeLine_projects_UI(QtGui.QMainWindow):
+class pipeLine_projects_UI(QtWidgets.QMainWindow):
     def __init__(self, parent=None, pipeline_window=None):
         
         super(pipeLine_projects_UI, self).__init__(parent)      
@@ -5622,7 +5644,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         index = self.ui.projects_tableWidget.indexAt(widget.pos())
         wanted_project_key = str(self.ui.projects_tableWidget.item(index.row(),4).text())
         
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.pipe file", filter = "pipe files (*.pipe)")
+        path = QtWidgets.QFileDialog.getOpenFileName(self, "Select *.pipe file", filter = "pipe files (*.pipe)")
         if os.path.isfile(path[0]):
             
             project_path = os.path.dirname(str(path[0])) 
@@ -5660,7 +5682,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             self.setColumnWidth_projectsTable()
 
     def load_project(self):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Select *.pipe file", filter = "pipe files (*.pipe)")
+        path = QtWidgets.QFileDialog.getOpenFileName(self, "Select *.pipe file", filter = "pipe files (*.pipe)")
         if path[0]:
             project_path = os.path.dirname(str(path[0]))        
             project_file = data.pickleDict(path=str(path[0]))
@@ -5738,7 +5760,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             active_project = True if self.pipeline_window.settings.current_project == key and project_status == "ONLINE" else False
 
                       
-            project_name = QtGui.QTableWidgetItem(projects[key][2])            
+            project_name = QtWidgets.QTableWidgetItem(projects[key][2])
             project_name.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
             project_name.setFont(self.boldFont)
             if active_project:
@@ -5748,7 +5770,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         
             if project_status == "OFFLINE":
                 
-                offlineButtonItem = QtGui.QPushButton(project_status)
+                offlineButtonItem = QtWidgets.QPushButton(project_status)
                 offlineButtonItem.setIcon(QtGui.QIcon(offline_icon))
                 offlineButtonItem.setIconSize(QtCore.QSize(20,20))
                 
@@ -5756,7 +5778,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                 offlineButtonItem.clicked.connect(self.relink_project)
                 
             else:   
-                status = QtGui.QTableWidgetItem(project_status)
+                status = QtWidgets.QTableWidgetItem(project_status)
                 status.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 if active_project:
                     status.setBackground(active_color) 
@@ -5764,7 +5786,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             
             if project_status == "ONLINE":
                 
-                editButtonItem = QtGui.QPushButton( "Edit")
+                editButtonItem = QtWidgets.QPushButton( "Edit")
                 editButtonItem.setIcon(QtGui.QIcon(edit_icon))
                 editButtonItem.setIconSize(QtCore.QSize(20,20))
                 self.ui.projects_tableWidget.setCellWidget(index,2,editButtonItem)
@@ -5776,7 +5798,7 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
                     
             '''
             if active_project:
-                active = QtGui.QTableWidgetItem("Active")
+                active = QtWidgets.QTableWidgetItem("Active")
                 active.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 active.setFont(self.boldFont)
                 active.setBackground(active_color) 
@@ -5784,13 +5806,13 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
             else:
             '''
             if project_status == "ONLINE":
-                setButtonItem = QtGui.QPushButton("Set Project")                  
+                setButtonItem = QtWidgets.QPushButton("Set Project")
                 setButtonItem.clicked.connect(self.set_project_button)                         
                 setButtonItem.setIcon(QtGui.QIcon(set_icon))
                 setButtonItem.setIconSize(QtCore.QSize(20,20))        
                 self.ui.projects_tableWidget.setCellWidget(index,3,setButtonItem)                        
       
-            key = QtGui.QTableWidgetItem(key)
+            key = QtWidgets.QTableWidgetItem(key)
             key.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
             self.ui.projects_tableWidget.setItem(index,4,key)
 
@@ -5803,28 +5825,28 @@ class pipeLine_projects_UI(QtGui.QMainWindow):
         self.ui.projects_tableWidget.setRowCount(1)
         self.ui.projects_tableWidget.setHorizontalHeaderLabels(["Name","Status","Edit","Set"])
         self.ui.projects_tableWidget.verticalHeader().setDefaultSectionSize(30);
-        self.ui.projects_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.ui.projects_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.ui.projects_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.ui.projects_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ui.projects_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
     
     def setColumnWidth_projectsTable(self):        
 
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Fixed )
+        self.ui.projects_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(0,200)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.ResizeToContents )
+        self.ui.projects_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(1,200)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(2, QtGui.QHeaderView.Fixed )        
+        self.ui.projects_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.projects_tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(2,100)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
+        self.ui.projects_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(3,100)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(4, QtGui.QHeaderView.Fixed )
+        self.ui.projects_tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(4,0)
 
     def close_window(self):
         self.close()
 
-class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
+class pipeLine_create_edit_project_UI(QtWidgets.QMainWindow):
     def __init__(self, parent=None, projects_window = None, **kwargs):
          
         super(pipeLine_create_edit_project_UI, self).__init__(parent)      
@@ -5888,8 +5910,8 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
             
     def playblast_help_button(self):
         
-        self.playblast_help_label = QtGui.QLabel()
-        sizepolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        self.playblast_help_label = QtWidgets.QLabel()
+        sizepolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
         sizepolicy.setHeightForWidth(self.playblast_help_label.sizePolicy().hasHeightForWidth())
         self.playblast_help_label.setSizePolicy(sizepolicy)
         self.playblast_help_label.setMinimumSize(QtCore.QSize(30, 30)) 
@@ -5897,13 +5919,13 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.ui.horizontalLayout_3.addWidget(self.playblast_help_label)
         self.ui.horizontalLayout_3.setContentsMargins(0,0,0,0)               
                        
-        layout = QtGui.QHBoxLayout(self.playblast_help_label)
+        layout = QtWidgets.QHBoxLayout(self.playblast_help_label)
         layout.setContentsMargins(0,0,0,0)
         
         
         self.playblast_help = alpha_button(self,help_icon)  
         self.playblast_help.set_pixmap(help_icon)      
-        sizepolicy2 = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+        sizepolicy2 = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
         sizepolicy2.setHeightForWidth(self.playblast_help.sizePolicy().hasHeightForWidth())
         self.playblast_help.setSizePolicy(sizepolicy2)
         self.playblast_help.setMinimumSize(QtCore.QSize(30, 30))          
@@ -5911,7 +5933,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         layout.addWidget(self.playblast_help)        
         self.connect(self.playblast_help, QtCore.SIGNAL('clicked()'), self.playblast_help_popup)
         
-        self.spacer = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.spacer = QtWidgets.QSpacerItem(40,20,QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Minimum)
         self.ui.horizontalLayout_3.addItem(self.spacer)
         
 
@@ -5968,7 +5990,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
     
     def set_project_path(self):
-        path = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+        path = str(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.ui.project_path_lineEdit.setText(os.path.join(path,str(self.ui.project_name_lineEdit.text())))
 
 
@@ -5981,16 +6003,16 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.ui.users_tableWidget.setRowCount(1)
         self.ui.users_tableWidget.setHorizontalHeaderLabels(["Username","password","Role","Action"])
         self.ui.users_tableWidget.verticalHeader().setDefaultSectionSize(30);
-        self.ui.users_tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.ui.users_tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.ui.users_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.ui.users_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ui.users_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(0, QtGui.QHeaderView.Stretch )
+        self.ui.users_tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(0,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(1, QtGui.QHeaderView.Stretch )
+        self.ui.users_tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(1,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)     
+        self.ui.users_tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.ui.users_tableWidget.horizontalHeader().resizeSection(2,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(3, QtGui.QHeaderView.Fixed )
+        self.ui.users_tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.Fixed )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(3,50)
 
 
@@ -5999,15 +6021,15 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         self.ui.users_tableWidget.clearContents()
         self.ui.users_tableWidget.setRowCount(len(self.users)+1)
 
-        admin_username = QtGui.QTableWidgetItem("Admin")                       
+        admin_username = QtWidgets.QTableWidgetItem("Admin")
         admin_username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
         admin_username.setFont(self.boldFont)
         self.ui.users_tableWidget.setItem(0,0,admin_username)
 
-        admin_password = QtGui.QTableWidgetItem(self.users["Admin"][0])            
+        admin_password = QtWidgets.QTableWidgetItem(self.users["Admin"][0])
         self.ui.users_tableWidget.setItem(0,1,admin_password)
 
-        role = QtGui.QTableWidgetItem("admin")                       
+        role = QtWidgets.QTableWidgetItem("admin")
         role.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
         role.setFont(self.boldFont)
         self.ui.users_tableWidget.setItem(0,2,role)  
@@ -6018,17 +6040,17 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
         if users:
             for index, key in enumerate(users):
                             
-                username = QtGui.QTableWidgetItem(key)                       
+                username = QtWidgets.QTableWidgetItem(key)
                 username.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
                 username.setFont(self.boldFont)
                 self.ui.users_tableWidget.setItem(index+1,0,username)
                 
-                password = QtGui.QTableWidgetItem(users[key][0])            
+                password = QtWidgets.QTableWidgetItem(users[key][0])
                 self.ui.users_tableWidget.setItem(index+1,1,password)
                 
                 role = users[key][1]            
                 
-                roles_combo = QtGui.QComboBox()
+                roles_combo = QtWidgets.QComboBox()
                 roles_combo.setEditable(False)
                 roles_combo.addItems(self.roles)
                 
@@ -6037,24 +6059,24 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
                 if i >= 0:
                     roles_combo.setCurrentIndex(i)
       
-                deleteButtonItem = QtGui.QPushButton("")
+                deleteButtonItem = QtWidgets.QPushButton("")
                 deleteButtonItem.setIcon(QtGui.QIcon(no_icon))
                 deleteButtonItem.setIconSize(QtCore.QSize(20,20))            
                 self.ui.users_tableWidget.setCellWidget(index+1,3,deleteButtonItem)
                 deleteButtonItem.clicked.connect(self.remove_user)
         
 
-        empty_item1 = QtGui.QTableWidgetItem("")
+        empty_item1 = QtWidgets.QTableWidgetItem("")
         empty_item1.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-        empty_item2 = QtGui.QTableWidgetItem("")
+        empty_item2 = QtWidgets.QTableWidgetItem("")
         empty_item2.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-        empty_item3 = QtGui.QTableWidgetItem("")
+        empty_item3 = QtWidgets.QTableWidgetItem("")
         empty_item3.setFlags( QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )        
         self.ui.users_tableWidget.setItem(len(self.users)+1,0,empty_item1)
         self.ui.users_tableWidget.setItem(len(self.users)+1,1,empty_item2)
         self.ui.users_tableWidget.setItem(len(self.users)+1,2,empty_item3)
         
-        newButtonItem = QtGui.QPushButton("")
+        newButtonItem = QtWidgets.QPushButton("")
         newButtonItem.setIcon(QtGui.QIcon(add_icon))
         newButtonItem.setIconSize(QtCore.QSize(20,20))            
         self.ui.users_tableWidget.setCellWidget(len(self.users)+1,3,newButtonItem)
@@ -6063,7 +6085,7 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
     def add_user(self):
         self.set_users_dict()
         
-        username, ok = QtGui.QInputDialog.getText(self, 'New User', 'Enter User name:')
+        username, ok = QtWidgets.QInputDialog.getText(self, 'New User', 'Enter User name:')
         
         if ok:        
             if username not in self.users and username != "":
@@ -6178,7 +6200,8 @@ class pipeLine_create_edit_project_UI(QtGui.QMainWindow):
 
         
 def show():
-    
+
+
     global UiWindow
     UiWindow=pipeLineUI(parent=maya_main_window())
     UiWindow.run()
