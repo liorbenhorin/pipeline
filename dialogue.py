@@ -44,8 +44,11 @@ Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License:
 
 '''
 import base64
-# from PySide import QtCore, QtGui
-from PySide2 import QtGui, QtWidgets, QtCore
+
+from modules.Qt import QtGui, QtWidgets, QtCore
+
+
+# from PySide2 import QtGui, QtWidgets, QtCore
 
 
 
