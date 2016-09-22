@@ -47,8 +47,8 @@ import base64
 # from PySide import QtCore, QtGui
 from PySide2 import QtGui, QtWidgets, QtCore
 
-# from PySide2.QtGui import *
-# from PySide2.QtWidgets import *
+
+
 import os
 import ast
 

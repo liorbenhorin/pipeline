@@ -50,12 +50,22 @@ import maya.OpenMayaUI as omui
 import maya.OpenMaya as OpenMaya
 import maya.cmds as cmds
 import os
-# import pysideuic
-import pyside2uic as pysideuic
-from PySide2 import QtGui, QtWidgets, QtCore
-# from PySide2.QtGui import *
-# from PySide2.QtWidgets import *
-from shiboken2 import wrapInstance
+
+from modules.Qt import QtGui, QtWidgets, QtCore
+
+# from PySide2 import QtGui, QtWidgets, QtCore
+
+try:
+
+    import pysideuic
+    from shiboken import wrapInstance
+except ImportError:
+
+    import pyside2uic as pysideuic
+    from shiboken2 import wrapInstance
+
+
+
 
 import xml.etree.ElementTree as xml
 from cStringIO import StringIO
