@@ -267,6 +267,8 @@ def getPlayblastOptions():
     options["compression"] = cmds.playblast(q=True,c=True)
     return options
     
+def maya_api_version():
+    return int(cmds.about(api=True))
 
 def scene_resolution():
     return [cmds.getAttr("defaultResolution.width"),cmds.getAttr("defaultResolution.height")]

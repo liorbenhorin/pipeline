@@ -5481,51 +5481,54 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow): #MayaQWidget
                     obj.setParent(None)
                     obj.deleteLater()
 
-    def closeEvent(self, *args, **kwargs):
-        self.close()
+    # def closeEvent(self, *args, **kwargs):
+    #     self.close()
+    #
+    # def close(self):
+    #     MayaQWidgetDockableMixin.close(self)
+    #
+    #     print "closed!"
 
-    def close(self):
-        MayaQWidgetDockableMixin.close(self)
+    def deleteControl(self, control):
 
-        print "closed!"
+        if cmds.workspaceControl(control, q=True, exists=True):
 
-    def xxx(self):
-        foundParentWorkspaceControl = False
-        workspaceControlName = 'PIPELINE22WorkspaceControl'
-        print "looking:"
-        if cmds.workspaceControl(workspaceControlName, q=True, exists=True):
-            print "found!"
-            cmds.workspaceControl(workspaceControlName, e=True, close=True)
-            cmds.deleteUI(workspaceControlName, control = True)
+            cmds.workspaceControl(control, e=True, close=True)
+            cmds.deleteUI(control, control = True)
 
     # Show window with docking ability
     def run(self):
-        self.xxx()
-        self.setObjectName("PIPELINE22")
-        self.show(dockable=True, area='right', floating=False)
-        self.raise_()
-        # self.setDockableParameters(width=420)
-        # self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred )
-        #
-        # self.show()
-        #
-        # self.setMinimumWidth(420)
-        # self.setMaximumWidth(600)
+
+        MAYA2014 = 201400
+        MAYA2015 = 201500
+        MAYA2016 = 201600
+        MAYA2016_5 = 201650
+        MAYA2017 = 201700
+
+        def run2017():
+            self.setObjectName("pipelineUI")
+            workspaceControlName = self.objectName() + 'WorkspaceControl'
+            self.deleteControl(workspaceControlName)
+            self.show(dockable=True, area='right', floating=False )
+            cmds.workspaceControl(workspaceControlName, e=True, ttc=["AttributeEditor",-1], wp="preferred")
+            self.raise_()
+            self.setDockableParameters(width=420)
+            self.setMaximumWidth(600)
+
+        def run2016():
+            self.show(dockable=True, area='right', floating=False)
+            self.raise_()
+            self.setDockableParameters(width=420)
+            self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred )
+            self.setMinimumWidth(420)
+            self.setMaximumWidth(600)
+
+        if maya.maya_api_version() < MAYA2017:
+            run2016()
+        else:
+            run2017()
 
 
-        # self.setVisible(True)
-        # DOCK_NAME = 'pipeline_dock22'
-        # cmds.workspaceControl(DOCK_NAME,
-        #                       retain=False,
-        #                       label="pipeline_title",
-        #                       ttc=["AttributeEditor",-1],
-        #                       )
-        # cmds.evalDeferred(lambda *args: cmds.workspaceControl(DOCK_NAME, e=True, r=True))
-
-    # @classmethod
-    # def resumeInWorkspaceControl():
-    #     window = MainWindow.getInstance()
-    #     window.createUI(cmds.setParent(q=True))
 
     def about(self):
         about = dlg.about()#(None,"About",
