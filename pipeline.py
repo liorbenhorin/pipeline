@@ -2399,7 +2399,7 @@ class pipeline_settings(pipeline_data):
         log.info("end logging settings")
 
 #@exceptions_handler(try_execpt) 
-class pipeLineUI(MayaQWidgetDockableMixin, QtWidgets.QMainWindow): #
+class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow): #MayaQWidgetDockableMixin
     def __init__(self, parent=None):
         
         self.deleteInstances()
@@ -5477,24 +5477,55 @@ class pipeLineUI(MayaQWidgetDockableMixin, QtWidgets.QMainWindow): #
                     print 'Deleting instance {0}'.format(obj)
                     #maya_main_window().removeDockWidget(obj) # This will remove from right-click menu, but won't actually delete it! ( still under mainWindow.children() )
                     # Delete it for good
+
                     obj.setParent(None)
                     obj.deleteLater()
-                          
+
+    def closeEvent(self, *args, **kwargs):
+        self.close()
+
+    def close(self):
+        MayaQWidgetDockableMixin.close(self)
+
+        print "closed!"
+
+    def xxx(self):
+        foundParentWorkspaceControl = False
+        workspaceControlName = 'PIPELINE22WorkspaceControl'
+        print "looking:"
+        if cmds.workspaceControl(workspaceControlName, q=True, exists=True):
+            print "found!"
+            cmds.workspaceControl(workspaceControlName, e=True, close=True)
+            cmds.deleteUI(workspaceControlName, control = True)
+
     # Show window with docking ability
     def run(self):
-
-
-        # self.show(dockable=True, area='right', floating=False)
-        # self.raise_()
+        self.xxx()
+        self.setObjectName("PIPELINE22")
+        self.show(dockable=True, area='right', floating=False)
+        self.raise_()
         # self.setDockableParameters(width=420)
         # self.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred )
+        #
+        # self.show()
+        #
+        # self.setMinimumWidth(420)
+        # self.setMaximumWidth(600)
 
-        self.show()
 
-        self.setMinimumWidth(420)
-        self.setMaximumWidth(600)
+        # self.setVisible(True)
+        # DOCK_NAME = 'pipeline_dock22'
+        # cmds.workspaceControl(DOCK_NAME,
+        #                       retain=False,
+        #                       label="pipeline_title",
+        #                       ttc=["AttributeEditor",-1],
+        #                       )
+        # cmds.evalDeferred(lambda *args: cmds.workspaceControl(DOCK_NAME, e=True, r=True))
 
-
+    # @classmethod
+    # def resumeInWorkspaceControl():
+    #     window = MainWindow.getInstance()
+    #     window.createUI(cmds.setParent(q=True))
 
     def about(self):
         about = dlg.about()#(None,"About",
