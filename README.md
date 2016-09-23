@@ -66,8 +66,8 @@ During the Beta stage Pipeline is collecting usage statistics.
 
 #Compatibility
 
-OSX / Windows / linux
-Maya 2015, 2016, 2016 Ext 2
+OSX / Windows
+Maya 2015, 2016, 2016 Ext 2, 2017
 Earlier Versions have not been tested.
 
 #Installation
