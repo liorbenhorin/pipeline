@@ -3118,8 +3118,8 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.assets_tableWidget.verticalHeader().setVisible(False)
         self.ui.assets_tableWidget.setColumnCount(1)
         self.ui.assets_tableWidget.setRowCount(1)
-        self.ui.assets_tableWidget.setHorizontalHeaderLabels(["Asset"]) 
-        self.ui.assets_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.assets_tableWidget.setHorizontalHeaderLabels(["Asset"])
+        QtCompat.setSectionResizeMode(self.ui.assets_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
         self.ui.assets_tableWidget.resizeRowsToContents() 
         self.ui.assets_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.assets_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -3134,8 +3134,8 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.components_tableWidget.verticalHeader().setVisible(False)
         self.ui.components_tableWidget.setColumnCount(1)
         self.ui.components_tableWidget.setRowCount(1)
-        self.ui.components_tableWidget.setHorizontalHeaderLabels(["Component"]) 
-        self.ui.components_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.components_tableWidget.setHorizontalHeaderLabels(["Component"])
+        QtCompat.setSectionResizeMode(self.ui.components_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
         self.ui.components_tableWidget.resizeRowsToContents() 
         self.ui.components_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.components_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -3153,22 +3153,22 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.component_versions_tableWidget.setRowCount(1)
         self.ui.component_versions_tableWidget.setHorizontalHeaderLabels(["Version","Note","Creator","Date Saved","Size","Open","Action"])
         self.ui.component_versions_tableWidget.resizeRowsToContents()
-        self.ui.component_versions_tableWidget.verticalHeader().setDefaultSectionSize(30);
+        self.ui.component_versions_tableWidget.verticalHeader().setDefaultSectionSize(30)
         self.ui.component_versions_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.component_versions_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-       
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(0, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
+        QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),0, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(0,25)
-        
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(1, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),1, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(1,25)
-        
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(5, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),4, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),5, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(5,60)
-        self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(6, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),6, QtWidgets.QHeaderView.Fixed )
         self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.component_versions_tableWidget.clearContents()
@@ -3187,19 +3187,19 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.component_masters_tableWidget.verticalHeader().setDefaultSectionSize(30);
         self.ui.component_masters_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.component_masters_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-       
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(0, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
+        QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),0, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(0,25)
-        
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(1, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),1, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(1,25)
-        
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(5, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),4, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),5, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(5,60)
-        self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(6, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),6, QtWidgets.QHeaderView.Fixed )
         self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.component_masters_tableWidget.clearContents()
@@ -3212,8 +3212,8 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.sequences_tableWidget.verticalHeader().setVisible(False)
         self.ui.sequences_tableWidget.setColumnCount(1)
         self.ui.sequences_tableWidget.setRowCount(1)
-        self.ui.sequences_tableWidget.setHorizontalHeaderLabels(["sequence"]) 
-        self.ui.sequences_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.sequences_tableWidget.setHorizontalHeaderLabels(["sequence"])
+        QtCompat.setSectionResizeMode(self.ui.sequences_tableWidget.horizontalHeader(), QtWidgets.QHeaderView.Stretch)
         self.ui.sequences_tableWidget.resizeRowsToContents() 
         self.ui.sequences_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.sequences_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -3227,8 +3227,8 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.shots_tableWidget.verticalHeader().setVisible(False)
         self.ui.shots_tableWidget.setColumnCount(1)
         self.ui.shots_tableWidget.setRowCount(1)
-        self.ui.shots_tableWidget.setHorizontalHeaderLabels(["shots"]) 
-        self.ui.shots_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.ui.shots_tableWidget.setHorizontalHeaderLabels(["shots"])
+        QtCompat.setSectionResizeMode(self.ui.shots_tableWidget.horizontalHeader(), QtWidgets.QHeaderView.Stretch)
         self.ui.shots_tableWidget.resizeRowsToContents() 
         self.ui.shots_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.shots_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
@@ -3252,14 +3252,14 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.published_assets_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.ui.published_assets_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(0, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),0, QtWidgets.QHeaderView.Fixed )
         self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(0,0)
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(1, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),1, QtWidgets.QHeaderView.Fixed )
         self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(1,48)
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.Stretch )
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtWidgets.QHeaderView.Stretch )
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(5, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.Stretch )
+        QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),3, QtWidgets.QHeaderView.Stretch )
+        QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),4, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),5, QtWidgets.QHeaderView.Fixed )
         self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(5,30)
 
         self.ui.published_assets_tableWidget.clearContents()
@@ -3277,19 +3277,19 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.shots_versions_tableWidget.verticalHeader().setDefaultSectionSize(30);
         self.ui.shots_versions_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.shots_versions_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-       
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(0, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
+        QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),0, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(0,25)
-        
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(1, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),1, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(1,25)
-        
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(5, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),4, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),5, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(5,60)
-        self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(6, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),6, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.shots_versions_tableWidget.clearContents()
@@ -3309,22 +3309,22 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.shots_playblasts_tableWidget.verticalHeader().setDefaultSectionSize(54);
         self.ui.shots_playblasts_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.shots_playblasts_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-       
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(0, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.shots_playblasts_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
+        QtCompat.setSectionResizeMode(self.ui.shots_playblasts_tableWidget.horizontalHeader(),0, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(0,25)
-        
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(1, QtWidgets.QHeaderView.Fixed )
+
+        QtCompat.setSectionResizeMode(self.ui.shots_playblasts_tableWidget.horizontalHeader(),1, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(1,96)
 
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.shots_playblasts_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(2,25)
         
         #self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(4, QtWidgets.QHeaderView.ResizeToContents )
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(5, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.shots_playblasts_tableWidget.horizontalHeader(),4, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.shots_playblasts_tableWidget.horizontalHeader(),5, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(5,25)
-        self.ui.shots_playblasts_tableWidget.horizontalHeader().setResizeMode(6, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.shots_playblasts_tableWidget.horizontalHeader(),6, QtWidgets.QHeaderView.Fixed )
         self.ui.shots_playblasts_tableWidget.horizontalHeader().resizeSection(6,25)
 
         self.ui.shots_playblasts_tableWidget.clearContents()
@@ -3554,10 +3554,10 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         if self.project:
             #remove users column if no users in project
             if self.project.project_users == None:
-                    self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.Fixed )
-                    self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(2,0)
+                QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.Fixed )
+                self.ui.component_versions_tableWidget.horizontalHeader().resizeSection(2,0)
             else:
-                self.ui.component_versions_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
+                QtCompat.setSectionResizeMode(self.ui.component_versions_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.ResizeToContents )
             
             
         self.active_version = None
@@ -3683,10 +3683,10 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         if self.project:    
         #remove users column if no users in project
             if self.project.project_users == None:
-                    self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.Fixed )
-                    self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(2,0)
+                QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.Fixed )
+                self.ui.component_masters_tableWidget.horizontalHeader().resizeSection(2,0)
             else:
-                self.ui.component_masters_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
+                QtCompat.setSectionResizeMode(self.ui.component_masters_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.ResizeToContents )
             
         
         self.active_version = None
@@ -3916,10 +3916,10 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         if self.project: 
 
             if self.project.project_users == None:
-                    self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtWidgets.QHeaderView.Fixed )
-                    self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(3,0)
+                QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),3, QtWidgets.QHeaderView.Fixed )
+                self.ui.published_assets_tableWidget.horizontalHeader().resizeSection(3,0)
             else:
-                self.ui.published_assets_tableWidget.horizontalHeader().setResizeMode(3, QtWidgets.QHeaderView.ResizeToContents )
+                QtCompat.setSectionResizeMode(self.ui.published_assets_tableWidget.horizontalHeader(),3, QtWidgets.QHeaderView.ResizeToContents )
             
             
             
@@ -3972,10 +3972,10 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         #remove users column if no users in project
         if self.project:
             if self.project.project_users == None:
-                    self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.Fixed )
-                    self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(2,0)
+                QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.Fixed )
+                self.ui.shots_versions_tableWidget.horizontalHeader().resizeSection(2,0)
             else:
-                self.ui.shots_versions_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.ResizeToContents )
+                QtCompat.setSectionResizeMode(self.ui.shots_versions_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.ResizeToContents )
             
             
         
@@ -5617,21 +5617,21 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         else:
             log.info("No settings found in UiWindow") 
         
-class pipeLine_settings_UI(QtWidgets.QMainWindow):
-    def __init__(self, parent=None):
-        
-        super(pipeLine_settings_UI, self).__init__(parent)      
-        self.setWindowFlags(QtCore.Qt.Tool)                
-        form_class, base_class = loadUiType(settings_uiFile)
-        
-        self.ui = form_class()
-        self.ui.setupUi(self)
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        self.setWindowTitle("Settings")
-                 
-        #connect ui
-        boldFont=QtGui.QFont()
-        boldFont.setBold(True)               
+# class pipeLine_settings_UI(QtWidgets.QMainWindow):
+#     def __init__(self, parent=None):
+#
+#         super(pipeLine_settings_UI, self).__init__(parent)
+#         self.setWindowFlags(QtCore.Qt.Tool)
+#         form_class, base_class = loadUiType(settings_uiFile)
+#
+#         self.ui = form_class()
+#         self.ui.setupUi(self)
+#         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+#         self.setWindowTitle("Settings")
+#
+#         #connect ui
+#         boldFont=QtGui.QFont()
+#         boldFont.setBold(True)
    
 class pipeLine_projects_UI(QtWidgets.QMainWindow):
     def __init__(self, parent=None, pipeline_window=None):
@@ -5894,18 +5894,18 @@ class pipeLine_projects_UI(QtWidgets.QMainWindow):
         self.ui.projects_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ui.projects_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
     
-    def setColumnWidth_projectsTable(self):        
+    def setColumnWidth_projectsTable(self):
 
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(0, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.projects_tableWidget.horizontalHeader(),0, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(0,200)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(1, QtWidgets.QHeaderView.ResizeToContents )
+        QtCompat.setSectionResizeMode(self.ui.projects_tableWidget.horizontalHeader(),1, QtWidgets.QHeaderView.ResizeToContents )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(1,200)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(2, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.projects_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
+        QtCompat.setSectionResizeMode(self.ui.projects_tableWidget.horizontalHeader(),2, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(2,100)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(3, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.projects_tableWidget.horizontalHeader(),3, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(3,100)
-        self.ui.projects_tableWidget.horizontalHeader().setResizeMode(4, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.projects_tableWidget.horizontalHeader(),4, QtWidgets.QHeaderView.Fixed )
         self.ui.projects_tableWidget.horizontalHeader().resizeSection(4,0)
 
     def close_window(self):
@@ -6071,13 +6071,13 @@ class pipeLine_create_edit_project_UI(QtWidgets.QMainWindow):
         self.ui.users_tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.ui.users_tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ui.users_tableWidget.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(0, QtWidgets.QHeaderView.Stretch )
+        QtCompat.setSectionResizeMode(self.ui.users_tableWidget.horizontalHeader(),0, QtWidgets.QHeaderView.Stretch )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(0,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(1, QtWidgets.QHeaderView.Stretch )
+        QtCompat.setSectionResizeMode(self.ui.users_tableWidget.horizontalHeader(),1, QtWidgets.QHeaderView.Stretch )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(1,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(QtWidgets.QHeaderView.Stretch)
+        QtCompat.setSectionResizeMode(self.ui.users_tableWidget.horizontalHeader(),QtWidgets.QHeaderView.Stretch)
         self.ui.users_tableWidget.horizontalHeader().resizeSection(2,200)
-        self.ui.users_tableWidget.horizontalHeader().setResizeMode(3, QtWidgets.QHeaderView.Fixed )
+        QtCompat.setSectionResizeMode(self.ui.users_tableWidget.horizontalHeader(),3, QtWidgets.QHeaderView.Fixed )
         self.ui.users_tableWidget.horizontalHeader().resizeSection(3,50)
 
 
