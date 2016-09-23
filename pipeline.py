@@ -5486,14 +5486,10 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         # Go through main window's children to find any previous instances
         def delete2016():
             for obj in maya_main_window().children():
-                print str(type( obj ))
-                if str(type( obj )) == "<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":#""<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":
-                    print obj.__class__.__name__, "<"
-                    if obj.__class__.__name__ == "MayaQDockWidget":# Compare object names
-                        # If they share the same name then remove it
 
-                        # maya_main_window().removeDockWidget(obj) # This will remove from right-click menu, but won't actually delete it! ( still under mainWindow.children() )
-                        # Delete it for good
+                if str(type( obj )) == "<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":#""<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":
+
+                    if obj.widget().__class__.__name__ == "pipeLineUI":# Compare object names
 
                         obj.setParent(None)
                         obj.deleteLater()
@@ -5504,10 +5500,6 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
                 if str(type(obj)) == "<class 'pipeline.pipeline.pipeLineUI'>":  # ""<class 'maya.app.general.mayaMixin.MayaQDockWidget'>":
 
                     if obj.__class__.__name__ == "pipeLineUI":  # Compare object names
-                        # If they share the same name then remove it
-
-                        # maya_main_window().removeDockWidget(obj)  # This will remove from right-click menu, but won't actually delete it! ( still under mainWindow.children() )
-                        # Delete it for good
 
                         obj.setParent(None)
                         obj.deleteLater()
