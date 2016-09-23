@@ -145,7 +145,7 @@ class about(QtWidgets.QDialog):
         self.logo_label.setPixmap(logo.scaled(250,56))         
         self.logo_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.version_label = QtWidgets.QLabel("<b>V 1.0.2</b>")
+        self.version_label = QtWidgets.QLabel("<b>V 1.0.3</b>")
         self.version_label.setAlignment(QtCore.Qt.AlignCenter)
         
         self.title_label = QtWidgets.QLabel("<b>A SIMPLE PROJECTS MANAGER FOR MAYA</b>")

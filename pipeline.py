@@ -54,17 +54,24 @@ import os
 from modules.Qt import QtGui, QtWidgets, QtCore, QtCompat
 
 # from PySide2 import QtGui, QtWidgets, QtCore
+import logging
 
 try:
 
     import pysideuic
     from shiboken import wrapInstance
+
+    logging.Logger.manager.loggerDict["pysideuic.uiparser"].setLevel(logging.CRITICAL)
+    logging.Logger.manager.loggerDict["pysideuic.properties"].setLevel(logging.CRITICAL)
+
+
 except ImportError:
 
     import pyside2uic as pysideuic
     from shiboken2 import wrapInstance
 
-
+    logging.Logger.manager.loggerDict["pyside2uic.uiparser"].setLevel(logging.CRITICAL)
+    logging.Logger.manager.loggerDict["pyside2uic.properties"].setLevel(logging.CRITICAL)
 
 
 import xml.etree.ElementTree as xml
@@ -79,7 +86,7 @@ import warnings
 import time
 from timeit import default_timer as timer
 import collections
-import logging
+
 import webbrowser
 import glob
 import sys
@@ -117,7 +124,6 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 log.handlers[:] = [hdlr]
 log.setLevel(logging.DEBUG)
-log.info(os.path.realpath(__file__))
 
 def general_log():
     if 'UiWindow' in globals():
@@ -277,7 +283,7 @@ projects_form_class, projects_base_class = loadUiType(projects_uiFile)
 create_edit_project_uiFile = os.path.join(os.path.dirname(__file__), 'ui', 'pipeline_create_edit_project_UI.ui')
 create_edit_project_form_class, create_edit_project_base_class = loadUiType(create_edit_project_uiFile)
 
-version = '1.0.3'
+__version__ = '1.0.3'
 
 
 def set_icons():
@@ -2426,8 +2432,8 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         
-        global version
-        self.setWindowTitle("Pipeline - %s"%(version))
+        # global version
+        self.setWindowTitle("Pipeline - %s"%(__version__))
 
               
         
@@ -2636,7 +2642,7 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.toggle_scene_open_script()  
               
         end_time = timer()    
-        log.info( "loaded in: %s"%(round((end_time - start_time),2)) )
+        # log.info( "loaded in: %s"%(round((end_time - start_time),2)) )
         self.ui.projects_tooltip_label.setHidden(True)
         # track.event(name = "PipelineUI_init", maya_version = maya.maya_version(), pipeline_version = version, startup_time = round((end_time - start_time),2))
         
@@ -5535,7 +5541,7 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
             cmds.workspaceControl(workspaceControlName, e=True, ttc=["AttributeEditor",-1], wp="preferred")
             self.raise_()
             self.setDockableParameters(width=420)
-            self.setMaximumWidth(600)
+
 
         def run2016():
             self.setObjectName("pipelineMainWindow")
@@ -6262,5 +6268,7 @@ def show():
     global UiWindow
     UiWindow=pipeLineUI(parent=maya_main_window())
     UiWindow.run()
-    
+
+    log.info("Successfully loaded Pipeline V{}".format(__version__))
+
     return UiWindow
