@@ -2683,7 +2683,9 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
         self.ui.import_shot_version_pushButton.setIcon(QtGui.QIcon(import_icon))
         self.ui.export_shot_pushButton.setIcon(QtGui.QIcon(export_icon))
         self.ui.playblast_shot_pushButton.setIcon(QtGui.QIcon(camrea_icon))
-                
+
+        self.ui.export_shot_pushButton.setHidden(True)
+
         self.ui.comp_icon_label.setPixmap(new_icon.scaled(16,16))
         self.ui.comp_user_label.setPixmap(users_icon.scaled(16,16))
         self.ui.comp_note_label.setPixmap(edit_icon.scaled(16,16))        
@@ -5538,8 +5540,9 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
             workspaceControlName = self.objectName() + 'WorkspaceControl'
             self.deleteControl(workspaceControlName)
             self.show(dockable=True, area='right', floating=False )
-            cmds.workspaceControl(workspaceControlName, e=True, ttc=["AttributeEditor",-1], wp="preferred")
+            cmds.workspaceControl(workspaceControlName, e=True, ttc=["AttributeEditor",-1], wp="preferred", mw=420)
             self.raise_()
+            self.setMinimumWidth(420)
             self.setDockableParameters(width=420)
 
 
