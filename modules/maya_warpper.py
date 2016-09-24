@@ -247,8 +247,16 @@ def playblast(path = None,format = None, compression = None, hud = None, offscre
             end  = cmds.playbackOptions( q=True,max=True )
             range = [start, end]
  	
-    cmds.playblast(startTime =range[0] ,endTime =range[1], f = path, fmt=format,  orn=hud, os=offscreen, wh = scene_resolution(), p=scale, qlt=90,c=compression, v=True) 
+    cmds.playblast(startTime =range[0] ,endTime =range[1], f = path, fmt=format,  orn=hud, os=offscreen, wh = scene_resolution(), p=scale, qlt=90,c=compression, v=True, s = qeury_active_sound_node())
 
+
+def qeury_active_sound_node():
+    aPlayBackSliderPython = mel.eval('$tmpVar=$gPlayBackSlider')
+    sound = cmds.timeControl(aPlayBackSliderPython, q=1, s=1)
+    if sound:
+        return sound
+    else:
+        return None
 
 def playback_selection_range():
     aPlayBackSliderPython = mel.eval('$tmpVar=$gPlayBackSlider')
