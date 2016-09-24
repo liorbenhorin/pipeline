@@ -34,6 +34,8 @@ Manage all you projects without leaving Maya.
 **Version - 1.0.3 - Beta**
 
 * Pipeline is compatible with Maya 2017 Win/OSX
+* Removed dummy button 'Export' for now
+* Playblasts will now record sound
 
 **Version - 1.0.2 - Beta**
 
