@@ -136,7 +136,9 @@
 
       <a id="version"></a>
       <h2 class="page-header">Version history</h2>
-      <p>1.0.2 - BETA - Free for educational and non commercial use!</p>
+      <p>1.0.3 - BETA</p>
+      <ul><li>Pipeline is compatible with Maya 2017 Win/OSX</li></ul>
+      <p>1.0.2 - BETA</p>
       <p>New features</p>
       <ul>
       <li>Toggle component masters from showing in the assets bank in the scenes mode (helps keep things clean).</li>
@@ -158,14 +160,14 @@
       <li>Not setting the project correctly in some cases on a windows machines.</li>
       </ul>
       <br>
-      <p>1.0.0 - BETA - Free for educational and non commercial use!</p>
+      <p>1.0.0 - BETA</p>
       <p>Like any program, it can have some bugs and glitchs,<br>so it's always a good idea to backup your work.<br>
       During the Beta stage Pipeline is collecting usage statistics.</p>
 
       <a id="compatibility"></a>
       <h2 class="page-header">Compatibility</h2>
       <p>OSX / Windows<br>
-      Maya 2015, 2016, 2016 Ext 2<br>
+      Maya 2015, 2016, 2016 Ext 2, 2017<br>
       Earlier Versions have not been tested.<br>
       Sorry, Maya 2017 for now is not supported.</p>
 
@@ -175,6 +177,15 @@
       <p>
       <pre>from pipeline import pipeline
 pipeline.show()</pre>
+      </p>
+      <p> If you want to run pipeline from different location then Maya's scripts folder, use this code insted
+        <pre>
+pth = '/Path/to/pipeline/directory'
+if not pth in sys.path:
+    sys.path.append(pth)
+
+from pipeline import pipeline
+    pipeline.show() </pre>
       </p>
 
       <h2 class="page-header">Getting started</h4>
