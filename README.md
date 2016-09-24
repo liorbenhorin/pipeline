@@ -31,6 +31,10 @@ Manage all you projects without leaving Maya.
 
 **TBA - 1.0.0 - First stable version**
 
+**Version - 1.0.3 - Beta**
+
+* Pipeline is compatible with Maya 2017 Win/OSX
+
 **Version - 1.0.2 - Beta**
 
 *New features*
@@ -62,8 +66,8 @@ During the Beta stage Pipeline is collecting usage statistics.
 
 #Compatibility
 
-OSX / Windows / linux
-Maya 2015, 2016, 2016 Ext 2
+OSX / Windows
+Maya 2015, 2016, 2016 Ext 2, 2017
 Earlier Versions have not been tested.
 
 #Installation
