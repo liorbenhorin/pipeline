@@ -5592,8 +5592,8 @@ class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
             maya.kill_scriptjob(self.open_scene_script)
             self.open_scene_script = None
             return False
-        
-        self.open_scene_script  = maya.open_scene_script("MayaWindow|pipelineMainWindow", self.scen_opened)
+        # workspaceControlName = self.objectName() + 'WorkspaceControl'
+        self.open_scene_script  = maya.open_scene_script("{}".format(self.objectName()), self.scen_opened) #MayaWindow|
         return True
     
     def send_bug_reports(self):
