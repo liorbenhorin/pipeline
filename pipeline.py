@@ -78,8 +78,8 @@ import xml.etree.ElementTree as xml
 from cStringIO import StringIO
 import pymel.core as pm
 import maya.mel as mel
-from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
-from maya.app.general.mayaMixin import MayaQDockWidget
+# from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
+# from maya.app.general.mayaMixin import MayaQDockWidget
 from maya.OpenMayaUI import MQtUtil
 import operator
 import warnings
@@ -2414,8 +2414,30 @@ class pipeline_settings(pipeline_data):
         log.info(self.data_file.print_nice())        
         log.info("end logging settings")
 
-#@exceptions_handler(try_execpt) 
-class pipeLineUI( MayaQWidgetDockableMixin, QtWidgets.QMainWindow):
+#@exceptions_handler(try_execpt)
+
+def BaseClass_by_version():
+    bases = [QtWidgets.QMainWindow]
+
+    if maya.maya_api_version() < 201700:
+
+        from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
+        class Mixin(MayaQWidgetDockableMixin, object): pass
+
+    elif maya.maya_api_version() > 201400:
+        from mayaMixin import MayaQWidgetDockableMixin
+        class Mixin(MayaQWidgetDockableMixin, object): pass
+
+    else:
+        import pipeline.libs.mayaMixin as mixin
+        class Mixin(mixin.MayaQWidgetDockableMixin, object): pass
+
+    bases.insert(0, Mixin)
+
+    return type('BuildBase', tuple(bases), {})
+
+
+class pipeLineUI( BaseClass_by_version()):
 
     def __init__(self, parent=None):
 

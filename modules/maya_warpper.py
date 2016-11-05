@@ -318,6 +318,9 @@ def new_scene_from_selection(project_path = None, mode = "include"):
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
+def maya_api_version():
+    return int(cmds.about(api=True))
+
 
 def maya_version():
     return cmds.about(version=True)
