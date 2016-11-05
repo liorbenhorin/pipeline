@@ -2417,20 +2417,23 @@ class pipeline_settings(pipeline_data):
 #@exceptions_handler(try_execpt)
 
 def BaseClass_by_version():
+    # logging.info(maya.maya_api_version())
     bases = [QtWidgets.QMainWindow]
 
-    if maya.maya_api_version() < 201700:
-
+    if maya.maya_api_version() < 201700 and maya.maya_api_version() > 201400:
+        logging.info("building UI for maya version 2015-2016")
         from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
         class Mixin(MayaQWidgetDockableMixin, object): pass
 
-    elif maya.maya_api_version() > 201400:
+    elif maya.maya_api_version() <= 201400:
+        logging.info("building UI for maya version 2014")
         from mayaMixin import MayaQWidgetDockableMixin
         class Mixin(MayaQWidgetDockableMixin, object): pass
 
-    else:
-        import pipeline.libs.mayaMixin as mixin
-        class Mixin(mixin.MayaQWidgetDockableMixin, object): pass
+    elif maya.maya_api_version() >= 201700:
+        logging.info("building UI for maya version 2017")
+        from mayaMixin2017 import MayaQWidgetDockableMixin
+        class Mixin(MayaQWidgetDockableMixin, object): pass
 
     bases.insert(0, Mixin)
 
@@ -5561,11 +5564,25 @@ class pipeLineUI( BaseClass_by_version()):
             self.setObjectName("pipelineMainWindow")
             workspaceControlName = self.objectName() + 'WorkspaceControl'
             self.deleteControl(workspaceControlName)
-            self.show(dockable=True, area='right', floating=False )
-            cmds.workspaceControl(workspaceControlName, e=True, ttc=["AttributeEditor",-1], wp="preferred", mw=420)
-            self.raise_()
             self.setMinimumWidth(420)
-            self.setDockableParameters(width=420)
+            # self.show(dockable=True, area='right', iw=350, mw=True, floating=False, wp="preferred")
+
+            self.show(dockable=True, area='right', iw=420, mw=True, floating=False, wp="preferred")
+            # cmds.workspaceControl(workspaceControlName, e=True, ttc=["AttributeEditor", -1], wp="preferred", mw=350)
+            # self.setMinimumWidth(400)
+            # self.setDockableParameters(dockable=True, width=400, area="right")
+            # cmds.workspaceControl(workspaceControlName, e=True, dtm=["right", True], wp="preferred", iw=300,  mw=True)
+            # self.show(dockable=True, area='right', floating=False)
+            self.raise_()
+
+            # self.setObjectName("pipelineMainWindow")
+            # workspaceControlName = self.objectName() + 'WorkspaceControl'
+            # self.deleteControl(workspaceControlName)
+            # self.show(dockable=True, area='right', floating=False )
+            # cmds.workspaceControl(workspaceControlName, e=True, ttc=["AttributeEditor",-1], wp="preferred", mw=420)
+            # self.raise_()
+            # self.setMinimumWidth(420)
+            # self.setDockableParameters(width=420)
 
 
         def run2016():
